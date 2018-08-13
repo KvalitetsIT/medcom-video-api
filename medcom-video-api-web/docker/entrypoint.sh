@@ -14,9 +14,9 @@ else
 	fi
 fi
 
-if [[ -z $SERVER_PORT ]]; then
-  echo "Default SERVER_PORT = 8080"
-  export SERVER_PORT=8080
+if [[ -z $server_port ]]; then
+  echo "Default server_port = 8080"
+  export server_port=8080
 fi
 
 if [[ -z $LOG_LEVEL ]]; then
@@ -27,6 +27,11 @@ fi
 if [[ -z $CORRELATION_ID ]]; then
   echo "Default CORRELATION_ID = correlation-id"
   export CORRELATION_ID=correlation-id
+fi
+
+if [[ -z $logging_config ]]; then
+  echo "Default logging_config=/app/logback-spring.xml"
+  export logging_config="/app/logback-spring.xml"
 fi
 
 envsubst < /configtemplates/logback.xml > /app/logback-spring.xml
