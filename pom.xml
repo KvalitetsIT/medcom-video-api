@@ -24,7 +24,6 @@
 		</dependency>
 	</dependencies>
 	<build>
-	
 		<finalName>${artifactId}</finalName>
 		<plugins>
 			<plugin>
@@ -115,5 +114,6 @@
 		<module>medcom-video-api-interface</module>
 		<module>medcom-video-api-service</module>
 		<module>medcom-video-api-web</module>
+		<module>medcom-video-api-test</module>
 	</modules>
 </project>
