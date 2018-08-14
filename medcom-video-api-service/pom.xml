@@ -9,6 +9,12 @@
 	<artifactId>medcom-video-api-service</artifactId>
 	<dependencies>
 		<dependency>
+			<groupId>dk.medcom.video.api</groupId>
+			<artifactId>medcom-video-api-interface</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- Spring for web -->
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
@@ -16,10 +22,25 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- Database -->
 		<dependency>
-			<groupId>dk.medcom.video.api</groupId>
-			<artifactId>medcom-video-api-interface</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>5.1.4</version>
+		</dependency>
+		<!-- Test -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<version>1.8.3</version>
 		</dependency>
 	</dependencies>
 </project>
