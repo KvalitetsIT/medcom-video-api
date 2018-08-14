@@ -2,6 +2,8 @@ package dk.medcom.video.api.repository;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -54,7 +56,9 @@ public class MeetingRepositoryTest {
 		
 		if (!testDataInitialised) {
 			Statement statement = dataSource.getConnection().createStatement();
-			statement.execute("INSERT INTO meetings (id, subject) VALUES (1, 'TestMeeting-xyz')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (2, uuid(), 'MyMeeting', 'another-test-org')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org')");
 			testDataInitialised = true;
 		}
 	}
@@ -63,8 +67,11 @@ public class MeetingRepositoryTest {
 	public void testCreateMeeting() {
 		
 		// Given
+		String uuid = UUID.randomUUID().toString();
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
+		meeting.setUuid(uuid);
+		meeting.setOrganisationId("Den Sjove Afdeling A/S");
 		
 		// When
 		meeting = subject.save(meeting);
@@ -72,6 +79,7 @@ public class MeetingRepositoryTest {
 		// Then
 		Assert.assertNotNull(meeting);
 		Assert.assertNotNull(meeting.getId());
+		Assert.assertEquals(uuid,  meeting.getUuid());
 	}
 	
 	@Test
@@ -84,14 +92,11 @@ public class MeetingRepositoryTest {
 		// Then
 		Assert.assertNotNull(meetings);
 		int numberOfMeetings = 0;
-		Meeting lastMeeting = null;
 		for (Meeting meeting : meetings) {
 			Assert.assertNotNull(meeting);
-			lastMeeting = meeting;
 			numberOfMeetings++;
 		}
-		Assert.assertEquals(1, numberOfMeetings);
-		Assert.assertEquals("TestMeeting-xyz", lastMeeting.getSubject());
+		Assert.assertEquals(3, numberOfMeetings);
 	}
 	
 	@Test
@@ -106,5 +111,73 @@ public class MeetingRepositoryTest {
 		Assert.assertNotNull(meeting);
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
+		Assert.assertEquals("test-org", meeting.getOrganisationId());
 	}
+
+	@Test
+	public void testFindMeetingWithNonExistingId() {
+		// Given
+		Long id = new Long(1999);
+		
+		// When
+		Meeting meeting = subject.findOne(id);
+		
+		// Then
+		Assert.assertNull(meeting);
+	}
+
+	@Test
+	public void testFindMeetingWithExistingUuid() {
+		// Given
+		String exitstingUUid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
+		
+		// When
+		Meeting meeting = subject.findOneByUuid(exitstingUUid);
+		
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertEquals(new Long(3), meeting.getId());
+		Assert.assertEquals(exitstingUUid, meeting.getUuid());
+		Assert.assertEquals("TestMeeting-123", meeting.getSubject());
+		Assert.assertEquals("test-org", meeting.getOrganisationId());
+	}
+
+	@Test
+	public void testFindMeetingWithNonExistingUuid() {
+		// Given
+		String nonExitstingUUid = "xxxxx";
+		
+		// When
+		Meeting meeting = subject.findOneByUuid(nonExitstingUUid);
+		
+		// Then
+		Assert.assertNull(meeting);
+	}
+
+	@Test
+	public void testFindMeetingByExistingOrganisationId() {
+		// Given
+		String existingOrg = "test-org";
+		
+		// When
+		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
+		
+		// Then
+		Assert.assertNotNull(meetings);
+		Assert.assertEquals(2, meetings.size());
+	}
+	
+	@Test
+	public void testFindMeetingByNonExistingOrganisationId() {
+		// Given
+		String existingOrg = "nonexisting-org";
+		
+		// When
+		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
+		
+		// Then
+		Assert.assertNotNull(meetings);
+		Assert.assertEquals(0, meetings.size());
+	}
+
 }

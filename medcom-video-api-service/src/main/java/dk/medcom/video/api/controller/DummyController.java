@@ -8,7 +8,6 @@ import dk.medcom.video.api.dto.DummyDto;
 @RestController
 public class DummyController {
 
-	
 	@RequestMapping(value = "/dummies")
 	public DummyDto[] getDummies() {
 		

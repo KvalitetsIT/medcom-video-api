@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
 
 @Configuration
-@ComponentScan("dk.medcom.video.api.controller")
+@ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller"})
 public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
