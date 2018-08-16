@@ -2,9 +2,10 @@ package dk.medcom.video.api.context;
 
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,9 +20,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class WspUserContext extends RestTemplate implements UserContext {
 
-	@Value("${userservice.session.id}")
+	private static Logger LOGGER = LoggerFactory.getLogger(WspUserContext.class);
+
+	@Value("${SESSION.ID:SESSION}")
 	private String sessionId;
-	
+
 	@Value("${userservice.url}")
 	private String userServiceUrl;
 
@@ -30,10 +33,22 @@ public class WspUserContext extends RestTemplate implements UserContext {
 
 	@Override
 	public String getUserOrganisation() {
-		SessionData sessionData = getSessionData();
-		List<String> orgs = sessionData.getUserAttributes().get(userServiceTokenAttributeOrganisation);
-		return orgs.get(0);
+		return getUserAttribute(userServiceTokenAttributeOrganisation);
 	}
+	
+	public String getUserAttribute(String attributeName) {
+		SessionData sessionData = getSessionData();
+		if (sessionData != null) {
+			List<String> orgs = sessionData.getUserAttributes().get(attributeName);
+			if (orgs != null && orgs.size() > 0) {
+				return orgs.get(0);
+			} else {
+				LOGGER.error("no attribute with key:"+attributeName);
+			}
+		}
+		return null;
+	}
+
 
 	public SessionData getSessionData() {
 		HttpHeaders headers = new HttpHeaders();
@@ -43,19 +58,13 @@ public class WspUserContext extends RestTemplate implements UserContext {
 		if (response.getStatusCode().equals(HttpStatus.OK)) {
 			return response.getBody();
 		} else {
+			LOGGER.error("return code from getsessiondata:"+response.getStatusCodeValue());
 			return null;
 		}
 	}		
 
 	private String getSessionId() {
 		HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		if (servletRequest.getCookies() != null) {
-			for (Cookie c : servletRequest.getCookies()) {
-				if (c.getName().equals(sessionId)) {
-					return c.getValue();
-				}
-			}   		
-		}
-		return "";
+		return servletRequest.getHeader(sessionId);
 	}
 }

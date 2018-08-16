@@ -14,9 +14,19 @@ else
 	fi
 fi
 
-if [[ -z $server_port ]]; then
-  echo "Default server_port = 8080"
-  export server_port=8080
+if [[ -z $CONTEXT ]]; then
+	echo "Using default context: /"
+	export SERVER_SERVLET_CONTEXT_PATH=/
+else
+	echo "Using context: $CONTEXT"
+	export SERVER_CONTEXT_PATH=$CONTEXT
+	export SERVER_SERVLET_CONTEXT_PATH=$CONTEXT
+fi
+
+if [[ -z $SERVER_PORT ]]; then
+	echo "Using default port (8080)"
+else
+	export server_port=$SERVER_PORT
 fi
 
 if [[ -z $LOG_LEVEL ]]; then

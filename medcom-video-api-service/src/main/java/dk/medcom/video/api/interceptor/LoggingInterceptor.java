@@ -16,7 +16,7 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
 	public static final String MDC_CORRELATION_ID = "correlation-id";
 	public static final String MDC_REQUEST_URL = "request-url";
 	
-	@Value("${correlationid.httpheader.name}")
+	@Value("${CORRELATION.ID:correlation-id}")
 	private String correlationIdHeaderName;
 	
 	@Override

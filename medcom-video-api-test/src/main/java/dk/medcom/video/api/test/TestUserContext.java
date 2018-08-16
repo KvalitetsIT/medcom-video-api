@@ -9,6 +9,6 @@ public class TestUserContext implements UserContext {
 
 	@Override
 	public String getUserOrganisation() {
-		return "kit";
+		return "kvak";
 	}
 }
