@@ -14,4 +14,13 @@ public class SessionData {
 	public void setUserAttributes(Map<String, List<String>> userAttributes) {
 		UserAttributes = userAttributes;
 	}
+	
+	public String getUserAttribute(String userAttribute) {
+		if (UserAttributes != null && UserAttributes.containsKey(userAttribute)) {
+			if (UserAttributes.get(userAttribute).size() > 0) {
+				return UserAttributes.get(userAttribute).get(0);
+			}
+		}
+		return null;
+	}
 }

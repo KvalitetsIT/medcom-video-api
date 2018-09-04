@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
@@ -20,11 +20,11 @@ public class MeetingService {
 	MeetingRepository meetingRepository;
 	
 	@Autowired
-	UserContext userService;
+	UserContextService userService;
 	
 	public List<Meeting> getMeetings() {
 		
-		return meetingRepository.findByOrganisationId(userService.getUserOrganisation());
+		return meetingRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
 	}
 
 	public Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
@@ -32,7 +32,7 @@ public class MeetingService {
 		if (meeting == null) {
 			throw new RessourceNotFoundException("meeting", "uuid");
 		}
-		if (!meeting.getOrganisationId().equals(userService.getUserOrganisation())) {
+		if (!meeting.getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
 			throw new PermissionDeniedException();
 		}
 		return meeting;
@@ -48,7 +48,7 @@ public class MeetingService {
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		meeting.setUuid(UUID.randomUUID().toString());
-		meeting.setOrganisationId(userService.getUserOrganisation());
+		meeting.setOrganisationId(userService.getUserContext().getUserOrganisation());
 		return meeting;
 	}
 }

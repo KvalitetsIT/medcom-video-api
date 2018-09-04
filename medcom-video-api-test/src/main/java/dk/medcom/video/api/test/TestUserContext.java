@@ -3,12 +3,15 @@ package dk.medcom.video.api.test;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextFactory;
+import dk.medcom.video.api.context.UserContextImpl;
 
 @Component
-public class TestUserContext implements UserContext {
+public class TestUserContext implements UserContextFactory {
 
 	@Override
-	public String getUserOrganisation() {
-		return "kvak";
+	public UserContext getUserContext() {
+		return new UserContextImpl("kvak");
 	}
+
 }
