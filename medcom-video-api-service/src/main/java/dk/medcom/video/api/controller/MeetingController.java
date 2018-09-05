@@ -13,15 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser; //TODO - include?
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
 import dk.medcom.video.api.service.MeetingService;
+import dk.medcom.video.api.service.MeetingUserService; //TODO - include?
 
 @RestController
 public class MeetingController {
 
 	@Autowired
 	MeetingService meetingService;
+	
+	@Autowired
+	MeetingUserService meetingUserService; //TODO: her?
 
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
 	public MeetingDto[] getMeetings() {
@@ -43,6 +48,12 @@ public class MeetingController {
 
 	@RequestMapping(value = "/meeting", method = RequestMethod.POST)
 	public MeetingDto createMeeting(@RequestBody CreateMeetingDto createMeetingDto) {
+		//***********************************************************************
+		//TODO: hvor skal det laves?
+		//TODO: skal dto objecgt med ned for meeting user?
+		MeetingUser meetingUser = meetingUserService.createMeetingUser();
+		//TODO: inkluder meetinguser i create, eller sæt på efterfølgende?
+		
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		return convert(meeting);
 	}

@@ -13,11 +13,13 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import dk.medcom.video.api.repository.MeetingRepository;
+import dk.medcom.video.api.repository.MeetingUserRepository;
 
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
-@EnableJpaRepositories(basePackageClasses = MeetingRepository.class)
+//@EnableJpaRepositories(basePackageClasses = MeetingRepository.class)
+@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
 public class DatabaseConfiguration {

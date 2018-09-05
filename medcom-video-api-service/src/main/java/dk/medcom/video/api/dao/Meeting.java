@@ -1,9 +1,12 @@
+//TODO: hvordan navngives? createdby eller meetingUser
 package dk.medcom.video.api.dao;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn; // ok?
+import javax.persistence.ManyToOne; // ok?
 import javax.persistence.Table;
 
 @Entity
@@ -19,6 +22,10 @@ public class Meeting {
 	private String subject;
 	
 	private String organisationId;
+
+	@ManyToOne
+    @JoinColumn(name="created_by")
+	private MeetingUser createdBy; // ok?
 	
 	public Long getId() {
 		return id;
@@ -51,4 +58,14 @@ public class Meeting {
 	public void setOrganisationId(String organisationId) {
 		this.organisationId = organisationId;
 	}
+
+	
+	public MeetingUser getMeetingUser() {
+		return createdBy;
+	}
+
+	public void setMeetingUser(MeetingUser meetingUser) {
+		this.createdBy = meetingUser;
+	}
+	//TODO: hvordan testet det?
 }
