@@ -1,7 +1,5 @@
 package dk.medcom.video.api.context;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -18,7 +16,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
-public class WspUserContext extends RestTemplate implements UserContext {
+public class WspUserContext extends RestTemplate implements UserContextFactory {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(WspUserContext.class);
 
@@ -32,23 +30,11 @@ public class WspUserContext extends RestTemplate implements UserContext {
 	private String userServiceTokenAttributeOrganisation;
 
 	@Override
-	public String getUserOrganisation() {
-		return getUserAttribute(userServiceTokenAttributeOrganisation);
-	}
-	
-	public String getUserAttribute(String attributeName) {
+	public UserContext getUserContext() {
 		SessionData sessionData = getSessionData();
-		if (sessionData != null) {
-			List<String> orgs = sessionData.getUserAttributes().get(attributeName);
-			if (orgs != null && orgs.size() > 0) {
-				return orgs.get(0);
-			} else {
-				LOGGER.error("no attribute with key:"+attributeName);
-			}
-		}
-		return null;
+		String organisationId = sessionData.getUserAttribute(userServiceTokenAttributeOrganisation);
+		return new UserContextImpl(organisationId);
 	}
-
 
 	public SessionData getSessionData() {
 		HttpHeaders headers = new HttpHeaders();

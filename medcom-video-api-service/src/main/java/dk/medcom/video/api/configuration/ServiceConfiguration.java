@@ -5,9 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
 
 @Configuration
@@ -28,4 +33,10 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 		return new LoggingInterceptor();
 	}
 
+	@Bean
+	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
+	public UserContextService userContextService() {
+		UserContextServiceImpl ucs = new UserContextServiceImpl();
+		return ucs;
+	}
 }
