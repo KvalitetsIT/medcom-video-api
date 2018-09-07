@@ -26,14 +26,19 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	@Value("${userservice.url}")
 	private String userServiceUrl;
 
-	@Value("${userservice.token.attribute.organisation}")
+	@Value("${userservice.token.attribute.organisation}")  //TODO Lene: SPØRGSMÅL: hvor var det det var?
 	private String userServiceTokenAttributeOrganisation;
+	
+	@Value("${userservice.token.attribute.email}")
+	private String userServiceTokenAttributeEmail;
+	
 
 	@Override
 	public UserContext getUserContext() {
 		SessionData sessionData = getSessionData();
 		String organisationId = sessionData.getUserAttribute(userServiceTokenAttributeOrganisation);
-		return new UserContextImpl(organisationId);
+		String email = sessionData.getUserAttribute(userServiceTokenAttributeEmail);
+		return new UserContextImpl(organisationId, email);
 	}
 
 	public SessionData getSessionData() {

@@ -7,8 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "meeting_users")
-public class MeetingUser {
+@Table(name = "organisation")
+public class Organisation {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -16,7 +16,7 @@ public class MeetingUser {
 
 	private String organisationId;
 	
-	private String email;
+	private String name;
 	
 	public Long getId() {
 		return id;
@@ -33,11 +33,13 @@ public class MeetingUser {
 	public void setOrganisationId(String organisationId) {
 		this.organisationId = organisationId;
 	}
-	public String getEmail() {
-		return email;
+	
+	public String getName() {
+		return name;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setName(String name) {
+		this.name = name;
 	}
+
 }

@@ -1,5 +1,7 @@
 package dk.medcom.video.api.service;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +14,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
+import dk.medcom.video.api.repository.MeetingUserRepository;
 
 @Component
 public class MeetingService {
@@ -20,7 +23,13 @@ public class MeetingService {
 	MeetingRepository meetingRepository;
 	
 	@Autowired
+	MeetingUserRepository meetingUserRepository;
+	
+	@Autowired
 	UserContextService userService;
+	
+	@Autowired
+	MeetingUserService meetingUserService;
 	
 	public List<Meeting> getMeetings() {
 		
@@ -40,6 +49,8 @@ public class MeetingService {
 
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) {
 		Meeting meeting = convert(createMeetingDto);
+		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		
 		meeting = meetingRepository.save(meeting);
 		return meeting;
 	}
@@ -49,6 +60,16 @@ public class MeetingService {
 		meeting.setSubject(createMeetingDto.getSubject());
 		meeting.setUuid(UUID.randomUUID().toString());
 		meeting.setOrganisationId(userService.getUserContext().getUserOrganisation());
+		
+		//TODO Lene: MANGEL: remopve again
+	    //Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
+		//this.endTime = calendar.getTime();
+		//meeting.setStartTime(calendar.getTime());
+		
+		meeting.setStartTime(createMeetingDto.getStartTime());
+		meeting.setEndTime(createMeetingDto.getEndTime());
+		meeting.setDescription(createMeetingDto.getDescription());
+	
 		return meeting;
 	}
 }

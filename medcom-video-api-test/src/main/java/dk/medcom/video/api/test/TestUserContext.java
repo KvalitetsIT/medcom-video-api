@@ -11,7 +11,7 @@ public class TestUserContext implements UserContextFactory {
 
 	@Override
 	public UserContext getUserContext() {
-		return new UserContextImpl("kvak");
+		return new UserContextImpl("kvak", "me2@me.dk");
 	}
-
+	
 }

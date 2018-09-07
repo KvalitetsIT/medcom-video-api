@@ -69,11 +69,9 @@ public class MeetingUserRepositoryTest {
 	public void testCreateMeetingUser() {
 		
 		// Given
-		//    String uuid = UUID.randomUUID().toString();
 	    String organisationId = "you firma 1";
 	    String email = "you@you.dk";
 		MeetingUser meetingUser = new MeetingUser();
-		//   meeting.setUuid(uuid);
 		meetingUser.setOrganisationId(organisationId);
 		meetingUser.setEmail(email);
 		
@@ -88,24 +86,6 @@ public class MeetingUserRepositoryTest {
 		//Assert.assertEquals(uuid,  meeting.getUuid());
 	}
 	
-//	@Test
-//	public void testFindAllMeetings() {
-//		// Given
-//		
-//		// When
-//		Iterable<Meeting> meetings = subject.findAll();
-//		
-//		// Then
-//		Assert.assertNotNull(meetings);
-//		int numberOfMeetings = 0;
-//		for (Meeting meeting : meetings) {
-//			Assert.assertNotNull(meeting);
-//			numberOfMeetings++;
-//		}
-//		Assert.assertEquals(3, numberOfMeetings);
-//	}
-
-
 	@Test
 	public void testFindMeetingUserWithExistingId() {
 		// Given
@@ -148,8 +128,6 @@ public class MeetingUserRepositoryTest {
 		Assert.assertEquals(new Long(2), meetingUser.getId());
 		Assert.assertEquals(existingOrganisation, meetingUser.getOrganisationId());
 		Assert.assertEquals(existingEmail, meetingUser.getEmail());
-		//Assert.assertEquals("TestMeeting-123", meeting.getSubject());
-		//Assert.assertEquals("test-org", meeting.getOrganisationId());
 	}
 
 	@Test
@@ -165,30 +143,5 @@ public class MeetingUserRepositoryTest {
 		Assert.assertNull(meetingUser);
 	}
 
-//	@Test
-//	public void testFindMeetingByExistingOrganisationId() {
-//		// Given
-//		String existingOrg = "test-org";
-//		
-//		// When
-//		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
-//		
-//		// Then
-//		Assert.assertNotNull(meetings);
-//		Assert.assertEquals(2, meetings.size());
-//	}
-	
-//	@Test
-//	public void testFindMeetingByNonExistingOrganisationId() {
-//		// Given
-//		String existingOrg = "nonexisting-org";
-//		
-//		// When
-//		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
-//		
-//		// Then
-//		Assert.assertNotNull(meetings);
-//		Assert.assertEquals(0, meetings.size());
-//	}
 
 }

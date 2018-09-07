@@ -2,6 +2,9 @@ package dk.medcom.video.api.repository;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +28,7 @@ import org.testcontainers.containers.MySQLContainer;
 import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @PropertySource("test.properties")
@@ -39,6 +43,9 @@ public class MeetingRepositoryTest {
 
 	@Resource
     private MeetingRepository subject;
+	
+	@Resource
+    private MeetingUserRepository subject2;
 
 	@Autowired
 	private DataSource dataSource;
@@ -53,12 +60,16 @@ public class MeetingRepositoryTest {
 	
 	@Before
 	public void setupTestData() throws SQLException {
-		
+
 		if (!testDataInitialised) {
 			Statement statement = dataSource.getConnection().createStatement();
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (2, uuid(), 'MyMeeting', 'another-test-org')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (1,  'test-org', 'me@me1.dk')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (2,  'another-test-org', 'me@me2.dk')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (3,  'test-org', 'me@me3.dk')");
+			
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 1, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 2, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 1,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3')");
 			testDataInitialised = true;
 		}
 	}
@@ -68,11 +79,23 @@ public class MeetingRepositoryTest {
 		
 		// Given
 		String uuid = UUID.randomUUID().toString();
+		Long meetingUserId = new Long(1);
+		
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
 		meeting.setUuid(uuid);
 		meeting.setOrganisationId("Den Sjove Afdeling A/S");
 		
+		MeetingUser meetingUser = subject2.findOne(meetingUserId);
+	    meeting.setMeetingUser(meetingUser);
+	    
+	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
+	    meeting.setStartTime(calendar.getTime());
+	    
+	    calendar.set(Calendar.HOUR_OF_DAY, 14);
+	    meeting.setEndTime(calendar.getTime());
+	    meeting.setDescription("Lang beskrivelse af, hvad der foregår");
+	    		
 		// When
 		meeting = subject.save(meeting);
 		
@@ -103,6 +126,9 @@ public class MeetingRepositoryTest {
 	public void testFindMeetingWithExistingId() {
 		// Given
 		Long id = new Long(1);
+//		TODO Lene: MANGEL remove code
+//		Calendar calendarStart = new GregorianCalendar(2018,10,02,15,00,00);
+//		Calendar calendarEnd = new GregorianCalendar(2018,10,02,16,00,00);
 		
 		// When
 		Meeting meeting = subject.findOne(id);
@@ -112,6 +138,12 @@ public class MeetingRepositoryTest {
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
 		Assert.assertEquals("test-org", meeting.getOrganisationId());
+		
+		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' TODO Lene: SPØRGSMÅL: hvordan laves dato unit test lettest?
+		//calendarStart.getTime().compareTo(meeting.getStartTime());
+
+		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
+
 	}
 
 	@Test
@@ -178,6 +210,41 @@ public class MeetingRepositoryTest {
 		// Then
 		Assert.assertNotNull(meetings);
 		Assert.assertEquals(0, meetings.size());
+	}
+	
+	@Test
+	public void testGetMeetingUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long meetingUserId = new Long(1);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+
+	}
+
+	@Test
+	public void testSetMeetingUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long meetingUserId = new Long(3);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+	    MeetingUser meetingUser = subject2.findOne(meetingUserId);
+	    meeting.setMeetingUser(meetingUser);	    
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertNotNull(meetingUser);
+		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+	
 	}
 
 }

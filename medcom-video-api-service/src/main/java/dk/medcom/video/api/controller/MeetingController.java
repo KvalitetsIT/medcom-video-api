@@ -3,6 +3,8 @@ package dk.medcom.video.api.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingUser; //TODO - include?
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
+import dk.medcom.video.api.dto.MeetingUserDto;
 import dk.medcom.video.api.service.MeetingService;
-import dk.medcom.video.api.service.MeetingUserService; //TODO - include?
 
 @RestController
 public class MeetingController {
@@ -25,9 +26,6 @@ public class MeetingController {
 	@Autowired
 	MeetingService meetingService;
 	
-	@Autowired
-	MeetingUserService meetingUserService; //TODO: her?
-
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
 	public MeetingDto[] getMeetings() {
 
@@ -47,13 +45,8 @@ public class MeetingController {
 	}
 
 	@RequestMapping(value = "/meeting", method = RequestMethod.POST)
-	public MeetingDto createMeeting(@RequestBody CreateMeetingDto createMeetingDto) {
-		//***********************************************************************
-		//TODO: hvor skal det laves?
-		//TODO: skal dto objecgt med ned for meeting user?
-		MeetingUser meetingUser = meetingUserService.createMeetingUser();
-		//TODO: inkluder meetinguser i create, eller sæt på efterfølgende?
-		
+	public MeetingDto createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) {
+
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		return convert(meeting);
 	}
@@ -62,6 +55,15 @@ public class MeetingController {
 		MeetingDto meetingDto = new MeetingDto();
 		meetingDto.setSubject(meeting.getSubject());
 		meetingDto.setUuid(meeting.getUuid());
+		
+		MeetingUserDto meetingUserDto = new MeetingUserDto();
+		meetingUserDto.setOrganisationId(meeting.getMeetingUser().getOrganisationId());
+		meetingUserDto.setEmail(meeting.getMeetingUser().getEmail());
+		
+		meetingDto.setCreatedBy(meetingUserDto);
+		meetingDto.setStartTime(meeting.getStartTime());
+		meetingDto.setEndTime(meeting.getEndTime());
+		meetingDto.setDescription(meeting.getDescription());
 		return meetingDto;
 	}
 }

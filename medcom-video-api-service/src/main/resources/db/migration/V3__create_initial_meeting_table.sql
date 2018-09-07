@@ -3,8 +3,11 @@ CREATE TABLE meetings (
   uuid varchar(40) NOT NULL,
   subject varchar(100) NOT NULL,
   organisation_id varchar(30) NOT NULL,
-  created_by bigint(20),
-  UNIQUE KEY (uuid),
+  created_by bigint(20) NOT NULL,
+  start_time datetime NOT NULL,
+  end_time datetime NOT NULL,
+  description varchar(500),
   PRIMARY KEY (id),
+  UNIQUE KEY (uuid),
   FOREIGN KEY (created_by) REFERENCES meeting_users(id)
 ) 

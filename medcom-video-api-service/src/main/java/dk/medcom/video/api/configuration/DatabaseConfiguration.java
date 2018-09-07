@@ -1,3 +1,4 @@
+//TODO Lene: SPØRGSMÅL: hvad gør denne i forhold til at sætte repository klasserne ind?
 package dk.medcom.video.api.configuration;
 
 import javax.sql.DataSource;
@@ -14,12 +15,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import dk.medcom.video.api.repository.MeetingRepository;
 import dk.medcom.video.api.repository.MeetingUserRepository;
+import dk.medcom.video.api.repository.SchedulingTemplateRepository;
+import dk.medcom.video.api.repository.OrganisationRepository;
 
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
 //@EnableJpaRepositories(basePackageClasses = MeetingRepository.class)
-@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class})
+@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
