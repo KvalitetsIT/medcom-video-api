@@ -61,11 +61,6 @@ public class MeetingService {
 		meeting.setUuid(UUID.randomUUID().toString());
 		meeting.setOrganisationId(userService.getUserContext().getUserOrganisation());
 		
-		//TODO Lene: MANGEL: remopve again
-	    //Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
-		//this.endTime = calendar.getTime();
-		//meeting.setStartTime(calendar.getTime());
-		
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());

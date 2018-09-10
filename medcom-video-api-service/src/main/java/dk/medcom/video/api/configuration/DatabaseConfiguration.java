@@ -1,4 +1,3 @@
-//TODO Lene: SPØRGSMÅL: hvad gør denne i forhold til at sætte repository klasserne ind?
 package dk.medcom.video.api.configuration;
 
 import javax.sql.DataSource;

@@ -17,10 +17,8 @@ public class CreateMeetingDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	public Date startTime;
 
-	//TODO Lene: MANGEL: fjern
-	//@DateTimeFormat(pattern="MM/dd/yyyy")
-	
-	
+
+	//TODO Lene .- remove @DateTimeFormat(pattern="MM/dd/yyyy")
 	//TODO Lene - VALIDERING: hvis forkert format sendes ind, så returneres en fejl
 	//TODO Lene - VALIDERING: hvis required felt er tom, så fejl. okay fejlhåndtering?
 	

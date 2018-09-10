@@ -31,10 +31,10 @@ import dk.medcom.video.api.dao.Organisation;;
   classes = { TestConfiguration.class, DatabaseConfiguration.class }, 
   loader = AnnotationConfigContextLoader.class)
 @Transactional
-public class OrganisationTest {
+public class OrganisationTest extends RepositoryTest{
 
-	@ClassRule
-	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
+//	@ClassRule
+//	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 
 	@Resource
     private OrganisationRepository subject;
@@ -44,11 +44,11 @@ public class OrganisationTest {
 
 	private static boolean testDataInitialised = false;
 	
-	@BeforeClass
-	public static void setupMySqlJdbcUrl() {
-		String jdbcUrl = mysql.getJdbcUrl();
-		System.setProperty("jdbc.url", jdbcUrl);
-	}
+//	@BeforeClass
+//	public static void setupMySqlJdbcUrl() {
+//		String jdbcUrl = mysql.getJdbcUrl();
+//		System.setProperty("jdbc.url", jdbcUrl);
+//	}
 	
 	@Before
 	public void setupTestData() throws SQLException {
