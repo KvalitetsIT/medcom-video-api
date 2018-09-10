@@ -6,35 +6,15 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
-import javax.transaction.Transactional;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.testcontainers.containers.MySQLContainer;
 
-import dk.medcom.video.api.configuration.DatabaseConfiguration;
-import dk.medcom.video.api.configuration.TestConfiguration;
 import dk.medcom.video.api.dao.Organisation;;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@PropertySource("test.properties")
-@ContextConfiguration(
-  classes = { TestConfiguration.class, DatabaseConfiguration.class }, 
-  loader = AnnotationConfigContextLoader.class)
-@Transactional
-public class OrganisationTest extends RepositoryTest{
-
-//	@ClassRule
-//	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
+public class OrganisationTest extends RepositoryTest {
 
 	@Resource
     private OrganisationRepository subject;
@@ -44,11 +24,6 @@ public class OrganisationTest extends RepositoryTest{
 
 	private static boolean testDataInitialised = false;
 	
-//	@BeforeClass
-//	public static void setupMySqlJdbcUrl() {
-//		String jdbcUrl = mysql.getJdbcUrl();
-//		System.setProperty("jdbc.url", jdbcUrl);
-//	}
 	
 	@Before
 	public void setupTestData() throws SQLException {
