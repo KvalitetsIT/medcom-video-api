@@ -1,0 +1,70 @@
+{
+	"info": {
+		"name": "medcom-video-api",
+		"_postman_id": "662bc6da-d070-c562-16d0-f65fe21567b8",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://{{service_url}}/api/meeting",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "SESSION",
+						"value": "eyJvcmdhbmlzYXRpb25faWQiOiJrbGFrIiwiZW1haWwiOiJldmFAa2xhay5kayJ9"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "http://{{service_url}}/api/meeting",
+					"protocol": "http",
+					"host": [
+						"{{service_url}}"
+					],
+					"path": [
+						"api",
+						"meeting"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://{{service_url}}/api/meetings/",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "SESSION",
+						"value": "eyJvcmdhbmlzYXRpb25faWQiOiJrbGFrIiwiZW1haWwiOiJldmFAa2xhay5kayJ9"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://{{service_url}}/api/meetings/",
+					"protocol": "http",
+					"host": [
+						"{{service_url}}"
+					],
+					"path": [
+						"api",
+						"meetings",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

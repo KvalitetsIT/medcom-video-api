@@ -24,16 +24,7 @@ import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
 import dk.medcom.video.api.dao.SchedulingTemplate;;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@PropertySource("test.properties")
-@ContextConfiguration(
-  classes = { TestConfiguration.class, DatabaseConfiguration.class }, 
-  loader = AnnotationConfigContextLoader.class)
-@Transactional
 public class SchedulingTemplateTest extends RepositoryTest{
-
-//	@ClassRule
-//	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 
 	@Resource
     private SchedulingTemplateRepository subject;
@@ -42,12 +33,6 @@ public class SchedulingTemplateTest extends RepositoryTest{
 	private DataSource dataSource;
 
 	private static boolean testDataInitialised = false;
-	
-	@BeforeClass
-	public static void setupMySqlJdbcUrl() {
-		String jdbcUrl = mysql.getJdbcUrl();
-		System.setProperty("jdbc.url", jdbcUrl);
-	}
 	
 	@Before
 	public void setupTestData() throws SQLException {

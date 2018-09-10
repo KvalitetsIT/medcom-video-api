@@ -1,0 +1,22 @@
+version: '2'
+services:
+   videoapi-mysql:
+      image: mysql:5.5
+      environment:
+       - MYSQL_DATABASE=videodb
+       - MYSQL_USER=video
+       - MYSQL_PASSWORD=video123
+       - MYSQL_ROOT_PASSWORD=rootroot
+   videoapi-service:
+     image: kvalitetsit/medcom-video-api-web:latest
+     environment:
+       - CONTEXT=/api
+       - jdbc_url=jdbc:mysql://videoapi-mysql:3306/videodb
+       - jdbc_user=video
+       - jdbc_pass=video123
+       - userservice_url=http://userservice:9200
+       - userservice_token_attribute_organisation=organisation_id
+       - userservice_token_attribute_username=username
+       - userservice.token.attribute.email=email
+   userservice:
+     build: usercontext
