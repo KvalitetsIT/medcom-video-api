@@ -30,6 +30,7 @@ abstract public class RepositoryTest {
 	public static void setupMySqlJdbcUrl() {
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 		mysql.start();
+				
 		String jdbcUrl = mysql.getJdbcUrl();
 		System.setProperty("jdbc.url", jdbcUrl);
 	}
