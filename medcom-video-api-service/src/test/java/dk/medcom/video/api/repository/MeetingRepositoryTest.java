@@ -1,3 +1,4 @@
+//TODO Lene: abstract repo test med mysql db oprettelse for sig
 package dk.medcom.video.api.repository;
 
 import java.sql.SQLException;
@@ -36,10 +37,10 @@ import dk.medcom.video.api.dao.MeetingUser;
   classes = { TestConfiguration.class, DatabaseConfiguration.class }, 
   loader = AnnotationConfigContextLoader.class)
 @Transactional
-public class MeetingRepositoryTest {
+public class MeetingRepositoryTest extends RepositoryTest{
 
-	@ClassRule
-	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
+//	@ClassRule
+//	public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 
 	@Resource
     private MeetingRepository subject;
@@ -126,9 +127,6 @@ public class MeetingRepositoryTest {
 	public void testFindMeetingWithExistingId() {
 		// Given
 		Long id = new Long(1);
-//		TODO Lene: MANGEL remove code
-//		Calendar calendarStart = new GregorianCalendar(2018,10,02,15,00,00);
-//		Calendar calendarEnd = new GregorianCalendar(2018,10,02,16,00,00);
 		
 		// When
 		Meeting meeting = subject.findOne(id);
@@ -138,9 +136,10 @@ public class MeetingRepositoryTest {
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
 		Assert.assertEquals("test-org", meeting.getOrganisationId());
+
 		
-		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' TODO Lene: SPØRGSMÅL: hvordan laves dato unit test lettest?
-		//calendarStart.getTime().compareTo(meeting.getStartTime());
+		//TODO Lene: tjek datoer er som forventet.
+		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
