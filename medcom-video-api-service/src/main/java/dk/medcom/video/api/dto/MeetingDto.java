@@ -1,11 +1,9 @@
-//TODO Lene: TASK: valider input længde med anotering
-//TODO Lene: TASK: valider input not null
-//TODO Lene: TASK: Formatering af dato gøres med anotering - måske den som bruges allerede kan bruges
 package dk.medcom.video.api.dto;
 
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 
 public class MeetingDto {
 
@@ -13,7 +11,9 @@ public class MeetingDto {
 	public String uuid;
 	public MeetingUserDto createdBy;
 
-	//TODO Lene: MANGEL: tjek om mulighed for "strict" format så den ikke tillader år som 20181
+	//TODO Lene: MANGEL: tjek om mulighed for "strict" format så den ikke tillader år som 20181.
+	//se: https://stackoverflow.com/questions/48934700/jackson-date-deserialization-invalid-day-of-month
+	//kan det passe at det har noget med version af jackson at gøre?
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") 	//Date format should be: "2018-07-12T09:00:00
 	public Date startTime;
 	

@@ -1,4 +1,4 @@
-//TODO Lene: abstract repo test med mysql db oprettelse for sig
+//TODO Lene: TASK: abstract repo test med mysql db oprettelse for sig
 package dk.medcom.video.api.repository;
 
 import java.sql.SQLException;
@@ -140,7 +140,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		//TODO Lene: tjek datoer er som forventet.
 		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
-
+		
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
 	}
