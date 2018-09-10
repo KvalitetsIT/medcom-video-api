@@ -37,23 +37,23 @@ public class MeetingRepositoryTest extends RepositoryTest{
 
 		if (!testDataInitialised) {
 			Statement statement = dataSource.getConnection().createStatement();
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (1,  'test-org', 'me@me1.dk')");
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (2,  'another-test-org', 'me@me2.dk')");
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (3,  'test-org', 'me@me3.dk')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (101,  'test-org', 'me@me101.dk')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (102,  'another-test-org', 'me@me102.dk')");
+			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (103,  'test-org', 'me@me103.dk')");
 			
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 1, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 2, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 1,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 101, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 102, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2')");
+			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 101,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3')");
 			testDataInitialised = true;
 		}
 	}
-	
+
 	@Test
 	public void testCreateMeeting() {
 		
 		// Given
 		String uuid = UUID.randomUUID().toString();
-		Long meetingUserId = new Long(1);
+		Long meetingUserId = new Long(101);
 		
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
@@ -189,7 +189,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		// Given
 		Long meetingId = new Long(1);
-		Long meetingUserId = new Long(1);
+		Long meetingUserId = new Long(101);
 			
 		// When
 		Meeting meeting = subject.findOne(meetingId);
@@ -205,7 +205,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		// Given
 		Long meetingId = new Long(1);
-		Long meetingUserId = new Long(3);
+		Long meetingUserId = new Long(103);
 			
 		// When
 		Meeting meeting = subject.findOne(meetingId);
