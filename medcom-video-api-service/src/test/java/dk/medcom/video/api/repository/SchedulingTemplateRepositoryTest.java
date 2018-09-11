@@ -1,67 +1,30 @@
 package dk.medcom.video.api.repository;
 
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import javax.annotation.Resource;
-import javax.sql.DataSource;
-import javax.transaction.Transactional;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.testcontainers.containers.MySQLContainer;
-
-import dk.medcom.video.api.configuration.DatabaseConfiguration;
-import dk.medcom.video.api.configuration.TestConfiguration;
 import dk.medcom.video.api.dao.SchedulingTemplate;;
 
-public class SchedulingTemplateTest extends RepositoryTest{
+public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 	@Resource
     private SchedulingTemplateRepository subject;
-	
-	@Autowired
-	private DataSource dataSource;
-
-	private static boolean testDataInitialised = false;
-	
-	@Before
-	public void setupTestData() throws SQLException {
-
-		if (!testDataInitialised) {
-			Statement statement = dataSource.getConnection().createStatement();
-			statement.execute("INSERT INTO scheduling_template (id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, uri_number_range_low, uri_number_range_high) "
-					+ "VALUES (1, 22, 'abc', 'test.dk/', 1, 1, 91, 0, 100, 991, 15, 10, 1000, 9991)");
-			statement.execute("INSERT INTO scheduling_template (id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, uri_number_range_low, uri_number_range_high) "
-					+ "VALUES (2, 33, 'def', 'test2.dk/', 0, 2, 92, 1, 102, 992, 30, 12, 1002, 9992)");
-
-			testDataInitialised = true;
-		}
-	}
 	
 	@Test
 	public void testSchedulingTemplate() {
 		
 		// Given
-		Long conferencingSysId = 7L; //
+		Long conferencingSysId = 7L; 
 		String uriPrefix = "abcd";
-		String uriDomain = "test7.dk"; //
-		boolean hostPinRequired = true; //
+		String uriDomain = "test7.dk"; 
+		boolean hostPinRequired = true; 
 		Long hostPinRangeLow = 7L;
 		Long hostPinRangeHigh = 97L;
-		boolean guestPinRequired = false; //
+		boolean guestPinRequired = false; 
 		Long guestPinRangeLow = 107L;
 		Long guestPinRangeHigh = 997L;
-		int vMRAvailableBefore = 10; //
+		int vMRAvailableBefore = 10; 
 		int maxParticipants = 17;
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;

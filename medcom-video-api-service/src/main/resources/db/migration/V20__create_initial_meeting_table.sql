@@ -10,4 +10,4 @@ CREATE TABLE meetings (
   PRIMARY KEY (id),
   UNIQUE KEY (uuid),
   FOREIGN KEY (created_by) REFERENCES meeting_users(id)
-) 
+)

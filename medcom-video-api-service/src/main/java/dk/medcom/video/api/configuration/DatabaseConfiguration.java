@@ -16,12 +16,13 @@ import dk.medcom.video.api.repository.MeetingRepository;
 import dk.medcom.video.api.repository.MeetingUserRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.repository.SchedulingInfoRepository;
 
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
 //@EnableJpaRepositories(basePackageClasses = MeetingRepository.class)
-@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class})
+@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
