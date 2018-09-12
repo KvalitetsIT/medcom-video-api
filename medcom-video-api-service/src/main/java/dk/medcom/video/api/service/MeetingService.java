@@ -1,7 +1,5 @@
 package dk.medcom.video.api.service;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +29,9 @@ public class MeetingService {
 	@Autowired
 	MeetingUserService meetingUserService;
 	
+	@Autowired
+	SchedulingInfoService schedulingInfoService;
+	
 	public List<Meeting> getMeetings() {
 		
 		return meetingRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
@@ -47,11 +48,14 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting createMeeting(CreateMeetingDto createMeetingDto) {
+	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
 		meeting = meetingRepository.save(meeting);
+		if (meeting != null) {
+			schedulingInfoService.createSchedulingInfo(meeting);
+		}
 		return meeting;
 	}
 

@@ -60,3 +60,4 @@ public class IntegrationTest {
 		return new HttpResponse().withBody("{\"organisation_id\":\"klak\",\"email\":\"eva@klak.dk\"}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
 	}
 }
+

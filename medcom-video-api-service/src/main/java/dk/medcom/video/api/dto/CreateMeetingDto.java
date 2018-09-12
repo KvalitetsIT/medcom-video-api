@@ -17,10 +17,7 @@ public class CreateMeetingDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	public Date startTime;
 
-
-	//TODO Lene .- remove @DateTimeFormat(pattern="MM/dd/yyyy")
-	//TODO Lene - VALIDERING: hvis forkert format sendes ind, så returneres en fejl
-	//TODO Lene - VALIDERING: hvis required felt er tom, så fejl. okay fejlhåndtering?
+	//TODO Lene - tjek om fejlmelding er okay på @notnull, @jsonformat og @size
 	
 	@NotNull
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -40,21 +37,21 @@ public class CreateMeetingDto {
 	public String getDescription() {
 		return description;
 	}
-	public void setDescription() {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
 	public Date getStartTime() {
 		return startTime;
 	}
-	public void setStartTime() {
+	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
 
 	public Date getEndTime() {
 		return endTime;
 	}
-	public void setEndTime() {
+	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
 }

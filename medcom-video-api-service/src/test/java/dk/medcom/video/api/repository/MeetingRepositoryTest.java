@@ -1,20 +1,14 @@
-//TODO Lene: abstract repo test med mysql db oprettelse for sig
 package dk.medcom.video.api.repository;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
-import javax.sql.DataSource;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingUser;
@@ -25,42 +19,24 @@ public class MeetingRepositoryTest extends RepositoryTest{
     private MeetingRepository subject;
 	
 	@Resource
-    private MeetingUserRepository subject2;
-
-	@Autowired
-	private DataSource dataSource;
-
-	private static boolean testDataInitialised = false;
+    private MeetingUserRepository subjectMU;
 	
-	@Before
-	public void setupTestData() throws SQLException {
-
-		if (!testDataInitialised) {
-			Statement statement = dataSource.getConnection().createStatement();
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (1,  'test-org', 'me@me1.dk')");
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (2,  'another-test-org', 'me@me2.dk')");
-			statement.execute("INSERT INTO meeting_users (id, organisation_id, email) VALUES (3,  'test-org', 'me@me3.dk')");
-			
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 1, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 2, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2')");
-			statement.execute("INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 1,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3')");
-			testDataInitialised = true;
-		}
-	}
+	@Resource
+    private SchedulingInfoRepository subjectSI;
 	
 	@Test
 	public void testCreateMeeting() {
 		
 		// Given
 		String uuid = UUID.randomUUID().toString();
-		Long meetingUserId = new Long(1);
+		Long meetingUserId = new Long(101);
 		
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
 		meeting.setUuid(uuid);
 		meeting.setOrganisationId("Den Sjove Afdeling A/S");
 		
-		MeetingUser meetingUser = subject2.findOne(meetingUserId);
+		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);
 	    
 	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
@@ -77,6 +53,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting);
 		Assert.assertNotNull(meeting.getId());
 		Assert.assertEquals(uuid,  meeting.getUuid());
+		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
 	}
 	
 	@Test
@@ -113,7 +90,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		//TODO Lene: tjek datoer er som forventet.
 		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
-
+		
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
 	}
@@ -189,7 +166,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		// Given
 		Long meetingId = new Long(1);
-		Long meetingUserId = new Long(1);
+		Long meetingUserId = new Long(101);
 			
 		// When
 		Meeting meeting = subject.findOne(meetingId);
@@ -205,11 +182,11 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		// Given
 		Long meetingId = new Long(1);
-		Long meetingUserId = new Long(3);
+		Long meetingUserId = new Long(103);
 			
 		// When
 		Meeting meeting = subject.findOne(meetingId);
-	    MeetingUser meetingUser = subject2.findOne(meetingUserId);
+	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);	    
 			
 		// Then
@@ -218,5 +195,6 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
 	
 	}
+
 
 }

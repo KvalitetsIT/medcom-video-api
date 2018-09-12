@@ -1,11 +1,10 @@
 package dk.medcom.video.api.repository;
 
-import javax.sql.DataSource;
 import javax.transaction.Transactional;
+
 
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,15 +22,20 @@ import dk.medcom.video.api.configuration.TestConfiguration;
 @Transactional
 abstract public class RepositoryTest {
 
-	@Autowired
-	private DataSource dataSource;
+//	@Autowired
+//	private DataSource dataSource;
+//	
+//	private static boolean testDataInitialised = false;
+
 
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
+		//TODO tjek warning "resource leak"
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 		mysql.start();
 				
 		String jdbcUrl = mysql.getJdbcUrl();
 		System.setProperty("jdbc.url", jdbcUrl);
 	}
+
 }

@@ -34,7 +34,6 @@ public class MeetingController {
 		for (Meeting meeting : meetings) {
 			meetingDtos.add(convert(meeting));
 		}
-
 		return meetingDtos.toArray(new MeetingDto[meetingDtos.size()]);
 	}
 
@@ -45,7 +44,7 @@ public class MeetingController {
 	}
 
 	@RequestMapping(value = "/meeting", method = RequestMethod.POST)
-	public MeetingDto createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) {
+	public MeetingDto createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
 
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		return convert(meeting);
