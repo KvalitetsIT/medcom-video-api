@@ -35,6 +35,7 @@ public class SchedulingInfoService {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		
+		schedulingInfo.setUuid(meeting.getUuid());
 		if (schedulingTemplate.getHostPinRequired()) {
 			schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
 		}
