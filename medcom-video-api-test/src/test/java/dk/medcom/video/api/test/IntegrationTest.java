@@ -1,14 +1,8 @@
 package dk.medcom.video.api.test;
 
-import java.io.IOException;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockserver.client.server.MockServerClient;
 import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
 @RunWith(TestRunner.class)
@@ -51,7 +45,6 @@ public class IntegrationTest {
 */
 	@Test
 	public void test() throws InterruptedException {
-		Thread.sleep(9000000);
 		
 	}
 	

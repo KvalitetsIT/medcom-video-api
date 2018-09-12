@@ -1,5 +1,12 @@
 package dk.medcom.video.api.test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
+
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
@@ -13,14 +20,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.output.OutputFrame.OutputType;
-import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 public class TestRunner extends Runner {
 
 	private Class testClass;
-	
+
+
 	public TestRunner(Class testClass) {
 		super();
 		this.testClass = testClass;
@@ -34,22 +40,40 @@ public class TestRunner extends Runner {
 
 	@Override
 	public void run(RunNotifier notifier) {
-		Network n = setup();
+		String projectDirectory = System.getenv("MAVEN_PROJECTBASEDIR");
+		String outputDirectory = projectDirectory+"/target";
 		
+		// Laver et sted, hvor junitreport kan ligge
+/*		TemporaryFolder testFolder = new TemporaryFolder();
+		String temporaryFolderUri = null;
+		try {
+			testFolder.create();
+			temporaryFolderUri = testFolder.getRoot().getCanonicalPath();
+		} catch (IOException e) {
+
+			throw new RuntimeException(e);
+		}
+*/
+		Network n = setup();
+
 		GenericContainer newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
 				.withNetwork(n)
-				.withFileSystemBind("/home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/output", "/testresult", BindMode.READ_WRITE)
+				.withFileSystemBind(outputDirectory, "/testresult", BindMode.READ_WRITE)
+				//.withFileSystemBind("/home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/output", "/testresult", BindMode.READ_WRITE)
 				.withClasspathResourceMapping("docker/collections/medcom-video-api.postman_collection.json", "/etc/postman/test_collection.json", BindMode.READ_ONLY)
-		.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/junit-result3.xml --global-var host=videoapi:8080");
+				.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi:8080");
 		newman.start();
-		// TODO Auto-generated method stub
 
-		ToStringConsumer toStringConsumer = new ToStringConsumer();
-		newman.followOutput(toStringConsumer, OutputType.STDOUT);
-		// Then
-		System.out.println("*****************"+toStringConsumer.toUtf8String());
-
-//		docker run --network f32fb72b08e7 -v /home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/docker/collections:/etc/postman -v /home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/docker/bla:/bla -t postman/newman_ubuntu1404:4.1.0 run /etc/postman/medcom-video-api.postman_collection.json --global-var service_url=videoapi:8080  -r junit --reporter-junit-export /bla/blabla.xml
+		/*while (!new File(temporaryFolderUri+"junit-result.xml").exists()) {
+			System.out.println("Waiting....");
+		}
+		try {
+			byte[] encoded = Files.readAllBytes(Paths.get(temporaryFolderUri+"junit-result.xml"));
+			String report = new String(encoded);
+			System.out.println(report);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}*/
 	}
 
 
@@ -82,7 +106,7 @@ public class TestRunner extends Runner {
 		return n;
 	}
 
-	
+
 	private static HttpResponse getResponse() {  
 		return new HttpResponse().withBody("{\"organisation_id\":\"klak\",\"email\":\"eva@klak.dk\"}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
 	}
