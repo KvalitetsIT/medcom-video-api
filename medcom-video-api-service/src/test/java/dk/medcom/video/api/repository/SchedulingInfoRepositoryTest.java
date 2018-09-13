@@ -24,7 +24,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Long guestPin = 2010L;
 		int vMRAvailableBefore = 45; 
 		int maxParticipants = 20;
-		Long meetingId = new Long(1);
+		Long meetingId = new Long(4);
 		
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setHostPin(hostPin);

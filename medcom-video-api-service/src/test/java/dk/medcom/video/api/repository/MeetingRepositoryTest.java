@@ -70,7 +70,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		Assert.assertEquals(3, numberOfMeetings);
+		Assert.assertEquals(4, numberOfMeetings);
 	}
 	
 	@Test

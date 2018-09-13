@@ -7,6 +7,7 @@ INSERT INTO meeting_users (id, organisation_id, email) VALUES (103,  'test-org',
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 101, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 102, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 101,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3');
+INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (4, uuid(), 'MyMeeting4', 'another-test-org', 102, '2018-11-04 15:00:00', '2018-11-04 16:00:00', 'Mødebeskrivelse 4');
 
 -- * scheduling_info *
 INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, max_participants, meetings_id) VALUES (201, (select uuid from meetings where id = 1) , 1001, 2001, 15, 10, 1);

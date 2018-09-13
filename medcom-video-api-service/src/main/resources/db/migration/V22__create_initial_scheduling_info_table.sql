@@ -7,5 +7,6 @@ CREATE TABLE scheduling_info (
   max_participants int NOT NULL,
   meetings_id bigint(20) NOT NULL,
   PRIMARY KEY (id),
+  UNIQUE KEY (uuid),
   FOREIGN KEY (meetings_id) REFERENCES meetings(id)
 )

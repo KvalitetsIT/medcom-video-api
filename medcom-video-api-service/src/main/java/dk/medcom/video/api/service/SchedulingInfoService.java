@@ -1,11 +1,13 @@
 package dk.medcom.video.api.service;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
@@ -28,7 +30,23 @@ public class SchedulingInfoService {
 	
 	@Autowired
 	UserContextService userService;
+
+	public List<SchedulingInfo> getSchedulingInfo() {
 	
+		return schedulingInfoRepository.findAll();
+	}
+
+	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
+		if (schedulingInfo == null) {
+			throw new RessourceNotFoundException("schedulingInfo", "uuid");
+		}
+		//TODO Lene: skal vi tjekke via organisation? teknik "personen" skal han ikke kunne trække en liste på tværs af organisation? men anden begrænsning?
+//		if (!schedulingInfo.getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
+//			throw new PermissionDeniedException();
+//		}
+		return schedulingInfo;
+	}
 
 	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws RessourceNotFoundException {
 		
@@ -50,5 +68,5 @@ public class SchedulingInfoService {
 		
 		return schedulingInfo;
 	}
-
+	
 }
