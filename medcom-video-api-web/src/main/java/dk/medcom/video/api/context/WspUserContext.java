@@ -28,17 +28,37 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 
 	@Value("${userservice.token.attribute.organisation}")  //TODO Lene: SPØRGSMÅL: hvor var det det var?
 	private String userServiceTokenAttributeOrganisation;
-	
+
 	@Value("${userservice.token.attribute.email}")
 	private String userServiceTokenAttributeEmail;
-	
+
+	@Value("${userservice.token.attribute.userrole}")
+	private String userServiceTokenAttributeUserRole;
+
 
 	@Override
 	public UserContext getUserContext() {
 		SessionData sessionData = getSessionData();
 		String organisationId = sessionData.getUserAttribute(userServiceTokenAttributeOrganisation);
 		String email = sessionData.getUserAttribute(userServiceTokenAttributeEmail);
-		return new UserContextImpl(organisationId, email);
+		UserRole userRole = getUserRole(sessionData);
+		return new UserContextImpl(organisationId, email, userRole);
+	}
+
+	private UserRole getUserRole(SessionData sessionData) {
+		String userRoleStr = sessionData.getUserAttribute(userServiceTokenAttributeUserRole);
+		if (userRoleStr != null) {
+			try {
+				UserRole userRole = UserRole.valueOf(userRoleStr);
+				return userRole;
+			} catch (IllegalArgumentException e) {
+				LOGGER.error("Userrole "+userRoleStr+" not legal value");
+				return null;
+			}
+		} else {
+			LOGGER.error("Attributes from token does not contain role (looking for "+userServiceTokenAttributeUserRole+")");
+			return null;
+		}
 	}
 
 	public SessionData getSessionData() {
