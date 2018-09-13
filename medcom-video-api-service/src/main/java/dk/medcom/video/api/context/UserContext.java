@@ -5,4 +5,6 @@ public interface UserContext {
 	String getUserOrganisation();
 	
 	String getUserEmail();
+	
+	UserRole getUserRole();
 }

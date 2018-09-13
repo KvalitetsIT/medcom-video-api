@@ -4,10 +4,12 @@ public class UserContextImpl implements UserContext {
 
 	protected String userOrganisation;
 	protected String userEmail;
+	protected UserRole userRole;
 	
-	public UserContextImpl(String userOrganisation, String userEmail) {
+	public UserContextImpl(String userOrganisation, String userEmail, UserRole userRole) {
 		this.userOrganisation = userOrganisation;
 		this.userEmail = userEmail;
+		this.userRole = userRole;
 	}
 	
 	@Override
@@ -20,4 +22,8 @@ public class UserContextImpl implements UserContext {
 		return userEmail;
 	}
 
+	@Override
+	public UserRole getUserRole() {
+		return userRole;
+	}
 }
