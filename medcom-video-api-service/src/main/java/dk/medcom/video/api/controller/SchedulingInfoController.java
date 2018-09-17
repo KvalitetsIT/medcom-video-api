@@ -3,6 +3,8 @@ package dk.medcom.video.api.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -10,6 +12,7 @@ import org.springframework.hateoas.Resources;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,7 +54,15 @@ public class SchedulingInfoController {
 		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);
 		
 		return resource;
+	}
 
+	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
+	public Resource <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody SchedulingInfoDto schedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException {
+		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, schedulingInfoDto);
+		SchedulingInfoDto shedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(shedulingInfoDto);
+		
+		return resource;
 	}
 
 }

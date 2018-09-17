@@ -12,6 +12,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
+import dk.medcom.video.api.dto.SchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 
@@ -66,6 +67,17 @@ public class SchedulingInfoService {
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
+		return schedulingInfo;
+	}
+	
+	public SchedulingInfo updateSchedulingInfo(String uuid, SchedulingInfoDto schedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException  {
+		
+		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+		schedulingInfo.setHostPin(schedulingInfoDto.getHostPin());
+		schedulingInfo.setGuestPin(schedulingInfoDto.getHostPin());
+		schedulingInfo.setVMRAvailableBefore(schedulingInfoDto.getVmrAvailableBefore());
+		schedulingInfo.setMaxParticipants(schedulingInfoDto.getMaxParticipants());
+		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		return schedulingInfo;
 	}
 	

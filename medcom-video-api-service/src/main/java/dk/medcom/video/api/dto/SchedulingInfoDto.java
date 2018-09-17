@@ -2,6 +2,7 @@ package dk.medcom.video.api.dto;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import dk.medcom.video.api.controller.MeetingController;
@@ -19,16 +20,21 @@ public class SchedulingInfoDto extends ResourceSupport {
 
 	//public MeetingDto meetingDto; //not included intentionally - loop reference
 
-	//public Long hostPin; 		
-	//public Long guestPin;
+	public Long hostPin; 		
+	public Long guestPin;
 
-	public int vMRAvailableBefore;
+	public int vmrAvailableBefore;
 	public int maxParticipants;		
+	
+	public SchedulingInfoDto() {	
+	}
 	
 	public SchedulingInfoDto(SchedulingInfo schedulingInfo) {
 		
 		uuid = schedulingInfo.getUuid();
-		vMRAvailableBefore = schedulingInfo.getVMRAvailableBefore();
+		hostPin = schedulingInfo.getHostPin();
+		guestPin = schedulingInfo.getGuestPin();
+		vmrAvailableBefore = schedulingInfo.getVMRAvailableBefore();
 		maxParticipants = schedulingInfo.getMaxParticipants();
 		
 
@@ -55,12 +61,25 @@ public class SchedulingInfoDto extends ResourceSupport {
 		this.uuid = uuid;
 	}
 	
-	public int getVMRAvailableBefore() {
-		return vMRAvailableBefore;
+	public Long getHostPin() {
+		return hostPin;
+	}
+	public void setHostPin(Long hostPin) {
+		this.hostPin = hostPin;
+	}
+	public Long getGuestPin() {
+		return guestPin;
+	}
+	public void setGuestPin(Long guestPin) {
+		this.guestPin = guestPin;
+	}
+
+	public int getVmrAvailableBefore() {
+		return vmrAvailableBefore;
 	}
  
-	public void setVMRAvailableBefore(int vMRAvailableBefore) {
-		this.vMRAvailableBefore = vMRAvailableBefore;
+	public void setVmrAvailableBefore(int vmrAvailableBefore) {
+		this.vmrAvailableBefore = vmrAvailableBefore;
 	}
 	
 	public int getMaxParticipants() {

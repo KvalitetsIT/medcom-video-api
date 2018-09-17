@@ -35,7 +35,6 @@ public class MeetingController {
 	MeetingService meetingService;
 	
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
-//	public Resources <MeetingDto> getMeetings() {
 	//TODO Lene: skal forkert datoformat i parameter fejlhåndteres anderledes? Og hvad med udeladt dato fejlhåndtering?
 	public Resources <MeetingDto> getMeetings(@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date fromStartTime, @RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date toStartTime) {
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
@@ -47,33 +46,27 @@ public class MeetingController {
 		}
 		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
 		
-		//Link selfRelLink = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(MeetingController.class).getMeetings()).withSelfRel();
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetings(fromStartTime, toStartTime)).withSelfRel();
 		resources.add(selfRelLink);
 
 		return resources;
-		//return meetingDtos.toArray(new MeetingDto[meetingDtos.size()]);
 	}
 	
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.GET)
-	//public MeetingDto getMeetingByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 	public Resource <MeetingDto> getMeetingByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		Meeting meeting = meetingService.getMeetingByUuid(uuid);
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
 		
 		return resource;
-		//return meetingDto;
 	}
 
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
-	//public MeetingDto createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
 	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
 		return resource;
-		//return meetingDto;
 	}
 
 }

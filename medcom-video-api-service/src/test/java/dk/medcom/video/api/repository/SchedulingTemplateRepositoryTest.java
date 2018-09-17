@@ -81,7 +81,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingTemplate);
 			numberOfSchedulingTemplates++;
 		}
-		Assert.assertEquals(2, numberOfSchedulingTemplates);
+		Assert.assertEquals(1, numberOfSchedulingTemplates);
 	}
 	
 	@Test

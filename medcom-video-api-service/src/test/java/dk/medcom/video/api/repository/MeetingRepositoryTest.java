@@ -88,7 +88,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals("test-org", meeting.getOrganisationId());
 
 		
-		//TODO Lene: TODO: tjek datoer er som forventet.
+		//TODO Lene: tjek datoer er som forventet.
 		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 		
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
