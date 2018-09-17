@@ -29,7 +29,7 @@ public class SchedulingTemplateService {
 		
 		
 		if (!schedulingTemplates.iterator().hasNext()) {
-			throw new RessourceNotFoundException("schedulingTemplate", "any"); //TODO Lene: MANGEL: hvad skal parm 2 være her?  //TODO Lene: MANGEL: pt returners     "path": "/api/meeting" i postman
+			throw new RessourceNotFoundException("schedulingTemplate", "schedulingTemplate");
 		} else {
 			SchedulingTemplate schedulingTemplate = schedulingTemplates.iterator().next();
 			return schedulingTemplate;

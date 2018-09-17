@@ -21,7 +21,7 @@ public class MeetingDto extends ResourceSupport {
 	public String uuid;
 	public MeetingUserDto createdBy;
 
-	//TODO Lene: MANGEL: tjek om mulighed for "strict" format så den ikke tillader år som 20181.
+	//TODO Lene: MANGEL: tjek om mulighed for "strict" format så den ikke tillader år som 20181. Pt valideres dato/tid ikke korrekt.
 	//se: https://stackoverflow.com/questions/48934700/jackson-date-deserialization-invalid-day-of-month
 	//kan det passe at det har noget med version af jackson at gøre?
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") 	//Date format should be: "2018-07-12T09:00:00
@@ -45,19 +45,17 @@ public class MeetingDto extends ResourceSupport {
 		endTime = meeting.getEndTime();
 		description = meeting.getDescription();
 
-		try {  //TODO Lene: hvordan håndteres dette? For linket i sig selv skaber vel ikke en exception før på evt. kaldetidspunkt
+		try { 
 			Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("self");
 			add(selfLink);
-		} catch (RessourceNotFoundException e) {
-		} catch (PermissionDeniedException e) {
+		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 		}
 		
-		try {  //TODO Lene: hvordan håndteres dette? For linket i sig selv skaber vel ikke en exception før på evt. kaldetidspunkt
+		try { 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("scheduling-info");
 			add(schedulingInfoLink);
-		} catch (RessourceNotFoundException e) {
-		} catch (PermissionDeniedException e) {
-		} 
+		} catch (RessourceNotFoundException | PermissionDeniedException e) {
+		}
 	}
 
 	public String getSubject() {

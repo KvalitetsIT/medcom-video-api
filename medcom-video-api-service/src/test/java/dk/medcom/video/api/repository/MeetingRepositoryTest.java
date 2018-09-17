@@ -88,7 +88,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals("test-org", meeting.getOrganisationId());
 
 		
-		//TODO Lene: tjek datoer er som forventet.
+		//TODO Lene: TODO: tjek datoer er som forventet.
 		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 		
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
@@ -139,9 +139,12 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	public void testFindMeetingByExistingOrganisationId() {
 		// Given
 		String existingOrg = "test-org";
+		Calendar calendarFrom = new GregorianCalendar(2018,01,01,01,01,01);
+		Calendar calendarTo = new GregorianCalendar(2018,31,12,23,59,00);
+	    
 		
 		// When
-		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
+		List<Meeting> meetings = subject.findByOrganisationIdAndStartTimeBetween(existingOrg, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
 		Assert.assertNotNull(meetings);
@@ -152,9 +155,12 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	public void testFindMeetingByNonExistingOrganisationId() {
 		// Given
 		String existingOrg = "nonexisting-org";
+		Calendar calendarFrom = new GregorianCalendar(2018,01,01,01,01,01);
+		Calendar calendarTo = new GregorianCalendar(2018,31,12,23,59,00);
 		
 		// When
-		List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
+		//List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
+		List<Meeting> meetings = subject.findByOrganisationIdAndStartTimeBetween(existingOrg, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
 		Assert.assertNotNull(meetings);

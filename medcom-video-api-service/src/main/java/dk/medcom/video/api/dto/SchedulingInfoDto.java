@@ -19,7 +19,6 @@ public class SchedulingInfoDto extends ResourceSupport {
 
 	//public MeetingDto meetingDto; //not included intentionally - loop reference
 
-	//TODO Lene: pin skal da vel ikke med ud...?
 	//public Long hostPin; 		
 	//public Long guestPin;
 
@@ -37,15 +36,13 @@ public class SchedulingInfoDto extends ResourceSupport {
 		try {  
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");
 			add(selfLink);
-		} catch (RessourceNotFoundException e) {
-		} catch (PermissionDeniedException e) {
+		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 		}
 			
 		try {
 			Link meetingLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("meeting");
 			add(meetingLink);
-		} catch (RessourceNotFoundException e) {			
-		} catch (PermissionDeniedException e) {
+		} catch (RessourceNotFoundException | PermissionDeniedException e) {			
 		}
 		
 	}

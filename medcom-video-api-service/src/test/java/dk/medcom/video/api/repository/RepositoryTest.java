@@ -30,7 +30,6 @@ abstract public class RepositoryTest {
 
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
-		//TODO tjek warning "resource leak"
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 		mysql.start();
 				

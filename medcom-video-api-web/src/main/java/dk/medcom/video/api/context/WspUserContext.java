@@ -26,7 +26,7 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	@Value("${userservice.url}")
 	private String userServiceUrl;
 
-	@Value("${userservice.token.attribute.organisation}")  //TODO Lene: SPØRGSMÅL: hvor var det det var?
+	@Value("${userservice.token.attribute.organisation}")
 	private String userServiceTokenAttributeOrganisation;
 
 	@Value("${userservice.token.attribute.email}")

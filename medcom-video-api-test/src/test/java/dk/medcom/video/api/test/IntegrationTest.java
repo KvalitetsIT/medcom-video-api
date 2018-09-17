@@ -1,3 +1,4 @@
+//TODO Lene: Gennembå postman test og se om de kan laves mere optimalt i forhold til hvad der er "root"
 package dk.medcom.video.api.test;
 
 import org.junit.Test;

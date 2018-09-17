@@ -6,12 +6,12 @@
 	},
 	"item": [
 		{
-			"name": "Empty call and global var initialization",
+			"name": "Get meetings  call and global var initialization",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "81c2d311-ddf7-4908-85e4-501b0c245986",
+						"id": "431b10e4-5c22-4ee6-8e6c-15c2b27bf017",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -19,7 +19,13 @@
 							"});",
 							"",
 							"const meetings = pm.response.json();",
-							"pm.globals.set(\"noOfMeetings\", meetings.length);",
+							"",
+							"if (meetings._embedded){",
+							"  pm.globals.set(\"noOfMeetings\", meetings._embedded.meetingDtoList.length);",
+							"} else { //the result is empty",
+							"    pm.globals.set(\"noOfMeetings\", 0);",
+							"}",
+							"",
 							""
 						]
 					}
@@ -40,13 +46,23 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/meetings",
+					"raw": "{{host}}/api/meetings?from-start-time=2018-01-01T01:01:01&to-start-time=2023-12-31T23:59:59",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"meetings"
+					],
+					"query": [
+						{
+							"key": "from-start-time",
+							"value": "2018-01-01T01:01:01"
+						},
+						{
+							"key": "to-start-time",
+							"value": "2023-12-31T23:59:59"
+						}
 					]
 				}
 			},
@@ -58,7 +74,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "3ba063c5-28f5-43cb-8ddc-3fcc4da20f19",
+						"id": "f51191b7-91b7-474f-8f8c-424d6129380f",
 						"type": "text/javascript",
 						"exec": [
 							"",
@@ -70,7 +86,7 @@
 							"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
 							"",
 							"//set uuid for later retrival",
-							"pm.globals.set(\"uuid\", pm.response.json().uuid);"
+							"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);"
 						]
 					}
 				},
@@ -98,13 +114,13 @@
 					"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\",\n\"description\": \"beskrivelse for møde a1\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -143,13 +159,13 @@
 					"raw": "{\n\"subject\": \"test møde a2\",\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -185,13 +201,13 @@
 					"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\",\n\"description\": \"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123 a3\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -226,13 +242,13 @@
 					"raw": "{\n\"subject\": \"test møde b1\",\n\"startTime\": \"20181-01-31T12:15:00\",\n\"endTime\": \"2018-01-31T12:30:00\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -267,13 +283,13 @@
 					"raw": "{\n\"subject\": \"test møde b2\",\n\"startTime\": \"2018-01-31T12:30:00\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -308,13 +324,13 @@
 					"raw": "{\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\",\n\"description\": \"beskrivelse for møde c1\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
@@ -349,42 +365,47 @@
 					"raw": "{\n\"subject\": \"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123 c2\",\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\",\n\"description\": \"beskrivelse for møde c2\"\n}"
 				},
 				"url": {
-					"raw": "{{host}}/api/meeting",
+					"raw": "{{host}}/api/meetings",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting"
+						"meetings"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Get meetings",
+			"name": "Get meetings and check numbers and subject",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "f3cf24e2-f894-42da-ba03-36173e5d1c1e",
+						"id": "74831d41-6e19-4961-82dc-1e5f386a4720",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"All meetings should have a subject\", function() {",
-							"    const meetings = pm.response.json();",
-							"    pm.expect(meetings.every((meeting) => {",
-							"        return meeting.subject !== undefined;",
-							"    })).to.be.true;",
-							"})",
+							"const meetings = pm.response.json();",
 							"",
-							"pm.test(\"Number of meetings must match existing + expected successes\", function() {",
-							"    const meetings = pm.response.json();",
-							"    pm.expect(meetings.length).to.eql(pm.globals.get(\"noOfMeetings\"));",
-							"}); ",
+							"if (meetings._embedded){",
+							"",
+							"    pm.test(\"All meetings should have a subject\", function() {",
+							"        pm.expect(meetings._embedded.meetingDtoList.every((meeting) => {",
+							"        return meeting.subject !== undefined;",
+							"        })).to.be.true;",
+							"        });",
+							"    ",
+							"    pm.test(\"Number of meetings must match existing + expected successes\", function() {",
+							"        pm.expect(meetings._embedded.meetingDtoList.length).to.eql(pm.globals.get(\"noOfMeetings\"));",
+							"        }); ",
+							"    ",
+							"}  //else the result is empty",
+							"",
 							""
 						]
 					}
@@ -395,13 +416,75 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/meetings",
+					"raw": "{{host}}/api/meetings?from-start-time=2018-01-01T01:01:01&to-start-time=2023-12-31T23:59:59",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"meetings"
+					],
+					"query": [
+						{
+							"key": "from-start-time",
+							"value": "2018-01-01T01:01:01"
+						},
+						{
+							"key": "to-start-time",
+							"value": "2023-12-31T23:59:59"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get meetings emtpy result due to very old an short dateinterval",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fa835f29-2b44-4d84-b9cb-9d5848ce67fd",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const meetings = pm.response.json();",
+							"",
+							"if (meetings._embedded){",
+							"  pm.test('Result is empty', function () { throw new Error(); });",
+							"} else {",
+							"    pm.test('Result is empty', true);",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/api/meetings?from-start-time=1970-01-01T01:01:01&to-start-time=1972-01-01T01:01:02",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"meetings"
+					],
+					"query": [
+						{
+							"key": "from-start-time",
+							"value": "1970-01-01T01:01:01"
+						},
+						{
+							"key": "to-start-time",
+							"value": "1972-01-01T01:01:02"
+						}
 					]
 				}
 			},
@@ -431,14 +514,48 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/meeting/{{uuid}}",
+					"raw": "{{host}}/api/meetings/{{meeting-uuid}}",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
-						"meeting",
-						"{{uuid}}"
+						"meetings",
+						"{{meeting-uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get scheduling-info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ff2be7a3-0a80-4228-8697-19d5799a3d44",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/api/scheduling-info",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"scheduling-info"
 					]
 				}
 			},

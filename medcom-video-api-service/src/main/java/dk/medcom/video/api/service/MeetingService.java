@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,9 +33,9 @@ public class MeetingService {
 	@Autowired
 	SchedulingInfoService schedulingInfoService;
 	
-	public List<Meeting> getMeetings() {
+	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) {
 		
-		return meetingRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
+		return meetingRepository.findByOrganisationIdAndStartTimeBetween(userService.getUserContext().getUserOrganisation(), fromStartTime, toStartTime);
 	}
 
 	public Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
