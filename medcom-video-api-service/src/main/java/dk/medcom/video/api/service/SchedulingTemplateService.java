@@ -21,9 +21,6 @@ public class SchedulingTemplateService {
 
 	public SchedulingTemplate getSchedulingTemplate() throws RessourceNotFoundException{
 		
-		
-		//userService.getUserContext().getUserOrganisation();
-		
 
 		Iterable<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findAll();
 		

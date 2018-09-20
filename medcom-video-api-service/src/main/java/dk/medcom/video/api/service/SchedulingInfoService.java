@@ -1,7 +1,11 @@
 package dk.medcom.video.api.service;
 
+
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +16,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.SchedulingInfoDto;
+import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 
@@ -28,10 +32,12 @@ public class SchedulingInfoService {
 	@Autowired
 	SchedulingTemplateService schedulingTemplateService;
 	
+	@Autowired
+	SchedulingStatusService schedulingStatusService;
 	
 	@Autowired
 	UserContextService userService;
-
+	
 	public List<SchedulingInfo> getSchedulingInfo() {
 	
 		return schedulingInfoRepository.findAll();
@@ -56,28 +62,61 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setUuid(meeting.getUuid());
 		if (schedulingTemplate.getHostPinRequired()) {
-			schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
+			if (schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
+				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
+			} else {	
+				throw new RessourceNotFoundException("schedulingInfo", "hostPin");
+			}
+			
 		}
 		if (schedulingTemplate.getGuestPinRequired()) {
-			schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
+			if (schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
+				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
+			} else {
+				throw new RessourceNotFoundException("schedulingInfo", "guestPin");
+			}
 		}
 		
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
+		
+		String randomUri;
+		int whileCount = 0;
+		int whileMax = 100;
+
+		SchedulingInfo schedulingInfoUri;
+		
+		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
+			throw new RessourceNotFoundException("schedulingInfo", "uriWithoutDomain");
+		}
+		do {  			//loop x number of times until a no-duplicate url is found
+			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
+			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
+			} while (schedulingInfoUri != null && whileCount++ < whileMax); 
+		if (whileCount > whileMax ) {
+			throw new RessourceNotFoundException("schedulingInfo", "uriWithoutDomain");
+		}
+		
+		schedulingInfo.setUriWithoutDomain(randomUri);		
+		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
+		schedulingInfo.setProvisionStatus(0);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
 		return schedulingInfo;
 	}
 	
-	public SchedulingInfo updateSchedulingInfo(String uuid, SchedulingInfoDto schedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException  {
+	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException  {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
-		schedulingInfo.setHostPin(schedulingInfoDto.getHostPin());
-		schedulingInfo.setGuestPin(schedulingInfoDto.getHostPin());
-		schedulingInfo.setVMRAvailableBefore(schedulingInfoDto.getVmrAvailableBefore());
-		schedulingInfo.setMaxParticipants(schedulingInfoDto.getMaxParticipants());
+		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
+		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());  
+		schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
+		
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingStatusService.createSchedulingStatus(schedulingInfo);
+		
 		return schedulingInfo;
 	}
 	

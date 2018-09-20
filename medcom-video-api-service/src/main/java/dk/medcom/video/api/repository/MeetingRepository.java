@@ -10,8 +10,6 @@ import dk.medcom.video.api.dao.Meeting;
 
 public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
-	//public List<Meeting> findByOrganisationId(String organisationId);
-
 	public List<Meeting> findByOrganisationIdAndStartTimeBetween(String organisationId, Date startTime, Date endTime);
 
 	public Meeting findOneByUuid(String uuid);

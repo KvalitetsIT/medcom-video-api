@@ -21,6 +21,7 @@ import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.SchedulingInfoDto;
+import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.service.SchedulingInfoService;
 
 @RestController
@@ -30,7 +31,6 @@ public class SchedulingInfoController {
 	SchedulingInfoService schedulingInfoService;
 	
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.GET)
-	//public MeetingDto[] getMeetings() {
 	public Resources <SchedulingInfoDto> getSchedulingInfo() {
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo();
 		
@@ -57,10 +57,11 @@ public class SchedulingInfoController {
 	}
 
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
-	public Resource <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody SchedulingInfoDto schedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException {
-		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, schedulingInfoDto);
-		SchedulingInfoDto shedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(shedulingInfoDto);
+	public Resource <SchedulingInfoDto> schedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException {
+ 
+		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);
 		
 		return resource;
 	}

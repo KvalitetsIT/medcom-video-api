@@ -1,4 +1,3 @@
-//TODO Lene: SPØRGSMÅL: skulle der laves link til SchedulingTemplate fra SchedulignInfo eller?
 package dk.medcom.video.api.dao;
 
 import java.util.Date;

@@ -1,10 +1,16 @@
 package dk.medcom.video.api.dao;
 
+import java.util.Date;
+
+import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -22,6 +28,17 @@ public class SchedulingInfo {
 
 	private int vMRAvailableBefore;		//how many minutes before meeting should the meeting room be available
 	private int maxParticipants;		//Locked when max is reached
+	
+	private String uriWithDomain;		
+	private String uriWithoutDomain;	//uri before the @
+	
+	@ManyToOne
+	@JoinColumn(name="scheduling_template_id")
+	private SchedulingTemplate schedulingTemplate;
+	
+	private int provisionStatus;
+	private Date provisionTimestamp;
+	private String provisionVMRId;
 	
 	@OneToOne
 	@JoinColumn(name="meetings_id")
@@ -69,4 +86,41 @@ public class SchedulingInfo {
 	public void setMeeting(Meeting meeting) {
 		this.meeting = meeting;
 	}
+	public String getUriWithDomain() {
+		return uriWithDomain;
+	}
+	public void setUriWithDomain(String uriWithDomain) {
+		this.uriWithDomain = uriWithDomain;
+	}
+	public String getUriWithoutDomain() {
+		return uriWithoutDomain;
+	}
+	public void setUriWithoutDomain(String uriWithoutDomain) {
+		this.uriWithoutDomain = uriWithoutDomain;
+	}
+	public SchedulingTemplate getSchedulingTemplate() {
+		return schedulingTemplate;
+	}
+	public void setSchedulingTemplate(SchedulingTemplate schedulingTemplate) {
+		this.schedulingTemplate = schedulingTemplate;
+	}
+	public int getProvisionStatus() {
+		return provisionStatus;
+	}
+	public void setProvisionStatus(int provisionStatus) {
+		this.provisionStatus = provisionStatus;
+	}
+	public Date getProvisionTimestamp() {
+		return provisionTimestamp;
+	}
+	public void setProvisionTimestamp(Date provisionTimestamp) {
+		this.provisionTimestamp = provisionTimestamp;
+	}
+	public String getProvisionVMRId() {
+		return provisionVMRId;
+	}
+	public void setProvisionVMRId(String provisionVMRId) {
+		this.provisionVMRId = provisionVMRId;
+	}
+	
 }

@@ -11,4 +11,6 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	List<SchedulingInfo> findAll();
 	
 	public SchedulingInfo findOneByUuid(String uuid);
+	
+	public SchedulingInfo findOneByUriWithoutDomain(String UriWithoutDomain);
 }

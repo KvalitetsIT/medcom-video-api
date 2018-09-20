@@ -39,8 +39,6 @@ public class TestApplication extends SpringBootServletInitializer {
 
 		Statement statement;
 		statement = dataSource.getConnection().createStatement();
-//		statement.execute("INSERT INTO scheduling_template (id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, uri_number_range_low, uri_number_range_high) "
-//					+ "VALUES (1, 22, 'abc', 'test.dk/', 1, 1, 9999, 0, 10000000000000, 99999999999999, 15, 10, 1000, 9991)");
 		
 	}
 }

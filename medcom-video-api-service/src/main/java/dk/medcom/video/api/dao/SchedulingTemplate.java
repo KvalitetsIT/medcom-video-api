@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "scheduling_template")
 public class SchedulingTemplate {
-
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;

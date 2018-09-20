@@ -1,12 +1,16 @@
 package dk.medcom.video.api.repository;
 
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import javax.annotation.Resource;
 import org.junit.Assert;
 import org.junit.Test;
 
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
+import dk.medcom.video.api.dao.SchedulingTemplate;
 
 public class SchedulingInfoRepositoryTest extends RepositoryTest{
 
@@ -16,6 +20,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 	@Resource
     private MeetingRepository subjectM;
 	
+	@Resource
+    private SchedulingTemplateRepository subjectST;
+	
 	@Test
 	public void testSchedulingInfo() {
 		
@@ -24,17 +31,33 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Long guestPin = 2010L;
 		int vMRAvailableBefore = 45; 
 		int maxParticipants = 20;
+		String uriWithDomain = "7777@test.dk";
+		String uriWithoutDomain = "7777";
+		
+		int provisionStatus = 0;
+		String provisionVMRId = "PVMRID";
+	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
+		
 		Long meetingId = new Long(4);
+		Long schedulingTemplateId = new Long(1);
 		
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
 		schedulingInfo.setVMRAvailableBefore(vMRAvailableBefore);
 		schedulingInfo.setMaxParticipants(maxParticipants);
+		schedulingInfo.setUriWithDomain(uriWithDomain);
+		schedulingInfo.setUriWithoutDomain(uriWithoutDomain);
+		schedulingInfo.setProvisionStatus(provisionStatus);
+		schedulingInfo.setProvisionTimestamp(calendar.getTime());
+		schedulingInfo.setProvisionVMRId(provisionVMRId);
 		
 		Meeting meeting = subjectM.findOne(meetingId);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setUuid(meeting.getUuid());
+		
+		SchedulingTemplate schedulingTemplate = subjectST.findOne(schedulingTemplateId);
+		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		
 		// When
 		schedulingInfo = subject.save(schedulingInfo);
@@ -46,8 +69,15 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(guestPin, schedulingInfo.getGuestPin());
 		Assert.assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
 		Assert.assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
+		Assert.assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
+		Assert.assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
+		Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+		Assert.assertEquals(calendar.getTime(), schedulingInfo.getProvisionTimestamp());
+		Assert.assertEquals(provisionVMRId, schedulingInfo.getProvisionVMRId());
+		
 		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
 		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
+		Assert.assertEquals(schedulingTemplateId, schedulingInfo.getSchedulingTemplate().getId());
 	}
 	
 	@Test
@@ -124,11 +154,13 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
 	    Meeting meeting = subjectM.findOne(meetingId);
 	    schedulingInfo.setMeeting(meeting);
+	    schedulingInfo.setUuid(meeting.getUuid());
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
 		Assert.assertNotNull(meeting);
 		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
+		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
 	}
 
 }

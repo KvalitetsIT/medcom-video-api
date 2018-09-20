@@ -97,7 +97,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(id, schedulingTemplate.getId());
 		Assert.assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		Assert.assertEquals("abc", schedulingTemplate.getUriPrefix());
-		Assert.assertEquals("test.dk/", schedulingTemplate.getUriDomain());
+		Assert.assertEquals("test.dk", schedulingTemplate.getUriDomain());
 		Assert.assertEquals(true, schedulingTemplate.getHostPinRequired());
 		Assert.assertEquals(1L, schedulingTemplate.getHostPinRangeLow().longValue());
 		Assert.assertEquals(91L, schedulingTemplate.getHostPinRangeHigh().longValue());
