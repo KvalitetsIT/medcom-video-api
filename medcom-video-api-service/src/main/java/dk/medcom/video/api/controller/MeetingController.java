@@ -44,6 +44,14 @@ public class MeetingController {
 		List<MeetingDto> meetingDtos = new LinkedList<MeetingDto>();
 		for (Meeting meeting : meetings) {
 			MeetingDto meetingDto = new MeetingDto(meeting);
+			
+			try { 
+				Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+				meetingDto.add(schedulingInfoLink);
+			} catch (RessourceNotFoundException | PermissionDeniedException e) {
+			}
+
+			
 			meetingDtos.add(meetingDto);
 		}
 		Resources<MeetingDto> resources = new Resources<>(meetingDtos);

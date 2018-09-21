@@ -13,6 +13,7 @@ import dk.medcom.video.api.controller.MeetingController;
 import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 
 
@@ -21,10 +22,6 @@ public class SchedulingInfoDto extends ResourceSupport {
 
 	
 	public String uuid;
-
-
-	//public MeetingDto meetingDto; //not included intentionally - loop reference
-
 	public Long hostPin; 		
 	public Long guestPin;
 
@@ -39,6 +36,8 @@ public class SchedulingInfoDto extends ResourceSupport {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
 	private String provisionVmrId;
+	
+	public MeetingDto meetingDto;
 
 	
 	public SchedulingInfoDto() {	
@@ -57,18 +56,23 @@ public class SchedulingInfoDto extends ResourceSupport {
 		
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
+		
+		Meeting meeting = schedulingInfo.getMeeting();
+		//MeetingDto meetingDto = new MeetingDto(meeting);
+		meetingDto = new MeetingDto(meeting);
+		
 
 		try {  
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");
 			add(selfLink);
 		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 		}
-			
-		try {
-			Link meetingLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("meeting");
-			add(meetingLink);
-		} catch (RessourceNotFoundException | PermissionDeniedException e) {			
-		}
+// TODO Lene Clean up			
+//		try {
+//			Link meetingLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("meeting");
+//			add(meetingLink);
+//		} catch (RessourceNotFoundException | PermissionDeniedException e) {			
+//		}
 		
 	}
 	

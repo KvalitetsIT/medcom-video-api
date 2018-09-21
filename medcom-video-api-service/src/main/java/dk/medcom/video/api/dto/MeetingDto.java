@@ -50,12 +50,12 @@ public class MeetingDto extends ResourceSupport {
 			add(selfLink);
 		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 		}
-		
-		try { 
-			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("scheduling-info");
-			add(schedulingInfoLink);
-		} catch (RessourceNotFoundException | PermissionDeniedException e) {
-		}
+//TODO LEne: clean up		
+//		try { 
+//			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("scheduling-info");
+//			add(schedulingInfoLink);
+//		} catch (RessourceNotFoundException | PermissionDeniedException e) {
+//		}
 	}
 
 	public String getSubject() {
