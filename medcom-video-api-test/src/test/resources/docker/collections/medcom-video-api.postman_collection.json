@@ -549,13 +549,117 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/scheduling-info",
+					"raw": "{{host}}/api/scheduling-info?from-start-time=2018-01-01T01:01:01&to-end-time=2023-12-31T23:59:59&provision-status=0",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"api",
 						"scheduling-info"
+					],
+					"query": [
+						{
+							"key": "from-start-time",
+							"value": "2018-01-01T01:01:01"
+						},
+						{
+							"key": "to-end-time",
+							"value": "2023-12-31T23:59:59"
+						},
+						{
+							"key": "provision-status",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get scheduling-info by uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ff2be7a3-0a80-4228-8697-19d5799a3d44",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/api/scheduling-info/{{meeting-uuid}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"scheduling-info",
+						"{{meeting-uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update scheduling -info by uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d7179889-ef7f-4a7f-b67a-758b13453894",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"provisionStatus\": 6,\n    \"provisionVmrId\": \"abcdef\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/api/scheduling-info/{{meeting-uuid}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"scheduling-info",
+						"{{meeting-uuid}}"
 					]
 				}
 			},

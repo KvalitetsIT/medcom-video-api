@@ -2,6 +2,7 @@ package dk.medcom.video.api.repository;
 
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.annotation.Resource;
@@ -161,6 +162,46 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting);
 		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
 		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
+	}
+	
+	@Test
+	public void testFindAllInIntervalAndProvisionStatus0() {
+		// Given
+	    Calendar calendarFrom = new GregorianCalendar(2012,10,01,13,15,00);
+	    Calendar calendarTo = new GregorianCalendar(2050,10,01,13,15,00);
+		int provisionStatus = 0;
+		
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
+		
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			numberOfSchedulingInfo++;
+		}
+		Assert.assertEquals(3, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testFindOneInIntervalAndProvisionStatus0() {
+		// Given
+		
+	    Calendar calendarFrom = new GregorianCalendar(2018,11,01,15,15,00); //month is zero-based
+	    Calendar calendarTo = new GregorianCalendar(2018,11,02,14,31,00);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00')
+		int provisionStatus = 0;
+	
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
+		
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			numberOfSchedulingInfo++;
+		}
+		Assert.assertEquals(1, numberOfSchedulingInfo);
 	}
 
 }

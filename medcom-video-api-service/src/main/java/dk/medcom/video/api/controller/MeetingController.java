@@ -36,7 +36,9 @@ public class MeetingController {
 	
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
 	//TODO Lene: skal forkert datoformat i parameter fejlhåndteres anderledes? Og hvad med udeladt dato fejlhåndtering?
-	public Resources <MeetingDto> getMeetings(@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date fromStartTime, @RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date toStartTime) {
+	public Resources <MeetingDto> getMeetings(
+			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date fromStartTime, 
+			@RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date toStartTime) {
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
 		
 		List<MeetingDto> meetingDtos = new LinkedList<MeetingDto>();

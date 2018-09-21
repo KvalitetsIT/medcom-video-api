@@ -2,6 +2,7 @@ package dk.medcom.video.api.service;
 
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,9 +39,8 @@ public class SchedulingInfoService {
 	@Autowired
 	UserContextService userService;
 	
-	public List<SchedulingInfo> getSchedulingInfo() {
-	
-		return schedulingInfoRepository.findAll();
+	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, int provisionStatus) {
+		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
 
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
