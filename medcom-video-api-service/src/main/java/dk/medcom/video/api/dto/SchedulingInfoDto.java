@@ -31,6 +31,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 
 	public int vmrAvailableBefore;
 	public int maxParticipants;
+	public boolean endMeetingOnEndTime;
 	
 	private String uriWithDomain;		
 	private String uriWithoutDomain;
@@ -54,6 +55,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 		guestPin = schedulingInfo.getGuestPin();
 		vmrAvailableBefore = schedulingInfo.getVMRAvailableBefore();
 		maxParticipants = schedulingInfo.getMaxParticipants();
+		endMeetingOnEndTime = schedulingInfo.getEndMeetingOnEndTime();
 		uriWithDomain = schedulingInfo.getUriWithDomain();
 		uriWithoutDomain = schedulingInfo.getUriWithoutDomain();
 		provisionStatus = schedulingInfo.getProvisionStatus();
@@ -116,7 +118,13 @@ public class SchedulingInfoDto extends ResourceSupport {
 	public void setMaxParticipants(int maxParticipants) {
 		this.maxParticipants = maxParticipants;
 	}
-
+	public boolean getEndMeetingOnEndTime() {
+		return endMeetingOnEndTime;
+	}
+	
+	public void setEndMeetingOnEndTime(boolean endMeetingOnEndTime) {
+		this.endMeetingOnEndTime = endMeetingOnEndTime;
+	}
 	public String getUriWithDomain() {
 		return uriWithDomain;
 	}

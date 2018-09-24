@@ -11,6 +11,7 @@ CREATE TABLE scheduling_template (
   guest_pin_range_high bigint(20) NOT NULL,
   vmravailable_before int NOT NULL,
   max_participants int NOT NULL,
+  end_meeting_on_end_time bit NOT NULL,
   uri_number_range_low bigint(20) NOT NULL,
   uri_number_range_high bigint(20) NOT NULL,
   PRIMARY KEY (id)  

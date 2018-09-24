@@ -26,6 +26,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long guestPinRangeHigh = 997L;
 		int vMRAvailableBefore = 10; 
 		int maxParticipants = 17;
+		boolean endMeetingOnEndTime = true;
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;
 		
@@ -42,6 +43,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate.setGuestPinRangeHigh(guestPinRangeHigh);
 		schedulingTemplate.setVMRAvailableBefore(vMRAvailableBefore);
 		schedulingTemplate.setMaxParticipants(maxParticipants);
+		schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
 		schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
 		schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
 		
@@ -62,6 +64,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(guestPinRangeHigh, schedulingTemplate.getGuestPinRangeHigh());
 		Assert.assertEquals(vMRAvailableBefore, schedulingTemplate.getVMRAvailableBefore());
 		Assert.assertEquals(maxParticipants, schedulingTemplate.getMaxParticipants());
+		Assert.assertEquals(endMeetingOnEndTime, schedulingTemplate.getEndMeetingOnEndTime());
 		Assert.assertEquals(uriNumberRangeLow, schedulingTemplate.getUriNumberRangeLow());
 		Assert.assertEquals(uriNumberRangeHigh, schedulingTemplate.getUriNumberRangeHigh());
 				
@@ -106,6 +109,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(991L, schedulingTemplate.getGuestPinRangeHigh().longValue());
 		Assert.assertEquals(15, schedulingTemplate.getVMRAvailableBefore());
 		Assert.assertEquals(10, schedulingTemplate.getMaxParticipants());
+		Assert.assertEquals(true, schedulingTemplate.getEndMeetingOnEndTime());
 		Assert.assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		Assert.assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
 	}

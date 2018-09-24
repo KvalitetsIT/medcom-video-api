@@ -14,19 +14,20 @@ public class SchedulingTemplate {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
-	private Long conferencingSysId;		//id on conference system
-	private String uriPrefix;  			//prefix before uri @
-	private String uriDomain;  			//domain after uri @
+	private Long conferencingSysId;			//id on conference system
+	private String uriPrefix;  				//prefix before uri @
+	private String uriDomain;  				//domain after uri @
 	private boolean hostPinRequired;
-	private Long hostPinRangeLow; 		//when random generating
-	private Long hostPinRangeHigh; 		//when random generating
+	private Long hostPinRangeLow; 			//when random generating
+	private Long hostPinRangeHigh; 			//when random generating
 	private boolean guestPinRequired;
-	private Long guestPinRangeLow;		//when random generating
-	private Long guestPinRangeHigh;		//when random generating
-	private int vMRAvailableBefore;		//how many minutes before meeting should the meeting room be availabe
-	private int maxParticipants;		//Locked when max i reached
-	private Long uriNumberRangeLow;		//when random generating
-	private Long uriNumberRangeHigh;	//when random generating
+	private Long guestPinRangeLow;			//when random generating
+	private Long guestPinRangeHigh;			//when random generating
+	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be availabe
+	private int maxParticipants;			//Locked when max i reached
+	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
+	private Long uriNumberRangeLow;			//when random generating
+	private Long uriNumberRangeHigh;		//when random generating
 	
 	
 	public Long getId() {
@@ -100,6 +101,12 @@ public class SchedulingTemplate {
 	}
 	public void setMaxParticipants(int maxParticipants) {
 		this.maxParticipants = maxParticipants;
+	}
+	public boolean getEndMeetingOnEndTime() {
+		return endMeetingOnEndTime;
+	}
+	public void setEndMeetingOnEndTime(boolean endMeetingOnEndTime) {
+		this.endMeetingOnEndTime = endMeetingOnEndTime;
 	}
 	public Long getUriNumberRangeLow() {
 		return uriNumberRangeLow;

@@ -15,18 +15,18 @@ INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (4, uuid(), 'MyMeeting4', 'another-test-org', 102, '2018-11-04 15:00:00', '2018-11-04 16:00:00', 'Mødebeskrivelse 4');
 
 -- * scheduling_template * 			
-INSERT INTO scheduling_template (id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, uri_number_range_low, uri_number_range_high) 
-VALUES (1, 22, 'abc', 'test.dk', 1, 1, 91, 0, 100, 991, 15, 10, 1000, 9991);
+INSERT INTO scheduling_template (id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high) 
+VALUES (1, 22, 'abc', 'test.dk', 1, 1, 91, 0, 100, 991, 15, 10, 1, 1000, 9991);
 
 -- * scheduling_info *
-INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, max_participants, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid) 
-VALUES (201, (select uuid from meetings where id = 1) , 1001, 2001, 15, 10, 1, '1230@test.dk', '1230', 1, 0, null, null);
+INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid) 
+VALUES (201, (select uuid from meetings where id = 1) , 1001, 2001, 15, '2018-10-02 14:45:00', 10, 1, 1, '1230@test.dk', '1230', 1, 0, null, null);
 
-INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, max_participants, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid)
-VALUES (202, (select uuid from meetings where id = 2), 1001, 2001, 20, 10, 2, '1231@test.dk', '1231', 1, 0, null, null);
+INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid)
+VALUES (202, (select uuid from meetings where id = 2), 1001, 2001, 20, '2018-11-02 14:40:00', 10, 1, 2, '1231@test.dk', '1231', 1, 0, null, null);
 
-INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, max_participants, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid)
-VALUES (203, (select uuid from meetings where id = 3), 1001, 2001, 30, 10, 3, '1232@test.dk', '1232', 1, 0, null, null);
+INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_timestamp,  provisionvmrid)
+VALUES (203, (select uuid from meetings where id = 3), 1001, 2001, 30, '2018-12-02 14:30:00', 10, 1, 3, '1232@test.dk', '1232', 1, 0, null, null);
 
 -- * scheduling_status * 			
 INSERT INTO scheduling_status (id, time_stamp, provision_status, meetings_id) VALUES (301, NOW(), 0, 1);

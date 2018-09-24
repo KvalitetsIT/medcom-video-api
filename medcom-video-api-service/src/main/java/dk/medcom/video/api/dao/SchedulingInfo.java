@@ -26,8 +26,10 @@ public class SchedulingInfo {
 	private Long hostPin; 		
 	private Long guestPin;
 
-	private int vMRAvailableBefore;		//how many minutes before meeting should the meeting room be available
-	private int maxParticipants;		//Locked when max is reached
+	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be available
+	private Date vMRStartTime;          	//meeting startTime with vMRAvailableBefore subtracted
+	private int maxParticipants;			//Locked when max is reached
+	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
 	
 	private String uriWithDomain;		
 	private String uriWithoutDomain;	//uri before the @
@@ -74,11 +76,23 @@ public class SchedulingInfo {
 	public void setVMRAvailableBefore(int vMRAvailableBefore) {
 		this.vMRAvailableBefore = vMRAvailableBefore;
 	}
+	public Date getvMRStartTime() {
+		return vMRStartTime;
+	}
+	public void setvMRStartTime(Date vMRStartTime) {
+		this.vMRStartTime = vMRStartTime;
+	}
 	public int getMaxParticipants() {
 		return maxParticipants;
 	}
 	public void setMaxParticipants(int maxParticipants) {
 		this.maxParticipants = maxParticipants;
+	}
+	public boolean getEndMeetingOnEndTime() {
+		return endMeetingOnEndTime;
+	}
+	public void setEndMeetingOnEndTime(boolean endMeetingOnEndTime) {
+		this.endMeetingOnEndTime = endMeetingOnEndTime;
 	}
 	public Meeting getMeeting() {
 	return meeting;

@@ -39,9 +39,8 @@ public class SchedulingInfoController {
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date fromStartTime, 
 			@RequestParam(value = "to-end-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") Date toEndTime,
 			@RequestParam(value = "provision-status", required = false, defaultValue = "0") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ss") int provisionStatus) {
-		//TODO !NU! lene test default works
-		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
 		
+		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
 		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<SchedulingInfoDto>();
 		for (SchedulingInfo schedulingInfo : schedulingInfos) {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);

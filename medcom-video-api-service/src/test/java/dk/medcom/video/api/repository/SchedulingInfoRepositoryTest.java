@@ -32,6 +32,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Long guestPin = 2010L;
 		int vMRAvailableBefore = 45; 
 		int maxParticipants = 20;
+		boolean endMeetingOnEndTime = true;
 		String uriWithDomain = "7777@test.dk";
 		String uriWithoutDomain = "7777";
 		
@@ -46,7 +47,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
 		schedulingInfo.setVMRAvailableBefore(vMRAvailableBefore);
+		
 		schedulingInfo.setMaxParticipants(maxParticipants);
+		schedulingInfo.setEndMeetingOnEndTime(endMeetingOnEndTime);
 		schedulingInfo.setUriWithDomain(uriWithDomain);
 		schedulingInfo.setUriWithoutDomain(uriWithoutDomain);
 		schedulingInfo.setProvisionStatus(provisionStatus);
@@ -56,6 +59,12 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Meeting meeting = subjectM.findOne(meetingId);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setUuid(meeting.getUuid());
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(meeting.getStartTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
+
 		
 		SchedulingTemplate schedulingTemplate = subjectST.findOne(schedulingTemplateId);
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
@@ -69,6 +78,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(hostPin, schedulingInfo.getHostPin());
 		Assert.assertEquals(guestPin, schedulingInfo.getGuestPin());
 		Assert.assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
+		Assert.assertEquals(cal.getTime(), schedulingInfo.getvMRStartTime());
 		Assert.assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
 		Assert.assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
 		Assert.assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
@@ -188,7 +198,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Given
 		
 	    Calendar calendarFrom = new GregorianCalendar(2018,11,01,15,15,00); //month is zero-based
-	    Calendar calendarTo = new GregorianCalendar(2018,11,02,14,31,00);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00')
+	    Calendar calendarTo = new GregorianCalendar(2018,11,02,14,31,00);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00', vmrstart_time is '2018-12-02 14:30:00') 
 		int provisionStatus = 0;
 	
 		// When

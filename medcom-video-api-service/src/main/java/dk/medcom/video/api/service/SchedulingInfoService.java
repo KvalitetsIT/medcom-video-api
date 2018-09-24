@@ -78,7 +78,13 @@ public class SchedulingInfoService {
 		}
 		
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(meeting.getStartTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
+		
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
+		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
 		
 		String randomUri;
 		int whileCount = 0;
