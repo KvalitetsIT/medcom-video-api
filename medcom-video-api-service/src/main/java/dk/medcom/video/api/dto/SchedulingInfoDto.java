@@ -7,7 +7,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import dk.medcom.video.api.controller.MeetingController;
 import dk.medcom.video.api.controller.SchedulingInfoController;
@@ -33,7 +37,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 	//private SchedulingTemplate schedulingTemplate; //TODO Lene SPGM skal det med ud eller ej? 
 	private int provisionStatus;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")		//Date format should be: "2018-07-12T09:00:00
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
 	private String provisionVmrId;
 	
@@ -54,7 +58,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 		uriWithoutDomain = schedulingInfo.getUriWithoutDomain();
 		provisionStatus = schedulingInfo.getProvisionStatus();
 		
-		provisionTimestamp = schedulingInfo.getProvisionTimestamp();
+		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
 		
 		Meeting meeting = schedulingInfo.getMeeting();

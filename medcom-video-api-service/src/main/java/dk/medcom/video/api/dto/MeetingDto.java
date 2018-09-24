@@ -1,6 +1,9 @@
 package dk.medcom.video.api.dto;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
@@ -24,10 +27,12 @@ public class MeetingDto extends ResourceSupport {
 	//TODO Lene: MANGEL: tjek om mulighed for "strict" format så den ikke tillader år som 20181. Pt valideres dato/tid ikke korrekt.
 	//se: https://stackoverflow.com/questions/48934700/jackson-date-deserialization-invalid-day-of-month
 	//kan det passe at det har noget med version af jackson at gøre?
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") 	//Date format should be: "2018-07-12T09:00:00
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 	//Date format should be: "2018-07-12T09:00:00
 	public Date startTime;
 	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")		//Date format should be: "2018-07-12T09:00:00
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
+	//@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	public Date endTime;
 	
 	public String description;
@@ -41,8 +46,13 @@ public class MeetingDto extends ResourceSupport {
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
 		
 		createdBy = meetingUserDto;
-		startTime = meeting.getStartTime();
-		endTime = meeting.getEndTime();
+//		startTime = meeting.getStartTime();
+//		endTime = meeting.getEndTime();
+//TODO Lene: clean up
+		startTime = Date.from(meeting.getStartTime().toInstant().atZone(ZonedDateTime.now().getZone()).toInstant());
+		endTime = Date.from(meeting.getEndTime().toInstant().atZone(ZonedDateTime.now().getZone()).toInstant());
+		
+		
 		description = meeting.getDescription();
 
 		try { 

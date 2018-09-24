@@ -111,7 +111,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00\",\n\"endTime\": \"2018-11-01T12:30:00\",\n\"description\": \"beskrivelse for møde a1\"\n}"
+					"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00 +0100\",\n\"endTime\": \"2018-11-01T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde a1\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/meetings",
@@ -549,7 +549,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/scheduling-info?from-start-time=2018-01-01T01:01:01&to-end-time=2023-12-31T23:59:59&provision-status=0",
+					"raw": "{{host}}/api/scheduling-info?from-start-time=2018-01-01T01:01:01 +0200&to-end-time=2023-12-31T23:59:59&provision-status=0",
 					"host": [
 						"{{host}}"
 					],
@@ -560,7 +560,7 @@
 					"query": [
 						{
 							"key": "from-start-time",
-							"value": "2018-01-01T01:01:01"
+							"value": "2018-01-01T01:01:01 +0200"
 						},
 						{
 							"key": "to-end-time",
@@ -649,7 +649,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"provisionStatus\": 6,\n    \"provisionVmrId\": \"abcdef\"\n}"
+					"raw": "{\n    \"provisionStatus\": 0,\n    \"provisionVmrId\": \"abcdef\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/scheduling-info/{{meeting-uuid}}",
