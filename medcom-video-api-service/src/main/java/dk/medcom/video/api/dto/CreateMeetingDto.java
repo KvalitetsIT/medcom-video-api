@@ -18,8 +18,6 @@ public class CreateMeetingDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
 	public Date startTime;
 
-	//TODO tjek om fejlmelding er okay på @notnull, @jsonformat og @size
-	
 	@NotNull
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
 	public Date endTime;

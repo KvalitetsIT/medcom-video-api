@@ -5,7 +5,7 @@ import javax.validation.constraints.Max;
 
 public class UpdateSchedulingInfoDto {
 	 
-	@Max(6)   //TODO Lene: remove if something better is found
+	@Max(6)
 	private int provisionStatus;
 	private String provisionVmrId;
 

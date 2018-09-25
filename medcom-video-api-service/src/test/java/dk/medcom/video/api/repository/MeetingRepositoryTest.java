@@ -1,6 +1,7 @@
 package dk.medcom.video.api.repository;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -39,11 +40,11 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);
 	    
-	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
-	    meeting.setStartTime(calendar.getTime());
+	    Calendar calendarStart = new GregorianCalendar(2018,10,01,13,15,00);
+	    meeting.setStartTime(calendarStart.getTime());
 	    
-	    calendar.set(Calendar.HOUR_OF_DAY, 14);
-	    meeting.setEndTime(calendar.getTime());
+	    Calendar calendarEnd = new GregorianCalendar(2018,10,01,13,30,00);
+	    meeting.setEndTime(calendarEnd.getTime());
 	    meeting.setDescription("Lang beskrivelse af, hvad der foregår");
 	    		
 		// When
@@ -54,6 +55,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting.getId());
 		Assert.assertEquals(uuid,  meeting.getUuid());
 		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
+		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
 	}
 	
 	@Test
@@ -86,11 +89,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
 		Assert.assertEquals("test-org", meeting.getOrganisationId());
-
-		
-		//TODO Lene: tjek datoer er som forventet.
-		//'2018-10-02 15:00:00', '2018-10-02 16:00:00' 
-		
+		//TODO: Check dates are as expected: '2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
 	}
@@ -159,7 +158,6 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Calendar calendarTo = new GregorianCalendar(2018,31,12,23,59,00);
 		
 		// When
-		//List<Meeting> meetings = subject.findByOrganisationId(existingOrg);
 		List<Meeting> meetings = subject.findByOrganisationIdAndStartTimeBetween(existingOrg, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then

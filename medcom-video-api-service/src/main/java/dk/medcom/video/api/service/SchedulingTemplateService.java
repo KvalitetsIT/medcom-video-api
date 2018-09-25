@@ -65,7 +65,7 @@ public class SchedulingTemplateService {
 			} else {
 				SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 				
-				//schedulingTemplate.setOrganisation(organisation);
+				//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
 				schedulingTemplate.setConferencingSysId(conferencingSysId);
 				schedulingTemplate.setUriPrefix(uriPrefix);
 				schedulingTemplate.setUriDomain(uriDomain);

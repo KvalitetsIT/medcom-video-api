@@ -48,10 +48,6 @@ public class SchedulingInfoService {
 		if (schedulingInfo == null) {
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
 		}
-		//TODO Lene: skal vi tjekke via organisation? teknik "personen" skal han ikke kunne trække en liste på tværs af organisation? men anden begrænsning? f.eks. er date internval kommet på getMeetings
-//		if (!schedulingInfo.getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
-//			throw new PermissionDeniedException();
-//		}
 		return schedulingInfo;
 	}
 

@@ -1,4 +1,4 @@
-//TODO Lene: database indexes matching requests?
+//TODO: Database indexes matching requests?
 package dk.medcom.video.api.repository;
 
 import java.util.Date;

@@ -23,14 +23,11 @@ public class SchedulingInfoDto extends ResourceSupport {
 	public String uuid;
 	public Long hostPin; 		
 	public Long guestPin;
-
 	public int vmrAvailableBefore;
 	public int maxParticipants;
 	public boolean endMeetingOnEndTime;
-	
 	private String uriWithDomain;		
 	private String uriWithoutDomain;
-	//private SchedulingTemplate schedulingTemplate; //TODO Lene SPGM skal det med ud eller ej? 
 	private int provisionStatus;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
@@ -38,7 +35,6 @@ public class SchedulingInfoDto extends ResourceSupport {
 	private String provisionVmrId;
 	
 	public MeetingDto meetingDto;
-
 	
 	public SchedulingInfoDto() {	
 	}
@@ -54,27 +50,18 @@ public class SchedulingInfoDto extends ResourceSupport {
 		uriWithDomain = schedulingInfo.getUriWithDomain();
 		uriWithoutDomain = schedulingInfo.getUriWithoutDomain();
 		provisionStatus = schedulingInfo.getProvisionStatus();
-		
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
 		
 		Meeting meeting = schedulingInfo.getMeeting();
-		//MeetingDto meetingDto = new MeetingDto(meeting);
 		meetingDto = new MeetingDto(meeting);
-		
 
 		try {  
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");
 			add(selfLink);
+			
 		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 		}
-// TODO Lene Clean up			
-//		try {
-//			Link meetingLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("meeting");
-//			add(meetingLink);
-//		} catch (RessourceNotFoundException | PermissionDeniedException e) {			
-//		}
-		
 	}
 	
 	public String getUuid() {
