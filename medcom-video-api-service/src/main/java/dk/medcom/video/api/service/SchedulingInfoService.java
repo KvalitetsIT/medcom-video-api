@@ -17,6 +17,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
+import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -39,7 +40,7 @@ public class SchedulingInfoService {
 	@Autowired
 	UserContextService userService;
 	
-	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, int provisionStatus) {
+	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
 		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
 
@@ -104,7 +105,7 @@ public class SchedulingInfoService {
 		schedulingInfo.setUriWithoutDomain(randomUri);		
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
-		schedulingInfo.setProvisionStatus(0);
+		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		

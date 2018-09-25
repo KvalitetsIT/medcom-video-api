@@ -11,6 +11,7 @@ import org.junit.Test;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
+import dk.medcom.video.api.dto.ProvisionStatus;
 
 public class SchedulingInfoRepositoryTest extends RepositoryTest{
 
@@ -35,7 +36,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		String uriWithDomain = "7777@test.dk";
 		String uriWithoutDomain = "7777";
 		
-		int provisionStatus = 0;
+		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		String provisionVMRId = "PVMRID";
 	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
 		
@@ -122,6 +123,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(2001L, schedulingInfo.getGuestPin().longValue());
 		Assert.assertEquals(15, schedulingInfo.getVMRAvailableBefore());
 		Assert.assertEquals(10, schedulingInfo.getMaxParticipants());
+		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
 	}
 
 	@Test
@@ -178,7 +180,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Given
 	    Calendar calendarFrom = new GregorianCalendar(2012,10,01,13,15,00);
 	    Calendar calendarTo = new GregorianCalendar(2050,10,01,13,15,00);
-		int provisionStatus = 0;
+	    ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
@@ -198,7 +200,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		
 	    Calendar calendarFrom = new GregorianCalendar(2018,11,01,15,15,00); //month is zero-based
 	    Calendar calendarTo = new GregorianCalendar(2018,11,02,14,31,00);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00', vmrstart_time is '2018-12-02 14:30:00') 
-		int provisionStatus = 0;
+	    ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 	
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);

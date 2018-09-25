@@ -5,18 +5,18 @@ import javax.validation.constraints.Max;
 
 public class UpdateSchedulingInfoDto {
 	 
-	@Max(6)
-	private int provisionStatus;
+//	@Max(6)
+	private ProvisionStatus provisionStatus;
 	private String provisionVmrId;
 
 	public UpdateSchedulingInfoDto() {	
 	}
 	
-	public int getProvisionStatus() {
+	public ProvisionStatus getProvisionStatus() {
 		return provisionStatus;
 	}
 
-	public void setProvisionStatus(int provisionStatus) {
+	public void setProvisionStatus(ProvisionStatus provisionStatus) {
 		this.provisionStatus = provisionStatus;
 	}
 

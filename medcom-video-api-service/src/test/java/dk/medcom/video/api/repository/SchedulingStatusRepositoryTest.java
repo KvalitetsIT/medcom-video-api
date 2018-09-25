@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingStatus;
+import dk.medcom.video.api.dto.ProvisionStatus;
 
 public class SchedulingStatusRepositoryTest extends RepositoryTest{
 
@@ -23,7 +24,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 	public void testSchedulingStatus() {
 		
 		// Given
-		int provisionStatus = 0; 
+		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION; 
 		Long meetingId = new Long(4);
 		Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
 		Meeting meeting = subjectM.findOne(meetingId);
@@ -57,7 +58,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingStatus);
 		Assert.assertEquals(id, schedulingStatus.getId());
-		Assert.assertEquals(0, schedulingStatus.getProvisionStatus());
+		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingStatus.getProvisionStatus());
 	}
 
 	@Test

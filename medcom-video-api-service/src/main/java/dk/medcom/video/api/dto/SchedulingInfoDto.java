@@ -28,7 +28,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 	public boolean endMeetingOnEndTime;
 	private String uriWithDomain;		
 	private String uriWithoutDomain;
-	private int provisionStatus;
+	private ProvisionStatus provisionStatus;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
@@ -123,11 +123,11 @@ public class SchedulingInfoDto extends ResourceSupport {
 		this.uriWithoutDomain = uriWithoutDomain;
 	}
 
-	public int getProvisionStatus() {
+	public ProvisionStatus getProvisionStatus() {
 		return provisionStatus;
 	}
 
-	public void setProvisionStatus(int provisionStatus) {
+	public void setProvisionStatus(ProvisionStatus provisionStatus) {
 		this.provisionStatus = provisionStatus;
 	}
 
