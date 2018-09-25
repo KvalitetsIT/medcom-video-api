@@ -15,13 +15,13 @@ public class CreateMeetingDto {
 	public String subject;
 
 	@NotNull
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
 	public Date startTime;
 
-	//TODO Lene - tjek om fejlmelding er okay på @notnull, @jsonformat og @size
+	//TODO tjek om fejlmelding er okay på @notnull, @jsonformat og @size
 	
 	@NotNull
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssZ")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
 	public Date endTime;
 	
 	@Size(max=500, message="description should have a maximum of 500 characters")

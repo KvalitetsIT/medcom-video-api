@@ -7,13 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
-import dk.medcom.video.api.controller.MeetingController;
 import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;

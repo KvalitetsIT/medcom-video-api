@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.SchedulingInfoDto;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;

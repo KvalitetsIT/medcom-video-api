@@ -2,11 +2,10 @@ package dk.medcom.video.api.dto;
 
 import javax.validation.constraints.Max;
 
-import dk.medcom.video.api.dao.SchedulingInfo;
 
 public class UpdateSchedulingInfoDto {
 	 
-	@Max(6)
+	@Max(6)   //TODO Lene: remove if something better is found
 	private int provisionStatus;
 	private String provisionVmrId;
 

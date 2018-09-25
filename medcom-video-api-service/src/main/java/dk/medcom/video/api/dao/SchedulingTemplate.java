@@ -4,7 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -14,6 +15,11 @@ public class SchedulingTemplate {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
+	
+	@ManyToOne
+    @JoinColumn(name="organisation_id")
+	private Organisation organisation;
+	
 	private Long conferencingSysId;			//id on conference system
 	private String uriPrefix;  				//prefix before uri @
 	private String uriDomain;  				//domain after uri @
@@ -29,12 +35,17 @@ public class SchedulingTemplate {
 	private Long uriNumberRangeLow;			//when random generating
 	private Long uriNumberRangeHigh;		//when random generating
 	
-	
 	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
 	}
 	public Long getConferencingSysId() {
 		return conferencingSysId;

@@ -1,9 +1,13 @@
 package dk.medcom.video.api.repository;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingTemplate;;
 
 public class SchedulingTemplateRepositoryTest extends RepositoryTest{
@@ -11,10 +15,14 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Resource
     private SchedulingTemplateRepository subject;
 	
+	@Resource
+    private OrganisationRepository subjectO;
+	
 	@Test
 	public void testSchedulingTemplate() {
 		
 		// Given
+		Long organisationId = 1L; 
 		Long conferencingSysId = 7L; 
 		String uriPrefix = "abcd";
 		String uriDomain = "test7.dk"; 
@@ -30,8 +38,10 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;
 		
+		Organisation organisation = subjectO.findOne(organisationId);
 		
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
+		schedulingTemplate.setOrganisation(organisation);
 		schedulingTemplate.setConferencingSysId(conferencingSysId);
 		schedulingTemplate.setUriPrefix(uriPrefix);
 		schedulingTemplate.setUriDomain(uriDomain);
@@ -53,6 +63,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingTemplate);
 		Assert.assertNotNull(schedulingTemplate.getId());
+		Assert.assertEquals(organisation, schedulingTemplate.getOrganisation());
 		Assert.assertEquals(conferencingSysId, schedulingTemplate.getConferencingSysId());
 		Assert.assertEquals(uriPrefix, schedulingTemplate.getUriPrefix());
 		Assert.assertEquals(uriDomain, schedulingTemplate.getUriDomain());
@@ -97,6 +108,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		
 		// Then
 		Assert.assertNotNull(schedulingTemplate);
+		Assert.assertEquals(1L, schedulingTemplate.getOrganisation().getId().longValue());
 		Assert.assertEquals(id, schedulingTemplate.getId());
 		Assert.assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		Assert.assertEquals("abc", schedulingTemplate.getUriPrefix());
@@ -125,5 +137,16 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNull(schedulingTemplate);
 	}
-
+	@Test
+	public void testFindScheduligTemplateWithExistingOrganisation() {
+		// Given
+		Organisation organisation = subjectO.findOne(1L);
+		
+		// When	
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisation(organisation); 
+		
+		// Then
+		Assert.assertNotNull(schedulingTemplates);
+		Assert.assertEquals(1, schedulingTemplates.size());
+	}
 }

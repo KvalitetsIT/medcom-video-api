@@ -47,7 +47,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		Assert.assertEquals(3, numberOfOrganisations);
+		Assert.assertEquals(4, numberOfOrganisations);
 	}
 	
 	@Test
@@ -83,11 +83,10 @@ public class OrganisationTest extends RepositoryTest {
 		String existingOrg = "Company 1";
 		
 		// When
-		List<Organisation> organisations = subject.findByOrganisationId(existingOrg);
+		Organisation organisation = subject.findByOrganisationId(existingOrg);
 		
 		// Then
-		Assert.assertNotNull(organisations);
-		Assert.assertEquals(1, organisations.size());
+		Assert.assertNotNull(organisation);
 	}
 	
 	@Test
@@ -96,11 +95,10 @@ public class OrganisationTest extends RepositoryTest {
 		String existingOrg = "nonexisting-org";
 		
 		// When
-		List<Organisation> organisations = subject.findByOrganisationId(existingOrg);
+		Organisation organisation = subject.findByOrganisationId(existingOrg);
 		
 		// Then
-		Assert.assertNotNull(organisations);
-		Assert.assertEquals(0, organisations.size());
+		Assert.assertNull(organisation);
 	}
 
 }

@@ -2,7 +2,6 @@ package dk.medcom.video.api.repository;
 
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.annotation.Resource;

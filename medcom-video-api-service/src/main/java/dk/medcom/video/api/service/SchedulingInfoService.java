@@ -62,7 +62,8 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setUuid(meeting.getUuid());
 		if (schedulingTemplate.getHostPinRequired()) {
-			if (schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
+			if (schedulingTemplate.getHostPinRangeLow() != null && schedulingTemplate.getHostPinRangeHigh() != null &&
+					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
 				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
 			} else {	
 				throw new RessourceNotFoundException("schedulingInfo", "hostPin");
@@ -70,7 +71,8 @@ public class SchedulingInfoService {
 			
 		}
 		if (schedulingTemplate.getGuestPinRequired()) {
-			if (schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
+			if (schedulingTemplate.getGuestPinRangeLow() != null && schedulingTemplate.getGuestPinRangeHigh() != null &&
+					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
 				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
 			} else {
 				throw new RessourceNotFoundException("schedulingInfo", "guestPin");
