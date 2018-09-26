@@ -3,17 +3,19 @@ INSERT INTO organisation (id, organisation_id, name) VALUES (1, 'company 1', 'co
 INSERT INTO organisation (id, organisation_id, name) VALUES (2, 'company 2', 'company name 2');
 INSERT INTO organisation (id, organisation_id, name) VALUES (3, 'company 3', 'company name 3');
 INSERT INTO organisation (id, organisation_id, name) VALUES (4, 'kvak', 'company name kvak');
+INSERT INTO organisation (id, organisation_id, name) VALUES (5, 'test-org', 'company name test-org');
+INSERT INTO organisation (id, organisation_id, name) VALUES (6, 'another-test-org', 'company name another-test-org');
 
 -- * meeting_users *
-INSERT INTO meeting_users (id, organisation_id, email) VALUES (101,  'test-org', 'me@me101.dk');
-INSERT INTO meeting_users (id, organisation_id, email) VALUES (102,  'another-test-org', 'me@me102.dk');
-INSERT INTO meeting_users (id, organisation_id, email) VALUES (103,  'test-org', 'me@me103.dk');
+INSERT INTO meeting_users (id, organisation_id, email) VALUES (101,  5, 'me@me101.dk');
+INSERT INTO meeting_users (id, organisation_id, email) VALUES (102,  6, 'me@me102.dk');
+INSERT INTO meeting_users (id, organisation_id, email) VALUES (103,  5, 'me@me103.dk');
 			
 -- * meetings *	
-INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 'test-org', 101, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1');
-INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 'another-test-org', 102, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2');
-INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 'test-org', 101,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3');
-INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (4, uuid(), 'MyMeeting4', 'another-test-org', 102, '2018-11-04 15:00:00', '2018-11-04 16:00:00', 'Mødebeskrivelse 4');
+INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (1, uuid(), 'TestMeeting-xyz', 5, 101, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1');
+INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (2, uuid(), 'MyMeeting', 6, 102, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2');
+INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 5, 101,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3');
+INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description) VALUES (4, uuid(), 'MyMeeting4', 6, 102, '2018-11-04 15:00:00', '2018-11-04 16:00:00', 'Mødebeskrivelse 4');
 
 -- * scheduling_template * 			
 INSERT INTO scheduling_template (id, organisation_id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high) 

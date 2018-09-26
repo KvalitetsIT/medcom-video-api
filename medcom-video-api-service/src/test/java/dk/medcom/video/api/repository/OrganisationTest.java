@@ -1,6 +1,5 @@
 package dk.medcom.video.api.repository;
 
-import java.util.List;
 import javax.annotation.Resource;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,7 +46,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		Assert.assertEquals(4, numberOfOrganisations);
+		Assert.assertEquals(6, numberOfOrganisations);
 	}
 	
 	@Test

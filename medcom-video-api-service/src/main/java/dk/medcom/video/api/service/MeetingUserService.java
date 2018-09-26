@@ -16,13 +16,15 @@ public class MeetingUserService {
 	@Autowired
 	UserContextService userService;
 	
+	@Autowired
+	OrganisationService organisationService;
 
 	public MeetingUser getOrCreateCurrentMeetingUser() {
-		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationIdAndEmail(userService.getUserContext().getUserOrganisation(), userService.getUserContext().getUserEmail());
+		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), userService.getUserContext().getUserEmail());
 		if (meetingUser == null) {
 			meetingUser = new MeetingUser();
 			meetingUser.setEmail(userService.getUserContext().getUserEmail());
-			meetingUser.setOrganisationId(userService.getUserContext().getUserOrganisation());
+			meetingUser.setOrganisation(organisationService.getUserOrganisation());
 			meetingUser = meetingUserRepository.save(meetingUser);
 		}
 		return meetingUser;

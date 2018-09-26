@@ -7,20 +7,27 @@ import org.junit.Test;
 
 //import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.dao.MeetingUser;
+import dk.medcom.video.api.dao.Organisation;
 
 public class MeetingUserRepositoryTest extends RepositoryTest{
 	
 	@Resource
     private MeetingUserRepository subject;
 	
+	@Resource
+    private OrganisationRepository subjectO;
+	
 	@Test
 	public void testCreateMeetingUser() {
 		
 		// Given
-	    String organisationId = "you firma 1";
+	    Long organisationId = 1L;
 	    String email = "you@you.dk";
+	    
+	    Organisation organisation = subjectO.findOne(organisationId);
+	    
 		MeetingUser meetingUser = new MeetingUser();
-		meetingUser.setOrganisationId(organisationId);
+		meetingUser.setOrganisation(organisation);
 		meetingUser.setEmail(email);
 		
 		// When
@@ -30,7 +37,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meetingUser);
 		Assert.assertNotNull(meetingUser.getId());
 		Assert.assertEquals(email,  meetingUser.getEmail());
-		Assert.assertEquals(organisationId,  meetingUser.getOrganisationId());
+		Assert.assertEquals(organisation,  meetingUser.getOrganisation());
 	}
 	
 	@Test
@@ -44,7 +51,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(meetingUser);
 		Assert.assertEquals(id, meetingUser.getId());
-		Assert.assertEquals("test-org", meetingUser.getOrganisationId());
+		Assert.assertEquals("test-org", meetingUser.getOrganisation().getOrganisationId());
 		Assert.assertEquals("me@me101.dk", meetingUser.getEmail());
 
 	}
@@ -52,7 +59,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindMeetingUserWithNonExistingId() {
 		// Given
-		Long id = new Long(1999);
+		Long id = new Long(3);
 		
 		// When
 		MeetingUser meetingUser = subject.findOne(id);
@@ -62,29 +69,34 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	}
 
 	@Test
-	public void testFindMeetingUserWithExistingOrganisationIdAndEmail() {
+	public void testFindMeetingUserWithExistingOrganisationAndEmail() {
 		// Given
-		String existingOrganisation = "another-test-org";
+		Long organisationId = new Long(6);
+		
 		String existingEmail = "me@me102.dk";
 		
+		Organisation organisation = subjectO.findOne(organisationId);
+		
 		// When
-		MeetingUser meetingUser = subject.findOneByOrganisationIdAndEmail(existingOrganisation, existingEmail);
+		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, existingEmail);
 		
 		// Then
 		Assert.assertNotNull(meetingUser);
 		Assert.assertEquals(new Long(102), meetingUser.getId());
-		Assert.assertEquals(existingOrganisation, meetingUser.getOrganisationId());
+		Assert.assertEquals(organisation.getName(), meetingUser.getOrganisation().getName());
 		Assert.assertEquals(existingEmail, meetingUser.getEmail());
 	}
 
 	@Test
-	public void testFindMeetingUserWithNonExistingOrganisationIdAndEmail() {
+	public void testFindMeetingUserWithNonExistingOrganisationAndEmail() {
 		// Given
-		String nonExistingOrganisationId = "xxxxx";
+		Long organisationId = new Long(3);
 		String nonExistingEmail = "xxxxx";
 		
+		Organisation organisation = subjectO.findOne(organisationId);
+		
 		// When
-		MeetingUser meetingUser = subject.findOneByOrganisationIdAndEmail(nonExistingOrganisationId, nonExistingEmail);
+		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, nonExistingEmail);
 		
 		// Then
 		Assert.assertNull(meetingUser);

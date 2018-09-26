@@ -1,9 +1,6 @@
 package dk.medcom.video.api.dto;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
@@ -12,7 +9,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import dk.medcom.video.api.controller.MeetingController;
-import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;

@@ -19,7 +19,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
     private OrganisationRepository subjectO;
 	
 	@Test
-	public void testSchedulingTemplate() {
+	public void testCreateSchedulingTemplate() {
 		
 		// Given
 		Long organisationId = 1L; 

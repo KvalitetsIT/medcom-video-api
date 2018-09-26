@@ -1,7 +1,6 @@
 package dk.medcom.video.api.repository;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +12,7 @@ import org.junit.Test;
 
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingUser;
+import dk.medcom.video.api.dao.Organisation;
 
 public class MeetingRepositoryTest extends RepositoryTest{
 
@@ -25,17 +25,23 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	@Resource
     private SchedulingInfoRepository subjectSI;
 	
+	@Resource
+    private OrganisationRepository subjectO;
+	
 	@Test
 	public void testCreateMeeting() {
 		
 		// Given
 		String uuid = UUID.randomUUID().toString();
 		Long meetingUserId = new Long(101);
+		Long organisationId = new Long(5);
 		
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
 		meeting.setUuid(uuid);
-		meeting.setOrganisationId("Den Sjove Afdeling A/S");
+		
+		Organisation organisation = subjectO.findOne(organisationId);
+		meeting.setOrganisation(organisation);
 		
 		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);
@@ -55,6 +61,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting.getId());
 		Assert.assertEquals(uuid,  meeting.getUuid());
 		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		Assert.assertEquals(organisationId, meeting.getOrganisation().getId());
 		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
 		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
 	}
@@ -80,6 +87,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	public void testFindMeetingWithExistingId() {
 		// Given
 		Long id = new Long(1);
+		Long organisationId = new Long(5);
+		Organisation organisation = subjectO.findOne(organisationId);
 		
 		// When
 		Meeting meeting = subject.findOne(id);
@@ -88,7 +97,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting);
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
-		Assert.assertEquals("test-org", meeting.getOrganisationId());
+		Assert.assertEquals(organisation.getOrganisationId(), meeting.getOrganisation().getOrganisationId());
 		//TODO: Check dates are as expected: '2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
@@ -119,7 +128,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(new Long(3), meeting.getId());
 		Assert.assertEquals(exitstingUUid, meeting.getUuid());
 		Assert.assertEquals("TestMeeting-123", meeting.getSubject());
-		Assert.assertEquals("test-org", meeting.getOrganisationId());
+		Assert.assertEquals("test-org", meeting.getOrganisation().getOrganisationId());
 	}
 
 	@Test
@@ -135,15 +144,17 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	}
 
 	@Test
-	public void testFindMeetingByExistingOrganisationId() {
+	public void testFindMeetingByExistingOrganisation() {
 		// Given
-		String existingOrg = "test-org";
+		Long organisationId = new Long(5);
 		Calendar calendarFrom = new GregorianCalendar(2018,01,01,01,01,01);
 		Calendar calendarTo = new GregorianCalendar(2018,31,12,23,59,00);
+		
+		Organisation organisation = subjectO.findOne(organisationId);
 	    
 		
 		// When
-		List<Meeting> meetings = subject.findByOrganisationIdAndStartTimeBetween(existingOrg, calendarFrom.getTime(), calendarTo.getTime());
+		List<Meeting> meetings = subject.findByOrganisationAndStartTimeBetween(organisation, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
 		Assert.assertNotNull(meetings);
@@ -151,14 +162,16 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	}
 	
 	@Test
-	public void testFindMeetingByNonExistingOrganisationId() {
+	public void testFindMeetingByNonExistingOrganisation() {
 		// Given
-		String existingOrg = "nonexisting-org";
+		Long organisationId = new Long(3);
 		Calendar calendarFrom = new GregorianCalendar(2018,01,01,01,01,01);
 		Calendar calendarTo = new GregorianCalendar(2018,31,12,23,59,00);
 		
+		Organisation organisation = subjectO.findOne(organisationId);
+		
 		// When
-		List<Meeting> meetings = subject.findByOrganisationIdAndStartTimeBetween(existingOrg, calendarFrom.getTime(), calendarTo.getTime());
+		List<Meeting> meetings = subject.findByOrganisationAndStartTimeBetween(organisation, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
 		Assert.assertNotNull(meetings);

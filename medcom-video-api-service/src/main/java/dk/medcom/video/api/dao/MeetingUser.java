@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -14,7 +16,9 @@ public class MeetingUser {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 
-	private String organisationId;
+	@ManyToOne
+    @JoinColumn(name="organisation_id")
+	private Organisation organisation;
 	
 	private String email;
 	
@@ -26,12 +30,12 @@ public class MeetingUser {
 		this.id = id;
 	}
 
-	public String getOrganisationId() {
-		return organisationId;
+	public Organisation getOrganisation() {
+		return organisation;
 	}
 
-	public void setOrganisationId(String organisationId) {
-		this.organisationId = organisationId;
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
 	}
 	public String getEmail() {
 		return email;

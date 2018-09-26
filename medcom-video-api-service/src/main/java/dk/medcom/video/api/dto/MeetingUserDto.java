@@ -8,7 +8,7 @@ public class MeetingUserDto {
 	public String email;
 
 	public MeetingUserDto(MeetingUser meetingUser) {
-		organisationId = meetingUser.getOrganisationId();
+		organisationId = meetingUser.getOrganisation().getOrganisationId();
 		email = meetingUser.getEmail();
 	}
 		

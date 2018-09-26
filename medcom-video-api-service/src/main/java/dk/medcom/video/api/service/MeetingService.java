@@ -6,14 +6,12 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
-import dk.medcom.video.api.repository.MeetingUserRepository;
+
 
 @Component
 public class MeetingService {
@@ -22,20 +20,18 @@ public class MeetingService {
 	MeetingRepository meetingRepository;
 	
 	@Autowired
-	MeetingUserRepository meetingUserRepository;
-	
-	@Autowired
-	UserContextService userService;
-	
-	@Autowired
 	MeetingUserService meetingUserService;
 	
 	@Autowired
 	SchedulingInfoService schedulingInfoService;
 	
+	@Autowired
+	OrganisationService organisationService;
+	
+	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) {
-		
-		return meetingRepository.findByOrganisationIdAndStartTimeBetween(userService.getUserContext().getUserOrganisation(), fromStartTime, toStartTime);
+	
+		return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);
 	}
 
 	public Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
@@ -43,7 +39,7 @@ public class MeetingService {
 		if (meeting == null) {
 			throw new RessourceNotFoundException("meeting", "uuid");
 		}
-		if (!meeting.getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
+		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
 			throw new PermissionDeniedException();
 		}
 		return meeting;
@@ -64,7 +60,7 @@ public class MeetingService {
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		meeting.setUuid(UUID.randomUUID().toString());
-		meeting.setOrganisationId(userService.getUserContext().getUserOrganisation());
+		meeting.setOrganisation(organisationService.getUserOrganisation());
 		
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
