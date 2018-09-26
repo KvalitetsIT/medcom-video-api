@@ -549,7 +549,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "{{host}}/api/scheduling-info?from-start-time=2018-01-01T01:01:01 +0200&to-end-time=2023-12-31T23:59:59&provision-status=0",
+					"raw": "{{host}}/api/scheduling-info?from-start-time=2018-01-01T01:01:01 +0200&to-end-time=2023-12-31T23:59:59&provision-status=AWAITS_PROVISION",
 					"host": [
 						"{{host}}"
 					],
@@ -568,7 +568,7 @@
 						},
 						{
 							"key": "provision-status",
-							"value": "0"
+							"value": "AWAITS_PROVISION"
 						}
 					]
 				}
@@ -649,7 +649,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"provisionStatus\": 0,\n    \"provisionVmrId\": \"abcdef\"\n}"
+					"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionVmrId\": \"abcdef\"\n}"
 				},
 				"url": {
 					"raw": "{{host}}/api/scheduling-info/{{meeting-uuid}}",

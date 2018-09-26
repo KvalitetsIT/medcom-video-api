@@ -1,11 +1,7 @@
 package dk.medcom.video.api.dto;
 
-import javax.validation.constraints.Max;
-
-
 public class UpdateSchedulingInfoDto {
 	 
-//	@Max(6)
 	private ProvisionStatus provisionStatus;
 	private String provisionVmrId;
 

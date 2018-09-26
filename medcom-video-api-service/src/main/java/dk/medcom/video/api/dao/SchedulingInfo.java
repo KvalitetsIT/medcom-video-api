@@ -2,8 +2,9 @@ package dk.medcom.video.api.dao;
 
 import java.util.Date;
 
-import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,7 +14,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.ProvisionStatusDBConverter;
 
 @Entity
 @Table(name = "scheduling_info")
@@ -38,8 +38,7 @@ public class SchedulingInfo {
 	@ManyToOne
 	@JoinColumn(name="scheduling_template_id")
 	private SchedulingTemplate schedulingTemplate;
-	
-	@Convert(converter = ProvisionStatusDBConverter.class) 
+	@Enumerated(EnumType.STRING)
 	private ProvisionStatus provisionStatus;
 	private Date provisionTimestamp;
 	private String provisionVMRId;

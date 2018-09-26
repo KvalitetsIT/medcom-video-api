@@ -1,7 +1,5 @@
-//TODO Lene: Er det 3 ProvisionStatus klasser korrekt navngivet og placeret i pakke?
 package dk.medcom.video.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ProvisionStatus {
 	AWAITS_PROVISION(0),
@@ -17,23 +15,8 @@ public enum ProvisionStatus {
 	private ProvisionStatus(int value) {
 		this.value = value;
 	}
-	@JsonValue //Handles correct output body
 	public int getValue() {
 		return value;
 	}
-	
-    public static ProvisionStatus getProvisionStatus(Integer id) {
-        if (id == null) {
-            return null;
-        }
- 
-        for (ProvisionStatus provisionStatus : ProvisionStatus.values()) {
-            if (id.equals(provisionStatus.getValue())) {
-                return provisionStatus;
-            }
-        }
- 
-        return null;
-    }
 	
 }

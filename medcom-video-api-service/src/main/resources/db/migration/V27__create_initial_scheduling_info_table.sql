@@ -10,7 +10,7 @@ CREATE TABLE scheduling_info (
   uri_with_domain varchar(100) NOT NULL,
   uri_without_domain varchar(100) NOT NULL,
   scheduling_template_id bigint(20),
-  provision_status int NOT NULL,
+  provision_status varchar(30) NOT NULL,
   provision_timestamp datetime,
   provisionvmrid varchar(50),
   meetings_id bigint(20) NOT NULL,
