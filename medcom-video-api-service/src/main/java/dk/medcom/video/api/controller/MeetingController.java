@@ -35,9 +35,9 @@ public class MeetingController {
 	MeetingService meetingService;
 	
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
-	public Resources <MeetingDto> getMeetings(
+	public Resources <MeetingDto> getMeetings( 
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime,
-			@RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toStartTime) {
+			@RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toStartTime) throws PermissionDeniedException {
 		
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
 		List<MeetingDto> meetingDtos = new LinkedList<MeetingDto>();
@@ -71,7 +71,7 @@ public class MeetingController {
 	}
 
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
-	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
+	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException {
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);

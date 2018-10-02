@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.repository.MeetingUserRepository;
 
@@ -19,7 +20,7 @@ public class MeetingUserService {
 	@Autowired
 	OrganisationService organisationService;
 
-	public MeetingUser getOrCreateCurrentMeetingUser() {
+	public MeetingUser getOrCreateCurrentMeetingUser() throws PermissionDeniedException {
 		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), userService.getUserContext().getUserEmail());
 		if (meetingUser == null) {
 			meetingUser = new MeetingUser();

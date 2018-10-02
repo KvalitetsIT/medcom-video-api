@@ -34,7 +34,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 	private Date provisionTimestamp;
 	private String provisionVmrId;
 	
-	public MeetingDto meetingDto;
+	public MeetingDto meetingDetails;
 	
 	public SchedulingInfoDto() {	
 	}
@@ -54,7 +54,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
 		
 		Meeting meeting = schedulingInfo.getMeeting();
-		meetingDto = new MeetingDto(meeting);
+		meetingDetails = new MeetingDto(meeting);
 
 		try {  
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");

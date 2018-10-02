@@ -29,7 +29,7 @@ public class MeetingService {
 	OrganisationService organisationService;
 	
 	
-	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) {
+	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
 	
 		return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);
 	}
@@ -45,7 +45,7 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException {
+	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException  {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
@@ -56,7 +56,7 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting convert(CreateMeetingDto createMeetingDto) {
+	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException {
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		meeting.setUuid(UUID.randomUUID().toString());
