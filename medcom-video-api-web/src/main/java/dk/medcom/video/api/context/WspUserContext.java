@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+
 @Component
 public class WspUserContext extends RestTemplate implements UserContextFactory {
 
@@ -35,6 +37,14 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	@Value("${userservice.token.attribute.userrole}")
 	private String userServiceTokenAttributeUserRole;
 
+	@Value("${mapping.role.provisioner}")
+	private String mappingRoleProvisioner;
+	
+	@Value("${mapping.role.admin}")
+	private String mappingRoleAdmin;
+	
+	@Value("${mapping.role.user}")
+	private String mappingRoleUser;
 
 	@Override
 	public UserContext getUserContext() {
@@ -46,18 +56,23 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	}
 
 	private UserRole getUserRole(SessionData sessionData) {
+
 		String userRoleStr = sessionData.getUserAttribute(userServiceTokenAttributeUserRole);
+		
 		if (userRoleStr != null) {
-			try {
-				UserRole userRole = UserRole.valueOf(userRoleStr);
-				return userRole;
-			} catch (IllegalArgumentException e) {
-				LOGGER.error("Userrole "+userRoleStr+" not legal value");
-				return null;
-			}
+				if (userRoleStr.equals(mappingRoleProvisioner)) {
+					return UserRole.PROVISIONER;
+				} else if (userRoleStr.equals(mappingRoleAdmin)) {
+					return UserRole.ADMIN;
+				} else if (userRoleStr.equals(mappingRoleUser)) {
+					return UserRole.USER;
+				} else {
+					LOGGER.error("Userrole "+userRoleStr+" not legal value");
+					return UserRole.UNAUTHORIZED;
+				}
 		} else {
 			LOGGER.error("Attributes from token does not contain role (looking for "+userServiceTokenAttributeUserRole+")");
-			return null;
+			return UserRole.UNDEFINED;
 		}
 	}
 

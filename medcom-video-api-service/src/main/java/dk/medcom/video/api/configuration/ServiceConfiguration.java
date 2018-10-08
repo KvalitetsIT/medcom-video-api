@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
+import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 
 @Configuration
 @ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller"})
@@ -25,6 +26,7 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
 		registry.addInterceptor(loggingInterceptor());
+		registry.addInterceptor(userSecurityInterceptor());
 	} 
 
 	@Bean
@@ -32,7 +34,13 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 		LOGGER.debug("Creating loggingInterceptor");
 		return new LoggingInterceptor();
 	}
-
+	
+	@Bean
+	public UserSecurityInterceptor userSecurityInterceptor() {
+		LOGGER.debug("Creating userSecurityInterceptor");
+		return new UserSecurityInterceptor();
+	}
+	
 	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
 	public UserContextService userContextService() {

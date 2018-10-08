@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
@@ -112,12 +114,19 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 	
-	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException  {
+	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException  {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());  
-		schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
+		
+		
+		try{
+		    UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
+		    schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
+		} catch (IllegalArgumentException exception){
+			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+		}
 		
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
