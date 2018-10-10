@@ -58,9 +58,12 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	private UserRole getUserRole(SessionData sessionData) {
 
 		String userRoleStr = sessionData.getUserAttribute(userServiceTokenAttributeUserRole);
-		
+
 		if (userRoleStr != null) {
 				if (userRoleStr.equals(mappingRoleProvisioner)) {
+					if ((sessionData.getUserAttribute(userServiceTokenAttributeOrganisation) != null) && (sessionData.getUserAttribute(userServiceTokenAttributeEmail) != null) ) {
+						return UserRole.PROVISIONER_USER;
+					}
 					return UserRole.PROVISIONER;
 				} else if (userRoleStr.equals(mappingRoleAdmin)) {
 					return UserRole.ADMIN;

@@ -24,7 +24,6 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-		//TODO: kan man gemme dem til senere?
 		String userOrganisationId = userService.getUserContext().getUserOrganisation();
 		Organisation organisation = organisationRepository.findByOrganisationId(userOrganisationId);
 		if (organisation == null) {
@@ -37,10 +36,12 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 		if (userRole == UserRole.UNDEFINED || userRole == UserRole.UNAUTHORIZED) {
 			throw new UnauthorizedException();
 		}
-		
-		userRole = userRole.claimRole(userEmail, userOrganisationId);
-		if (userRole == UserRole.UNAUTHORIZED) {
-			throw new UnauthorizedException();
+				
+		if (userRole != UserRole.PROVISIONER) {
+			if ((userEmail == null ) || (userEmail.isEmpty()) || (userOrganisationId == null) || (userOrganisationId.isEmpty())) {
+				userRole = UserRole.UNAUTHORIZED;
+				throw new UnauthorizedException();
+			}
 		}
 		
 		return true;
