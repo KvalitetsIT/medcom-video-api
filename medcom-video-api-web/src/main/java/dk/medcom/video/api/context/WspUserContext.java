@@ -15,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-
 @Component
 public class WspUserContext extends RestTemplate implements UserContextFactory {
 
