@@ -54,7 +54,7 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException  {
+	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException  {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		

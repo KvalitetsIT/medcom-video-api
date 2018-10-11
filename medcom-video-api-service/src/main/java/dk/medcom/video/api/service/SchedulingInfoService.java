@@ -56,7 +56,7 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws NotAcceptableException {
+	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws NotAcceptableException, PermissionDeniedException {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
