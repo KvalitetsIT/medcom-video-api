@@ -21,11 +21,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dk.medcom.video.api.aspect.APISecurityAnnotation;
+import dk.medcom.video.api.context.UserRole;
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
+import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
+import dk.medcom.video.api.dto.SchedulingInfoDto;
+import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.service.MeetingService;
 
 @RestController
@@ -76,6 +84,21 @@ public class MeetingController {
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
 		return resource;
+	}
+	
+	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.PUT)
+	public Resource <MeetingDto> updateMeeting(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateMeetingDto updateMeetingDto ) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
+		MeetingDto meetingDto = new MeetingDto(meeting);
+		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
+		
+		return resource;
+	}
+	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.DELETE)
+	public Resource <MeetingDto> deleteMeeting(@PathVariable("uuid") String uuid) throws  RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+		meetingService.deleteMeeting(uuid);
+
+		return null;
 	}
 
 }

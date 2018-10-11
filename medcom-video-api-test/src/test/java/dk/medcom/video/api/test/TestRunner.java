@@ -63,9 +63,9 @@ public class TestRunner extends Runner {
 
 		GenericContainer newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
 				.withNetwork(n)
-				//.withFileSystemBind(temporaryFolderUri, "/testresult", BindMode.READ_WRITE)
+				.withFileSystemBind(temporaryFolderUri, "/testresult", BindMode.READ_WRITE)
 				//.withFileSystemBind("/home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/output", "/testresult", BindMode.READ_WRITE)
-				.withFileSystemBind("/home/lene/data/logs", "/testresult", BindMode.READ_WRITE)  
+				//.withFileSystemBind("/home/lene/data/logs", "/testresult", BindMode.READ_WRITE)  
 				.withClasspathResourceMapping("docker/collections/medcom-video-api.postman_collection.json", "/etc/postman/test_collection.json", BindMode.READ_ONLY)
 				.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi:8080; cat /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml");				
 		newman.start();

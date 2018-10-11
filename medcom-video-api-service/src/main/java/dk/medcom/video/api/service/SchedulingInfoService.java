@@ -20,6 +20,7 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dto.SchedulingInfoDto;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -120,11 +121,13 @@ public class SchedulingInfoService {
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());  
 		
-		
+
 		try{
-		    UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
-		    schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
-		} catch (IllegalArgumentException exception){
+			if (updateSchedulingInfoDto.getProvisionVmrId() != null) {
+				UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
+			}
+			schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
+		} catch (IllegalArgumentException exception) {
 			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
 		}
 		
@@ -133,5 +136,28 @@ public class SchedulingInfoService {
 		
 		return schedulingInfo;
 	}
+	
+	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
+		
+		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+
+		Calendar cal = Calendar.getInstance();
+		
+		cal.setTime(startTime);
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
+
+		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		
+		return schedulingInfo;
+	}
+
+	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+		
+		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+		schedulingInfoRepository.delete(schedulingInfo);
+
+	}
+
 	
 }

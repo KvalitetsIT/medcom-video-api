@@ -1,7 +1,10 @@
 package dk.medcom.video.api.dto;
 
+import javax.validation.constraints.NotNull;
+
 public class UpdateSchedulingInfoDto {
 	 
+	@NotNull
 	private ProvisionStatus provisionStatus;
 	private String provisionVmrId;
 

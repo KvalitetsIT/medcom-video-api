@@ -68,7 +68,7 @@ public class SchedulingInfoController {
 
 	@APISecurityAnnotation({UserRole.PROVISIONER, UserRole.PROVISIONER_USER})
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
-	public Resource <SchedulingInfoDto> schedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
+	public Resource <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
 		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);

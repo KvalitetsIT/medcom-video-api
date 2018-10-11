@@ -1,0 +1,1514 @@
+{
+	"info": {
+		"_postman_id": "6d55f909-81a2-460e-b514-8a8969a6ea51",
+		"name": "VDX-Booking-Module-API-V0.1.1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create and get flow with positive outcome",
+			"item": [
+				{
+					"name": "Get meetings  and global var initialization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "431b10e4-5c22-4ee6-8e6c-15c2b27bf017",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const meetings = pm.response.json();",
+									"",
+									"if (meetings._embedded){",
+									"  pm.globals.set(\"noOfMeetings\", meetings._embedded.meetingDtoList.length);",
+									"} else { //the result is empty",
+									"    pm.globals.set(\"noOfMeetings\", 0);",
+									"}",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2dc59f8a-faf3-46fc-8759-e518e2630421",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-sys}}/meetings?from-start-time=2018-01-01T03:12:30%2B0100&to-start-time=2023-12-31T03:12:30-0100",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-start-time",
+									"value": "2023-12-31T03:12:30-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting a1 with description (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "e8b206f1-f45b-47b5-9e0d-8658cebd5dad",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0706a707-80f6-4881-9629-8cbbe1c2e567",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde a1\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting a2 without a description",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "496bdc66-945f-4d14-a2d3-8078c11d25c1",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde a2\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0200\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get meetings and check numbers and subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "74831d41-6e19-4961-82dc-1e5f386a4720",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const meetings = pm.response.json();",
+									"",
+									"if (meetings._embedded){",
+									"",
+									"    pm.test(\"All meetings should have a subject\", function() {",
+									"        pm.expect(meetings._embedded.meetingDtoList.every((meeting) => {",
+									"        return meeting.subject !== undefined;",
+									"        })).to.be.true;",
+									"        });",
+									"    ",
+									"    pm.test(\"Number of meetings must match existing + expected successes\", function() {",
+									"        pm.expect(meetings._embedded.meetingDtoList.length).to.eql(pm.globals.get(\"noOfMeetings\"));",
+									"        }); ",
+									"    ",
+									"}  //else the result is empty",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-sys}}/meetings?from-start-time=2018-01-01T03:12:30%2B0100&to-start-time=2023-12-31T03:12:30-0100",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-start-time",
+									"value": "2023-12-31T03:12:30-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get meeting by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f65eb236-6877-4415-9a15-39ffc07fcb80",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ff2be7a3-0a80-4228-8697-19d5799a3d44",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ff2be7a3-0a80-4228-8697-19d5799a3d44",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info?from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T03:12:30-0100&provision-status=AWAITS_PROVISION",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-end-time",
+									"value": "2023-12-31T03:12:30-0100"
+								},
+								{
+									"key": "provision-status",
+									"value": "AWAITS_PROVISION"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info - check status is default",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8ca46db4-07aa-425b-9639-aed06e183cfd",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"//the string compared must match what is actually sent in url",
+									"",
+									"pm.test(\"Body matches string\", function () {",
+									"pm.expect(pm.response.text()).to.include(\"scheduling-info?from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION\");",
+									" })",
+									"",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info?from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T03:12:30-0100",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-end-time",
+									"value": "2023-12-31T03:12:30-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get meetings - empty result due to very old an short dateinterval",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa835f29-2b44-4d84-b9cb-9d5848ce67fd",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const meetings = pm.response.json();",
+									"",
+									"if (meetings._embedded){",
+									"  pm.test('Result is empty', function () { throw new Error(); });",
+									"} else {",
+									"    pm.test('Result is empty', true);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-sys}}/meetings?from-start-time=1970-01-01T01:01:01%2B0100&to-start-time=1972-01-01T01:01:02-0100",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "1970-01-01T01:01:01%2B0100"
+								},
+								{
+									"key": "to-start-time",
+									"value": "1972-01-01T01:01:02-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "create flow with negative outcome",
+			"item": [
+				{
+					"name": "Create meeting b1 - fails due to invalid startTime",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c9033031-0b45-490c-8c17-ad7ebc479857",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 500\", function () {",
+									"    pm.response.to.have.status(500);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde b1\",\n\"startTime\": \"20181-01-31T12:15:00 +0200\",\n\"endTime\": \"2018-01-31T12:30:00 +0200\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting b2 - fails due to empty startTime",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c34fb971-5874-4d16-89ab-30950c09e2ef",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde b2\",\n\"startTime\": \"2018-01-31T12:30:00 +0200\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting b3 - fails because description > 500",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b200dda9-2629-46ac-a43f-97110f0932c7",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde b3\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0200\",\n\"description\": \"12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123 a3\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting b4 - fails due to empty subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "596246e8-d798-4f84-b02f-e2cd6e34bc69",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0200\",\n\"description\": \"beskrivelse for møde b4\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting b5 - fails due to too long subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "71d4f27e-fbd7-4129-bb2f-e9ca32e6e8a8",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123 c2\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0200\",\n\"description\": \"beskrivelse for møde b5\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "meeting  delete flow",
+			"item": [
+				{
+					"name": "Create meeting c1 with description (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f51191b7-91b7-474f-8f8c-424d6129380f",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde c1\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete meeting by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d7179889-ef7f-4a7f-b67a-758b13453894",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get meeting by uuid - fails because of uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f52fc6f0-3b6b-4a60-a052-fbfdf85e2cd3",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid - fails because of uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "06e9a0b1-1764-4bd1-b992-cbc68982f787",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "flow with negative outcome because of existing status",
+			"item": [
+				{
+					"name": "Create meeting c2 with description (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f51191b7-91b7-474f-8f8c-424d6129380f",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde c2\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update scheduling - info by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ed984060-8d06-4ca0-b3db-770ee38d12fb",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Provision status is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.provisionStatus).to.eql(pm.globals.get(\"provision_status\"));",
+									"});",
+									"",
+									"pm.test(\"Provision Vmr id is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.provisionVmrId).to.eql(pm.globals.get(\"provision_vmr_id\"));",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fff43e91-2da9-4eac-9849-e7772eeb5a46",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"provision_status\", \"PROVISIONED_OK\");",
+									"pm.globals.set(\"provision_vmr_id\", \"0f701780-0c61-4709-b1fc-a2370d60fed1\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid - fails because of existing status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "4e19379f-8f52-4e4f-b0df-582d708976c6",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 406\", function () {",
+									"    pm.response.to.have.status(406);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"startTime\": \"2018-11-12T12:15:00 +0200\",\n\"endTime\": \"2018-11-12T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde c1 version 2\"\n}"
+						},
+						"url": {
+							"raw": "{{host-prv}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete meeting by uuid - fails because of existing status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7361a5ac-71da-43a8-8072-4f6036d2293f",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 406\", function () {",
+									"    pm.response.to.have.status(406);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update flow with postive and negativ outcome",
+			"item": [
+				{
+					"name": "Create meeting c3 with description (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f51191b7-91b7-474f-8f8c-424d6129380f",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"test møde a1\",\n\"startTime\": \"2018-11-01T12:15:00 +0200\",\n\"endTime\": \"2018-11-01T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde c3\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update scheduling-info by uuid - fails because of provisionVmrId",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "f60c9e26-7387-4aa0-b36d-7da2479fd512",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionVmrId\": \"0f7017800c614709b1fca2370d60fed1\"\n}"
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update scheduling-info by uuid - fails because status missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "876e1fd5-0c33-4030-9cab-181a4327dcf4",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fff43e91-2da9-4eac-9849-e7772eeb5a46",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"provision_status\", \"PROVISIONED_OK\");",
+									"pm.globals.set(\"provision_vmr_id\", \"0f701780-0c61-4709-b1fc-a2370d60fed1\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "96eea14c-5669-4265-83b1-b618f3086a3f",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});"
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "980d0ee5-ba90-4643-b542-e7f59c184459",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde c1 version 2\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\"\n\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid - fails because startTime missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8737cd34-ceba-423c-8587-02e0d03f3ebb",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "980d0ee5-ba90-4643-b542-e7f59c184459",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde c1 version 2\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\"\n\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid - fails because endTime missing",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "8737cd34-ceba-423c-8587-02e0d03f3ebb",
+								"type": "text/javascript",
+								"exec": [
+									"",
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "980d0ee5-ba90-4643-b542-e7f59c184459",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde c1 version 2\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"startTime\": \"{{start_time}}\",\n\"description\": \"{{meeting_description}}\"\n\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "89f15d75-6825-46df-880f-96104c9ab8c0",
+						"type": "text/javascript",
+						"exec": [
+							"// this postman collecion matches API description v0.1.1",
+							"//",
+							"// the user for which the test is running for should have the role PROVISONER and have a valid organisation and email."
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2dc59f8a-faf3-46fc-8759-e518e2630421",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{host-sys}}/info",
+					"host": [
+						"{{host-sys}}"
+					],
+					"path": [
+						"info"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

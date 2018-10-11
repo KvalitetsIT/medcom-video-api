@@ -1,15 +1,24 @@
 package dk.medcom.video.api.service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
+import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.MeetingRepository;
 
 
@@ -68,4 +77,38 @@ public class MeetingService {
 	
 		return meeting;
 	}
+	
+	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+		
+		Meeting meeting = getMeetingByUuid(uuid);
+		
+		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
+		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION) {
+			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be updated");
+		}
+		
+		meeting.setStartTime(updateMeetingDto.getStartTime());
+		meeting.setEndTime(updateMeetingDto.getEndTime());
+		meeting.setDescription(updateMeetingDto.getDescription());
+		
+		meeting = meetingRepository.save(meeting);
+		schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
+				
+		return meeting;
+	}
+	
+	public void deleteMeeting(String uuid) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+		
+		Meeting meeting = getMeetingByUuid(uuid);
+		
+		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
+		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION) {
+			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be deleted");
+		}
+		
+		schedulingInfoService.deleteSchedulingInfo(uuid);
+		meetingRepository.delete(meeting);
+
+	}
+
 }

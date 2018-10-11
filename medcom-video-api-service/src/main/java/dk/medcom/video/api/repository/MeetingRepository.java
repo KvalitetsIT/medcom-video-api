@@ -14,5 +14,5 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 	public List<Meeting> findByOrganisationAndStartTimeBetween( Organisation organisation, Date startTime, Date endTime);
 
 	public Meeting findOneByUuid(String uuid);
-
+	
 }

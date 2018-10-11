@@ -12,7 +12,8 @@ public class TestUserContext implements UserContextFactory {
 
 	@Override
 	public UserContext getUserContext() {
-		return new UserContextImpl("kvak", "me2@me.dk", UserRole.ADMIN);
+		//return new UserContextImpl("kvak", "me2@me.dk", UserRole.ADMIN);
+		return new UserContextImpl("kvak", "me2@me.dk", UserRole.PROVISIONER_USER);
 	}
 	
 }
