@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
@@ -55,7 +56,7 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws RessourceNotFoundException {
+	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws NotAcceptableException {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
@@ -66,7 +67,7 @@ public class SchedulingInfoService {
 					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
 				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
 			} else {	
-				throw new RessourceNotFoundException("schedulingInfo", "hostPin");
+				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
 			}
 			
 		}
@@ -75,7 +76,7 @@ public class SchedulingInfoService {
 					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
 				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
 			} else {
-				throw new RessourceNotFoundException("schedulingInfo", "guestPin");
+				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
 			}
 		}
 		
@@ -95,14 +96,14 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfoUri;
 		
 		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
-			throw new RessourceNotFoundException("schedulingInfo", "uriWithoutDomain");
+			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
 		}
 		do {  			//loop x number of times until a no-duplicate url is found
 			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
 			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
 			} while (schedulingInfoUri != null && whileCount++ < whileMax); 
 		if (whileCount > whileMax ) {
-			throw new RessourceNotFoundException("schedulingInfo", "uriWithoutDomain");
+			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
 		}
 		
 		schedulingInfo.setUriWithoutDomain(randomUri);		

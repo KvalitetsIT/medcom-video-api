@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingTemplate;
@@ -55,7 +56,7 @@ public class SchedulingTemplateService {
 	private Long uriNumberRangeHigh;		
 
 	
-	public SchedulingTemplate getSchedulingTemplate() throws RessourceNotFoundException{
+	public SchedulingTemplate getSchedulingTemplate() throws PermissionDeniedException{
 		
 		Organisation organisation = organisationRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
 		if (organisation != null) {
@@ -84,7 +85,7 @@ public class SchedulingTemplateService {
 			}
 			
 		} else {
-			throw new RessourceNotFoundException("schedulingTemplate", "schedulingTemplate");
+			throw new PermissionDeniedException();
 		}
 		
 	}
