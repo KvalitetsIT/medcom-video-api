@@ -31,9 +31,12 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 		LOGGER.debug("Entry of preHandle method");
 		
 		String userOrganisationId = userService.getUserContext().getUserOrganisation();
-		Organisation organisation = organisationRepository.findByOrganisationId(userOrganisationId);
-		if (organisation == null) {
-			throw new PermissionDeniedException();
+		Organisation organisation = null;
+		if ((userOrganisationId != null) && (!userOrganisationId.isEmpty())) {
+			organisation = organisationRepository.findByOrganisationId(userOrganisationId);
+			if (organisation == null) {
+				throw new PermissionDeniedException();
+			}			
 		}
 		
 		String userEmail = userService.getUserContext().getUserEmail();
@@ -50,7 +53,7 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 		
-		LOGGER.debug("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation);
+		LOGGER.info("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation.getName());
 		return true;
 	}
 }
