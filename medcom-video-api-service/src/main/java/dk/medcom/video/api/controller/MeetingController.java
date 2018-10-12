@@ -79,7 +79,7 @@ public class MeetingController {
 	}
 
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
-	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
@@ -87,7 +87,7 @@ public class MeetingController {
 	}
 	
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.PUT)
-	public Resource <MeetingDto> updateMeeting(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateMeetingDto updateMeetingDto ) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+	public Resource <MeetingDto> updateMeeting(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateMeetingDto updateMeetingDto ) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);

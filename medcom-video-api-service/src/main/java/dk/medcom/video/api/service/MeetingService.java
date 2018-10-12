@@ -54,7 +54,7 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException  {
+	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException  {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
@@ -65,12 +65,25 @@ public class MeetingService {
 		return meeting;
 	}
 
-	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException {
+	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
+		
+		validateDate(createMeetingDto.getStartTime());
+		validateDate(createMeetingDto.getEndTime());
+		
+//		Calendar calendar = Calendar.getInstance();
+//		calendar.setTime(createMeetingDto.getStartTime());
+//		if (calendar.get(Calendar.YEAR) > 9999) {
+//			throw new NotValidDataException("startTime format is wrong, year must only have 4 digits");
+//		}
+//		calendar.setTime(createMeetingDto.getEndTime());
+//		if (calendar.get(Calendar.YEAR) > 9999) {
+//			throw new NotValidDataException("endTime format is wrong, year must only have 4 digits");
+//		}
+		
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		meeting.setUuid(UUID.randomUUID().toString());
 		meeting.setOrganisation(organisationService.getUserOrganisation());
-		
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());
@@ -78,7 +91,7 @@ public class MeetingService {
 		return meeting;
 	}
 	
-	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		
 		Meeting meeting = getMeetingByUuid(uuid);
 		
@@ -87,6 +100,10 @@ public class MeetingService {
 			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be updated");
 		}
 		
+		validateDate(updateMeetingDto.getStartTime());
+		validateDate(updateMeetingDto.getEndTime());
+		
+		meeting.setSubject(updateMeetingDto.getSubject());
 		meeting.setStartTime(updateMeetingDto.getStartTime());
 		meeting.setEndTime(updateMeetingDto.getEndTime());
 		meeting.setDescription(updateMeetingDto.getDescription());
@@ -111,4 +128,12 @@ public class MeetingService {
 
 	}
 
+	private void validateDate(Date date) throws PermissionDeniedException, NotValidDataException {
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		if (calendar.get(Calendar.YEAR) > 9999) {
+			throw new NotValidDataException("Date format is wrong, year must only have 4 digits");
+		}
+	}
 }
