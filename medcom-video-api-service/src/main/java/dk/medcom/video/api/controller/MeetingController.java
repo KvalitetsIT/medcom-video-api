@@ -36,7 +36,7 @@ import dk.medcom.video.api.service.MeetingService;
 @RestController
 public class MeetingController {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MeetingController.class);
 
 	@Autowired
 	MeetingService meetingService;

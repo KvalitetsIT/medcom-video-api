@@ -3,17 +3,22 @@ package dk.medcom.video.api.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
+import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.UnauthorizedException;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.repository.OrganisationRepository;
 
 public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(UserSecurityInterceptor.class);
 	
 	@Autowired
 	UserContextService userService;
@@ -23,7 +28,8 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
+		LOGGER.debug("Entry of preHandle method");
+		
 		String userOrganisationId = userService.getUserContext().getUserOrganisation();
 		Organisation organisation = organisationRepository.findByOrganisationId(userOrganisationId);
 		if (organisation == null) {
@@ -44,6 +50,7 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 		
+		LOGGER.debug("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation);
 		return true;
 	}
 }
