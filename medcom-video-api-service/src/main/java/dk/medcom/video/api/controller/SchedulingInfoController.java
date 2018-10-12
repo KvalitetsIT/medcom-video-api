@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.slf4j.Logger;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
@@ -33,7 +35,9 @@ import dk.medcom.video.api.service.SchedulingInfoService;
 
 @RestController
 public class SchedulingInfoController {
-
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
+	
 	@Autowired
 	SchedulingInfoService schedulingInfoService;
 	
@@ -42,7 +46,8 @@ public class SchedulingInfoController {
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime, 
 			@RequestParam(value = "to-end-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toEndTime,
 			@RequestParam(value = "provision-status", required = false, defaultValue = "AWAITS_PROVISION") ProvisionStatus provisionStatus) {
-		
+		LOGGER.debug("Entry of /scheduling-info.get fromStartTime: "+ fromStartTime.toString() + " toEndTime: " + toEndTime.toString() + " provision status: "+ provisionStatus.getValue()); 
+
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
 		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<SchedulingInfoDto>();
 		for (SchedulingInfo schedulingInfo : schedulingInfos) {
@@ -54,6 +59,7 @@ public class SchedulingInfoController {
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfo(fromStartTime, toEndTime, provisionStatus)).withSelfRel();
 		resources.add(selfRelLink);
 
+		LOGGER.debug("Exit of /scheduling-info.get resources: " + resources.toString());
 		return resources;
 	}
 	
@@ -69,10 +75,13 @@ public class SchedulingInfoController {
 	@APISecurityAnnotation({UserRole.PROVISIONER, UserRole.PROVISIONER_USER})
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
 	public Resource <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
+		LOGGER.debug("Entry of /scheduling-info.put uuid: " + uuid);
+				
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
 		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);
 		
+		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());
 		return resource;
 	}
 
