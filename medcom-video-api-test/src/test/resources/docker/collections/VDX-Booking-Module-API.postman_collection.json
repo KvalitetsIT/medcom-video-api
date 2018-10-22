@@ -982,7 +982,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
+							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionStatusDescription\": \"all ok\",\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
 						},
 						"url": {
 							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
@@ -1206,7 +1206,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionVmrId\": \"0f7017800c614709b1fca2370d60fed1\"\n}"
+							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionStatusDescription\": \"all ok\",\n    \"provisionVmrId\": \"0f7017800c614709b1fca2370d60fed1\"\n}"
 						},
 						"url": {
 							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
@@ -1260,7 +1260,61 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
+							"raw": "{\n\t\"provisionStatusDescription\": \"all ok\",\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update scheduling-info by uuid - fails because provsion status description > 200",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "876e1fd5-0c33-4030-9cab-181a4327dcf4",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									""
+								]
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "fff43e91-2da9-4eac-9849-e7772eeb5a46",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.set(\"provision_status\", \"PROVISIONED_OK\");",
+									"pm.globals.set(\"provision_vmr_id\", \"0f701780-0c61-4709-b1fc-a2370d60fed1\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"provisionStatus\": \"PROVISIONED_OK\",\n\t\"provisionStatusDescription\": \"123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901\",\n\t\"provisionVmrId\": \"0f701780-0c61-4709-b1fc-a2370d60fed1\"   \n}"
 						},
 						"url": {
 							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",

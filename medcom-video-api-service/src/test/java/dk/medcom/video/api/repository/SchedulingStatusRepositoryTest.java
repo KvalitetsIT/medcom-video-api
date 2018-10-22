@@ -24,7 +24,8 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 	public void testSchedulingStatus() {
 		
 		// Given
-		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION; 
+		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+		String provisionStatusDescription = "All is okay yet";
 		Long meetingId = new Long(4);
 		Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
 		Meeting meeting = subjectM.findOne(meetingId);
@@ -32,6 +33,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		SchedulingStatus schedulingStatus = new SchedulingStatus();
 		schedulingStatus.setTimeStamp(calendar.getTime());
 		schedulingStatus.setProvisionStatus(provisionStatus);
+		schedulingStatus.setProvisionStatusDescription(provisionStatusDescription);
 		schedulingStatus.setMeeting(meeting);
 		
 		// When
@@ -42,6 +44,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(schedulingStatus);
 		Assert.assertNotNull(schedulingStatus.getId());
 		Assert.assertEquals(provisionStatus, schedulingStatus.getProvisionStatus());
+		Assert.assertEquals(provisionStatusDescription, schedulingStatus.getProvisionStatusDescription());
 		Assert.assertEquals(meetingId, schedulingStatus.getMeeting().getId());
 		
 		Assert.assertEquals(calendar.getTime(), schedulingStatus.getTimeStamp());
@@ -59,6 +62,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(schedulingStatus);
 		Assert.assertEquals(id, schedulingStatus.getId());
 		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingStatus.getProvisionStatus());
+		Assert.assertEquals("all ok", schedulingStatus.getProvisionStatusDescription());
 	}
 
 	@Test

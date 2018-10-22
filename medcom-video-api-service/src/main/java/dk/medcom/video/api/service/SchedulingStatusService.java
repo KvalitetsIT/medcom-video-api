@@ -17,6 +17,7 @@ public class SchedulingStatusService {
 		SchedulingStatus schedulingStatus = new SchedulingStatus();
 		schedulingStatus.setMeeting(schedulingInfo.getMeeting());
 		schedulingStatus.setProvisionStatus(schedulingInfo.getProvisionStatus());
+		schedulingStatus.setProvisionStatusDescription(schedulingInfo.getProvisionStatusDescription());
 		schedulingStatus.setTimeStamp(schedulingInfo.getProvisionTimestamp());
 		schedulingStatus = schedulingStatusRepository.save(schedulingStatus);
 		

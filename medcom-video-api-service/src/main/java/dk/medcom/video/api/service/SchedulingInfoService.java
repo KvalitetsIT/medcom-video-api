@@ -120,6 +120,7 @@ public class SchedulingInfoService {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
+		schedulingInfo.setProvisionStatusDescription(updateSchedulingInfoDto.getProvisionStatusDescription());
 		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());  
 		
 

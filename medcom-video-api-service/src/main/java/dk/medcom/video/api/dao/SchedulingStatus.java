@@ -24,6 +24,7 @@ public class SchedulingStatus {
 	private Date timeStamp;
 	@Enumerated(EnumType.STRING)
 	private ProvisionStatus provisionStatus;
+	private String provisionStatusDescription;
 	
 	@ManyToOne
     @JoinColumn(name="meetings_id")
@@ -47,6 +48,12 @@ public class SchedulingStatus {
 	}
 	public void setProvisionStatus(ProvisionStatus provisionStatus) {
 		this.provisionStatus = provisionStatus;
+	}
+	public String getProvisionStatusDescription() {
+		return provisionStatusDescription;
+	}
+	public void setProvisionStatusDescription(String provisionStatusDescription) {
+		this.provisionStatusDescription = provisionStatusDescription;
 	}
 	public Meeting getMeeting() {
 	return meeting;

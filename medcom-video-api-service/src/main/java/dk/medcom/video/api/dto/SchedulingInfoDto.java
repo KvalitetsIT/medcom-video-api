@@ -29,6 +29,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 	private String uriWithDomain;		
 	private String uriWithoutDomain;
 	private ProvisionStatus provisionStatus;
+	private String provisionStatusDescription;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
@@ -50,6 +51,7 @@ public class SchedulingInfoDto extends ResourceSupport {
 		uriWithDomain = schedulingInfo.getUriWithDomain();
 		uriWithoutDomain = schedulingInfo.getUriWithoutDomain();
 		provisionStatus = schedulingInfo.getProvisionStatus();
+		provisionStatusDescription = schedulingInfo.getProvisionStatusDescription();
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
 		
@@ -129,6 +131,13 @@ public class SchedulingInfoDto extends ResourceSupport {
 
 	public void setProvisionStatus(ProvisionStatus provisionStatus) {
 		this.provisionStatus = provisionStatus;
+	}
+	public String getProvisionStatusDescription() {
+		return provisionStatusDescription;
+	}
+
+	public void setProvisionStatusDescription(String provisionStatusDescription) {
+		this.provisionStatusDescription = provisionStatusDescription;
 	}
 
 	public Date getProvisionTimestamp() {

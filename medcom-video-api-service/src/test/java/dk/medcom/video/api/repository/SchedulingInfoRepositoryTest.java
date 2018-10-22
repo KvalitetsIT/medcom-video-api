@@ -37,6 +37,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		String uriWithoutDomain = "7777";
 		
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+		String provisionStatusDescription = "All okay untill now";
 		String provisionVMRId = "PVMRID";
 	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
 		
@@ -53,6 +54,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		schedulingInfo.setUriWithDomain(uriWithDomain);
 		schedulingInfo.setUriWithoutDomain(uriWithoutDomain);
 		schedulingInfo.setProvisionStatus(provisionStatus);
+		schedulingInfo.setProvisionStatusDescription(provisionStatusDescription);
 		schedulingInfo.setProvisionTimestamp(calendar.getTime());
 		schedulingInfo.setProvisionVMRId(provisionVMRId);
 		
@@ -83,6 +85,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
 		Assert.assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
 		Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+		Assert.assertEquals(provisionStatusDescription, schedulingInfo.getProvisionStatusDescription());
 		Assert.assertEquals(calendar.getTime(), schedulingInfo.getProvisionTimestamp());
 		Assert.assertEquals(provisionVMRId, schedulingInfo.getProvisionVMRId());
 		
@@ -124,6 +127,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(15, schedulingInfo.getVMRAvailableBefore());
 		Assert.assertEquals(10, schedulingInfo.getMaxParticipants());
 		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
+		Assert.assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());
 	}
 
 	@Test

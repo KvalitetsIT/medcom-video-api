@@ -40,6 +40,7 @@ public class SchedulingInfo {
 	private SchedulingTemplate schedulingTemplate;
 	@Enumerated(EnumType.STRING)
 	private ProvisionStatus provisionStatus;
+	private String provisionStatusDescription;
 	private Date provisionTimestamp;
 	private String provisionVMRId;
 	
@@ -124,6 +125,12 @@ public class SchedulingInfo {
 	}
 	public void setProvisionStatus(ProvisionStatus provisionStatus) {
 		this.provisionStatus = provisionStatus;
+	}
+	public String getProvisionStatusDescription() {
+		return provisionStatusDescription;
+	}
+	public void setProvisionStatusDescription(String provisionStatusDescription) {
+		this.provisionStatusDescription = provisionStatusDescription;
 	}
 	public Date getProvisionTimestamp() {
 		return provisionTimestamp;
