@@ -53,7 +53,7 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 			}
 		}
 		
-		LOGGER.info("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation);
+		LOGGER.debug("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation);
 		return true;
 	}
 }

@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "6d55f909-81a2-460e-b514-8a8969a6ea51",
-		"name": "VDX-Booking-Module-API-V0.1.1",
+		"name": "VDX-Booking-Module-API-V0.2.0",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -380,7 +380,7 @@
 						{
 							"listen": "test",
 							"script": {
-								"id": "8ca46db4-07aa-425b-9639-aed06e183cfd",
+								"id": "be35ef0a-b4c1-44f7-a8eb-61eeb006b9a9",
 								"type": "text/javascript",
 								"exec": [
 									"pm.test(\"Status code is 200\", function () {",
@@ -390,7 +390,7 @@
 									"//the string compared must match what is actually sent in url",
 									"",
 									"pm.test(\"Body matches string\", function () {",
-									"pm.expect(pm.response.text()).to.include(\"scheduling-info?from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION\");",
+									"pm.expect(pm.response.text()).to.include(\"&provision-status=AWAITS_PROVISION\");",
 									" })",
 									"",
 									"",
@@ -1039,9 +1039,9 @@
 							"raw": "{\n\"subject\": \"test møde a1 version 2\",\n\"startTime\": \"2018-11-12T12:15:00 +0200\",\n\"endTime\": \"2018-11-12T12:30:00 +0100\",\n\"description\": \"beskrivelse for møde c1 version 2\"\n}"
 						},
 						"url": {
-							"raw": "{{host-prv}}/meetings/{{meeting-uuid}}",
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
 							"host": [
-								"{{host-prv}}"
+								"{{host-sys}}"
 							],
 							"path": [
 								"meetings",
