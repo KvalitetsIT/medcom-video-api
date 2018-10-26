@@ -35,6 +35,7 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 		if ((userOrganisationId != null) && (!userOrganisationId.isEmpty())) {
 			organisation = organisationRepository.findByOrganisationId(userOrganisationId);
 			if (organisation == null) {
+				LOGGER.debug("organisation is not found using findByOrganisationId(userOrganisationId). userOrganisationId: " + userOrganisationId );
 				throw new PermissionDeniedException();
 			}			
 		}
@@ -43,11 +44,13 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 		
 		UserRole userRole = userService.getUserContext().getUserRole();
 		if (userRole == UserRole.UNDEFINED || userRole == UserRole.UNAUTHORIZED) {
+			LOGGER.debug("userRole is not valid: UserRole Ordinal: " + userRole.ordinal());
 			throw new UnauthorizedException();
 		}
 				
 		if (userRole != UserRole.PROVISIONER) {
 			if ((userEmail == null ) || (userEmail.isEmpty()) || (userOrganisationId == null) || (userOrganisationId.isEmpty())) {
+				LOGGER.debug("Email or user are not valid: userEmail: " + userEmail + ", userOrganisationId = " + userOrganisationId);
 				userRole = UserRole.UNAUTHORIZED;
 				throw new UnauthorizedException();
 			}
