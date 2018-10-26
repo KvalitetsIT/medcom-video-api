@@ -81,6 +81,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 				
 	}
 	
+
+	
 	@Test
 	public void testFindAllSchedulingTemplate() {
 		// Given
@@ -149,4 +151,66 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(schedulingTemplates);
 		Assert.assertEquals(1, schedulingTemplates.size());
 	}
+	
+	@Test
+	public void testFindScheduligTemplateWithOrganisationNull() {
+		
+		// Given
+		Long conferencingSysId = 7L; 
+		String uriPrefix = "abcd";
+		String uriDomain = "test7.dk"; 
+		boolean hostPinRequired = true; 
+		Long hostPinRangeLow = 7L;
+		Long hostPinRangeHigh = 97L;
+		boolean guestPinRequired = false; 
+		Long guestPinRangeLow = 107L;
+		Long guestPinRangeHigh = 997L;
+		int vMRAvailableBefore = 10; 
+		int maxParticipants = 17;
+		boolean endMeetingOnEndTime = true;
+		Long uriNumberRangeLow = 1007L;
+		Long uriNumberRangeHigh = 9997L;
+
+		// When
+		// Then
+		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationIsNull();
+		int numberOfSchedulingTemplates = 0;
+		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
+			Assert.assertNull(schedulingTemplate.getOrganisation());
+			numberOfSchedulingTemplates++;
+		}
+		
+		if (numberOfSchedulingTemplates < 1) {
+			SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
+			schedulingTemplate.setConferencingSysId(conferencingSysId);
+			schedulingTemplate.setUriPrefix(uriPrefix);
+			schedulingTemplate.setUriDomain(uriDomain);
+			schedulingTemplate.setHostPinRequired(hostPinRequired);
+			schedulingTemplate.setHostPinRangeLow(hostPinRangeLow);
+			schedulingTemplate.setHostPinRangeHigh(hostPinRangeHigh);
+			schedulingTemplate.setGuestPinRequired(guestPinRequired);
+			schedulingTemplate.setGuestPinRangeLow(guestPinRangeLow);
+			schedulingTemplate.setGuestPinRangeHigh(guestPinRangeHigh);
+			schedulingTemplate.setVMRAvailableBefore(vMRAvailableBefore);
+			schedulingTemplate.setMaxParticipants(maxParticipants);
+			schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
+			schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
+			schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
+
+			schedulingTemplate = subject.save(schedulingTemplate);
+			schedulingTemplates = subject.findByOrganisationIsNull();
+			
+			Assert.assertNotNull(schedulingTemplates);
+			numberOfSchedulingTemplates = 0;
+			for (SchedulingTemplate schedulingTemplate2 : schedulingTemplates) {
+				Assert.assertNotNull(schedulingTemplate2);
+				Assert.assertNull(schedulingTemplate2.getOrganisation());
+				numberOfSchedulingTemplates++;
+			}
+			Assert.assertEquals(1, numberOfSchedulingTemplates);
+			
+		}
+				
+	}
+	
 }

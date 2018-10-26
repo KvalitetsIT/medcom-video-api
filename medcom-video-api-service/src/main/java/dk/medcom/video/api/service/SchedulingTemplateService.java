@@ -64,26 +64,30 @@ public class SchedulingTemplateService {
 			if (schedulingTemplates.size() > 0) {
 				return schedulingTemplates.get(0);
 			} else {
-				SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
+				schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNull();
+				if (schedulingTemplates.size() > 0) {
+					return schedulingTemplates.get(0);
+				} else {
+					SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 				
-				//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
-				schedulingTemplate.setConferencingSysId(conferencingSysId);
-				schedulingTemplate.setUriPrefix(uriPrefix);
-				schedulingTemplate.setUriDomain(uriDomain);
-				schedulingTemplate.setHostPinRequired(hostPinRequired);
-				schedulingTemplate.setHostPinRangeLow(hostPinRangeLow);
-				schedulingTemplate.setHostPinRangeHigh(hostPinRangeHigh);
-				schedulingTemplate.setGuestPinRequired(guestPinRequired);
-				schedulingTemplate.setGuestPinRangeLow(guestPinRangeLow);
-				schedulingTemplate.setGuestPinRangeHigh(guestPinRangeHigh);
-				schedulingTemplate.setVMRAvailableBefore(vMRAvailableBefore);
-				schedulingTemplate.setMaxParticipants(maxParticipants);
-				schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
-				schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
-				schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
-				return schedulingTemplateRepository.save(schedulingTemplate);
+					//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
+					schedulingTemplate.setConferencingSysId(conferencingSysId);
+					schedulingTemplate.setUriPrefix(uriPrefix);
+					schedulingTemplate.setUriDomain(uriDomain);
+					schedulingTemplate.setHostPinRequired(hostPinRequired);
+					schedulingTemplate.setHostPinRangeLow(hostPinRangeLow);
+					schedulingTemplate.setHostPinRangeHigh(hostPinRangeHigh);
+					schedulingTemplate.setGuestPinRequired(guestPinRequired);
+					schedulingTemplate.setGuestPinRangeLow(guestPinRangeLow);
+					schedulingTemplate.setGuestPinRangeHigh(guestPinRangeHigh);
+					schedulingTemplate.setVMRAvailableBefore(vMRAvailableBefore);
+					schedulingTemplate.setMaxParticipants(maxParticipants);
+					schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
+					schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
+					schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
+					return schedulingTemplateRepository.save(schedulingTemplate);
+				}
 			}
-			
 		} else {
 			throw new PermissionDeniedException();
 		}
