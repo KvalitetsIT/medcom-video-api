@@ -1168,60 +1168,6 @@
 					"response": []
 				},
 				{
-					"name": "Update scheduling-info by uuid - fails because of provisionVmrId",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "f60c9e26-7387-4aa0-b36d-7da2479fd512",
-								"type": "text/javascript",
-								"exec": [
-									"",
-									"pm.test(\"Status code is 400\", function () {",
-									"    pm.response.to.have.status(400);",
-									"});",
-									"",
-									""
-								]
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"id": "aa0fd51b-d0c5-4a53-8f0d-11865adceb38",
-								"type": "text/javascript",
-								"exec": [
-									""
-								]
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"provisionStatus\": \"PROVISIONED_OK\",\n    \"provisionStatusDescription\": \"all ok\",\n    \"provisionVmrId\": \"0f7017800c614709b1fca2370d60fed1\"\n}"
-						},
-						"url": {
-							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
-							"host": [
-								"{{host-prv}}"
-							],
-							"path": [
-								"scheduling-info",
-								"{{meeting-uuid}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "Update scheduling-info by uuid - fails because status missing",
 					"event": [
 						{

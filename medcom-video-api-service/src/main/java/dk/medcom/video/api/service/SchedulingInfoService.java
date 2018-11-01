@@ -5,9 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.SchedulingInfoDto;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -121,17 +118,17 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionStatusDescription(updateSchedulingInfoDto.getProvisionStatusDescription());
-		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());  
+		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
 		
-
-		try{
-			if (updateSchedulingInfoDto.getProvisionVmrId() != null) {
-				UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
-			}
-			schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
-		} catch (IllegalArgumentException exception) {
-			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
-		}
+		//Removed UUID validation again		
+//		try{
+//			if (updateSchedulingInfoDto.getProvisionVmrId() != null) {
+//				UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
+//			}
+		schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
+//		} catch (IllegalArgumentException exception) {
+//			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+//		}
 		
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
