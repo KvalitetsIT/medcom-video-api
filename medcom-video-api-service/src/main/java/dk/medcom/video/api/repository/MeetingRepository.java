@@ -7,12 +7,15 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
 
 public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	public List<Meeting> findByOrganisationAndStartTimeBetween( Organisation organisation, Date startTime, Date endTime);
-
+	
+	public List<Meeting> findByOrganizedByAndStartTimeBetween( MeetingUser organizedBy, Date startTime, Date endTime);
+	
 	public Meeting findOneByUuid(String uuid);
 	
 }

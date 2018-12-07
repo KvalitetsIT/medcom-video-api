@@ -37,6 +37,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		boolean endMeetingOnEndTime = true;
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;
+		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
 		
 		Organisation organisation = subjectO.findOne(organisationId);
 		
@@ -56,6 +57,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
 		schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
 		schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
+		schedulingTemplate.setIvrTheme(ivrTheme);
 		
 		// When
 		schedulingTemplate = subject.save(schedulingTemplate);
@@ -78,6 +80,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(endMeetingOnEndTime, schedulingTemplate.getEndMeetingOnEndTime());
 		Assert.assertEquals(uriNumberRangeLow, schedulingTemplate.getUriNumberRangeLow());
 		Assert.assertEquals(uriNumberRangeHigh, schedulingTemplate.getUriNumberRangeHigh());
+		Assert.assertEquals(ivrTheme, schedulingTemplate.getIvrTheme());
 				
 	}
 	
@@ -126,6 +129,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(true, schedulingTemplate.getEndMeetingOnEndTime());
 		Assert.assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		Assert.assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
+		Assert.assertEquals("/api/admin/configuration/v1/ivr_theme/10/", schedulingTemplate.getIvrTheme());
 	}
 
 	@Test
@@ -170,6 +174,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		boolean endMeetingOnEndTime = true;
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;
+		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
 
 		// When
 		// Then
@@ -196,6 +201,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
 			schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
 			schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
+			schedulingTemplate.setIvrTheme(ivrTheme);
 
 			schedulingTemplate = subject.save(schedulingTemplate);
 			schedulingTemplates = subject.findByOrganisationIsNull();

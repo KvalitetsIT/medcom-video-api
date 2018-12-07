@@ -48,6 +48,9 @@ public class SchedulingInfo {
 	@JoinColumn(name="meetings_id")
 	private Meeting meeting;
 	
+	private String portalLink;				//link to "borger-portal"
+	private String ivrTheme;				//theme to use in Pexip
+
 	public Long getId() {
 		return id;
 	}
@@ -143,6 +146,18 @@ public class SchedulingInfo {
 	}
 	public void setProvisionVMRId(String provisionVMRId) {
 		this.provisionVMRId = provisionVMRId;
+	}
+	public String getPortalLink() {
+		return portalLink;
+	}
+	public void setPortalLink(String portalLink) {
+		this.portalLink = portalLink;
+	}
+	public String getIvrTheme() {
+		return ivrTheme;
+	}
+	public void setIvrTheme(String ivrTheme) {
+		this.ivrTheme = ivrTheme;
 	}
 	
 }

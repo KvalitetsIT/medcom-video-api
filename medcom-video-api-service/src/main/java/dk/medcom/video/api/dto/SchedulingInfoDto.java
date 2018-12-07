@@ -30,6 +30,8 @@ public class SchedulingInfoDto extends ResourceSupport {
 	private String uriWithoutDomain;
 	private ProvisionStatus provisionStatus;
 	private String provisionStatusDescription;
+	private String portalLink;
+	private String ivrTheme;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
@@ -52,6 +54,8 @@ public class SchedulingInfoDto extends ResourceSupport {
 		uriWithoutDomain = schedulingInfo.getUriWithoutDomain();
 		provisionStatus = schedulingInfo.getProvisionStatus();
 		provisionStatusDescription = schedulingInfo.getProvisionStatusDescription();
+		portalLink = schedulingInfo.getPortalLink();
+		ivrTheme = schedulingInfo.getIvrTheme();
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
 		
@@ -156,4 +160,19 @@ public class SchedulingInfoDto extends ResourceSupport {
 		this.provisionVmrId = provisionVmrId;
 	}
 	
+	public String getPortalLink() {
+		return portalLink;
+	}
+
+	public void setPortalLink(String portalLink) {
+		this.portalLink = portalLink;
+	}
+	
+	public String getIvrTheme() {
+		return ivrTheme;
+	}
+
+	public void setIvrTheme(String ivrTheme) {
+		this.ivrTheme = ivrTheme;
+	}
 }

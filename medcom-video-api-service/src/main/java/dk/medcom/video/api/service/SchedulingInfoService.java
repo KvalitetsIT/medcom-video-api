@@ -1,13 +1,18 @@
 package dk.medcom.video.api.service;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
@@ -25,6 +30,8 @@ import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 
 @Component
 public class SchedulingInfoService {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
 	@Autowired
 	SchedulingInfoRepository schedulingInfoRepository;
@@ -41,20 +48,25 @@ public class SchedulingInfoService {
 	@Autowired
 	UserContextService userService;
 	
+	@Value("${scheduling.info.citizen.portal}")
+	private String citizenPortal;		
+	
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
 		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
 
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		if (schedulingInfo == null) {
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
 		}
+		LOGGER.debug("Exit getSchedulingInfoByUuid");
 		return schedulingInfo;
 	}
 
 	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws NotAcceptableException, PermissionDeniedException {
-		
+		LOGGER.debug("Entry createSchedulingInfo");
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		
@@ -85,6 +97,7 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
 		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
+		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
 		
 		String randomUri;
 		int whileCount = 0;
@@ -105,16 +118,42 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setUriWithoutDomain(randomUri);		
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		
+		LOGGER.debug("CitizenPortal (borgerPortal) parameter is: " + citizenPortal);
+		
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String portalDate = formatter.format(meeting.getStartTime());
+		LOGGER.debug("portalDate is: " + portalDate);
+		
+		String portalPin;
+		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
+			portalPin = schedulingInfo.getGuestPin().toString();
+			LOGGER.debug("Portal pin used is guest");
+		} else {
+				if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
+					portalPin = schedulingInfo.getHostPin().toString();
+					LOGGER.debug("Portal pin used is host");
+				} else {
+					portalPin = "";
+					LOGGER.debug("Portal pin used is empty");
+				}
+		}
+		
+		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54
+		LOGGER.debug("portalLink is " + portalLink);
+		schedulingInfo.setPortalLink(portalLink);
+		
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
+		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}
 	
 	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException  {
-		
+		LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionStatusDescription(updateSchedulingInfoDto.getProvisionStatusDescription());
@@ -133,10 +172,12 @@ public class SchedulingInfoService {
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
 		
+		LOGGER.debug("Exit updateSchedulingInfo");
 		return schedulingInfo;
 	}
 	
 	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
+		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 
@@ -148,14 +189,17 @@ public class SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
+		LOGGER.debug("Entry updateSchedulingInfo");
 		return schedulingInfo;
 	}
 
 	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+		LOGGER.debug("Entry deleteSchedulingInfo. uuid=" + uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-
+		
+		LOGGER.debug("Exit deleteeSchedulingInfo");
 	}
 
 	

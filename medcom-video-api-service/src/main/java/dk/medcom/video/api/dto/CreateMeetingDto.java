@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Email;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 
@@ -24,6 +26,12 @@ public class CreateMeetingDto {
 	
 	@Size(max=500, message="description should have a maximum of 500 characters")
 	public String description;
+	
+	@Size(max=20, message="Project Code should have a maximum of 20 characters")
+	public String projectCode;
+	
+	@Email
+	public String organizedByEmail;
 
 	public String getSubject() {
 		return subject;
@@ -36,6 +44,7 @@ public class CreateMeetingDto {
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -50,7 +59,25 @@ public class CreateMeetingDto {
 	public Date getEndTime() {
 		return endTime;
 	}
+	
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
+	
+	public String getProjectCode() {
+		return projectCode;
+	}
+
+	public void setProjectCode(String projectCode) {
+		this.projectCode = projectCode;
+	}
+	
+	public String getOrganizedByEmail() {
+		return organizedByEmail;
+	}
+
+	public void setOrganizedByEmail(String organizedByEmail) {
+		this.organizedByEmail = organizedByEmail;
+	}
+
 }

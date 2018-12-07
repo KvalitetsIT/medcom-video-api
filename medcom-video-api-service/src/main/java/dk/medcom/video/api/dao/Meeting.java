@@ -30,9 +30,16 @@ public class Meeting {
     @JoinColumn(name="created_by")
 	private MeetingUser createdBy;
 	
+	@ManyToOne
+    @JoinColumn(name="organized_by")
+	private MeetingUser organizedBy;
+	
 	private Date startTime;
 	private Date endTime;
 	private String description;
+	
+	private String projectCode;
+	
 	
 	public Long getId() {
 		return id;
@@ -96,5 +103,19 @@ public class Meeting {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public MeetingUser getOrganizedByUser() {
+		return organizedBy;
+	}
+
+	public void setOrganizedByUser(MeetingUser meetingUser) {
+		this.organizedBy = meetingUser;
+	}
+	public String getProjectCode() {
+		return projectCode;
+	}
+	public void setProjectCode(String projectCode) {
+		this.projectCode = projectCode;
+	}
+
 
 }

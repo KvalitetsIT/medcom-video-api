@@ -43,6 +43,9 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	
 	@Value("${mapping.role.user}")
 	private String mappingRoleUser;
+	
+	@Value("${mapping.role.meeting_planner}")
+	private String mappingRoleMeetingPlanner;
 
 	@Override
 	public UserContext getUserContext() {
@@ -57,7 +60,7 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 
 		String userRoleStr = sessionData.getUserAttribute(userServiceTokenAttributeUserRole);
 		LOGGER.debug("User role is: " + userRoleStr );
-		LOGGER.debug("Map values are: Provisioner: " + mappingRoleProvisioner + " Admin: " + mappingRoleAdmin + " User: " + mappingRoleUser); 
+		LOGGER.debug("Map values are: Provisioner: " + mappingRoleProvisioner + " Admin: " + mappingRoleAdmin + " User: " + mappingRoleUser + " Meeting Planner: " + mappingRoleMeetingPlanner); 
 
 		if (userRoleStr != null) {
 				if (userRoleStr.equals(mappingRoleProvisioner)) {
@@ -70,7 +73,9 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 					return UserRole.ADMIN;
 				} else if (userRoleStr.equals(mappingRoleUser)) {
 					return UserRole.USER;
-				} else {
+				} else if (userRoleStr.equals(mappingRoleMeetingPlanner)) {
+					return UserRole.MEETING_PLANNER;
+				} else { 
 					LOGGER.error("Userrole "+userRoleStr+" not legal value");
 					return UserRole.UNAUTHORIZED;
 				}

@@ -21,10 +21,14 @@ public class MeetingUserService {
 	OrganisationService organisationService;
 
 	public MeetingUser getOrCreateCurrentMeetingUser() throws PermissionDeniedException {
-		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), userService.getUserContext().getUserEmail());
+		return getOrCreateCurrentMeetingUser(userService.getUserContext().getUserEmail());
+	}
+	
+	public MeetingUser getOrCreateCurrentMeetingUser(String email) throws PermissionDeniedException {
+		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), email);
 		if (meetingUser == null) {
 			meetingUser = new MeetingUser();
-			meetingUser.setEmail(userService.getUserContext().getUserEmail());
+			meetingUser.setEmail(email);
 			meetingUser.setOrganisation(organisationService.getUserOrganisation());
 			meetingUser = meetingUserRepository.save(meetingUser);
 		}

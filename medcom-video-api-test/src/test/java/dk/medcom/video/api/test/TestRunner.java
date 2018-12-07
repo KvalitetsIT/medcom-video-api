@@ -129,9 +129,12 @@ public class TestRunner extends Runner {
 				.withEnv("scheduling.template.default.end.meeting.on.end.time", "true") 
 				.withEnv("scheduling.template.default.uri.number.range.low", "1000") 
 				.withEnv("scheduling.template.default.uri.number.range.high", "9999") 
+				.withEnv("scheduling.template.default.ivr.theme", "10")
+				.withEnv("scheduling.info.citizen.portal", "https://portal.vconf.dk")
 				.withEnv("mapping.role.provisioner", "dk:medcom:role:provisioner")
 				.withEnv("mapping.role.admin", "dk:medcom:role:admin")
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
+				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/info").forStatusCode(200));
 		videoApi.start();

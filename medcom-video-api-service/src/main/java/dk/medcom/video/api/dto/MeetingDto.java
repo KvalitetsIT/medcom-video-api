@@ -2,6 +2,9 @@ package dk.medcom.video.api.dto;
 
 import java.util.Date;
 
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
@@ -19,6 +22,7 @@ public class MeetingDto extends ResourceSupport {
 	public String subject;
 	public String uuid;
 	public MeetingUserDto createdBy;
+	public MeetingUserDto organizedBy;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
 	public Date startTime;
@@ -27,6 +31,7 @@ public class MeetingDto extends ResourceSupport {
 	public Date endTime;
 	
 	public String description;
+	public String projectCode;
 	
 	public MeetingDto(Meeting meeting) {
 		
@@ -36,10 +41,15 @@ public class MeetingDto extends ResourceSupport {
 		MeetingUser meetingUser = meeting.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
 		
+		MeetingUser organizedByUser = meeting.getOrganizedByUser();
+		MeetingUserDto organizedByUserDto = new MeetingUserDto(organizedByUser);
+
 		createdBy = meetingUserDto;
 		startTime = meeting.getStartTime();
 		endTime = meeting.getEndTime();
 		description = meeting.getDescription();
+		projectCode = meeting.getProjectCode();
+		organizedBy = organizedByUserDto;  
 
 		try { 
 			Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("self");
@@ -92,4 +102,15 @@ public class MeetingDto extends ResourceSupport {
 		this.endTime = endTime;
 	}
 	
+	public String projectCode() {
+		return projectCode;
+	}
+
+	public void setProjectCode(String projectCode) {
+		this.projectCode = projectCode;
+	}
+	
+	public void setOrganizedBy(MeetingUserDto meetingUserDto) {
+		this.organizedBy =  meetingUserDto;
+	}
 }

@@ -54,7 +54,8 @@ public class SchedulingTemplateService {
 	private Long uriNumberRangeLow;			
 	@Value("${scheduling.template.default.uri.number.range.high}")
 	private Long uriNumberRangeHigh;		
-
+	@Value("${scheduling.template.default.ivr.theme}")
+	private String ivrTheme;		
 	
 	public SchedulingTemplate getSchedulingTemplate() throws PermissionDeniedException{
 		
@@ -85,6 +86,7 @@ public class SchedulingTemplateService {
 					schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
 					schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
 					schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
+					schedulingTemplate.setIvrTheme(ivrTheme);;
 					return schedulingTemplateRepository.save(schedulingTemplate);
 				}
 			}

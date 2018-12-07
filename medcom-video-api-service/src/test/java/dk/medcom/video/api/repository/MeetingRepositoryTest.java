@@ -1,5 +1,7 @@
 package dk.medcom.video.api.repository;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -35,6 +37,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		String uuid = UUID.randomUUID().toString();
 		Long meetingUserId = new Long(101);
 		Long organisationId = new Long(5);
+		String projectCode = "PROJECT1";
 		
 		Meeting meeting = new Meeting();
 		meeting.setSubject("Test meeting");
@@ -45,6 +48,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);
+	    meeting.setOrganizedByUser(meetingUser);
 	    
 	    Calendar calendarStart = new GregorianCalendar(2018,10,01,13,15,00);
 	    meeting.setStartTime(calendarStart.getTime());
@@ -52,7 +56,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    Calendar calendarEnd = new GregorianCalendar(2018,10,01,13,30,00);
 	    meeting.setEndTime(calendarEnd.getTime());
 	    meeting.setDescription("Lang beskrivelse af, hvad der foregår");
-	    		
+	    meeting.setProjectCode(projectCode);
+	    
 		// When
 		meeting = subject.save(meeting);
 		
@@ -64,6 +69,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(organisationId, meeting.getOrganisation().getId());
 		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
 		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
+		Assert.assertEquals(meeting.getMeetingUser(), meeting.getOrganizedByUser());
+		Assert.assertEquals(projectCode, meeting.getProjectCode());
 	}
 	
 	@Test
@@ -80,7 +87,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		Assert.assertEquals(4, numberOfMeetings);
+		Assert.assertEquals(6, numberOfMeetings);
 	}
 	
 	@Test
@@ -98,7 +105,6 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(id, meeting.getId());
 		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
 		Assert.assertEquals(organisation.getOrganisationId(), meeting.getOrganisation().getOrganisationId());
-		//TODO: Check dates are as expected: '2018-10-02 15:00:00', '2018-10-02 16:00:00' 
 		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
 	}
@@ -158,7 +164,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		// Then
 		Assert.assertNotNull(meetings);
-		Assert.assertEquals(2, meetings.size());
+		Assert.assertEquals(4, meetings.size());
 	}
 	
 	@Test
@@ -212,6 +218,39 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
 	
 	}
+	@Test
+	public void testGetOrganizerUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long organizedByUserId = new Long(101);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
 
+	}
+
+	@Test
+	public void testSetOrganinizerUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long organizedByUserId = new Long(105);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+	    MeetingUser meetingUser = subjectMU.findOne(organizedByUserId);
+	    meeting.setOrganizedByUser(meetingUser);	    
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertNotNull(meetingUser);
+		Assert.assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
+	
+	}
 
 }

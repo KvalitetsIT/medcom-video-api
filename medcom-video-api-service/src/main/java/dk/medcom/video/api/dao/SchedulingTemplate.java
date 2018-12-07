@@ -34,6 +34,7 @@ public class SchedulingTemplate {
 	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
 	private Long uriNumberRangeLow;			//when random generating
 	private Long uriNumberRangeHigh;		//when random generating
+	private String ivrTheme;  				//theme to use in Pexip
 	
 	public Long getId() {
 		return id;
@@ -131,5 +132,10 @@ public class SchedulingTemplate {
 	public void setUriNumberRangeHigh(Long uriNumberRangeHigh) {
 		this.uriNumberRangeHigh = uriNumberRangeHigh;
 	}
-
+	public String getIvrTheme() {
+		return ivrTheme;
+	}
+	public void setIvrTheme(String ivrTheme) {
+		this.ivrTheme = ivrTheme;
+	}
 }

@@ -44,6 +44,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Long meetingId = new Long(4);
 		Long schedulingTemplateId = new Long(1);
 		
+		String portalLink = "https://portal-test.vconf.dk/?url=7777@test.dk&pin=2010&start_dato=2018-12-02T15:00:00";
+		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
+		
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
@@ -67,9 +70,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
-		
 		SchedulingTemplate schedulingTemplate = subjectST.findOne(schedulingTemplateId);
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
+		schedulingInfo.setPortalLink(portalLink);
+		schedulingInfo.setIvrTheme(ivrTheme);
 		
 		// When
 		schedulingInfo = subject.save(schedulingInfo);
@@ -92,6 +96,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
 		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
 		Assert.assertEquals(schedulingTemplateId, schedulingInfo.getSchedulingTemplate().getId());
+		Assert.assertEquals(portalLink, schedulingInfo.getPortalLink());
+		Assert.assertEquals(ivrTheme, schedulingInfo.getIvrTheme());
 	}
 	
 	@Test
@@ -108,7 +114,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		Assert.assertEquals(3, numberOfSchedulingInfo);
+		Assert.assertEquals(5, numberOfSchedulingInfo);
 	}
 	
 	@Test
@@ -196,7 +202,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		Assert.assertEquals(3, numberOfSchedulingInfo);
+		Assert.assertEquals(5, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testFindOneInIntervalAndProvisionStatus0() {
