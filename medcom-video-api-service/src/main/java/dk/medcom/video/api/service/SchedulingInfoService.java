@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,6 +48,9 @@ public class SchedulingInfoService {
 	
 	@Autowired
 	UserContextService userService;
+	
+	@Autowired
+	MeetingUserService meetingUserService;
 	
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
@@ -145,6 +149,11 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
+		
+		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingInfo.setCreatedTime(calendarNow.getTime());
+		
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
@@ -169,13 +178,17 @@ public class SchedulingInfoService {
 //			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
 //		}
 		
+		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingInfo.setUpdatedTime(calendarNow.getTime());
+		
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
 		
 		LOGGER.debug("Exit updateSchedulingInfo");
 		return schedulingInfo;
 	}
-	
+	//used by meetingService to update VMRStarttime because it depends on the meetings starttime
 	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
 		
@@ -187,6 +200,10 @@ public class SchedulingInfoService {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
+		
+		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		
 		LOGGER.debug("Entry updateSchedulingInfo");

@@ -29,6 +29,12 @@ public class Meeting {
 	@ManyToOne
     @JoinColumn(name="created_by")
 	private MeetingUser createdBy;
+	private Date createdTime;
+	
+	@ManyToOne
+    @JoinColumn(name="updated_by")
+	private MeetingUser updatedBy;
+	private Date updatedTime;
 	
 	@ManyToOne
     @JoinColumn(name="organized_by")
@@ -80,6 +86,14 @@ public class Meeting {
 	public void setMeetingUser(MeetingUser meetingUser) {
 		this.createdBy = meetingUser;
 	}
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
+	}
+	
 	public Date getStartTime() {
 		return startTime;
 	}
@@ -106,7 +120,6 @@ public class Meeting {
 	public MeetingUser getOrganizedByUser() {
 		return organizedBy;
 	}
-
 	public void setOrganizedByUser(MeetingUser meetingUser) {
 		this.organizedBy = meetingUser;
 	}
@@ -116,6 +129,16 @@ public class Meeting {
 	public void setProjectCode(String projectCode) {
 		this.projectCode = projectCode;
 	}
-
-
+	public MeetingUser getUpdatedByUser() {
+		return updatedBy;
+	}
+	public void setUpdatedByUser(MeetingUser meetingUser) {
+		this.updatedBy = meetingUser;
+	}
+	public Date getUpdatedTime() {
+		return updatedTime;
+	}
+	public void setUpdatedTime(Date updatedTime) {
+		this.updatedTime = updatedTime;
+	}
 }

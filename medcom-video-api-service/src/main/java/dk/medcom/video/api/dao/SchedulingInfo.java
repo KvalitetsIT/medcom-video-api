@@ -50,6 +50,16 @@ public class SchedulingInfo {
 	
 	private String portalLink;				//link to "borger-portal"
 	private String ivrTheme;				//theme to use in Pexip
+	
+	@ManyToOne
+    @JoinColumn(name="created_by")
+	private MeetingUser createdBy;
+	private Date createdTime;
+	
+	@ManyToOne
+    @JoinColumn(name="updated_by")
+	private MeetingUser updatedBy;
+	private Date updatedTime;
 
 	public Long getId() {
 		return id;
@@ -159,5 +169,28 @@ public class SchedulingInfo {
 	public void setIvrTheme(String ivrTheme) {
 		this.ivrTheme = ivrTheme;
 	}
-	
+	public MeetingUser getMeetingUser() {
+		return createdBy;
+	}
+	public void setMeetingUser(MeetingUser meetingUser) {
+		this.createdBy = meetingUser;
+	}
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
+	}
+	public MeetingUser getUpdatedByUser() {
+		return updatedBy;
+	}
+	public void setUpdatedByUser(MeetingUser meetingUser) {
+		this.updatedBy = meetingUser;
+	}
+	public Date getUpdatedTime() {
+		return updatedTime;
+	}
+	public void setUpdatedTime(Date updatedTime) {
+		this.updatedTime = updatedTime;
+	}	
 }

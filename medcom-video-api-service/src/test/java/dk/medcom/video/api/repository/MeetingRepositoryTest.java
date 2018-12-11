@@ -48,7 +48,9 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		
 		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
 	    meeting.setMeetingUser(meetingUser);
+	    
 	    meeting.setOrganizedByUser(meetingUser);
+	    meeting.setUpdatedByUser(meetingUser);
 	    
 	    Calendar calendarStart = new GregorianCalendar(2018,10,01,13,15,00);
 	    meeting.setStartTime(calendarStart.getTime());
@@ -58,6 +60,10 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    meeting.setDescription("Lang beskrivelse af, hvad der foregår");
 	    meeting.setProjectCode(projectCode);
 	    
+	    Calendar calendarCreate = new GregorianCalendar(2018,8,01,13,30,00);
+	    meeting.setCreatedTime(calendarCreate.getTime());
+	    meeting.setUpdatedTime(calendarCreate.getTime());
+	    
 		// When
 		meeting = subject.save(meeting);
 		
@@ -66,11 +72,14 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meeting.getId());
 		Assert.assertEquals(uuid,  meeting.getUuid());
 		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		Assert.assertEquals(meeting.getMeetingUser(), meeting.getOrganizedByUser());
+		Assert.assertEquals(meetingUserId, meeting.getUpdatedByUser().getId());
 		Assert.assertEquals(organisationId, meeting.getOrganisation().getId());
 		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
 		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
-		Assert.assertEquals(meeting.getMeetingUser(), meeting.getOrganizedByUser());
 		Assert.assertEquals(projectCode, meeting.getProjectCode());
+		Assert.assertEquals(calendarCreate.getTime(), meeting.getCreatedTime());
+		Assert.assertEquals(calendarCreate.getTime(), meeting.getUpdatedTime());
 	}
 	
 	@Test
@@ -253,4 +262,39 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	
 	}
 
+	@Test
+	public void testGetUpdatedUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long updatedByUserId = new Long(101);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
+
+	}
+
+	@Test
+	public void testSetUpdatedUserOnExistingMeeting() {
+		
+		// Given
+		Long meetingId = new Long(1);
+		Long updatedByUserId = new Long(105);
+			
+		// When
+		Meeting meeting = subject.findOne(meetingId);
+	    MeetingUser meetingUser = subjectMU.findOne(updatedByUserId);
+	    meeting.setUpdatedByUser(meetingUser);	    
+			
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertNotNull(meetingUser);
+		Assert.assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
+	
+	}
+	
 }

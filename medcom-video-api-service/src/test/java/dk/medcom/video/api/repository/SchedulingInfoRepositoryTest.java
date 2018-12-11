@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.ProvisionStatus;
@@ -24,6 +25,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 	@Resource
     private SchedulingTemplateRepository subjectST;
 	
+	@Resource
+    private MeetingUserRepository subjectMU;
+	
 	@Test
 	public void testSchedulingInfo() {
 		
@@ -35,6 +39,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		boolean endMeetingOnEndTime = true;
 		String uriWithDomain = "7777@test.dk";
 		String uriWithoutDomain = "7777";
+		Long meetingUserId = new Long(101);
 		
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		String provisionStatusDescription = "All okay untill now";
@@ -69,6 +74,14 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		cal.setTime(meeting.getStartTime());
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
+		
+		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		schedulingInfo.setMeetingUser(meetingUser);
+	    schedulingInfo.setUpdatedByUser(meetingUser);
+		
+		Calendar calendarCreate = new GregorianCalendar(2018,8,01,13,30,00);
+	    schedulingInfo.setCreatedTime(calendarCreate.getTime());
+	    schedulingInfo.setUpdatedTime(calendarCreate.getTime());
 
 		SchedulingTemplate schedulingTemplate = subjectST.findOne(schedulingTemplateId);
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
@@ -98,6 +111,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(schedulingTemplateId, schedulingInfo.getSchedulingTemplate().getId());
 		Assert.assertEquals(portalLink, schedulingInfo.getPortalLink());
 		Assert.assertEquals(ivrTheme, schedulingInfo.getIvrTheme());
+		
+		Assert.assertEquals(calendarCreate.getTime(), schedulingInfo.getCreatedTime());
+		Assert.assertEquals(calendarCreate.getTime(), schedulingInfo.getUpdatedTime());
+		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 	}
 	
 	@Test
@@ -223,6 +241,74 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			numberOfSchedulingInfo++;
 		}
 		Assert.assertEquals(1, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testGetMeetingUserOnExistingSchedulingInfo() {
+		
+		// Given
+		Long schedulingInfoId = new Long(202);
+		Long meetingUserId = new Long(102);
+			
+		// When
+		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+			
+		// Then
+		Assert.assertNotNull(schedulingInfo);
+		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+
+	}
+
+	@Test
+	public void testSetMeetingUserOnExistingMeeting() {
+		
+		// Given
+		Long schedulingInfoId = new Long(203);
+		Long meetingUserId = new Long(102);
+			
+		// When
+		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+	    schedulingInfo.setMeetingUser(meetingUser);	    
+			
+		// Then
+		Assert.assertNotNull(schedulingInfo);
+		Assert.assertNotNull(meetingUser);
+		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+	
+	}
+	@Test
+	public void testGetUpdatedByUserOnExistingSchedulingInfo() {
+		
+		// Given
+		Long schedulingInfoId = new Long(202);
+		Long meetingUserId = new Long(102);
+			
+		// When
+		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+			
+		// Then
+		Assert.assertNotNull(schedulingInfo);
+		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+
+	}
+
+	@Test
+	public void testSetUpdatedByUserOnExistingMeeting() {
+		
+		// Given
+		Long schedulingInfoId = new Long(203);
+		Long meetingUserId = new Long(102);
+			
+		// When
+		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+	    schedulingInfo.setUpdatedByUser(meetingUser);	    
+			
+		// Then
+		Assert.assertNotNull(schedulingInfo);
+		Assert.assertNotNull(meetingUser);
+		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+	
 	}
 
 }

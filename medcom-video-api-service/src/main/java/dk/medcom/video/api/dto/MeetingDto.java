@@ -22,6 +22,7 @@ public class MeetingDto extends ResourceSupport {
 	public String subject;
 	public String uuid;
 	public MeetingUserDto createdBy;
+	public MeetingUserDto updatedBy;
 	public MeetingUserDto organizedBy;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
@@ -33,6 +34,11 @@ public class MeetingDto extends ResourceSupport {
 	public String description;
 	public String projectCode;
 	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date createdTime;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date updatedTime;
+	
 	public MeetingDto(Meeting meeting) {
 		
 		subject = meeting.getSubject();
@@ -43,14 +49,20 @@ public class MeetingDto extends ResourceSupport {
 		
 		MeetingUser organizedByUser = meeting.getOrganizedByUser();
 		MeetingUserDto organizedByUserDto = new MeetingUserDto(organizedByUser);
+		
+		MeetingUser updatedByUser = meeting.getUpdatedByUser();
+		MeetingUserDto updatedByUserDto = new MeetingUserDto(updatedByUser);
 
 		createdBy = meetingUserDto;
+		organizedBy = organizedByUserDto;
+		updatedBy = updatedByUserDto;
 		startTime = meeting.getStartTime();
 		endTime = meeting.getEndTime();
 		description = meeting.getDescription();
 		projectCode = meeting.getProjectCode();
-		organizedBy = organizedByUserDto;  
-
+		createdTime = meeting.getCreatedTime();
+		updatedTime = meeting.getUpdatedTime();
+		
 		try { 
 			Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("self");
 			add(selfLink);

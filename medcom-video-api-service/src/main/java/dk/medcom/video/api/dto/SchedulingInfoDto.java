@@ -13,6 +13,7 @@ import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
 
 
@@ -36,6 +37,13 @@ public class SchedulingInfoDto extends ResourceSupport {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
 	private String provisionVmrId;
+
+	public MeetingUserDto createdBy;
+	public MeetingUserDto updatedBy;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date createdTime;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date updatedTime;
 	
 	public MeetingDto meetingDetails;
 	
@@ -58,6 +66,17 @@ public class SchedulingInfoDto extends ResourceSupport {
 		ivrTheme = schedulingInfo.getIvrTheme();
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
+		
+		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
+		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
+		
+		MeetingUser updatedByUser = schedulingInfo.getUpdatedByUser();
+		MeetingUserDto updatedByUserDto = new MeetingUserDto(updatedByUser);
+
+		createdBy = meetingUserDto;
+		updatedBy = updatedByUserDto;
+		createdTime = schedulingInfo.getCreatedTime();
+		updatedTime = schedulingInfo.getUpdatedTime();
 		
 		Meeting meeting = schedulingInfo.getMeeting();
 		meetingDetails = new MeetingDto(meeting);

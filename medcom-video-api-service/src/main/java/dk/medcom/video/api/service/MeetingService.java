@@ -2,8 +2,8 @@ package dk.medcom.video.api.service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,10 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
-import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.MeetingRepository;
 
 
@@ -86,6 +84,11 @@ public class MeetingService {
 			meeting.setOrganizedByUser(meeting.getMeetingUser());
 		}
 			
+		Calendar calendarNow = new GregorianCalendar();
+		meeting.setCreatedTime(calendarNow.getTime());
+//		meeting.setUpdatedTime(calendarNow.getTime());
+//		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+
 		meeting = meetingRepository.save(meeting);
 		if (meeting != null) {
 			schedulingInfoService.createSchedulingInfo(meeting);
@@ -134,6 +137,10 @@ public class MeetingService {
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		}
 
+		Calendar calendarNow = new GregorianCalendar();
+		meeting.setUpdatedTime(calendarNow.getTime());
+		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		
 		meeting = meetingRepository.save(meeting);
 		schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
 				

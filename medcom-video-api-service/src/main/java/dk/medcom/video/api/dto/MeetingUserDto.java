@@ -8,6 +8,9 @@ public class MeetingUserDto {
 	public String email;
 
 	public MeetingUserDto(MeetingUser meetingUser) {
+		if (meetingUser == null) {
+			return;
+		}
 		organisationId = meetingUser.getOrganisation().getOrganisationId();
 		email = meetingUser.getEmail();
 	}

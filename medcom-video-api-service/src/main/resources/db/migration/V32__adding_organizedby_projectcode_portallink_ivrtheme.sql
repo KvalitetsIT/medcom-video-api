@@ -21,3 +21,19 @@ set organized_by = created_by;
 
 ALTER TABLE meetings
 MODIFY COLUMN organized_by bigint(20) NOT NULL;
+
+---
+
+ALTER TABLE meetings
+ADD COLUMN updated_by bigint(20),
+ADD COLUMN created_time datetime,
+ADD COLUMN updated_time datetime,
+ADD FOREIGN KEY (updated_by) REFERENCES meeting_users(id);
+
+ALTER TABLE scheduling_info
+ADD COLUMN created_by bigint(20),
+ADD COLUMN updated_by bigint(20),
+ADD COLUMN created_time datetime,
+ADD COLUMN updated_time datetime,
+ADD FOREIGN KEY (created_by) REFERENCES meeting_users(id),
+ADD FOREIGN KEY (updated_by) REFERENCES meeting_users(id);
