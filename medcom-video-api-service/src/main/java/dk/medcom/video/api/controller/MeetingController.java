@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dk.medcom.video.api.aspect.APISecurityAnnotation;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -81,7 +83,7 @@ public class MeetingController {
 		LOGGER.debug("Exit of /meetings.get resource: " + resource);
 		return resource;
 	}
-
+	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
 	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		LOGGER.debug("Entry of /meetings.post");
@@ -94,6 +96,7 @@ public class MeetingController {
 		return resource;
 	}
 	
+	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.PUT)
 	public Resource <MeetingDto> updateMeeting(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateMeetingDto updateMeetingDto ) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		LOGGER.debug("Entry of /meetings.put uuid: " + uuid);
@@ -105,6 +108,8 @@ public class MeetingController {
 		LOGGER.debug("Exit of /meetings.put resource: " + resource);
 		return resource;
 	}
+	
+	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.DELETE)
 	public Resource <MeetingDto> deleteMeeting(@PathVariable("uuid") String uuid) throws  RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry of /meetings.delete uuid: " + uuid);

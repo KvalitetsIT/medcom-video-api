@@ -17,7 +17,11 @@ public class TestUserContext implements UserContextFactory {
 		return new UserContextImpl("test-org", "me@me101.dk", UserRole.PROVISIONER_USER);  	//4 meetings for this user in test data
 //		return new UserContextImpl("test-org", "me@me105organizer.dk", UserRole.USER);  	//2 meeting for this user in test data
 //		return new UserContextImpl("test-org", "me@me101.dk", UserRole.USER);  				//3 meetings for this user in test data
-//		return new UserContextImpl("test-org", "me@me101.dk", UserRole.MEETING_PLANNER);	//4 meetings for this user in test data (two as organizer, one as creator  
+//		return new UserContextImpl("test-org", "me@me101.dk", UserRole.MEETING_PLANNER);	//4 meetings for this user in test data (two as organizer, one as creator
+//		return new UserContextImpl("test-org", "me@me102.dk", UserRole.ADMIN);	
+//
+//		return new UserContextImpl("test-org", "", UserRole.MEETING_PLANNER);	//4 meetings for this user in test data (two as organizer, one as creator
+//		return new UserContextImpl("test-org", "", UserRole.PROVISIONER);  	//4 meetings for this user in test data
 	}
 	
 }

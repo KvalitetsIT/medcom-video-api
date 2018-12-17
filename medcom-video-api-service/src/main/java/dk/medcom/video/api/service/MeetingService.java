@@ -78,7 +78,7 @@ public class MeetingService {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
-		if (createMeetingDto.getOrganizedByEmail() != null && createMeetingDto.getOrganizedByEmail() != null && userRole == UserRole.MEETING_PLANNER) {
+		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(createMeetingDto.getOrganizedByEmail()));
 		} else {
 			meeting.setOrganizedByUser(meeting.getMeetingUser());
@@ -131,7 +131,7 @@ public class MeetingService {
 		meeting.setDescription(updateMeetingDto.getDescription());
 		meeting.setProjectCode(updateMeetingDto.getProjectCode());
 		
-		if (updateMeetingDto.getOrganizedByEmail() != null && updateMeetingDto.getOrganizedByEmail() != null  && userRole == UserRole.MEETING_PLANNER) {
+		if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(updateMeetingDto.getOrganizedByEmail()));
 		} else {
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
