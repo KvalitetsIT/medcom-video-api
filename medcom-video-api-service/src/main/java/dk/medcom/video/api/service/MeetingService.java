@@ -44,6 +44,20 @@ public class MeetingService {
 	@Autowired
 	UserContextService userService;
 	
+	public MeetingService() {
+		
+	}
+	
+	public MeetingService(MeetingRepository meetingRepository, MeetingUserService meetingUserService, SchedulingInfoService schedulingInfoService, SchedulingStatusService schedulingStatusService, 
+			OrganisationService organisationService, UserContextService userService) {
+	 	this.meetingRepository = meetingRepository;
+	 	this.meetingUserService = meetingUserService;
+	 	this.schedulingInfoService = schedulingInfoService;
+	 	this.schedulingStatusService = schedulingStatusService;
+	 	this.organisationService = organisationService;
+	 	this.userService = userService;
+	}
+	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
 		UserRole userRole = userService.getUserContext().getUserRole();
 		
@@ -118,32 +132,36 @@ public class MeetingService {
 		Meeting meeting = getMeetingByUuid(uuid);
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
-		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION) {
-			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be updated");
+		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION && schedulingInfo.getProvisionStatus() != ProvisionStatus.PROVISIONED_OK) {
+			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated");
 		}
 		
-		validateDate(updateMeetingDto.getStartTime());
 		validateDate(updateMeetingDto.getEndTime());
+		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {  //only when this status must all but endTime be updated
+			validateDate(updateMeetingDto.getStartTime());
+			
+			meeting.setSubject(updateMeetingDto.getSubject());
+			meeting.setStartTime(updateMeetingDto.getStartTime());
+			meeting.setDescription(updateMeetingDto.getDescription());
+			meeting.setProjectCode(updateMeetingDto.getProjectCode());
+			
+			if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
+				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(updateMeetingDto.getOrganizedByEmail()));
+			} else {
+				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+			}
+			
+		} 
+		meeting.setEndTime(updateMeetingDto.getEndTime());		
 		
-		meeting.setSubject(updateMeetingDto.getSubject());
-		meeting.setStartTime(updateMeetingDto.getStartTime());
-		meeting.setEndTime(updateMeetingDto.getEndTime());
-		meeting.setDescription(updateMeetingDto.getDescription());
-		meeting.setProjectCode(updateMeetingDto.getProjectCode());
-		
-		if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
-			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(updateMeetingDto.getOrganizedByEmail()));
-		} else {
-			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
-		}
-
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
 		meeting = meetingRepository.save(meeting);
-		schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
-				
+		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
+			schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
+		}
 		return meeting;
 	}
 	

@@ -55,6 +55,16 @@ public class SchedulingInfoService {
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
 	
+	public SchedulingInfoService() {
+		
+	}
+	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService, 
+			SchedulingStatusService schedulingStatusService, UserContextService userService, MeetingUserService meetingUserService) {
+		this.schedulingInfoRepository = schedulingInfoRepository;
+//		this.schedulingTemplateRepository = 
+	}
+	
+	
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
 		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
