@@ -1,0 +1,472 @@
+{
+	"info": {
+		"_postman_id": "a1fa9da8-bbae-440a-9fe0-1e858a686ee9",
+		"name": "VDX-Booking-Module-API-V0.3.0 - Role planner refact",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create and get flow with positive outcome",
+			"item": [
+				{
+					"name": "Get meetings  and global var initialization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "431b10e4-5c22-4ee6-8e6c-15c2b27bf017",
+								"exec": [
+									"",
+									"",
+									"const meetings = pm.response.json();",
+									"",
+									"if (meetings._embedded){",
+									"  pm.globals.set(\"noOfMeetings\", meetings._embedded.meetingDtoList.length);",
+									"} else { //the result is empty",
+									"    pm.globals.set(\"noOfMeetings\", 0);",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2dc59f8a-faf3-46fc-8759-e518e2630421",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-pln}}/meetings?from-start-time=2018-01-01T03:12:30%2B0100&to-start-time=2023-12-31T03:12:30-0100",
+							"host": [
+								"{{host-pln}}"
+							],
+							"path": [
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-start-time",
+									"value": "2023-12-31T03:12:30-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting a1pln with description and projectCode  (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d143b2f7-3f7c-4c7c-aef0-27778c52ea3d",
+								"exec": [
+									"",
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});",
+									"pm.test(\"createdBy and organizedBy is the same\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.createdBy).to.eql(jsonData.organizedBy);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aacf6c83-1960-4667-b752-5fb946a1e2e0",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde a1pln\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1pln\");",
+									"pm.globals.set(\"project_code\", \"PROJECT001\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-pln}}/meetings",
+							"host": [
+								"{{host-pln}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting a3pln setting organizedby  (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "04409f24-46cb-4afc-a4d0-84c4131205b2",
+								"exec": [
+									"",
+									"// when expected successful call add one to noOfMeetings",
+									"pm.globals.set(\"noOfMeetings\", Number(pm.globals.get(\"noOfMeetings\"))+1);",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});",
+									"pm.test(\"OrganizedBy.email is as organizedByEmail and organisation is the same for createdBy and organisedBy\", function () {",
+									"    var jsonData = pm.response.json();",
+									"//    console.log(organizedByEmail);",
+									"    pm.expect(jsonData.organizedBy.email).to.eql(pm.globals.get(\"organized_by_email\"));",
+									"    pm.expect(jsonData.organizedBy.organisationId).to.eql(jsonData.createdBy.organisationId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "229cd03a-b94e-4974-823b-d65f0a6bbad1",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde a3pln\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1pln\");",
+									"pm.globals.set(\"project_code\", \"PROJECT001\");",
+									"pm.globals.set(\"organized_by_email\", \"me3@me.dk\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"organizedByEmail\": \"{{organized_by_email}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-pln}}/meetings",
+							"host": [
+								"{{host-pln}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid with description, projectCode, organizedby",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a21d1331-56d8-4e47-a504-12f8af5eb3e3",
+								"exec": [
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});",
+									"",
+									"pm.test(\"OrganizedBy.email is as organizedByEmail and organisation is the same for createdBy and organisedBy\", function () {",
+									"    var jsonData = pm.response.json();",
+									"//    console.log(organizedByEmail);",
+									"    pm.expect(jsonData.organizedBy.email).to.eql(pm.globals.get(\"organized_by_email\"));",
+									"    pm.expect(jsonData.organizedBy.organisationId).to.eql(jsonData.createdBy.organisationId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "921d46c4-eae3-4103-a38e-2075de9d8b24",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde a3pln version 2\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a3pln version 2\");",
+									"pm.globals.set(\"project_code\", \"PROJECT002\");",
+									"pm.globals.set(\"organized_by_email\", \"me4@me.dk\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"organizedByEmail\": \"{{organized_by_email}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-pln}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-pln}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get meetings and check numbers and subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "74831d41-6e19-4961-82dc-1e5f386a4720",
+								"exec": [
+									"",
+									"",
+									"const meetings = pm.response.json();",
+									"",
+									"if (meetings._embedded){",
+									"",
+									"    pm.test(\"All meetings should have a subject\", function() {",
+									"        pm.expect(meetings._embedded.meetingDtoList.every((meeting) => {",
+									"        return meeting.subject !== undefined;",
+									"        })).to.be.true;",
+									"        });",
+									"    ",
+									"    pm.test(\"Number of meetings must match existing + expected successes\", function() {",
+									"        pm.expect(meetings._embedded.meetingDtoList.length).to.eql(pm.globals.get(\"noOfMeetings\"));",
+									"        }); ",
+									"    ",
+									"}  //else the result is empty",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-pln}}/meetings?from-start-time=2018-01-01T03:12:30%2B0100&to-start-time=2023-12-31T03:12:30-0100",
+							"host": [
+								"{{host-pln}}"
+							],
+							"path": [
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "from-start-time",
+									"value": "2018-01-01T03:12:30%2B0100"
+								},
+								{
+									"key": "to-start-time",
+									"value": "2023-12-31T03:12:30-0100"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9bb07c1c-b011-4d48-820d-bf08e5547a59",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "9ac2444a-ca9e-459a-825e-eca6cbf1a104",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "89f15d75-6825-46df-880f-96104c9ab8c0",
+						"type": "text/javascript",
+						"exec": [
+							"// this postman collecion matches API description v0.1.1",
+							"//",
+							"// the user for which the test is running for should have the role PROVISONER and have a valid organisation and email."
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2dc59f8a-faf3-46fc-8759-e518e2630421",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host-pln}}/info",
+					"host": [
+						"{{host-pln}}"
+					],
+					"path": [
+						"info"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
