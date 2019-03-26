@@ -1,6 +1,7 @@
 # medcom-video-api
 ## Databasemodel 
 Video api'ets database er struktureret som følger
+![databasemodel](/medcom-video-api-qa/docs/database.png)
 
 ## API dokumenatation
 API's dokumentation kan findes på swaggerhub:
