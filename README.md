@@ -11,7 +11,7 @@ https://app.swaggerhub.com/apis/Kvalitetsit/VDX-Booking-Module-API/0.4.0
 ### Unit test
 Der udvikles løbende unit test til koden på formen: præcondition (Given), udførsel (When), tjek (Then)
 
-Repository testene der kører mod en database gør brug af af docker containere til at starte en database op inden testene udføres.
+Repository testene, der kører mod en database, gør brug af af docker containere til at starte en database op inden testene udføres. I medcom-video-api-service modules findes et sql script til indlæsning af unit test data (V901__insert _test_data.sql)
 
 ### Code coverage
 Til udregning af testcoverage anvendes Jacoco Maven Plugin. Testcoverage udregnes i de enkelte Maven moduler og aggregeres til en samlet rapport i modulet medcom-video-api-qa
@@ -22,3 +22,5 @@ Således er en samlet rapport over testcoverage tilgængelig efter kørsel af bu
 ### Integrations test
 Integrations testen udføres fra Postman scripts. Se video infrastuktur projektet for dette:
 https://github.com/KvalitetsIT/medcom-video-infrastructure/tree/master/postman
+
+For at køre disse scripts mod udviklings versionen i f.eks. eclipse, køres klassen TestApplication.java i MVN modulet medcom-video-api-test. User context sættes inden i klassen TestUserContext i samme modul. User Context har indvirkning på, hvilke data der kan oprettes, hentes og rettes. I samme modul findes også script til test data V901__insert _test_data.sql, som indlæses i en tom database når TestApplication.java køres.
