@@ -3,13 +3,13 @@
 Video api'ets database er struktureret som følger
 ![databasemodel](/medcom-video-api-qa/docs/database.png)
 
-## API dokumenatation
-API's dokumentation kan findes på swaggerhub:
+## API dokumentation
+API'ets snitflade dokumentation kan findes på swaggerhub:
 https://app.swaggerhub.com/apis/Kvalitetsit/VDX-Booking-Module-API/0.4.0
 
 ## Test
 ### Unit test
-Der vil løbende blive udviklet unit test til koden på formen: præcondition (Given), udførsel (When), tjek (Then)
+Der udvikles løbende unit test til koden på formen: præcondition (Given), udførsel (When), tjek (Then)
 
 Repository testene der kører mod en database gør brug af af docker containere til at starte en database op inden testene udføres.
 
