@@ -26,7 +26,7 @@ public class UpdateMeetingDto {
 	@Size(max=500, message="description should have a maximum of 500 characters")
 	public String description;
 	
-	@Size(max=20, message="Project Code should have a maximum of 20 characters")
+	@Size(max=100, message="Project Code should have a maximum of 100 characters")
 	public String projectCode;
 	
 	@Email

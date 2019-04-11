@@ -99,6 +99,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
 		Assert.assertEquals(cal.getTime(), schedulingInfo.getvMRStartTime());
 		Assert.assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
+		Assert.assertEquals(endMeetingOnEndTime, schedulingInfo.getEndMeetingOnEndTime());
 		Assert.assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
 		Assert.assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
 		Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());

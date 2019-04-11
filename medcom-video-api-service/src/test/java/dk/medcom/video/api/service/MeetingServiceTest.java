@@ -20,6 +20,7 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
+import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
@@ -31,14 +32,15 @@ public class MeetingServiceTest {
 	private Calendar calendarEnd = new GregorianCalendar(2018,10,01,14,15,00);
 	private Calendar calendarEndUpdated = new GregorianCalendar(2018,10,01,14,45,00);
 	
-	
+	private CreateMeetingDto createMeetingDto;	
 	private UpdateMeetingDto updateMeetingDto;
 	private MeetingUser meetingUser;
 	private Organisation organisation;
 	
 	@Before
 	public void prepareTest() {
-		updateMeetingDto = getMeetingDtoWithDefaultValues();
+		createMeetingDto = getCreateMeetingDtoWithDefaultValues();
+		updateMeetingDto = getUpdateMeetingDtoWithDefaultValues();
 		meetingUser = new MeetingUser();
 		organisation = new Organisation();
 		meetingUser.setOrganisation(organisation);
@@ -63,16 +65,27 @@ public class MeetingServiceTest {
 
 		return meeting;
 	}
-	private UpdateMeetingDto getMeetingDtoWithDefaultValues() {
+	private UpdateMeetingDto getUpdateMeetingDtoWithDefaultValues() {
 		UpdateMeetingDto meetingDto = new UpdateMeetingDto();
 		meetingDto.setSubject("Test mødev2");
-//		meetingDto.setStartTime(calendarStart.getTime());
 		meetingDto.setStartTime(calendarStartUpdated.getTime());
 		meetingDto.setEndTime(calendarEndUpdated.getTime());
 		meetingDto.setDescription("Meeting Description long textv2");
 		meetingDto.setProjectCode("P001v2");
 		meetingDto.setOrganizedByEmail("you@mail.dk");
 		return meetingDto;
+	}
+	private CreateMeetingDto getCreateMeetingDtoWithDefaultValues() {
+		CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+		createMeetingDto.setSubject("Test mødev2");
+		createMeetingDto.setStartTime(calendarStart.getTime());
+//		createMeetingDto.setStartTime(calendarStartUpdated.getTime());
+//		createMeetingDto.setEndTime(calendarEndUpdated.getTime());
+		createMeetingDto.setEndTime(calendarEnd.getTime());
+		createMeetingDto.setDescription("Meeting Description long textv2");
+		createMeetingDto.setProjectCode("P001v2");
+		createMeetingDto.setOrganizedByEmail("you@mail.dk");
+		return createMeetingDto;
 	}
 	
 	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String uuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException {
@@ -101,7 +114,10 @@ public class MeetingServiceTest {
 		
 		return meetingService;
 	}
-
+	// *** Get meeting tests **********************************************************************************************************
+	// *** Create meeting tests **********************************************************************************************************
+	// *** Delete meeting tests **********************************************************************************************************
+	// *** Update meeting tests **********************************************************************************************************
 	@Test
 	public void testRoleUserUpdateMeetingWithStatusAwaitsProvisionUpdatesAllValues() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		
@@ -188,5 +204,28 @@ public class MeetingServiceTest {
 		// Then
 		// assert Excpetion
 
+	}
+	// *** Other tests **********************************************************************************************************
+	@Test
+	public void testConversionFromDtoToDao() throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException {
+		// Given
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";		
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
+		
+		// When
+		Meeting meeting = meetingService.convert(createMeetingDto);
+		
+		// Then
+		Assert.assertNotNull(meeting);
+		Assert.assertEquals(createMeetingDto.getSubject(), meeting.getSubject());
+		Assert.assertNotNull(meeting.getUuid());
+//		Assert.assertEquals(meetingUser, meeting.getOrganizedByUser()); //TODO: 0 -fix test
+		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
+		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
+		Assert.assertEquals(createMeetingDto.getDescription(), meeting.getDescription());
+		Assert.assertEquals(createMeetingDto.getProjectCode(), meeting.getProjectCode());
+		
 	}
 }
