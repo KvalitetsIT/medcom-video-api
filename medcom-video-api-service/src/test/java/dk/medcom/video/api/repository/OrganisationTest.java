@@ -32,6 +32,7 @@ public class OrganisationTest extends RepositoryTest {
 		Assert.assertNotNull(organisation.getId());
 		Assert.assertEquals(organisationId,  organisation.getOrganisationId());
 		Assert.assertEquals(name,  organisation.getName());
+		Assert.assertEquals(name,  organisation.toString());
 	}
 	
 	@Test
