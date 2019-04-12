@@ -10,7 +10,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
-import dk.medcom.video.api.controller.SchedulingInfoController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.UnauthorizedException;
 import dk.medcom.video.api.dao.Organisation;
@@ -42,21 +41,19 @@ public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 		
 		String userEmail = userService.getUserContext().getUserEmail();
 		
-		UserRole userRole = userService.getUserContext().getUserRole();
-		if (userRole == UserRole.UNDEFINED || userRole == UserRole.UNAUTHORIZED) {
-			LOGGER.debug("userRole is not valid: UserRole Ordinal: " + userRole.ordinal());
+		if (userService.getUserContext().hasNoLegalRoles()) {
+			LOGGER.debug("userRole is not valid or not set");
 			throw new UnauthorizedException();
 		}
 				
-		if (userRole != UserRole.PROVISIONER) {
+		if (!userService.getUserContext().hasOnlyRole(UserRole.PROVISIONER)) {
 			if ((userEmail == null ) || (userEmail.isEmpty()) || (userOrganisationId == null) || (userOrganisationId.isEmpty())) {
 				LOGGER.debug("Email or user are not valid: userEmail: " + userEmail + ", userOrganisationId = " + userOrganisationId);
-				userRole = UserRole.UNAUTHORIZED;
 				throw new UnauthorizedException();
 			}
 		}
 		
-		LOGGER.debug("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userRole.ordinal() + " Organisation: " + organisation);
+		LOGGER.debug("Exit of preHandle method: Usermail: " + userEmail + " UserRole: " + userService.getUserContext().getUserRoles() + " Organisation: " + organisation);
 		return true;
 	}
 }

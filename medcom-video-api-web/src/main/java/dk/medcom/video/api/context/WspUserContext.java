@@ -1,5 +1,8 @@
 package dk.medcom.video.api.context;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -52,37 +55,40 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 		SessionData sessionData = getSessionData();
 		String organisationId = sessionData.getUserAttribute(userServiceTokenAttributeOrganisation);
 		String email = sessionData.getUserAttribute(userServiceTokenAttributeEmail);
-		UserRole userRole = getUserRole(sessionData);
-		return new UserContextImpl(organisationId, email, userRole);
+		List<UserRole> userRoles = getUserRoles(sessionData);
+		return new UserContextImpl(organisationId, email, userRoles);
 	}
 
-	private UserRole getUserRole(SessionData sessionData) {
+	private List<UserRole> getUserRoles(SessionData sessionData) {
+		List<UserRole> userRoles = new LinkedList<>();
 
-		String userRoleStr = sessionData.getUserAttribute(userServiceTokenAttributeUserRole);
-		LOGGER.debug("User role is: " + userRoleStr );
+		List<String> userRoleStrList = sessionData.getUserAttributes(userServiceTokenAttributeUserRole);
+		LOGGER.debug("User role is: " + userRoleStrList );
 		LOGGER.debug("Map values are: Provisioner: " + mappingRoleProvisioner + " Admin: " + mappingRoleAdmin + " User: " + mappingRoleUser + " Meeting Planner: " + mappingRoleMeetingPlanner); 
 
-		if (userRoleStr != null) {
+		if (userRoleStrList != null && userRoleStrList.size() > 0) {
+			for (String userRoleStr : userRoleStrList) {
 				if (userRoleStr.equals(mappingRoleProvisioner)) {
 					if ((sessionData.getUserAttribute(userServiceTokenAttributeOrganisation) != null) && (sessionData.getUserAttribute(userServiceTokenAttributeEmail) != null) ) {
 						LOGGER.debug("Provisioner changed to provisioner_user. Because of organisation and email: " +  sessionData.getUserAttribute(userServiceTokenAttributeOrganisation) + " and " + sessionData.getUserAttribute(userServiceTokenAttributeEmail));
-						return UserRole.PROVISIONER_USER;
+						userRoles.add(UserRole.PROVISIONER_USER);
+					} else {
+						userRoles.add(UserRole.PROVISIONER);
 					}
-					return UserRole.PROVISIONER;
 				} else if (userRoleStr.equals(mappingRoleAdmin)) {
-					return UserRole.ADMIN;
+					userRoles.add(UserRole.ADMIN);
 				} else if (userRoleStr.equals(mappingRoleUser)) {
-					return UserRole.USER;
+					userRoles.add(UserRole.USER);
 				} else if (userRoleStr.equals(mappingRoleMeetingPlanner)) {
-					return UserRole.MEETING_PLANNER;
+					userRoles.add(UserRole.MEETING_PLANNER);
 				} else { 
-					LOGGER.error("Userrole "+userRoleStr+" not legal value");
-					return UserRole.UNAUTHORIZED;
+					LOGGER.info("Userrole "+userRoleStrList+" not legal value...ignoring");
 				}
+			}
 		} else {
 			LOGGER.error("Attributes from token does not contain role (looking for "+userServiceTokenAttributeUserRole+")");
-			return UserRole.UNDEFINED;
 		}
+		return userRoles;
 	}
 
 	public SessionData getSessionData() {

@@ -59,10 +59,7 @@ public class MeetingService {
 	}
 	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
-		UserRole userRole = userService.getUserContext().getUserRole();
-		
-		
-		if (userRole == UserRole.USER) {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
 			return meetingRepository.findByOrganizedByAndStartTimeBetween(meetingUserService.getOrCreateCurrentMeetingUser(), fromStartTime, toStartTime);
 		} else {
 			return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);	
@@ -71,7 +68,6 @@ public class MeetingService {
 	}
 
 	public Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
-		UserRole userRole = userService.getUserContext().getUserRole();
 		Meeting meeting = meetingRepository.findOneByUuid(uuid);
 		if (meeting == null) {
 			throw new RessourceNotFoundException("meeting", "uuid");
@@ -80,7 +76,7 @@ public class MeetingService {
 			throw new PermissionDeniedException();
 		}
 		
-		if (userRole == UserRole.USER && !(meeting.getOrganizedByUser() == meetingUserService.getOrCreateCurrentMeetingUser())) {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER) && !(meeting.getOrganizedByUser() == meetingUserService.getOrCreateCurrentMeetingUser())) {
 			throw new PermissionDeniedException();
 		} 
 		
@@ -88,11 +84,10 @@ public class MeetingService {
 	}
 
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException  {
-		UserRole userRole = userService.getUserContext().getUserRole();
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
-		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
+		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(createMeetingDto.getOrganizedByEmail()));
 		} else {
 			meeting.setOrganizedByUser(meeting.getMeetingUser());
@@ -128,7 +123,6 @@ public class MeetingService {
 	}
 	
 	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		UserRole userRole = userService.getUserContext().getUserRole();
 		Meeting meeting = getMeetingByUuid(uuid);
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
@@ -145,7 +139,7 @@ public class MeetingService {
 			meeting.setDescription(updateMeetingDto.getDescription());
 			meeting.setProjectCode(updateMeetingDto.getProjectCode());
 			
-			if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && (userRole == UserRole.MEETING_PLANNER || userRole == UserRole.ADMIN)) {
+			if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {
 				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(updateMeetingDto.getOrganizedByEmail()));
 			} else {
 				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());

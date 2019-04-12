@@ -1,15 +1,23 @@
 package dk.medcom.video.api.context;
 
-public class UserContextImpl implements UserContext {
+import java.util.LinkedList;
+import java.util.List;
+
+public class UserContextImpl extends AbstractUserContextImpl {
 
 	protected String userOrganisation;
 	protected String userEmail;
-	protected UserRole userRole;
+	protected List<UserRole> userRoles;
+	
 	
 	public UserContextImpl(String userOrganisation, String userEmail, UserRole userRole) {
+		this(userOrganisation, userEmail, UserContextImpl.createList(userRole));
+	}
+	
+	public UserContextImpl(String userOrganisation, String userEmail, List<UserRole> userRoles) {
 		this.userOrganisation = userOrganisation;
 		this.userEmail = userEmail;
-		this.userRole = userRole;
+		this.userRoles = userRoles;
 	}
 	
 	@Override
@@ -23,7 +31,15 @@ public class UserContextImpl implements UserContext {
 	}
 
 	@Override
-	public UserRole getUserRole() {
-		return userRole;
+	public List<UserRole> getUserRoles() {
+		return userRoles;
 	}
+	
+	private static List<UserRole> createList(UserRole userRole) {
+		List<UserRole> userRoles = new LinkedList<>();
+		userRoles.add(userRole);
+		return userRoles;
+	}
+
+
 }

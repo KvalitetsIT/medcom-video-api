@@ -1,5 +1,8 @@
 package dk.medcom.video.api.aspect;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -21,19 +24,10 @@ public class APISecurityAspect {
 	public void APISecurityAnnotation(JoinPoint joinPoint, APISecurityAnnotation aPISecurityAnnotation) throws Throwable {
 
 		UserRole[] allowedUserRoles = aPISecurityAnnotation.value();
-		UserRole userRole = userService.getUserContext().getUserRole();
-		if (!checkRoleAllowed(allowedUserRoles, userRole)) {
+		List<UserRole> allowed = Arrays.asList(allowedUserRoles);
+
+		if (!userService.getUserContext().hasAnyNumberOfRoles(allowed)) {
 			throw new UnauthorizedException();
 		}
     }
-	
-	private boolean checkRoleAllowed(UserRole[] allowedUserRoles, UserRole userRole) {
-		for (int i = 0; i < allowedUserRoles.length; i++){
-	        if (allowedUserRoles[i] == userRole) {
-	        	return true;
-	        }
-	 	}
-		return false;
-	}
-
 }
