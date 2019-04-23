@@ -12,19 +12,24 @@ INSERT INTO meeting_users (id, organisation_id, email) VALUES (102,  6, 'me@me10
 INSERT INTO meeting_users (id, organisation_id, email) VALUES (103,  5, 'me@me103.dk');
 INSERT INTO meeting_users (id, organisation_id, email) VALUES (104,  5, 'me@me105organizer.dk');
 INSERT INTO meeting_users (id, organisation_id, email) VALUES (105,  5, 'me@me106organizer.dk');
-			
+-- testing schedulingTemplate
+INSERT INTO meeting_users (id, organisation_id, email) VALUES (106,  2, 'me@me107.dk');
+
 -- * meetings *	
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (1, uuid(), 'TestMeeting-xyz', 5, 101, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 1', 'PRJCDE1', 101, 101, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (2, uuid(), 'MyMeeting', 6, 102, '2018-11-02 15:00:00', '2018-11-02 16:00:00', 'Mødebeskrivelse 2', 'PRJCDE1', 102, 102, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (3, '7cc82183-0d47-439a-a00c-38f7a5a01fce', 'TestMeeting-123', 5, 101,  '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 3', 'PRJCDE1', 101, 101, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (4, uuid(), 'MyMeeting4', 6, 102, '2018-11-04 15:00:00', '2018-11-04 16:00:00', 'Mødebeskrivelse 4', 'PRJCDE1', 102, 102, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (5, uuid(), 'TestMeeting-xyz5', 5, 101, '2018-12-02 15:00:00', '2018-12-02 16:00:00', 'Mødebeskrivelse 5', 'PRJCDE1', 104, 101, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
---INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (6, uuid(), 'TestMeeting-xyz6', 5, 104, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 6', 'PRJCDE1', 101, 104, '2018-09-02 15:00:00', '2018-09-02 15:00:00');
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time) VALUES (6, uuid(), 'TestMeeting-xyz6', 5, 104, '2018-10-02 15:00:00', '2018-10-02 16:00:00', 'Mødebeskrivelse 6', 'PRJCDE1', 101, NULL, NULL, NULL);
 
 -- * scheduling_template * 			
 INSERT INTO scheduling_template (id, organisation_id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high, ivr_theme) 
 VALUES (1, 1, 22, 'abc', 'test.dk', 1, 1, 91, 0, 100, 991, 15, 10, 1, 1000, 9991, '/api/admin/configuration/v1/ivr_theme/10/');
+INSERT INTO scheduling_template (id, organisation_id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high, ivr_theme) 
+VALUES (2, 2, 22, 'abc2a', 'test.dk', 1, 1, 91, 0, 100, 991, 20, 10, 1, 1000, 9991, '/api/admin/configuration/v1/ivr_theme/10/');
+INSERT INTO scheduling_template (id, organisation_id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high, ivr_theme) 
+VALUES (3, 2, 22, 'abc2b', 'test.dk', 1, 1, 91, 0, 100, 991, 15, 10, 1, 1000, 9991, '/api/admin/configuration/v1/ivr_theme/10/');
 -- INSERT INTO scheduling_template (id, organisation_id, conferencing_sys_id, uri_prefix, uri_domain, host_pin_required, host_pin_range_low, host_pin_range_high, guest_pin_required, guest_pin_range_low, guest_pin_range_high, vmravailable_before, max_participants, end_meeting_on_end_time, uri_number_range_low, uri_number_range_high, ivr_theme) 
 -- VALUES (2, 4, 22, 'abc', 'test.dk', 1, 1, 91, 0, 100, 991, 15, 10, 1, 1000, 9991, '');
 
@@ -43,7 +48,6 @@ VALUES (204, (select uuid from meetings where id = 5) , 1001, 2001, 15, '2018-12
 
 INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_status_description, provision_timestamp,  provisionvmrid, portal_link, ivr_theme, created_by, created_time, updated_by, updated_time) 
 VALUES (206, (select uuid from meetings where id = 6) , 1001, 2001, 15, '2018-10-02 14:45:00', 10, 1, 6, '1236@test.dk', '1236', 1, 'AWAITS_PROVISION', 'all ok', null, null, 'https://portal-test.vconf.dk/?url=1236@test.dk&pin=2001&start_dato=2018-10-02T15:00:00', '/api/admin/configuration/v1/ivr_theme/10/', 104, NULL, NULL, NULL);
---VALUES (206, (select uuid from meetings where id = 6) , 1001, 2001, 15, '2018-10-02 14:45:00', 10, 1, 6, '1236@test.dk', '1236', 1, 'AWAITS_PROVISION', 'all ok', null, null, 'https://portal-test.vconf.dk/?url=1236@test.dk&pin=2001&start_dato=2018-10-02T15:00:00', '/api/admin/configuration/v1/ivr_theme/10/', 104, '2018-09-02 15:00:00', 104, '2018-09-02 15:00:00');
 
 -- * scheduling_status * 			
 INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_status_description, meetings_id) VALUES (301, NOW(), 'AWAITS_PROVISION', 'all ok', 1);

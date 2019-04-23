@@ -2,13 +2,14 @@ package dk.medcom.video.api.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.repository.OrganisationRepository;
@@ -16,6 +17,8 @@ import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 
 @Component
 public class SchedulingTemplateService {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
 	@Autowired
 	SchedulingTemplateRepository schedulingTemplateRepository;
@@ -69,6 +72,8 @@ public class SchedulingTemplateService {
 				if (schedulingTemplates.size() > 0) {
 					return schedulingTemplates.get(0);
 				} else {
+					LOGGER.debug("Creating default schedulingTemplate");
+					
 					SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 				
 					//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
@@ -95,5 +100,15 @@ public class SchedulingTemplateService {
 		}
 		
 	}
-
+	public SchedulingTemplate getSchedulingTemplateFromOrganisation(long schedulingTemplateId) {
+		
+		Organisation organisation = organisationRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
+		if (organisation != null) {
+			SchedulingTemplate schedulingTemplates = schedulingTemplateRepository.findOne(schedulingTemplateId) ;
+			if (organisation.equals(schedulingTemplates.getOrganisation())) {
+				return schedulingTemplates;
+			}
+		}
+		return null;
+	}
 }

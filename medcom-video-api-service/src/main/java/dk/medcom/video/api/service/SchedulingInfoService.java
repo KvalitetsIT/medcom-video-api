@@ -24,6 +24,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
+import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
@@ -79,10 +80,20 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	public SchedulingInfo createSchedulingInfo(Meeting meeting) throws NotAcceptableException, PermissionDeniedException {
+	public SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException {
 		LOGGER.debug("Entry createSchedulingInfo");
-		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
+		SchedulingTemplate schedulingTemplate = null;
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
+		
+		//if template is input and is related to the users organisation use that. Otherwise find default.
+		if (createMeetingDto.getSchedulingTemplateId() != null && createMeetingDto.getSchedulingTemplateId() > 0 ) {
+			LOGGER.debug("Searching for  schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
+			schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisation(createMeetingDto.getSchedulingTemplateId());
+		}
+		if (schedulingTemplate == null) {
+			schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
+		}
+		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		
 		schedulingInfo.setUuid(meeting.getUuid());
 		if (schedulingTemplate.getHostPinRequired()) {
@@ -109,8 +120,8 @@ public class SchedulingInfoService {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 		
-		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
-		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
+//		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants()); //TODO: clean up
+//		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
 		
 		String randomUri;
@@ -156,6 +167,20 @@ public class SchedulingInfoService {
 		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54
 		LOGGER.debug("portalLink is " + portalLink);
 		schedulingInfo.setPortalLink(portalLink);
+		
+		//Overwrite template value with input parameters 
+		if (createMeetingDto.getMaxParticipants() > 0) { 
+			schedulingInfo.setMaxParticipants(createMeetingDto.getMaxParticipants());
+			LOGGER.debug("MaxParticipants is taken from input: " + createMeetingDto.getMaxParticipants());
+		} else {
+			schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());	
+		}
+		if (createMeetingDto.isEndMeetingOnEndTime() != null) {
+			schedulingInfo.setEndMeetingOnEndTime(createMeetingDto.isEndMeetingOnEndTime());
+			LOGGER.debug("EndMeetingOnTime is taken from input: " + createMeetingDto.isEndMeetingOnEndTime().toString());
+		} else {
+			schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());	
+		}
 		
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);

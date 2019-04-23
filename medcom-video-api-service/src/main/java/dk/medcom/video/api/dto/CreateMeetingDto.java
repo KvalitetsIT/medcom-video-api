@@ -32,6 +32,38 @@ public class CreateMeetingDto {
 	
 	@Email
 	public String organizedByEmail;
+	
+	public int maxParticipants;
+	
+	public Boolean endMeetingOnEndTime;
+	
+	private Long schedulingTemplateId;
+
+	
+	public int getMaxParticipants() {
+		return maxParticipants;
+	}
+
+	public void setMaxParticipants(int maxParticipants) {
+		this.maxParticipants = maxParticipants;
+	}
+
+	public Boolean isEndMeetingOnEndTime() {
+		return endMeetingOnEndTime;
+	}
+
+	public void setEndMeetingOnEndTime(Boolean endMeetingOnEndTime) {
+		this.endMeetingOnEndTime = endMeetingOnEndTime;
+	}
+
+	public Long getSchedulingTemplateId() {
+		return schedulingTemplateId;
+	}
+
+	public void setSchedulingTemplateId(Long schedulingTemplateId) {
+		this.schedulingTemplateId = schedulingTemplateId;
+	}
+
 
 	public String getSubject() {
 		return subject;

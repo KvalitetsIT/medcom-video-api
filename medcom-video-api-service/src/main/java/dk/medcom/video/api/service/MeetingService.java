@@ -100,7 +100,7 @@ public class MeetingService {
 
 		meeting = meetingRepository.save(meeting);
 		if (meeting != null) {
-			schedulingInfoService.createSchedulingInfo(meeting);
+			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 		}
 		return meeting;
 	}

@@ -138,4 +138,16 @@ public class SchedulingTemplate {
 	public void setIvrTheme(String ivrTheme) {
 		this.ivrTheme = ivrTheme;
 	}
+	
+	@Override
+	public String toString() {
+		return "SchedulingTemplate [id=" + id + ", organisation=" + organisation + ", conferencingSysId="
+				+ conferencingSysId + ", uriPrefix=" + uriPrefix + ", uriDomain=" + uriDomain + ", hostPinRequired="
+				+ hostPinRequired + ", hostPinRangeLow=" + hostPinRangeLow + ", hostPinRangeHigh=" + hostPinRangeHigh
+				+ ", guestPinRequired=" + guestPinRequired + ", guestPinRangeLow=" + guestPinRangeLow
+				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vMRAvailableBefore=" + vMRAvailableBefore
+				+ ", maxParticipants=" + maxParticipants + ", endMeetingOnEndTime=" + endMeetingOnEndTime
+				+ ", uriNumberRangeLow=" + uriNumberRangeLow + ", uriNumberRangeHigh=" + uriNumberRangeHigh
+				+ ", ivrTheme=" + ivrTheme + "]";
+	}
 }
