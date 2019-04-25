@@ -100,7 +100,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingTemplate);
 			numberOfSchedulingTemplates++;
 		}
-		Assert.assertEquals(3, numberOfSchedulingTemplates);
+		Assert.assertEquals(5, numberOfSchedulingTemplates);
 	}
 	
 	@Test
@@ -217,6 +217,33 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			
 		}
 				
+	}
+	@Test
+	public void testFindScheduligTemplateWithExistingOrganisationAndIsDefault() {
+		// Given
+		Organisation organisation = subjectO.findOne(3L);
+		
+		// When	
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplate(organisation, true); 
+		
+		// Then
+		Assert.assertNotNull(schedulingTemplates);
+		Assert.assertEquals(1, schedulingTemplates.size());
+	}
+	
+	@Test
+	public void testFindScheduligTemplateWithExistingOrganisationAndId() {
+		// Given
+		Organisation organisation = subjectO.findOne(3L);
+		Long id = 5L;
+		
+		// When	
+		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndId(organisation, id); 
+		
+		// Then
+		Assert.assertNotNull(schedulingTemplate);
+		Assert.assertEquals(id, schedulingTemplate.getId());
+	
 	}
 	
 }

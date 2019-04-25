@@ -35,6 +35,7 @@ public class SchedulingTemplate {
 	private Long uriNumberRangeLow;			//when random generating
 	private Long uriNumberRangeHigh;		//when random generating
 	private String ivrTheme;  				//theme to use in Pexip
+	private boolean isDefaultTemplate;		//an organisation can have one default template
 	
 	public Long getId() {
 		return id;
@@ -138,7 +139,12 @@ public class SchedulingTemplate {
 	public void setIvrTheme(String ivrTheme) {
 		this.ivrTheme = ivrTheme;
 	}
-	
+	public boolean getIsDefaultTemplate() {
+		return isDefaultTemplate;
+	}
+	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
+		this.isDefaultTemplate = isDefaultTemplate;
+	}
 	@Override
 	public String toString() {
 		return "SchedulingTemplate [id=" + id + ", organisation=" + organisation + ", conferencingSysId="
@@ -148,6 +154,7 @@ public class SchedulingTemplate {
 				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vMRAvailableBefore=" + vMRAvailableBefore
 				+ ", maxParticipants=" + maxParticipants + ", endMeetingOnEndTime=" + endMeetingOnEndTime
 				+ ", uriNumberRangeLow=" + uriNumberRangeLow + ", uriNumberRangeHigh=" + uriNumberRangeHigh
-				+ ", ivrTheme=" + ivrTheme + "]";
+				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + "]";
 	}
+	
 }

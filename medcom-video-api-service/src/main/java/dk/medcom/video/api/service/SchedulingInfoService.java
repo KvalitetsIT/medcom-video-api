@@ -120,8 +120,6 @@ public class SchedulingInfoService {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 		
-//		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants()); //TODO: clean up
-//		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
 		
 		String randomUri;

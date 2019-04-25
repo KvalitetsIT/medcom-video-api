@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "4cb6956c-c8e7-49cc-a7df-d34281c8e834",
-		"name": "VDX-Booking-Module-API-V0.3.0 - Role meeting user refact",
+		"name": "VDX-Booking-Module-API-V0.4.0 - Role meeting user",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -83,9 +83,25 @@
 							"name": "Create meeting a1mtn with description and projectCode  (sets uuid)",
 							"event": [
 								{
+									"listen": "prerequest",
+									"script": {
+										"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+										"exec": [
+											"pm.globals.set(\"subject\", \"test møde a1mtn\");",
+											"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+											"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+											"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+											"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+											"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1mtn\");",
+											"pm.globals.set(\"project_code\", \"PROJECT001PROJECT001PROJECT001\");"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
 									"listen": "test",
 									"script": {
-										"id": "d143b2f7-3f7c-4c7c-aef0-27778c52ea3d",
+										"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
 										"exec": [
 											"",
 											"",
@@ -120,22 +136,6 @@
 											"    var jsonData = pm.response.json();",
 											"    pm.expect(jsonData.createdBy).to.eql(jsonData.organizedBy);",
 											"});"
-										],
-										"type": "text/javascript"
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "e34796af-14b7-4d19-8113-1c65089dca2c",
-										"exec": [
-											"pm.globals.set(\"subject\", \"test møde a1mtn\");",
-											"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
-											"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
-											"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
-											"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
-											"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1mtn\");",
-											"pm.globals.set(\"project_code\", \"PROJECT001\");"
 										],
 										"type": "text/javascript"
 									}
@@ -283,6 +283,94 @@
 								"body": {
 									"mode": "raw",
 									"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"organizedByEmail\": \"{{organized_by_email}}\"\n}"
+								},
+								"url": {
+									"raw": "{{host-sys}}/meetings",
+									"host": [
+										"{{host-sys}}"
+									],
+									"path": [
+										"meetings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create meeting a4mtn with template  (sets uuid)",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "4d01b526-ec5c-4f5f-b711-c50f6e332893",
+										"exec": [
+											"pm.globals.set(\"subject\", \"test møde a4mtn\");",
+											"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+											"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+											"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+											"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+											"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a4mtn\");",
+											"pm.globals.set(\"project_code\", \"PROJECT004\");",
+											"pm.globals.set(\"scheduling_template_id\", \"3\");",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "1054a2a9-68f1-46bb-be62-10d3dbc28814",
+										"exec": [
+											"",
+											"",
+											"",
+											"//set uuid for later retrival",
+											"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+											"",
+											"pm.test(\"Subject is as given input\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+											"});",
+											"",
+											"pm.test(\"Description is as given input\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+											"});",
+											"",
+											"pm.test(\"From time is as given input\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+											"});",
+											"",
+											"pm.test(\"To time is as given input\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+											"});",
+											"pm.test(\"ProjectCode is as given input\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+											"});",
+											"pm.test(\"createdBy and organizedBy is the same\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.createdBy).to.eql(jsonData.organizedBy);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"schedulingTemplateId\": \"{{scheduling_template_id}}\"\n}"
 								},
 								"url": {
 									"raw": "{{host-sys}}/meetings",

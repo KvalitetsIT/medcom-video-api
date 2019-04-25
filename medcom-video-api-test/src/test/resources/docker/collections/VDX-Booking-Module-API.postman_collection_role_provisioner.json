@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "7cbd4610-d2e4-4fc8-8798-fef4287438ac",
-		"name": "VDX-Booking-Module-API-V0.3.0 - Role provisioner refact",
+		"name": "VDX-Booking-Module-API-V0.4.0 - Role provisioner",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -411,6 +411,163 @@
 									"key": "to-end-time",
 									"value": "2023-12-31T03:12:30-0100"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting a2prv with maxParticipants and endMeetingOnTime  (sets uuid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d143b2f7-3f7c-4c7c-aef0-27778c52ea3d",
+								"exec": [
+									"",
+									"",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});",
+									"pm.test(\"createdBy and organizedBy is the same\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.createdBy).to.eql(jsonData.organizedBy);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e34796af-14b7-4d19-8113-1c65089dca2c",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde a2prv\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a4mtn\");",
+									"pm.globals.set(\"project_code\", \"PROJECT004\");",
+									"pm.globals.set(\"scheduling_template_id\", \"2\");",
+									"pm.globals.set(\"max_participants\", 2);",
+									"pm.globals.set(\"end_meeting_on_time\", true);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"schedulingTemplateId\": \"{{scheduling_template_id}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_time}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid og tjek",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19d12198-1554-44a4-b5a2-5fae8ae2a5de",
+								"exec": [
+									"",
+									"pm.test(\"Check that created user email is not null\", function () {",
+									"    pm.expect(pm.response.json().createdBy.email).not.equal(null);",
+									"});",
+									"pm.test(\"Check that created user organisation is not null\", function () {",
+									"    pm.expect(pm.response.json().createdBy.organisationId).not.equal(null);",
+									"});",
+									"pm.test(\"Check that crate date is not null\", function () {",
+									"    pm.expect(pm.response.json().createdTime).not.equal(null);",
+									"});",
+									"pm.test(\"Check that updated date is null\", function () {",
+									"    pm.expect(pm.response.json().updatedTime).equal(null);",
+									"});",
+									"pm.test(\"Check that updated user email is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.email).equal(null);",
+									"});",
+									"pm.test(\"Check that updated user organisation is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.organisationId).equal(null);",
+									"});",
+									"pm.test(\"Check that meeting updated date is null\", function () {",
+									"    pm.expect(pm.response.json().meetingDetails.updatedTime).equal(null);",
+									"});",
+									"pm.test(\"Check that meeting updated user email is null\", function () {",
+									"    pm.expect(pm.response.json().meetingDetails.updatedBy.email).equal(null);",
+									"});",
+									"pm.test(\"Check that meeting updated user organisation is null\", function () {",
+									"    pm.expect(pm.response.json().meetingDetails.updatedBy.organisationId).equal(null);",
+									"});",
+									"pm.test(\"Check that maxParticipant is as input\", function () {",
+									"    pm.expect(pm.response.json().maxParticipants).equal(pm.globals.get(\"max_participants\"));",
+									"});",
+									"pm.test(\"Check that endMeetingOnTime is as input\", function () {",
+									"    pm.expect(pm.response.json().endMeetingOnEndTime).equal(pm.globals.get(\"end_meeting_on_time\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
 							]
 						}
 					},

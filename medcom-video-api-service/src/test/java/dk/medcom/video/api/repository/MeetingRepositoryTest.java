@@ -1,7 +1,5 @@
 package dk.medcom.video.api.repository;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;

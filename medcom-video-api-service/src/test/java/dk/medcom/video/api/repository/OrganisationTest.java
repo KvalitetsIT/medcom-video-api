@@ -1,12 +1,11 @@
 package dk.medcom.video.api.repository;
 
 import javax.annotation.Resource;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.service.MeetingUserService;
 
 public class OrganisationTest extends RepositoryTest {
 

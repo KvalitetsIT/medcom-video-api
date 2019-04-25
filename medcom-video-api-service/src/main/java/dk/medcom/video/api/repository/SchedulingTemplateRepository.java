@@ -11,5 +11,7 @@ public interface SchedulingTemplateRepository extends CrudRepository<SchedulingT
 	
 	public List<SchedulingTemplate> findByOrganisation(Organisation organisation);
 	public List<SchedulingTemplate> findByOrganisationIsNull();
+	public List<SchedulingTemplate> findByOrganisationAndIsDefaultTemplate(Organisation organisation, boolean isDefaultTemplate);
+	public SchedulingTemplate findByOrganisationAndId(Organisation organisation, Long id);
 
 }

@@ -1,13 +1,12 @@
 package dk.medcom.video.api.dto;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import java.util.Date;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
