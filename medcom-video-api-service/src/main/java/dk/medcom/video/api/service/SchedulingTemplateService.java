@@ -27,9 +27,6 @@ public class SchedulingTemplateService {
 	SchedulingTemplateRepository schedulingTemplateRepository;
 	
 	@Autowired
-	OrganisationRepository organisationRepository;
-	
-	@Autowired
 	UserContextService userService;
 	
 	@Autowired
@@ -64,11 +61,22 @@ public class SchedulingTemplateService {
 	@Value("${scheduling.template.default.uri.number.range.high}")
 	private Long uriNumberRangeHigh;		
 	@Value("${scheduling.template.default.ivr.theme}")
-	private String ivrTheme;		
+	private String ivrTheme;
+	
+	public SchedulingTemplateService() {
+		
+	}
+	
+	public SchedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService) {
+	 	this.schedulingTemplateRepository = schedulingTemplateRepository;
+	 	this.userService = userService;
+	 	this.organisationService = organisationService;
+	}
+
 	
 	public SchedulingTemplate getSchedulingTemplate() throws PermissionDeniedException{
 		
-		Organisation organisation = organisationRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
+		Organisation organisation = organisationService.getUserOrganisation();
 		List<SchedulingTemplate> schedulingTemplates = null;
 		if (organisation != null) {
 			//first try: find default template for organization. Use list just in case.
@@ -117,9 +125,9 @@ public class SchedulingTemplateService {
 		}
 		
 	}
-	public SchedulingTemplate getSchedulingTemplateFromOrganisation(long schedulingTemplateId) {
+	public SchedulingTemplate getSchedulingTemplateFromOrganisation(long schedulingTemplateId) throws PermissionDeniedException {
 		
-		Organisation organisation = organisationRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
+		Organisation organisation = organisationService.getUserOrganisation();
 		if (organisation != null) {
 			SchedulingTemplate schedulingTemplates = schedulingTemplateRepository.findOne(schedulingTemplateId) ;
 			if (organisation.equals(schedulingTemplates.getOrganisation())) {
