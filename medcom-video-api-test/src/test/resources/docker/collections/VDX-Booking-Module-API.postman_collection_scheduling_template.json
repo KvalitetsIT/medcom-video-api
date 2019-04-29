@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "a5c95145-93fc-49ff-97f2-19f413a98ef7",
-		"name": "VDX-Booking-Module-API-V0.4.0 - Role user admin mm",
+		"name": "VDX-Booking-Module-API-V0.4.0 - scheduling template",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -213,7 +213,7 @@
 			]
 		},
 		{
-			"name": "use organization template",
+			"name": "dont use organization template",
 			"item": [
 				{
 					"name": "Create schedulingTemplate as non-default and validate",
@@ -398,7 +398,7 @@
 								"exec": [
 									"pm.test(\"Check that ivrTheme is as given by expectedTemplate\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.ivrTheme).to.eql(pm.globals.get(\"ivr_theme\"));",
+									"        pm.expect(jsonData.ivrTheme).to.eql(\"10\");",
 									"});"
 								],
 								"type": "text/javascript"
@@ -1044,6 +1044,244 @@
 			]
 		},
 		{
+			"name": "dont use newly created template when deleted",
+			"item": [
+				{
+					"name": "Create schedulingTemplate as default",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"conferencing_sys_id\", 23);",
+									"pm.globals.set(\"uri_prefix\", \"abc\");",
+									"pm.globals.set(\"uri_domain\", \"abc2b\");",
+									"pm.globals.set(\"host_pin_required\", true);",
+									"pm.globals.set(\"host_pin_range_low\", 1);",
+									"pm.globals.set(\"host_pin_range_high\", 91);",
+									"pm.globals.set(\"guest_pin_required\", true);",
+									"pm.globals.set(\"guest_pin_range_low\", 100);",
+									"pm.globals.set(\"guest_pin_range_high\", 991);",
+									"pm.globals.set(\"vmr_available_before\", 5);",
+									"pm.globals.set(\"max_participants\", 3);",
+									"pm.globals.set(\"end_meeting_on_end_time\", true);",
+									"pm.globals.set(\"uri_number_range_low\", 1000);",
+									"pm.globals.set(\"uri_number_range_high\", 9991);",
+									"pm.globals.set(\"ivr_theme\", \"/api/admin/configuration/v1/ivr_theme/new_template/\");",
+									"pm.globals.set(\"is_default_template\", true);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"//set id for later retrival",
+									"pm.globals.set(\"previous_scheduling_template_id\", pm.globals.get(\"last_scheduling_template_id\"));",
+									"pm.globals.set(\"last_scheduling_template_id\", pm.response.json().id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete last schedulingTemplate",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates/{{last_scheduling_template_id}}",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates",
+								"{{last_scheduling_template_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create meeting with new template",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde med ny template\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde med ny template\");",
+									"pm.globals.set(\"project_code\", \"PROJECT_TEMPLATE\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\",\n\"schedulingTemplateId\": \"{{last_scheduling_template_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19d12198-1554-44a4-b5a2-5fae8ae2a5de",
+								"exec": [
+									"pm.test(\"Check that ivrTheme is as given by expectedTemplate\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.ivrTheme).to.eql(\"10\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "280f603e-fb40-426e-a797-5b7cc671be03",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f1d28983-fbec-4f31-8de2-e11fd3276dce",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
 			"name": "changing existing default template with post and put",
 			"item": [
 				{
@@ -1357,6 +1595,578 @@
 					"listen": "test",
 					"script": {
 						"id": "1867a4e7-dceb-4180-8643-1a8dc2d9e21e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "test create and update dates",
+			"item": [
+				{
+					"name": "Create schedulingTemplate as default",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"conferencing_sys_id\", 23);",
+									"pm.globals.set(\"uri_prefix\", \"abc\");",
+									"pm.globals.set(\"uri_domain\", \"abc2b\");",
+									"pm.globals.set(\"host_pin_required\", true);",
+									"pm.globals.set(\"host_pin_range_low\", 1);",
+									"pm.globals.set(\"host_pin_range_high\", 91);",
+									"pm.globals.set(\"guest_pin_required\", true);",
+									"pm.globals.set(\"guest_pin_range_low\", 100);",
+									"pm.globals.set(\"guest_pin_range_high\", 991);",
+									"pm.globals.set(\"vmr_available_before\", 5);",
+									"pm.globals.set(\"max_participants\", 3);",
+									"pm.globals.set(\"end_meeting_on_end_time\", true);",
+									"pm.globals.set(\"uri_number_range_low\", 1000);",
+									"pm.globals.set(\"uri_number_range_high\", 9991);",
+									"pm.globals.set(\"ivr_theme\", \"/api/admin/configuration/v1/ivr_theme/organization_template/\");",
+									"pm.globals.set(\"is_default_template\", true);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"//set id for later retrival",
+									"pm.globals.set(\"previous_scheduling_template_id\", pm.globals.get(\"last_scheduling_template_id\"));",
+									"pm.globals.set(\"last_scheduling_template_id\", pm.response.json().id);",
+									"",
+									"pm.test(\"isDefaultTemplate as given input\", function () {",
+									"    pm.expect(pm.response.json().isDefaultTemplate).to.eql(pm.globals.get(\"is_default_template\"));",
+									"});",
+									"",
+									"pm.test(\"Check that create user is not null\", function () {",
+									"    pm.expect(pm.response.json().createdBy.email).not.equal(null);",
+									"});",
+									"pm.test(\"Check that create time is not null\", function () {",
+									"    pm.expect(pm.response.json().createdTime).not.equal(null);",
+									"});",
+									"",
+									"pm.test(\"Check that update user is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.email).equal(null);",
+									"});",
+									"pm.test(\"Check that update time is null\", function () {",
+									"    pm.expect(pm.response.json().updatedTime).equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create schedulingTemplate as non-default",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"conferencing_sys_id\", 23);",
+									"pm.globals.set(\"uri_prefix\", \"abc\");",
+									"pm.globals.set(\"uri_domain\", \"abc2b\");",
+									"pm.globals.set(\"host_pin_required\", true);",
+									"pm.globals.set(\"host_pin_range_low\", 1);",
+									"pm.globals.set(\"host_pin_range_high\", 91);",
+									"pm.globals.set(\"guest_pin_required\", true);",
+									"pm.globals.set(\"guest_pin_range_low\", 100);",
+									"pm.globals.set(\"guest_pin_range_high\", 991);",
+									"pm.globals.set(\"vmr_available_before\", 5);",
+									"pm.globals.set(\"max_participants\", 3);",
+									"pm.globals.set(\"end_meeting_on_end_time\", true);",
+									"pm.globals.set(\"uri_number_range_low\", 1000);",
+									"pm.globals.set(\"uri_number_range_high\", 9991);",
+									"pm.globals.set(\"ivr_theme\", \"/api/admin/configuration/v1/ivr_theme/organization_template/\");",
+									"pm.globals.set(\"is_default_template\", false);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"//set id for later retrival",
+									"pm.globals.set(\"previous_scheduling_template_id\", pm.globals.get(\"last_scheduling_template_id\"));",
+									"pm.globals.set(\"last_scheduling_template_id\", pm.response.json().id);",
+									"",
+									"pm.test(\"isDefaultTemplate as given input\", function () {",
+									"    pm.expect(pm.response.json().isDefaultTemplate).to.eql(pm.globals.get(\"is_default_template\"));",
+									"});",
+									"",
+									"pm.test(\"Check that create user is not null\", function () {",
+									"    pm.expect(pm.response.json().createdBy.email).not.equal(null);",
+									"});",
+									"pm.test(\"Check that create time is not null\", function () {",
+									"    pm.expect(pm.response.json().createdTime).not.equal(null);",
+									"});",
+									"",
+									"pm.test(\"Check that update user is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.email).equal(null);",
+									"});",
+									"pm.test(\"Check that update time is null\", function () {",
+									"    pm.expect(pm.response.json().updatedTime).equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update schedulingTemplate check updatedtime and user",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"conferencing_sys_id\", 23);",
+									"pm.globals.set(\"uri_prefix\", \"abc\");",
+									"pm.globals.set(\"uri_domain\", \"abc2b\");",
+									"pm.globals.set(\"host_pin_required\", true);",
+									"pm.globals.set(\"host_pin_range_low\", 1);",
+									"pm.globals.set(\"host_pin_range_high\", 91);",
+									"pm.globals.set(\"guest_pin_required\", true);",
+									"pm.globals.set(\"guest_pin_range_low\", 100);",
+									"pm.globals.set(\"guest_pin_range_high\", 991);",
+									"pm.globals.set(\"vmr_available_before\", 5);",
+									"pm.globals.set(\"max_participants\", 3);",
+									"pm.globals.set(\"end_meeting_on_end_time\", true);",
+									"pm.globals.set(\"uri_number_range_low\", 1000);",
+									"pm.globals.set(\"uri_number_range_high\", 9991);",
+									"pm.globals.set(\"ivr_theme\", \"/api/admin/configuration/v1/ivr_theme/770077/\");",
+									"pm.globals.set(\"is_default_template\", true);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"pm.test(\"Check that update user is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.email).not.equal(null);",
+									"});",
+									"pm.test(\"Check that update time is not null\", function () {",
+									"    pm.expect(pm.response.json().updatedTime).not.equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates/{{last_scheduling_template_id}}",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates",
+								"{{last_scheduling_template_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get previous scheduling template check updatetime and user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7078a8df-ab06-4617-b07a-2ba2fdd30b10",
+								"exec": [
+									"pm.test(\"isDefaultTemplate reset to false\", function () {",
+									"    pm.expect(pm.response.json().isDefaultTemplate).to.eql(false);",
+									"});",
+									"",
+									"pm.test(\"Check that update user is not null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.email).not.equal(null);",
+									"});",
+									"pm.test(\"Check that update time is not null\", function () {",
+									"    pm.expect(pm.response.json().updatedTime).not.equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eaf76bc8-cbfe-432b-a876-9a64a5c62f4b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates/{{previous_scheduling_template_id}}",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates",
+								"{{previous_scheduling_template_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1ff3c4f3-d28c-4019-90ce-133fd7e46f99",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "169618cb-0b57-47b2-ba02-00bff02cf423",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "test delete",
+			"item": [
+				{
+					"name": "Get scheduling templates  and count",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7078a8df-ab06-4617-b07a-2ba2fdd30b10",
+								"exec": [
+									"",
+									"",
+									"const templates = pm.response.json();",
+									"",
+									"if (templates._embedded){",
+									"  pm.globals.set(\"noOfTemplates\", templates._embedded.schedulingTemplateDtoList.length);",
+									"} else { //the result is empty",
+									"    pm.globals.set(\"noOfTemplates\", 0);",
+									"}",
+									"pm.globals.set(\"last_scheduling_template_id\", 0);",
+									"pm.globals.set(\"previous_scheduling_template_id\", 0);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eaf76bc8-cbfe-432b-a876-9a64a5c62f4b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-sys}}/scheduling-templates/",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"scheduling-templates",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create schedulingTemplate as non-default",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"conferencing_sys_id\", 23);",
+									"pm.globals.set(\"uri_prefix\", \"abc\");",
+									"pm.globals.set(\"uri_domain\", \"abc2b\");",
+									"pm.globals.set(\"host_pin_required\", true);",
+									"pm.globals.set(\"host_pin_range_low\", 1);",
+									"pm.globals.set(\"host_pin_range_high\", 91);",
+									"pm.globals.set(\"guest_pin_required\", true);",
+									"pm.globals.set(\"guest_pin_range_low\", 100);",
+									"pm.globals.set(\"guest_pin_range_high\", 991);",
+									"pm.globals.set(\"vmr_available_before\", 5);",
+									"pm.globals.set(\"max_participants\", 3);",
+									"pm.globals.set(\"end_meeting_on_end_time\", true);",
+									"pm.globals.set(\"uri_number_range_low\", 1000);",
+									"pm.globals.set(\"uri_number_range_high\", 9991);",
+									"pm.globals.set(\"ivr_theme\", \"/api/admin/configuration/v1/ivr_theme/organization_template/\");",
+									"pm.globals.set(\"is_default_template\", false);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"//set id for later retrival",
+									"pm.globals.set(\"previous_scheduling_template_id\", pm.globals.get(\"last_scheduling_template_id\"));",
+									"pm.globals.set(\"last_scheduling_template_id\", pm.response.json().id);",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete last schedulingTemplate",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-admin}}/scheduling-templates/{{last_scheduling_template_id}}",
+							"host": [
+								"{{host-admin}}"
+							],
+							"path": [
+								"scheduling-templates",
+								"{{last_scheduling_template_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling templates  and count the same",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7078a8df-ab06-4617-b07a-2ba2fdd30b10",
+								"exec": [
+									"",
+									"",
+									"const templates = pm.response.json();",
+									"",
+									"if (templates._embedded){",
+									"  pm.globals.set(\"noOfTemplatesUpdated\", templates._embedded.schedulingTemplateDtoList.length);",
+									"} else { //the result is empty",
+									"    pm.globals.set(\"noOfTemplatesUpdated\", 0);",
+									"}",
+									"",
+									"pm.test(\"No of cheduling meeting has not changed\", function () {",
+									"    pm.expect(pm.globals.get(\"noOfTemplates\")).to.eql(pm.globals.get(\"noOfTemplatesUpdated\"));",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "eaf76bc8-cbfe-432b-a876-9a64a5c62f4b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-sys}}/scheduling-templates/",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"scheduling-templates",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5ce2772e-618a-46c8-b752-0a47d104ece2",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b6850029-c857-4acd-8bf1-53da66d76c19",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",

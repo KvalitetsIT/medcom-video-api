@@ -6,7 +6,6 @@ import javax.validation.constraints.Size;
 import org.springframework.hateoas.ResourceSupport;
 
 public class CreateSchedulingTemplateDto extends ResourceSupport {
-	
 	@NotNull
 	private Long conferencingSysId;
 	
@@ -32,13 +31,13 @@ public class CreateSchedulingTemplateDto extends ResourceSupport {
 	
 	private Long guestPinRangeHigh;
 	
-	@NotNull
+	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
 	private int vMRAvailableBefore;
 	
-	@NotNull
+	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
 	private int maxParticipants;
 	
-	@NotNull
+	//@NotNull - even though required by database not required in call. Will have the value false when not included in call.
 	private boolean endMeetingOnEndTime;
 	
 	@NotNull

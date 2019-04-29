@@ -9,9 +9,9 @@ import dk.medcom.video.api.dao.SchedulingTemplate;
 
 public interface SchedulingTemplateRepository extends CrudRepository<SchedulingTemplate, Long> {
 	
-	public List<SchedulingTemplate> findByOrganisation(Organisation organisation);
-	public List<SchedulingTemplate> findByOrganisationIsNull();
-	public List<SchedulingTemplate> findByOrganisationAndIsDefaultTemplate(Organisation organisation, boolean isDefaultTemplate);
-	public SchedulingTemplate findByOrganisationAndId(Organisation organisation, Long id);
+	public List<SchedulingTemplate> findByOrganisationAndDeletedTimeIsNull(Organisation organisation);
+	public List<SchedulingTemplate> findByOrganisationIsNullAndDeletedTimeIsNull();
+	public List<SchedulingTemplate> findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Organisation organisation, boolean isDefaultTemplate);
+	public SchedulingTemplate findByOrganisationAndIdAndDeletedTimeIsNull(Organisation organisation, Long id);
 
 }

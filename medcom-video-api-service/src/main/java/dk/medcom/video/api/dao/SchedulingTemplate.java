@@ -1,5 +1,7 @@
 package dk.medcom.video.api.dao;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -36,6 +38,22 @@ public class SchedulingTemplate {
 	private Long uriNumberRangeHigh;		//when random generating
 	private String ivrTheme;  				//theme to use in Pexip
 	private boolean isDefaultTemplate;		//an organisation can have one default template
+	
+	@ManyToOne
+    @JoinColumn(name="created_by")
+	private MeetingUser createdBy;
+	private Date createdTime;
+	
+	@ManyToOne
+    @JoinColumn(name="updated_by")
+	private MeetingUser updatedBy;
+	private Date updatedTime;
+
+	@ManyToOne
+    @JoinColumn(name="deleted_by")
+	private MeetingUser deletedBy;
+	private Date deletedTime;
+
 	
 	public Long getId() {
 		return id;
@@ -145,6 +163,43 @@ public class SchedulingTemplate {
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
 	}
+	
+	public MeetingUser getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(MeetingUser createdBy) {
+		this.createdBy = createdBy;
+	}
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
+	}
+	public MeetingUser getUpdatedBy() {
+		return updatedBy;
+	}
+	public void setUpdatedBy(MeetingUser updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+	public Date getUpdatedTime() {
+		return updatedTime;
+	}
+	public void setUpdatedTime(Date updatedTime) {
+		this.updatedTime = updatedTime;
+	}
+	public MeetingUser getDeletedBy() {
+		return deletedBy;
+	}
+	public void setDeletedBy(MeetingUser deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+	public Date getDeletedTime() {
+		return deletedTime;
+	}
+	public void setDeletedTime(Date deletedTime) {
+		this.deletedTime = deletedTime;
+	}
 	@Override
 	public String toString() {
 		return "SchedulingTemplate [id=" + id + ", organisation=" + organisation + ", conferencingSysId="
@@ -154,7 +209,9 @@ public class SchedulingTemplate {
 				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vMRAvailableBefore=" + vMRAvailableBefore
 				+ ", maxParticipants=" + maxParticipants + ", endMeetingOnEndTime=" + endMeetingOnEndTime
 				+ ", uriNumberRangeLow=" + uriNumberRangeLow + ", uriNumberRangeHigh=" + uriNumberRangeHigh
-				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + "]";
+				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + ", createdBy=" + createdBy
+				+ ", createdTime=" + createdTime + ", updatedBy=" + updatedBy + ", updatedTime=" + updatedTime
+				+ ", deletedBy=" + deletedBy + ", deletedTime=" + deletedTime + "]";
 	}
 	
 }

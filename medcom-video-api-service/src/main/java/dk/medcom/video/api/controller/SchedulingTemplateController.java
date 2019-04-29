@@ -57,6 +57,7 @@ public class SchedulingTemplateController {
 		return resources;
 
 	}
+	
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.GET)
 	public Resource <SchedulingTemplateDto> getSchedulingTemplateById(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException {
 		LOGGER.debug("Entry of /scheduling-templates.get id: " + id);
@@ -75,7 +76,7 @@ public class SchedulingTemplateController {
 	public Resource <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException {
 		LOGGER.debug("Entry of /scheduling-template.post");
 		
-		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto);
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 		Resource <SchedulingTemplateDto> resource = new Resource <SchedulingTemplateDto>(schedulingTemplateDto);
 		
@@ -98,16 +99,15 @@ public class SchedulingTemplateController {
 
 	}
 	
-//	@APISecurityAnnotation({UserRole.ADMIN}) //TODO: skal der laves slet?
-//	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.DELETE)
-//	public Resource <SchedulingTemplateDto> deleteSchedulingTemplate(@PathVariable("id") String id)  {
-//		LOGGER.debug("Entry of /schedulingTemplate.delete id: " + id);
-//		
-////		meetingService.deleteMeeting(uuid);
-//
-//		LOGGER.debug("Exit of /scheduling-template.delete");
-//		return null;
-//	}
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.DELETE)
+	public Resource <SchedulingTemplateDto> deleteSchedulingTemplate(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException  {
+		LOGGER.debug("Entry of /schedulingTemplate.delete id: " + id);
+		
+		schedulingTemplateService.deleteSchedulingTemplate(id);
 
+		LOGGER.debug("Exit of /scheduling-template.delete");
+		return null;
+	}
 	
 }

@@ -3,14 +3,18 @@ package dk.medcom.video.api.dto;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.Date;
+
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import dk.medcom.video.api.controller.SchedulingTemplateController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 
 public class SchedulingTemplateDto extends ResourceSupport {
@@ -32,8 +36,14 @@ public class SchedulingTemplateDto extends ResourceSupport {
 	private Long uriNumberRangeLow;			
 	private Long uriNumberRangeHigh;		
 	private String ivrTheme;
-
 	private boolean isDefaultTemplate;
+	
+	public MeetingUserDto createdBy;
+	public MeetingUserDto updatedBy;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date createdTime;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
+	public Date updatedTime;
 
 	public SchedulingTemplateDto() {	
 	}
@@ -58,6 +68,18 @@ public class SchedulingTemplateDto extends ResourceSupport {
 		uriNumberRangeHigh = schedulingTemplate.getUriNumberRangeHigh();
 		ivrTheme = schedulingTemplate.getIvrTheme();
 		isDefaultTemplate = schedulingTemplate.getIsDefaultTemplate();
+		
+		createdTime = schedulingTemplate.getCreatedTime();
+		updatedTime = schedulingTemplate.getUpdatedTime();
+		
+		MeetingUser createdByUser = schedulingTemplate.getCreatedBy();
+		MeetingUserDto meetingUserDto = new MeetingUserDto(createdByUser);
+		
+		MeetingUser updatedByUser = schedulingTemplate.getUpdatedBy();
+		MeetingUserDto updatedByUserDto = new MeetingUserDto(updatedByUser);
+
+		createdBy = meetingUserDto;
+		updatedBy = updatedByUserDto;
 		
 		try { //does not make sense to throw since its only a link 
 			Link selfLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplateById(templateId)).withRel("self");
@@ -211,4 +233,38 @@ public class SchedulingTemplateDto extends ResourceSupport {
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
 	}
+
+	public MeetingUserDto getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(MeetingUserDto createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public MeetingUserDto getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(MeetingUserDto updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public Date getCreatedTime() {
+		return createdTime;
+	}
+
+	public void setCreatedTime(Date createdTime) {
+		this.createdTime = createdTime;
+	}
+
+	public Date getUpdatedTime() {
+		return updatedTime;
+	}
+
+	public void setUpdatedTime(Date updatedTime) {
+		this.updatedTime = updatedTime;
+	}
+
+	
 }

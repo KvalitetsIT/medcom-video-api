@@ -149,7 +149,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Organisation organisation = subjectO.findOne(1L);
 		
 		// When	
-		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisation(organisation); 
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndDeletedTimeIsNull(organisation); 
 		
 		// Then
 		Assert.assertNotNull(schedulingTemplates);
@@ -178,7 +178,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 		// When
 		// Then
-		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationIsNull();
+		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
 		int numberOfSchedulingTemplates = 0;
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
 			Assert.assertNull(schedulingTemplate.getOrganisation());
@@ -204,7 +204,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			schedulingTemplate.setIvrTheme(ivrTheme);
 
 			schedulingTemplate = subject.save(schedulingTemplate);
-			schedulingTemplates = subject.findByOrganisationIsNull();
+			schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
 			
 			Assert.assertNotNull(schedulingTemplates);
 			numberOfSchedulingTemplates = 0;
@@ -224,7 +224,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Organisation organisation = subjectO.findOne(3L);
 		
 		// When	
-		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplate(organisation, true); 
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true); 
 		
 		// Then
 		Assert.assertNotNull(schedulingTemplates);
@@ -238,11 +238,25 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long id = 5L;
 		
 		// When	
-		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndId(organisation, id); 
+		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
 		
 		// Then
 		Assert.assertNotNull(schedulingTemplate);
 		Assert.assertEquals(id, schedulingTemplate.getId());
+	
+	}
+	
+	@Test
+	public void testFindScheduligTemplateWithExistingOrganisationAndIdNotFound() {
+		// Given
+		Organisation organisation = subjectO.findOne(3L);
+		Long id = 777L;
+		
+		// When	
+		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
+		
+		// Then
+		Assert.assertNull(schedulingTemplate);
 	
 	}
 	

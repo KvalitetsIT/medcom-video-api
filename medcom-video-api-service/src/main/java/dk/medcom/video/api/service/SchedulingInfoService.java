@@ -88,10 +88,14 @@ public class SchedulingInfoService {
 		//if template is input and is related to the users organisation use that. Otherwise find default.
 		if (createMeetingDto.getSchedulingTemplateId() != null && createMeetingDto.getSchedulingTemplateId() > 0 ) {
 			LOGGER.debug("Searching for  schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
-			schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisation(createMeetingDto.getSchedulingTemplateId());
+			try {
+				schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(createMeetingDto.getSchedulingTemplateId());
+			} catch (RessourceNotFoundException e) {
+				//Do nothing. More logic below
+			} 
 		}
 		if (schedulingTemplate == null) {
-			schedulingTemplate = schedulingTemplateService.getSchedulingTemplate();
+			schedulingTemplate = schedulingTemplateService.getDefaultSchedulingTemplate();
 		}
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		

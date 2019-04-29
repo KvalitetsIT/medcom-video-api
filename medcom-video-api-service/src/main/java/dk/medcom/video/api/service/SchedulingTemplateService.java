@@ -1,5 +1,7 @@
 package dk.medcom.video.api.service;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -15,7 +17,6 @@ import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.CreateSchedulingTemplateDto;
 import dk.medcom.video.api.dto.UpdateSchedulingTemplateDto;
-import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 
 @Component
@@ -31,6 +32,10 @@ public class SchedulingTemplateService {
 	
 	@Autowired
 	OrganisationService organisationService;
+	
+	@Autowired
+	MeetingUserService meetingUserService;
+
 	
 	@Value("${scheduling.template.default.conferencing.sys.id}")
 	private Long conferencingSysId;
@@ -67,56 +72,36 @@ public class SchedulingTemplateService {
 		
 	}
 	
-	public SchedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService) {
+	public SchedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService, MeetingUserService meetingUserService) {
 	 	this.schedulingTemplateRepository = schedulingTemplateRepository;
 	 	this.userService = userService;
 	 	this.organisationService = organisationService;
+	 	this.meetingUserService = meetingUserService;
 	}
 
 	
-	public SchedulingTemplate getSchedulingTemplate() throws PermissionDeniedException{
+	public SchedulingTemplate getDefaultSchedulingTemplate() throws PermissionDeniedException{
 		
 		Organisation organisation = organisationService.getUserOrganisation();
 		List<SchedulingTemplate> schedulingTemplates = null;
 		if (organisation != null) {
 			//first try: find default template for organization. Use list just in case.
-			schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplate(organisation, true);
+			schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true);
 			if (schedulingTemplates.size() > 0) {
 				LOGGER.debug("Template found using default organization template: " + schedulingTemplates.get(0).toString());
 				return schedulingTemplates.get(0);
 			}
-			//second try: find other organization template. 			
-			schedulingTemplates = schedulingTemplateRepository.findByOrganisation(organisation) ; //TODO: order by id eller væk
-			if (schedulingTemplates.size() > 0) { 
-				LOGGER.debug("Template found using organization template: " + schedulingTemplates.get(0).toString());
-				return schedulingTemplates.get(0);
-			}
 			
-			//third try: find shared default template, where organization is null
-			schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNull();
+			//second try: find shared default template, where organization is null
+			schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull();
 			if (schedulingTemplates.size() > 0) {
 				LOGGER.debug("Template found using shared default template: " + schedulingTemplates.get(0).toString());
 				return schedulingTemplates.get(0);
 			}
-			
-			//if none of above is found - create teh shared default template
-			SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
-			//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
-			schedulingTemplate.setConferencingSysId(conferencingSysId);
-			schedulingTemplate.setUriPrefix(uriPrefix);
-			schedulingTemplate.setUriDomain(uriDomain);
-			schedulingTemplate.setHostPinRequired(hostPinRequired);
-			schedulingTemplate.setHostPinRangeLow(hostPinRangeLow);
-			schedulingTemplate.setHostPinRangeHigh(hostPinRangeHigh);
-			schedulingTemplate.setGuestPinRequired(guestPinRequired);
-			schedulingTemplate.setGuestPinRangeLow(guestPinRangeLow);
-			schedulingTemplate.setGuestPinRangeHigh(guestPinRangeHigh);
-			schedulingTemplate.setVMRAvailableBefore(vMRAvailableBefore);
-			schedulingTemplate.setMaxParticipants(maxParticipants);
-			schedulingTemplate.setEndMeetingOnEndTime(endMeetingOnEndTime);
-			schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
-			schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
-			schedulingTemplate.setIvrTheme(ivrTheme);;
+	
+			//if none of above is found - create the shared default template
+			CreateSchedulingTemplateDto createSchedulingTemplateDto = getSchedulingTemplateDto();
+			SchedulingTemplate schedulingTemplate = createSchedulingTemplate(createSchedulingTemplateDto, false);
 			LOGGER.debug("Creating default schedulingTemplate: " + schedulingTemplate.toString());
 			return schedulingTemplateRepository.save(schedulingTemplate);
 
@@ -125,20 +110,9 @@ public class SchedulingTemplateService {
 		}
 		
 	}
-	public SchedulingTemplate getSchedulingTemplateFromOrganisation(long schedulingTemplateId) throws PermissionDeniedException {
-		
-		Organisation organisation = organisationService.getUserOrganisation();
-		if (organisation != null) {
-			SchedulingTemplate schedulingTemplates = schedulingTemplateRepository.findOne(schedulingTemplateId) ;
-			if (organisation.equals(schedulingTemplates.getOrganisation())) {
-				return schedulingTemplates;
-			}
-		}
-		return null;
-	}
 	
 	public SchedulingTemplate getSchedulingTemplateFromOrganisationAndId(Long schedulingTemplateId) throws PermissionDeniedException, RessourceNotFoundException {
-		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationAndId(organisationService.getUserOrganisation(), schedulingTemplateId);
+		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(organisationService.getUserOrganisation(), schedulingTemplateId);
 		
 		if (schedulingTemplate == null) {
 			LOGGER.debug("scheduleTemplate not found. Id: " + schedulingTemplateId + ". Organisation: " + organisationService.getUserOrganisation().toString());
@@ -148,10 +122,10 @@ public class SchedulingTemplateService {
 	}
 	
 	public List<SchedulingTemplate> getSchedulingTemplates() throws PermissionDeniedException  {
-		return schedulingTemplateRepository.findByOrganisation(organisationService.getUserOrganisation()) ;
+		return schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(organisationService.getUserOrganisation()) ;
 	}
 
-	public SchedulingTemplate createSchedulingTemplate(CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException  {
+	public SchedulingTemplate createSchedulingTemplate(CreateSchedulingTemplateDto createSchedulingTemplateDto, boolean includeOrganisation) throws PermissionDeniedException  {
 		LOGGER.debug("Entry createSchedulingTemplate");
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 		
@@ -163,7 +137,9 @@ public class SchedulingTemplateService {
 		}
 		
 		//then create the new template
-		schedulingTemplate.setOrganisation(organisationService.getUserOrganisation());
+		if (includeOrganisation) {
+			schedulingTemplate.setOrganisation(organisationService.getUserOrganisation());	
+		}
 		schedulingTemplate.setConferencingSysId(createSchedulingTemplateDto.getConferencingSysId());
 		schedulingTemplate.setUriPrefix(createSchedulingTemplateDto.getUriPrefix());
 		schedulingTemplate.setUriDomain(createSchedulingTemplateDto.getUriDomain());
@@ -173,6 +149,9 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setGuestPinRequired(createSchedulingTemplateDto.isGuestPinRequired());
 		schedulingTemplate.setGuestPinRangeLow(createSchedulingTemplateDto.getGuestPinRangeLow());
 		schedulingTemplate.setGuestPinRangeHigh(createSchedulingTemplateDto.getGuestPinRangeHigh());
+//		if (createSchedulingTemplateDto.getvMRAvailableBefore() == null) {
+//			
+//		}
 		schedulingTemplate.setVMRAvailableBefore(createSchedulingTemplateDto.getvMRAvailableBefore());
 		schedulingTemplate.setMaxParticipants(createSchedulingTemplateDto.getMaxParticipants());
 		schedulingTemplate.setEndMeetingOnEndTime(createSchedulingTemplateDto.isEndMeetingOnEndTime());
@@ -180,6 +159,10 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setUriNumberRangeHigh(createSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(createSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(createSchedulingTemplateDto.getIsDefaultTemplate());
+		
+		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingTemplate.setCreatedTime(calendarNow.getTime());
 				
 		schedulingTemplate = schedulingTemplateRepository.save(schedulingTemplate);
 		
@@ -215,15 +198,32 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setUriNumberRangeHigh(updateSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(updateSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(updateSchedulingTemplateDto.getIsDefaultTemplate());
+		
+		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingTemplate.setUpdatedTime(calendarNow.getTime());
 
 		schedulingTemplate = schedulingTemplateRepository.save(schedulingTemplate);
 		
 		LOGGER.debug("Exit updateSchedulingTemplate");
 		return schedulingTemplate;
 	}
+	
+	public void deleteSchedulingTemplate(Long id) throws PermissionDeniedException, RessourceNotFoundException  {
+		LOGGER.debug("Entry deleteSchedulingTemplate. id: " + id);
+		
+		SchedulingTemplate schedulingTemplate = getSchedulingTemplateFromOrganisationAndId(id);
+		
+		schedulingTemplate.setDeletedBy(meetingUserService.getOrCreateCurrentMeetingUser());
+		Calendar calendarNow = new GregorianCalendar();
+		schedulingTemplate.setDeletedTime(calendarNow.getTime());
+		
+		schedulingTemplate = schedulingTemplateRepository.save(schedulingTemplate);
+		LOGGER.debug("Exit deleteSchedulingTemplate");
+	}
 
 	private boolean checkIfDefaultTemplateExistAndRemove() throws PermissionDeniedException {
-		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplate(organisationService.getUserOrganisation(), true); 
+		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true); 
 		//cannot return "same" record as being return, because compare on	 isDefaultTemplate has been made in call method. 	
 
 		if (schedulingTemplates.size() == 0) {
@@ -233,12 +233,15 @@ public class SchedulingTemplateService {
 		
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
 			schedulingTemplate.setIsDefaultTemplate(false);
+			schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
+			Calendar calendarNow = new GregorianCalendar();
+			schedulingTemplate.setUpdatedTime(calendarNow.getTime());
 			schedulingTemplateRepository.save(schedulingTemplate);
 			LOGGER.debug("Changed default template not to be default: " + schedulingTemplate.toString());
 		}
 		
 		//double check just to be sure that the reset was completed
-		schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplate(organisationService.getUserOrganisation(), true);	
+		schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);	
 
 		if (schedulingTemplates.size() == 0) {
 			LOGGER.debug("Existing default template has been reset as non-default for organization: " + organisationService.getUserOrganisation().toString());
@@ -248,6 +251,27 @@ public class SchedulingTemplateService {
 		//we have not been able to reset existing template and hence cannot add a new default
 		LOGGER.debug("Existing default templates prevent adding a new one. Organisation : " + organisationService.getUserOrganisation().toString());
 		return false;
+	}
+	
+	private CreateSchedulingTemplateDto getSchedulingTemplateDto()  {
+		CreateSchedulingTemplateDto createSchedulingTemplateDto = new CreateSchedulingTemplateDto();
+		//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
+		createSchedulingTemplateDto.setConferencingSysId(conferencingSysId);
+		createSchedulingTemplateDto.setUriPrefix(uriPrefix);
+		createSchedulingTemplateDto.setUriDomain(uriDomain);
+		createSchedulingTemplateDto.setHostPinRequired(hostPinRequired);
+		createSchedulingTemplateDto.setHostPinRangeLow(hostPinRangeLow);
+		createSchedulingTemplateDto.setHostPinRangeHigh(hostPinRangeHigh);
+		createSchedulingTemplateDto.setGuestPinRequired(guestPinRequired);
+		createSchedulingTemplateDto.setGuestPinRangeLow(guestPinRangeLow);
+		createSchedulingTemplateDto.setGuestPinRangeHigh(guestPinRangeHigh);
+		createSchedulingTemplateDto.setvMRAvailableBefore(vMRAvailableBefore);
+		createSchedulingTemplateDto.setMaxParticipants(maxParticipants);
+		createSchedulingTemplateDto.setEndMeetingOnEndTime(endMeetingOnEndTime);
+		createSchedulingTemplateDto.setUriNumberRangeLow(uriNumberRangeLow);
+		createSchedulingTemplateDto.setUriNumberRangeHigh(uriNumberRangeHigh);
+		createSchedulingTemplateDto.setIvrTheme(ivrTheme);;
+		return createSchedulingTemplateDto;
 	}
 	
 }
