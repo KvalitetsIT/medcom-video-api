@@ -6,6 +6,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,8 @@ import dk.medcom.video.api.repository.MeetingRepository;
 @Component
 public class MeetingService {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
+	
 	@Autowired
 	MeetingRepository meetingRepository;
 	
@@ -60,8 +64,10 @@ public class MeetingService {
 	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
 		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByOrganizedByAndStartTimeBetween");
 			return meetingRepository.findByOrganizedByAndStartTimeBetween(meetingUserService.getOrCreateCurrentMeetingUser(), fromStartTime, toStartTime);
 		} else {
+			LOGGER.debug("Finding meetings using findByOrganisationAndStartTimeBetween");
 			return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);	
 		}
 		
@@ -70,13 +76,17 @@ public class MeetingService {
 	public Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		Meeting meeting = meetingRepository.findOneByUuid(uuid);
 		if (meeting == null) {
+			LOGGER.debug("The meeting was not found. UUID: " + uuid );
 			throw new RessourceNotFoundException("meeting", "uuid");
 		}
 		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
+			LOGGER.debug("The user does not have the same organization as the meeting: ");
+			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getOrganisationId() + ", + meetingOrganizing user" + meeting.getOrganisation().getOrganisationId());
 			throw new PermissionDeniedException();
 		}
 		
 		if (userService.getUserContext().hasOnlyRole(UserRole.USER) && !(meeting.getOrganizedByUser() == meetingUserService.getOrCreateCurrentMeetingUser())) {
+			LOGGER.debug("The user only has the role USER and cannot see meetings not organized by this user. Calling user: " + meetingUserService.getOrCreateCurrentMeetingUser().getEmail() + ", + meetingOrganizing user" + meeting.getOrganizedByUser().getEmail());
 			throw new PermissionDeniedException();
 		} 
 		
@@ -88,8 +98,10 @@ public class MeetingService {
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
 		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {
+			LOGGER.debug("Setting Organized By using input given user");
 			meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(createMeetingDto.getOrganizedByEmail()));
 		} else {
+			LOGGER.debug("Setting Organized By using meeting user (same as current user)");
 			meeting.setOrganizedByUser(meeting.getMeetingUser());
 		}
 			
@@ -127,6 +139,7 @@ public class MeetingService {
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION && schedulingInfo.getProvisionStatus() != ProvisionStatus.PROVISIONED_OK) {
+			LOGGER.debug("Meeting does not have the correct Status for updating. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
 			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated");
 		}
 		
@@ -140,8 +153,10 @@ public class MeetingService {
 			meeting.setProjectCode(updateMeetingDto.getProjectCode());
 			
 			if (updateMeetingDto.getOrganizedByEmail() != null && !updateMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {
+				LOGGER.debug("Setting Organized By using input given user");
 				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser(updateMeetingDto.getOrganizedByEmail()));
 			} else {
+				LOGGER.debug("Setting Organized By using current user");
 				meeting.setOrganizedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 			}
 			
@@ -154,6 +169,7 @@ public class MeetingService {
 		
 		meeting = meetingRepository.save(meeting);
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
+			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");
 			schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
 		}
 		return meeting;
@@ -165,6 +181,7 @@ public class MeetingService {
 		
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION) {
+			LOGGER.debug("Meeting does not have the correct Status for deletion. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
 			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be deleted");
 		}
 		
@@ -179,6 +196,7 @@ public class MeetingService {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		if (calendar.get(Calendar.YEAR) > 9999) {
+			LOGGER.debug("Date must be less than 9999 but is not. Actual value is: " + calendar.get(Calendar.YEAR));
 			throw new NotValidDataException("Date format is wrong, year must only have 4 digits");
 		}
 	}

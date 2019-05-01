@@ -106,6 +106,7 @@ public class SchedulingTemplateService {
 			return schedulingTemplateRepository.save(schedulingTemplate);
 
 		} else {
+			LOGGER.debug("organization is null");
 			throw new PermissionDeniedException();
 		}
 		
@@ -131,7 +132,9 @@ public class SchedulingTemplateService {
 		
 		//first find any other default template and make it non-default 
 		if (createSchedulingTemplateDto.getIsDefaultTemplate()) {
+			LOGGER.debug("SchedulingTemplate is a default template");
 			if (!checkIfDefaultTemplateExistAndRemove()) {
+				LOGGER.debug("It was not possible to remove other default templates");
 				throw new PermissionDeniedException();
 			}
 		}
@@ -177,7 +180,9 @@ public class SchedulingTemplateService {
 
 		//first find any other default template and make it non-default 
 		if (updateSchedulingTemplateDto.getIsDefaultTemplate() && !schedulingTemplate.getIsDefaultTemplate() ) {
+			LOGGER.debug("SchedulingTemplate is a default template");
 			if (!checkIfDefaultTemplateExistAndRemove()) {
+				LOGGER.debug("It was not possible to remove other default templates");
 				throw new PermissionDeniedException();
 			}
 		}

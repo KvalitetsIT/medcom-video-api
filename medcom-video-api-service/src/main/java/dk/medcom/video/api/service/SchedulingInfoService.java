@@ -74,6 +74,7 @@ public class SchedulingInfoService {
 		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		if (schedulingInfo == null) {
+			LOGGER.debug("SchedulingInfo was null");
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
 		}
 		LOGGER.debug("Exit getSchedulingInfoByUuid");
@@ -87,33 +88,39 @@ public class SchedulingInfoService {
 		
 		//if template is input and is related to the users organisation use that. Otherwise find default.
 		if (createMeetingDto.getSchedulingTemplateId() != null && createMeetingDto.getSchedulingTemplateId() > 0 ) {
-			LOGGER.debug("Searching for  schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
+			LOGGER.debug("Searching for schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
 			try {
 				schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(createMeetingDto.getSchedulingTemplateId());
 			} catch (RessourceNotFoundException e) {
+				LOGGER.debug("The template was not found using Organization and id");
 				//Do nothing. More logic below
 			} 
 		}
 		if (schedulingTemplate == null) {
+			LOGGER.debug("Searching for schedulingTemplate");
 			schedulingTemplate = schedulingTemplateService.getDefaultSchedulingTemplate();
 		}
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		
 		schedulingInfo.setUuid(meeting.getUuid());
 		if (schedulingTemplate.getHostPinRequired()) {
+			LOGGER.debug("HostPin is required");
 			if (schedulingTemplate.getHostPinRangeLow() != null && schedulingTemplate.getHostPinRangeHigh() != null &&
 					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
 				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
 			} else {	
+				LOGGER.debug("The host pincode assignment failed due to invalid setup on the template used.");
 				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
 			}
 			
 		}
 		if (schedulingTemplate.getGuestPinRequired()) {
+			LOGGER.debug("GuestPin is required");
 			if (schedulingTemplate.getGuestPinRangeLow() != null && schedulingTemplate.getGuestPinRangeHigh() != null &&
 					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
 				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
 			} else {
+				LOGGER.debug("The guest pincode assignment failed due to invalid setup on the template used");
 				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
 			}
 		}
@@ -133,6 +140,7 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfoUri;
 		
 		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
+			LOGGER.debug("The Uri assignment failed due to invalid setup on the template used.");
 			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
 		}
 		do {  			//loop x number of times until a no-duplicate url is found
@@ -140,6 +148,7 @@ public class SchedulingInfoService {
 			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
 			} while (schedulingInfoUri != null && whileCount++ < whileMax); 
 		if (whileCount > whileMax ) {
+			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
 			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
 		}
 		

@@ -46,21 +46,16 @@ public class MeetingController {
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
 	public Resources <MeetingDto> getMeetings( 
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime,
-			@RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toStartTime) throws PermissionDeniedException {
+			@RequestParam(value = "to-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toStartTime) throws PermissionDeniedException, RessourceNotFoundException {
 		LOGGER.debug("Entry of /meetings.get fromStartTime: "+ fromStartTime.toString() + " toStartTime: " + toStartTime.toString());
 		
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
 		List<MeetingDto> meetingDtos = new LinkedList<MeetingDto>();
 		for (Meeting meeting : meetings) {
 			MeetingDto meetingDto = new MeetingDto(meeting);
-			
-			try { 
-				Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
-				meetingDto.add(schedulingInfoLink);
-			} catch (RessourceNotFoundException | PermissionDeniedException e) {
-			}
 
-			
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
 			meetingDtos.add(meetingDto);
 		}
 		Resources<MeetingDto> resources = new Resources<>(meetingDtos);

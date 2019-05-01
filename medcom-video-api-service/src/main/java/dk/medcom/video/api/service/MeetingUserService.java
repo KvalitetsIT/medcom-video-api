@@ -32,6 +32,7 @@ public class MeetingUserService {
 		LOGGER.debug("Entry getOrCreateCurrentMeetingUser organisation is required  and is: " + organisationService.getUserOrganisation());
 		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), email);
 		if (meetingUser == null) {
+			LOGGER.debug("Creating meeting user");
 			meetingUser = new MeetingUser();
 			meetingUser.setEmail(email);
 			meetingUser.setOrganisation(organisationService.getUserOrganisation());
