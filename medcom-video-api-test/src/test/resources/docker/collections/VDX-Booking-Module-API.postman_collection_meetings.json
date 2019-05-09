@@ -1,0 +1,311 @@
+{
+	"info": {
+		"_postman_id": "da733689-fab6-4e8e-8907-b4d03c3d1d11",
+		"name": "VDX-Booking-Module-API-V0.5.0 - Meetings",
+		"description": "This test collection is intended as groups of tests, that groups a set of steps to solve that test case.\nIn time it might replace the role specific test collections.\n",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1 - update meeting test scheduling info is updated",
+			"item": [
+				{
+					"name": "Create meeting meetingToUpdate01  (sets uuid)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "01a61fb1-d916-4212-a480-e8b5ffcb07b1",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde meetingToUpdate01\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:15:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"beskrivelse for møde a1mtn\");",
+									"pm.globals.set(\"project_code\", \"PROJECT001PROJECT001PROJECT001\");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "554ba71e-03a4-4a70-859b-00adbe84e6c0",
+								"exec": [
+									"",
+									"",
+									"",
+									"//set uuid for later retrival",
+									"pm.globals.set(\"meeting-uuid\", pm.response.json().uuid);",
+									"",
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});",
+									"pm.test(\"createdBy and organizedBy is the same\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.createdBy).to.eql(jsonData.organizedBy);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19d12198-1554-44a4-b5a2-5fae8ae2a5de",
+								"exec": [
+									"pm.test(\"Portal link is as expected\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-12T11:15:00\");",
+									"});",
+									"pm.test(\"Check that updated user organisation is null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.organisationId).equal(null);",
+									"});",
+									"pm.test(\"Check that meeting updated date is null\", function () {",
+									"    pm.expect(pm.response.json().meetingDetails.updatedTime).equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update meeting by uuid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "72b9a046-62fa-4519-9d2e-aa5260566f95",
+								"exec": [
+									"pm.test(\"Subject is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.subject).to.eql(pm.globals.get(\"subject\"));",
+									"});",
+									"",
+									"pm.test(\"Description is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.description).to.eql(pm.globals.get(\"meeting_description\"));",
+									"});",
+									"",
+									"pm.test(\"From time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.startTime).to.eql(pm.globals.get(\"start_timeGMT\"));",
+									"});",
+									"",
+									"pm.test(\"To time is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endTime).to.eql(pm.globals.get(\"end_timeGMT\"));",
+									"});",
+									"pm.test(\"ProjectCode is as given input\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.projectCode).to.eql(pm.globals.get(\"project_code\"));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "63015d02-5a15-4731-86a0-96d23ffe9b85",
+								"exec": [
+									"pm.globals.set(\"subject\", \"test møde meetingToUpdate01 v2\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-12T12:30:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:30:00 +0000\");",
+									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
+									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
+									"pm.globals.set(\"meeting_description\", \"\");",
+									"pm.globals.set(\"project_code\", \"\");",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"subject\": \"{{subject}}\",\n\"startTime\": \"{{start_time}}\",\n\"endTime\": \"{{end_time}}\",\n\"description\": \"{{meeting_description}}\",\n\"projectCode\": \"{{project_code}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host-sys}}/meetings/{{meeting-uuid}}",
+							"host": [
+								"{{host-sys}}"
+							],
+							"path": [
+								"meetings",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get scheduling-info by uuid test values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "19d12198-1554-44a4-b5a2-5fae8ae2a5de",
+								"exec": [
+									"pm.test(\"Portal link is as expected\", function () {",
+									"    var jsonData = pm.response.json();",
+									"        pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-12T11:30:00\");",
+									"});",
+									"pm.test(\"Check that updated user organisation is not null\", function () {",
+									"    pm.expect(pm.response.json().updatedBy.organisationId).not.equal(null);",
+									"});",
+									"pm.test(\"Check that meeting updated date is not null\", function () {",
+									"    pm.expect(pm.response.json().meetingDetails.updatedTime).not.equal(null);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host-prv}}/scheduling-info/{{meeting-uuid}}",
+							"host": [
+								"{{host-prv}}"
+							],
+							"path": [
+								"scheduling-info",
+								"{{meeting-uuid}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a534d749-a6e1-4c8d-9b6e-646801b57673",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "7c799166-63d2-4e7f-8066-56d41c0d5ecb",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "3dce55cc-364a-453b-bac0-054db4e08046",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "0c254a09-4d84-4780-a12d-e8f23a5916ed",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

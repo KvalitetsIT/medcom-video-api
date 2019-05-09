@@ -154,30 +154,9 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setUriWithoutDomain(randomUri);		
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+	
+		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		
-		LOGGER.debug("CitizenPortal (borgerPortal) parameter is: " + citizenPortal);
-		
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		String portalDate = formatter.format(meeting.getStartTime());
-		LOGGER.debug("portalDate is: " + portalDate);
-		
-		String portalPin;
-		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
-			portalPin = schedulingInfo.getGuestPin().toString();
-			LOGGER.debug("Portal pin used is guest");
-		} else {
-				if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
-					portalPin = schedulingInfo.getHostPin().toString();
-					LOGGER.debug("Portal pin used is host");
-				} else {
-					portalPin = "";
-					LOGGER.debug("Portal pin used is empty");
-				}
-		}
-		
-		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54
-		LOGGER.debug("portalLink is " + portalLink);
-		schedulingInfo.setPortalLink(portalLink);
 		
 		//Overwrite template value with input parameters 
 		if (createMeetingDto.getMaxParticipants() > 0) { 
@@ -235,7 +214,8 @@ public class SchedulingInfoService {
 		LOGGER.debug("Exit updateSchedulingInfo");
 		return schedulingInfo;
 	}
-	//used by meetingService to update VMRStarttime because it depends on the meetings starttime
+	
+	//used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
 	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
 		
@@ -246,7 +226,8 @@ public class SchedulingInfoService {
 		cal.setTime(startTime);
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
-
+		
+		schedulingInfo.setPortalLink(createPortalLink(startTime, schedulingInfo));
 		
 		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
@@ -266,5 +247,29 @@ public class SchedulingInfoService {
 		LOGGER.debug("Exit deleteeSchedulingInfo");
 	}
 
-	
+	private String createPortalLink(Date startTime, SchedulingInfo schedulingInfo) {
+		LOGGER.debug("CitizenPortal (borgerPortal) parameter is: " + citizenPortal);
+		
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		String portalDate = formatter.format(startTime);
+		LOGGER.debug("portalDate is: " + portalDate);
+		
+		String portalPin;
+		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
+			portalPin = schedulingInfo.getGuestPin().toString();
+			LOGGER.debug("Portal pin used is guest");
+		} else {
+				if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
+					portalPin = schedulingInfo.getHostPin().toString();
+					LOGGER.debug("Portal pin used is host");
+				} else {
+					portalPin = "";
+					LOGGER.debug("Portal pin used is empty");
+				}
+		}
+		
+		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54
+		LOGGER.debug("portalLink is " + portalLink);
+		return portalLink;
+	}	
 }
