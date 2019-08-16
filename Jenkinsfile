@@ -14,4 +14,10 @@ node {
 			sh 'mvn install'
 		}
 	}
+	
+	stage('Tag Docker image and push to registry') {
+		docker.withRegistry('https://kitdocker.kvalitetsit.dk/') {
+  			docker.image("kvalitetsit/medcom-video-api-web:${scmInfo.GIT_COMMIT}").push("${scmInfo.GIT_COMMIT}")
+		}
+	}
 }
