@@ -67,7 +67,9 @@ public class TestRunner extends Runner {
 				//.withFileSystemBind("/home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/output", "/testresult", BindMode.READ_WRITE)
 				//.withFileSystemBind("/home/lene/data/logs", "/testresult", BindMode.READ_WRITE)  
 				.withClasspathResourceMapping("docker/collections/medcom-video-api.postman_collection.json", "/etc/postman/test_collection.json", BindMode.READ_ONLY)
-				.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi:8080; cat /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml");				
+				.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi:8080; cat /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml");
+		System.out.println("Newman container configuration:");
+		System.out.println(newman);
 		newman.start();
 
 		/*while (!new File(temporaryFolderUri+"junit-result.xml").exists()) {
@@ -87,6 +89,7 @@ public class TestRunner extends Runner {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}*/
+
 
 		System.out.println("kuk");
 	}
