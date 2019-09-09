@@ -16,11 +16,14 @@ import org.mockserver.matchers.Times;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.OutputFrame;
+import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.containers.wait.strategy.WaitStrategy;
 
@@ -65,11 +68,9 @@ public class TestRunner extends Runner {
 				.withNetwork(n)
 				.withFileSystemBind(temporaryFolderUri, "/testresult", BindMode.READ_WRITE)
 				//.withFileSystemBind("/home/eva/ffproject/medcom-video-api/medcom-video-api-test/src/test/resources/output", "/testresult", BindMode.READ_WRITE)
-				//.withFileSystemBind("/home/lene/data/logs", "/testresult", BindMode.READ_WRITE)  
+				//.withFileSystemBind("/home/lene/data/logs", "/testresult", BindMode.READ_WRITE)
 				.withClasspathResourceMapping("docker/collections/medcom-video-api.postman_collection.json", "/etc/postman/test_collection.json", BindMode.READ_ONLY)
 				.withCommand("run /etc/postman/test_collection.json -r junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi:8080; cat /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml");
-		System.out.println("Newman container configuration:");
-		System.out.println(newman);
 		newman.start();
 
 		/*while (!new File(temporaryFolderUri+"junit-result.xml").exists()) {
