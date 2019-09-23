@@ -17,7 +17,9 @@ public class Organisation {
 	private String organisationId;
 	
 	private String name;
-	
+
+	private Integer poolSize;
+
 	public Long getId() {
 		return id;
 	}
@@ -41,6 +43,15 @@ public class Organisation {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public Integer getPoolSize() {
+		return poolSize;
+	}
+
+	public void setPoolSize(Integer poolSize) {
+		this.poolSize = poolSize;
+	}
+
 	@Override
 	public String toString() {
 		return name;

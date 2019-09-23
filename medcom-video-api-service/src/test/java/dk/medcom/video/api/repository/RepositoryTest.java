@@ -36,5 +36,4 @@ abstract public class RepositoryTest {
 		String jdbcUrl = mysql.getJdbcUrl();
 		System.setProperty("jdbc.url", jdbcUrl);
 	}
-
 }

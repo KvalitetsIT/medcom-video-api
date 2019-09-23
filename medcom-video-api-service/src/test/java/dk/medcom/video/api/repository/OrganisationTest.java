@@ -7,6 +7,11 @@ import org.junit.Test;
 
 import dk.medcom.video.api.dao.Organisation;
 
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class OrganisationTest extends RepositoryTest {
 
 	@Resource
@@ -21,6 +26,7 @@ public class OrganisationTest extends RepositoryTest {
 		
 		Organisation organisation = new Organisation();
 		organisation.setOrganisationId(organisationId);
+		organisation.setPoolSize(10);
 		organisation.setName(name);
 
 		// When
@@ -29,9 +35,10 @@ public class OrganisationTest extends RepositoryTest {
 		// Then
 		Assert.assertNotNull(organisation);
 		Assert.assertNotNull(organisation.getId());
-		Assert.assertEquals(organisationId,  organisation.getOrganisationId());
-		Assert.assertEquals(name,  organisation.getName());
-		Assert.assertEquals(name,  organisation.toString());
+		assertEquals(organisationId,  organisation.getOrganisationId());
+		assertEquals(name,  organisation.getName());
+		assertEquals(name,  organisation.toString());
+		assertEquals(10, organisation.getPoolSize().longValue());
 	}
 	
 	@Test
@@ -48,7 +55,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		Assert.assertEquals(6, numberOfOrganisations);
+		assertEquals(7, numberOfOrganisations);
 	}
 	
 	@Test
@@ -61,9 +68,10 @@ public class OrganisationTest extends RepositoryTest {
 		
 		// Then
 		Assert.assertNotNull(organisation);
-		Assert.assertEquals(id, organisation.getId());
-		Assert.assertEquals("company 1", organisation.getOrganisationId());
-		Assert.assertEquals("company name 1", organisation.getName());
+		assertEquals(id, organisation.getId());
+		assertEquals("company 1", organisation.getOrganisationId());
+		assertEquals("company name 1", organisation.getName());
+		Assert.assertNull(organisation.getPoolSize());
 	}
 
 	@Test
@@ -102,4 +110,31 @@ public class OrganisationTest extends RepositoryTest {
 		Assert.assertNull(organisation);
 	}
 
+	@Test
+	public void testFindOrganizationWithPool() {
+		// Given
+		String existingOrg = "pool-test-org";
+
+		// When
+		Organisation organisation = subject.findByOrganisationId(existingOrg);
+
+		// Then
+		Assert.assertNotNull(organisation);
+		assertEquals(10, organisation.getPoolSize().longValue());
+		assertEquals("pool-test-org", organisation.getOrganisationId());
+		assertEquals("company name another-test-org", organisation.getName());
+	}
+
+	@Test
+	public void testFindAllPoolOrganizations() {
+		List<Organisation> organizations = subject.findByPoolSizeNotNull();
+
+		assertNotNull(organizations);
+		assertEquals(1, organizations.size());
+
+		Organisation organization = organizations.get(0);
+		assertEquals("company name another-test-org", organization.getName());
+		assertEquals("pool-test-org", organization.getOrganisationId());
+		assertEquals(10, organization.getPoolSize().intValue());
+	}
 }
