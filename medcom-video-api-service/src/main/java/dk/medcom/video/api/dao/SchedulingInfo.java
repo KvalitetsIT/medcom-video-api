@@ -43,7 +43,11 @@ public class SchedulingInfo {
 	private String provisionStatusDescription;
 	private Date provisionTimestamp;
 	private String provisionVMRId;
-	
+
+	@ManyToOne
+	@JoinColumn(name="organisation_id")
+	private Organisation organisation;
+
 	@OneToOne
 	@JoinColumn(name="meetings_id")
 	private Meeting meeting;
@@ -192,5 +196,13 @@ public class SchedulingInfo {
 	}
 	public void setUpdatedTime(Date updatedTime) {
 		this.updatedTime = updatedTime;
-	}	
+	}
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
+	}
 }

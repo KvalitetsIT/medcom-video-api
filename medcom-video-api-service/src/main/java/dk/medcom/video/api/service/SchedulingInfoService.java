@@ -62,7 +62,6 @@ public class SchedulingInfoService {
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService, 
 			SchedulingStatusService schedulingStatusService, UserContextService userService, MeetingUserService meetingUserService) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
-//		this.schedulingTemplateRepository = 
 	}
 	
 	
@@ -181,6 +180,8 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+
+		schedulingInfo.setOrganisation(meeting.getOrganisation());
 		
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;

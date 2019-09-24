@@ -3,16 +3,18 @@ package dk.medcom.video.api.repository;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.annotation.Resource;
+
+import dk.medcom.video.api.dao.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.SchedulingInfo;
-import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.ProvisionStatus;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 public class SchedulingInfoRepositoryTest extends RepositoryTest{
 
@@ -27,6 +29,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 	
 	@Resource
     private MeetingUserRepository subjectMU;
+
+	@Resource
+	private OrganisationRepository subjectOrganisationRepository;
 	
 	@Test
 	public void testSchedulingInfo() {
@@ -87,6 +92,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setPortalLink(portalLink);
 		schedulingInfo.setIvrTheme(ivrTheme);
+
+		Organisation organization = subjectOrganisationRepository.findByOrganisationId("test-org");
+		schedulingInfo.setOrganisation(organization);
 		
 		// When
 		schedulingInfo = subject.save(schedulingInfo);
@@ -94,29 +102,31 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingInfo);
 		Assert.assertNotNull(schedulingInfo.getId());
-		Assert.assertEquals(hostPin, schedulingInfo.getHostPin());
-		Assert.assertEquals(guestPin, schedulingInfo.getGuestPin());
-		Assert.assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
-		Assert.assertEquals(cal.getTime(), schedulingInfo.getvMRStartTime());
-		Assert.assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
-		Assert.assertEquals(endMeetingOnEndTime, schedulingInfo.getEndMeetingOnEndTime());
-		Assert.assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
-		Assert.assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
-		Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
-		Assert.assertEquals(provisionStatusDescription, schedulingInfo.getProvisionStatusDescription());
-		Assert.assertEquals(calendar.getTime(), schedulingInfo.getProvisionTimestamp());
-		Assert.assertEquals(provisionVMRId, schedulingInfo.getProvisionVMRId());
+		assertEquals(hostPin, schedulingInfo.getHostPin());
+		assertEquals(guestPin, schedulingInfo.getGuestPin());
+		assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
+		assertEquals(cal.getTime(), schedulingInfo.getvMRStartTime());
+		assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
+		assertEquals(endMeetingOnEndTime, schedulingInfo.getEndMeetingOnEndTime());
+		assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
+		assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
+		assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+		assertEquals(provisionStatusDescription, schedulingInfo.getProvisionStatusDescription());
+		assertEquals(calendar.getTime(), schedulingInfo.getProvisionTimestamp());
+		assertEquals(provisionVMRId, schedulingInfo.getProvisionVMRId());
 		
-		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
-		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
-		Assert.assertEquals(schedulingTemplateId, schedulingInfo.getSchedulingTemplate().getId());
-		Assert.assertEquals(portalLink, schedulingInfo.getPortalLink());
-		Assert.assertEquals(ivrTheme, schedulingInfo.getIvrTheme());
+		assertEquals(meetingId, schedulingInfo.getMeeting().getId());
+		assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
+		assertEquals(schedulingTemplateId, schedulingInfo.getSchedulingTemplate().getId());
+		assertEquals(portalLink, schedulingInfo.getPortalLink());
+		assertEquals(ivrTheme, schedulingInfo.getIvrTheme());
 		
-		Assert.assertEquals(calendarCreate.getTime(), schedulingInfo.getCreatedTime());
-		Assert.assertEquals(calendarCreate.getTime(), schedulingInfo.getUpdatedTime());
-		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
-		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+		assertEquals(calendarCreate.getTime(), schedulingInfo.getCreatedTime());
+		assertEquals(calendarCreate.getTime(), schedulingInfo.getUpdatedTime());
+		assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+		assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+
+		assertEquals(organization.getOrganisationId(), schedulingInfo.getOrganisation().getOrganisationId());
 	}
 	
 	@Test
@@ -133,7 +143,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		Assert.assertEquals(5, numberOfSchedulingInfo);
+		assertEquals(6, numberOfSchedulingInfo);
 	}
 	
 	@Test
@@ -146,13 +156,13 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		
 		// Then
 		Assert.assertNotNull(schedulingInfo);
-		Assert.assertEquals(id, schedulingInfo.getId());
-		Assert.assertEquals(1001L, schedulingInfo.getHostPin().longValue());
-		Assert.assertEquals(2001L, schedulingInfo.getGuestPin().longValue());
-		Assert.assertEquals(15, schedulingInfo.getVMRAvailableBefore());
-		Assert.assertEquals(10, schedulingInfo.getMaxParticipants());
-		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
-		Assert.assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());
+		assertEquals(id, schedulingInfo.getId());
+		assertEquals(1001L, schedulingInfo.getHostPin().longValue());
+		assertEquals(2001L, schedulingInfo.getGuestPin().longValue());
+		assertEquals(15, schedulingInfo.getVMRAvailableBefore());
+		assertEquals(10, schedulingInfo.getMaxParticipants());
+		assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
+		assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());
 	}
 
 	@Test
@@ -180,8 +190,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
-		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
-		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
+		assertEquals(meetingId, schedulingInfo.getMeeting().getId());
+		assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
 	}
 
 	@Test
@@ -200,8 +210,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingInfo);
 		Assert.assertNotNull(meeting);
-		Assert.assertEquals(meetingId, schedulingInfo.getMeeting().getId());
-		Assert.assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
+		assertEquals(meetingId, schedulingInfo.getMeeting().getId());
+		assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
 	}
 	
 	@Test
@@ -221,7 +231,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		Assert.assertEquals(5, numberOfSchedulingInfo);
+		assertEquals(5, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testFindOneInIntervalAndProvisionStatus0() {
@@ -241,7 +251,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		Assert.assertEquals(1, numberOfSchedulingInfo);
+		assertEquals(1, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testGetMeetingUserOnExistingSchedulingInfo() {
@@ -255,7 +265,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
-		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+		assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
 
 	}
 
@@ -274,7 +284,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingInfo);
 		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
+		assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
 	
 	}
 	@Test
@@ -289,7 +299,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
-		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+		assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 
 	}
 
@@ -308,8 +318,15 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		// Then
 		Assert.assertNotNull(schedulingInfo);
 		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
+		assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 	
 	}
 
+	@Test
+	public void testGetSchedulingInfoByMeetingsIdNull() {
+		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNull();
+
+		assertNotNull(schedulingInfos);
+		assertEquals(1, schedulingInfos.size());
+	}
 }

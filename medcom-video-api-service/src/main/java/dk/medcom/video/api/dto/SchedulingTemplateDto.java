@@ -51,7 +51,10 @@ public class SchedulingTemplateDto extends ResourceSupport {
 	public SchedulingTemplateDto(SchedulingTemplate schedulingTemplate) throws PermissionDeniedException {
 		
 		templateId = schedulingTemplate.getId();
-		organisationId = schedulingTemplate.getOrganisation().getOrganisationId();
+		if(schedulingTemplate.getOrganisation() != null) {
+			organisationId = schedulingTemplate.getOrganisation().getOrganisationId();
+		}
+
 		conferencingSysId = schedulingTemplate.getConferencingSysId();
 		uriPrefix = schedulingTemplate.getUriPrefix();
 		uriDomain = schedulingTemplate.getUriDomain();
@@ -87,7 +90,6 @@ public class SchedulingTemplateDto extends ResourceSupport {
 			add(selfLink);
 		} catch (RessourceNotFoundException e) {
 		}
-
 	}
 
 	public Long getTemplateId() {
