@@ -49,7 +49,7 @@ public class TestRunner extends Runner {
 	public void run(RunNotifier notifier) {
 		String projectDirectory = System.getenv("MAVEN_PROJECTBASEDIR");
 		String outputDirectory = projectDirectory+"/target/surefire-reports";
-		
+
 		// Laver et sted, hvor junitreport kan ligge
 		TemporaryFolder testFolder = new TemporaryFolder();
 		String temporaryFolderUri = null;

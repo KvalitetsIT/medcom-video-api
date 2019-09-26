@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
+import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,7 +42,20 @@ public class SchedulingInfoController {
 	
 	@Autowired
 	SchedulingInfoService schedulingInfoService;
-	
+
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(value = "/scheduling-info", method = RequestMethod.POST)
+	public Resource<SchedulingInfoDto> createSchedulingInfo(@Valid @RequestBody CreateSchedulingInfoDto createSchedulingInfoDto) throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
+		LOGGER.debug("Entry of /scheduling-info.post.");
+
+		SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(createSchedulingInfoDto);
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
+
+		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource.toString());
+		return resource;
+	}
+
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.GET)
 	public Resources <SchedulingInfoDto> getSchedulingInfo(
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime, 
@@ -49,7 +64,7 @@ public class SchedulingInfoController {
 		LOGGER.debug("Entry of /scheduling-info.get fromStartTime: "+ fromStartTime.toString() + " toEndTime: " + toEndTime.toString() + " provision status: "+ provisionStatus.getValue()); 
 
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
-		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<SchedulingInfoDto>();
+		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();
 		for (SchedulingInfo schedulingInfo : schedulingInfos) {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
 			schedulingInfoDtos.add(schedulingInfoDto);
@@ -67,7 +82,7 @@ public class SchedulingInfoController {
 	public Resource <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);
+		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
 		
 		return resource;
 	}
@@ -79,10 +94,9 @@ public class SchedulingInfoController {
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource <SchedulingInfoDto>(schedulingInfoDto);
+		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
 		
 		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());
 		return resource;
 	}
-
 }
