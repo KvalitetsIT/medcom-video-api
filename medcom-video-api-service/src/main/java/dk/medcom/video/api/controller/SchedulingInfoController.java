@@ -37,11 +37,13 @@ import dk.medcom.video.api.service.SchedulingInfoService;
 
 @RestController
 public class SchedulingInfoController {
-	
 	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
 	
-	@Autowired
-	SchedulingInfoService schedulingInfoService;
+	private SchedulingInfoService schedulingInfoService;
+
+	public SchedulingInfoController(SchedulingInfoService schedulingInfoService) {
+		this.schedulingInfoService = schedulingInfoService;
+	}
 
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.POST)

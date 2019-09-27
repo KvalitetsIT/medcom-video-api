@@ -79,7 +79,9 @@ public class SchedulingInfoDto extends ResourceSupport {
 		updatedTime = schedulingInfo.getUpdatedTime();
 		
 		Meeting meeting = schedulingInfo.getMeeting();
-		meetingDetails = new MeetingDto(meeting);
+		if(meeting != null) {
+			meetingDetails = new MeetingDto(meeting);
+		}
 
 		try {  
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");

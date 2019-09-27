@@ -9,6 +9,7 @@ import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -249,14 +250,7 @@ public class SchedulingInfoServiceTest {
     }
 
     private Organisation createOrganisation(boolean poolEnabled, String orgId, long id)  {
-        Organisation organisation = new Organisation();
-        organisation.setId(id);
-        organisation.setName("this is a name");
-        organisation.setOrganisationId(orgId);
-        organisation.setPoolSize(poolEnabled ? 10 : null);
-
-        return organisation;
-
+        return TestDataHelper.createOrganisation(poolEnabled, orgId, id);
     }
 
     private Organisation createOrganisation() {
