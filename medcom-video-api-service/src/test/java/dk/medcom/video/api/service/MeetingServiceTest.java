@@ -26,23 +26,22 @@ import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
 
 public class MeetingServiceTest {
-	private Calendar calendarDate = new GregorianCalendar(2018,9,01,13,15,00);
-	private Calendar calendarStart = new GregorianCalendar(2018,10,01,13,15,00);
-	private Calendar calendarStartUpdated = new GregorianCalendar(2018,10,01,13,45,00);
-	private Calendar calendarEnd = new GregorianCalendar(2018,10,01,14,15,00);
-	private Calendar calendarEndUpdated = new GregorianCalendar(2018,10,01,14,45,00);
+	private Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1,13,15, 0);
+	private Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,15, 0);
+	private Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,45, 0);
+	private Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,14,15, 0);
+	private Calendar calendarEndUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,14,45, 0);
 	
 	private CreateMeetingDto createMeetingDto;	
 	private UpdateMeetingDto updateMeetingDto;
 	private MeetingUser meetingUser;
-	private Organisation organisation;
-	
+
 	@Before
 	public void prepareTest() {
 		createMeetingDto = getCreateMeetingDtoWithDefaultValues();
 		updateMeetingDto = getUpdateMeetingDtoWithDefaultValues();
 		meetingUser = new MeetingUser();
-		organisation = new Organisation();
+		Organisation organisation = new Organisation();
 		meetingUser.setOrganisation(organisation);
 	}
 	
@@ -196,10 +195,10 @@ public class MeetingServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.PROVISION_PROBLEMS);
-		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
+		getMeetingWithDefaultValues(meetingUser, uuid);
 		
 		// When
-		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
+		meetingService.updateMeeting(uuid, updateMeetingDto);
 		
 		// Then
 		// assert Excpetion
@@ -226,6 +225,5 @@ public class MeetingServiceTest {
 		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
 		Assert.assertEquals(createMeetingDto.getDescription(), meeting.getDescription());
 		Assert.assertEquals(createMeetingDto.getProjectCode(), meeting.getProjectCode());
-		
 	}
 }
