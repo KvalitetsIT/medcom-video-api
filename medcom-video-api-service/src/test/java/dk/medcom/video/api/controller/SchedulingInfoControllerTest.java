@@ -48,7 +48,5 @@ public class SchedulingInfoControllerTest {
         assertNotNull(result.getContent());
         SchedulingInfoDto schedulingInfoDto = result.getContent();
         assertEquals("vmr id", schedulingInfoDto.getProvisionVmrId());
-
     }
-
 }

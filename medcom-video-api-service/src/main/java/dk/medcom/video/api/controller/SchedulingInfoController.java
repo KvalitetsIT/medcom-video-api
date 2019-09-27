@@ -1,39 +1,32 @@
 package dk.medcom.video.api.controller;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import org.slf4j.Logger;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingInfo;
+import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.SchedulingInfoDto;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.service.SchedulingInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class SchedulingInfoController {
@@ -41,7 +34,7 @@ public class SchedulingInfoController {
 	
 	private SchedulingInfoService schedulingInfoService;
 
-	public SchedulingInfoController(SchedulingInfoService schedulingInfoService) {
+	SchedulingInfoController(SchedulingInfoService schedulingInfoService) {
 		this.schedulingInfoService = schedulingInfoService;
 	}
 
@@ -84,9 +77,8 @@ public class SchedulingInfoController {
 	public Resource <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
-		
-		return resource;
+
+		return  new Resource<>(schedulingInfoDto);
 	}
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER}) //full user context is required in order to update, because of updatedbyuser

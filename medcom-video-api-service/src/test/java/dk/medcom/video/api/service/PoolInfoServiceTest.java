@@ -7,10 +7,8 @@ import dk.medcom.video.api.dto.PoolInfoDto;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
-import org.aspectj.weaver.ast.Or;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -67,10 +65,10 @@ public class PoolInfoServiceTest {
     @Test
     public void testGetPoolInfoNoConfiguredPools() {
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(Collections.EMPTY_LIST);
+        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
 
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(Collections.EMPTY_LIST);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(Collections.emptyList());
 
         SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
@@ -117,7 +115,7 @@ public class PoolInfoServiceTest {
         return organization;
     }
 
-    public SchedulingTemplate createDefaultSchedulingTemplate() {
+    private SchedulingTemplate createDefaultSchedulingTemplate() {
         SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
         schedulingTemplate.setIsDefaultTemplate(true);
         schedulingTemplate.setConferencingSysId(1L);
