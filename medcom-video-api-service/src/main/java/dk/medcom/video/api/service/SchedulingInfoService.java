@@ -296,17 +296,17 @@ public class SchedulingInfoService {
 		}
 
 		//if template is input and is related to the users organisation use that. Otherwise find default.
-		LOGGER.debug("Searching for schedulingTemplate using id: " + createSchedulingInfoDto.getTemplateId());
-		SchedulingTemplate schedulingTemplate  = schedulingTemplateRepository.findOne(createSchedulingInfoDto.getTemplateId());
+		LOGGER.debug("Searching for schedulingTemplate using id: " + createSchedulingInfoDto.getSchedulingTemplateId());
+		SchedulingTemplate schedulingTemplate  = schedulingTemplateRepository.findOne(createSchedulingInfoDto.getSchedulingTemplateId());
 
 		if (schedulingTemplate == null) {
-			LOGGER.debug(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getTemplateId()));
-			throw new NotValidDataException(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getTemplateId()));
+			LOGGER.debug(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
+			throw new NotValidDataException(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
 		}
 
 		if(schedulingTemplate.getOrganisation() != null && !schedulingTemplate.getOrganisation().getOrganisationId().equals(createSchedulingInfoDto.getOrganizationId())) {
-			LOGGER.debug(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getTemplateId(), createSchedulingInfoDto.getOrganizationId()));
-			throw new NotValidDataException(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getTemplateId(), createSchedulingInfoDto.getOrganizationId()));
+			LOGGER.debug(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
+			throw new NotValidDataException(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
 
 		}
 

@@ -2,7 +2,7 @@ package dk.medcom.video.api.dto;
 
 public class CreateSchedulingInfoDto {
 	private String organizationId;
-	private Long templateId;
+	private Long schedulingTemplateId;
 	private String provisionVmrId;
 
 	public String getProvisionVmrId() {
@@ -21,11 +21,11 @@ public class CreateSchedulingInfoDto {
 		this.organizationId = organizationId;
 	}
 
-	public Long getTemplateId() {
-		return templateId;
+	public Long getSchedulingTemplateId() {
+		return schedulingTemplateId;
 	}
 
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
+	public void setSchedulingTemplateId(Long schedulingTemplateId) {
+		this.schedulingTemplateId = schedulingTemplateId;
 	}
 }

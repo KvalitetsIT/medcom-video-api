@@ -27,7 +27,6 @@ public class PoolController {
 
 	@RequestMapping(value = "/pool", method = RequestMethod.GET)
 	public Resources<PoolInfoDto> getPoolInfo() {
-//		logger.debug("Entry of /scheduling-info.get fromStartTime: "+ fromStartTime.toString() + " toEndTime: " + toEndTime.toString() + " provision status: "+ provisionStatus.getValue());
 		logger.debug("Entering /pool");
 
 		List<PoolInfoDto> response = poolInfoService.getPoolInfo();
@@ -37,7 +36,6 @@ public class PoolController {
 		resources.add(selfRelLink);
 
 		logger.debug("Finishing /pool request.");
-//		logger.debug("Exit of /scheduling-info.get resources: " + resources.toString());
 		return resources;
 	}
 }

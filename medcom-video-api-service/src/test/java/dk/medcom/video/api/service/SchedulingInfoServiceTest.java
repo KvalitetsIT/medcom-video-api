@@ -120,7 +120,7 @@ public class SchedulingInfoServiceTest {
 
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
-        input.setTemplateId(SCHEDULING_TEMPLATE_ID);
+        input.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
         input.setProvisionVmrId("vmr id");
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(input);
 
@@ -159,7 +159,7 @@ public class SchedulingInfoServiceTest {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
         input.setProvisionVmrId("vmr id");
-        input.setTemplateId(10L);
+        input.setSchedulingTemplateId(10L);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
 
@@ -171,7 +171,7 @@ public class SchedulingInfoServiceTest {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
         input.setProvisionVmrId("vmr id");
-        input.setTemplateId(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
+        input.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
 
@@ -183,7 +183,7 @@ public class SchedulingInfoServiceTest {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(NON_POOL_ORG);
         input.setProvisionVmrId("vmr id");
-        input.setTemplateId(2L);
+        input.setSchedulingTemplateId(2L);
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 
@@ -195,7 +195,7 @@ public class SchedulingInfoServiceTest {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId("non existing org");
         input.setProvisionVmrId("vmr id");
-        input.setTemplateId(2L);
+        input.setSchedulingTemplateId(2L);
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 

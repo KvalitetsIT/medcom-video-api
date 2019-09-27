@@ -32,7 +32,7 @@ public class SchedulingInfoControllerTest {
     public void testCreateSchedulingInfo() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setProvisionVmrId("vmr id");
-        input.setTemplateId(1L);
+        input.setSchedulingTemplateId(1L);
         input.setOrganizationId("pool-org");
 
         SchedulingInfoService schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
