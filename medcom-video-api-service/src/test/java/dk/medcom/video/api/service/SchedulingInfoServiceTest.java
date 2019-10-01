@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
@@ -200,6 +201,21 @@ public class SchedulingInfoServiceTest {
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 
         schedulingInfoService.createSchedulingInfo(input);
+    }
+
+    @Test
+    public void testGetUnusedSchedulingInfoForOrganisation() throws NotValidDataException {
+        Organisation organisation = new Organisation();
+        organisation.setId(1234L);
+        organisation.setName("this is org name");
+        organisation.setOrganisationId("RH");
+        organisation.setPoolSize(10);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisation(organisation)).thenReturn(Collections.singletonList(createSchedulingInfo()));
+
+        SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
+        assertNotNull(schedulingInfo);
     }
 
     private SchedulingTemplate createSchedulingTemplate(long id) {

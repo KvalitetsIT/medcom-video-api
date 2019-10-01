@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
+import dk.medcom.video.api.dto.MeetingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,9 +113,28 @@ public class MeetingService {
 
 		meeting = meetingRepository.save(meeting);
 		if (meeting != null) {
-			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+			attachOrCreateSchedulingInfo(meeting, createMeetingDto);
 		}
 		return meeting;
+	}
+
+	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
+		if(meeting.getOrganisation().getPoolSize() == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
+			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
+		}
+
+		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
+			SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+			schedulingInfo.setMeetingUser(meeting.getMeetingUser());
+			schedulingInfo.setUpdatedTime(new Date());
+			schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
+			schedulingInfo.setUuid(meeting.getUuid());
+			schedulingInfo.setMeeting(meeting);
+			schedulingInfoService.updateSchedulingInfo(schedulingInfo);
+		}
+		else {
+			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+		}
 	}
 
 	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
@@ -124,13 +144,18 @@ public class MeetingService {
 		
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
-		meeting.setUuid(UUID.randomUUID().toString());
+		if(createMeetingDto.getUuid() != null) {
+			meeting.setUuid(createMeetingDto.getUuid().toString());
+		}
+		else {
+			meeting.setUuid(UUID.randomUUID().toString());
+		}
 		meeting.setOrganisation(organisationService.getUserOrganisation());
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());
 		meeting.setProjectCode(createMeetingDto.getProjectCode());
-	
+
 		return meeting;
 	}
 	

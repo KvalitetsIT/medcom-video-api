@@ -1,13 +1,5 @@
 package dk.medcom.video.api.service;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
 import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
@@ -21,20 +13,36 @@ import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.MeetingType;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.UUID;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
 
 public class MeetingServiceTest {
-	private Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1,13,15, 0);
-	private Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,15, 0);
-	private Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,45, 0);
-	private Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,14,15, 0);
-	private Calendar calendarEndUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,14,45, 0);
-	
-	private CreateMeetingDto createMeetingDto;	
+	private Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1, 13, 15, 0);
+	private Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 15, 0);
+	private Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 45, 0);
+	private Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 15, 0);
+	private Calendar calendarEndUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 45, 0);
+
+	private CreateMeetingDto createMeetingDto;
 	private UpdateMeetingDto updateMeetingDto;
 	private MeetingUser meetingUser;
+
+	private SchedulingInfoService schedulingInfoService;
 
 	@Before
 	public void prepareTest() {
@@ -42,12 +50,17 @@ public class MeetingServiceTest {
 		updateMeetingDto = getUpdateMeetingDtoWithDefaultValues();
 		meetingUser = new MeetingUser();
 		Organisation organisation = new Organisation();
+		organisation.setOrganisationId("RH");
+		organisation.setName("some name");
+		organisation.setId(1234L);
+		organisation.setPoolSize(10);
+
 		meetingUser.setOrganisation(organisation);
 	}
-	
+
 	private Meeting getMeetingWithDefaultValues(MeetingUser meetingUser, String uuid) {
 		Meeting meeting = new Meeting();
-		meeting.setOrganizedByUser(meetingUser);	
+		meeting.setOrganizedByUser(meetingUser);
 		meeting.setId((long) 100077);
 		meeting.setUuid(uuid);
 		meeting.setSubject("Test møde");
@@ -64,6 +77,7 @@ public class MeetingServiceTest {
 
 		return meeting;
 	}
+
 	private UpdateMeetingDto getUpdateMeetingDtoWithDefaultValues() {
 		UpdateMeetingDto meetingDto = new UpdateMeetingDto();
 		meetingDto.setSubject("Test mødev2");
@@ -74,6 +88,7 @@ public class MeetingServiceTest {
 		meetingDto.setOrganizedByEmail("you@mail.dk");
 		return meetingDto;
 	}
+
 	private CreateMeetingDto getCreateMeetingDtoWithDefaultValues() {
 		CreateMeetingDto createMeetingDto = new CreateMeetingDto();
 		createMeetingDto.setSubject("Test mødev2");
@@ -86,144 +101,249 @@ public class MeetingServiceTest {
 		createMeetingDto.setOrganizedByEmail("you@mail.dk");
 		return createMeetingDto;
 	}
-	
-	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String uuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException {
-		
+
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
+
 		MeetingRepository meetingRepository = Mockito.mock(MeetingRepository.class);
 		MeetingUserService meetingUserService = Mockito.mock(MeetingUserService.class);
-		SchedulingInfoService schedulingInfoService  = Mockito.mock(SchedulingInfoService.class);
-		SchedulingStatusService schedulingStatusService  = Mockito.mock(SchedulingStatusService.class);
+		schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
+		SchedulingStatusService schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
-		
+
 		MeetingService meetingService = new MeetingService(meetingRepository, meetingUserService, schedulingInfoService, schedulingStatusService, organisationService, userContextService);
 		Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-		
+
 		MeetingUser meetingUserOrganizer = new MeetingUser();
+		meetingUserOrganizer.setEmail("some@email.com");
+
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser(Mockito.anyString())).thenReturn(meetingUserOrganizer);
-		
+
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
-		Meeting meetingInService = getMeetingWithDefaultValues(meetingUser,  uuid);
+		Meeting meetingInService = getMeetingWithDefaultValues(meetingUser, meetingUuid);
 		Mockito.when(meetingRepository.findOneByUuid(Mockito.anyString())).thenReturn(meetingInService);
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setProvisionStatus(provisionStatus);
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
+		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
-		
+		Mockito.when(meetingRepository.save((Meeting) Mockito.argThat(x -> ((Meeting) x).getUuid().equals(meetingUuid)))).thenAnswer(i -> {
+			Meeting meeting = (Meeting) i.getArguments()[0];
+			meeting.setId(57483L);
+			return meeting;
+		});
+
 		return meetingService;
 	}
+
 	// *** Get meeting tests **********************************************************************************************************
 	// *** Create meeting tests **********************************************************************************************************
 	// *** Delete meeting tests **********************************************************************************************************
 	// *** Update meeting tests **********************************************************************************************************
 	@Test
 	public void testRoleUserUpdateMeetingWithStatusAwaitsProvisionUpdatesAllValues() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		
+
 		// Given
-		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";		
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
-		
+
 		// When
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
-		
+
 		// Then
 		Assert.assertNotNull(meeting);
-		Assert.assertEquals(updateMeetingDto.getSubject(), meeting.getSubject());
-		Assert.assertEquals(calendarStartUpdated.getTime(), meeting.getStartTime());
-		Assert.assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
-		Assert.assertEquals(updateMeetingDto.getDescription(), meeting.getDescription());
-		Assert.assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
-		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(),meeting.getUpdatedTime() );
-		Assert.assertEquals(meetingUser, meeting.getOrganizedByUser());
+		assertEquals(updateMeetingDto.getSubject(), meeting.getSubject());
+		assertEquals(calendarStartUpdated.getTime(), meeting.getStartTime());
+		assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
+		assertEquals(updateMeetingDto.getDescription(), meeting.getDescription());
+		assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
+		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
+		assertEquals(meetingUser, meeting.getOrganizedByUser());
 	}
-	
+
 	@Test
 	public void testRoleMeetingPlannerUpdateMeetingWithDifferentMeetingUser() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		
+
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.MEETING_PLANNER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
-		
+
 		// When
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
-		
+
 		// Then
 		Assert.assertNotNull(meeting);
-		Assert.assertEquals(updateMeetingDto.getSubject(), meeting.getSubject());
-		Assert.assertEquals(calendarStartUpdated.getTime(), meeting.getStartTime());
-		Assert.assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
-		Assert.assertEquals(updateMeetingDto.getDescription(), meeting.getDescription());
-		Assert.assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
-		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(),meeting.getUpdatedTime() );
+		assertEquals(updateMeetingDto.getSubject(), meeting.getSubject());
+		assertEquals(calendarStartUpdated.getTime(), meeting.getStartTime());
+		assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
+		assertEquals(updateMeetingDto.getDescription(), meeting.getDescription());
+		assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
+		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
 		Assert.assertNotEquals(meetingUser, meeting.getOrganizedByUser());
 	}
-	
+
 	@Test
 	public void testRoleUserUpdateMeetingWithStatusProvisionedOkUpdatesEndTimeUpdatedTimeAndupdateUserOnly() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		
+
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.PROVISIONED_OK);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
-		
+
 		// When
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
-		
+
 		// Then
 		Assert.assertNotNull(meeting);
-		Assert.assertEquals(meetingToCompare.getStartTime(), meeting.getStartTime());
-		Assert.assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
-		Assert.assertEquals(meetingToCompare.getDescription(), meeting.getDescription());
-		Assert.assertEquals(meetingToCompare.getProjectCode(), meeting.getProjectCode());
-		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(),meeting.getUpdatedTime() );
+		assertEquals(meetingToCompare.getStartTime(), meeting.getStartTime());
+		assertEquals(calendarEndUpdated.getTime(), meeting.getEndTime());
+		assertEquals(meetingToCompare.getDescription(), meeting.getDescription());
+		assertEquals(meetingToCompare.getProjectCode(), meeting.getProjectCode());
+		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
 	}
 
 	@Test(expected = NotAcceptableException.class)
 	public void testRoleUserUpdateMeetingWithStatusProvisionedProblemsReturnsError() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		
+
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.PROVISION_PROBLEMS);
 		getMeetingWithDefaultValues(meetingUser, uuid);
-		
+
 		// When
 		meetingService.updateMeeting(uuid, updateMeetingDto);
-		
+
 		// Then
 		// assert Excpetion
 
 	}
+
 	// *** Other tests **********************************************************************************************************
 	@Test
 	public void testConversionFromDtoToDao() throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException {
 		// Given
-		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";		
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
-		
+
 		// When
 		Meeting meeting = meetingService.convert(createMeetingDto);
-		
+
 		// Then
 		Assert.assertNotNull(meeting);
-		Assert.assertEquals(createMeetingDto.getSubject(), meeting.getSubject());
+		assertEquals(createMeetingDto.getSubject(), meeting.getSubject());
 		Assert.assertNotNull(meeting.getUuid());
 //		Assert.assertEquals(meetingUser, meeting.getOrganizedByUser()); //TODO: 0 -fix test
-		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
-		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
-		Assert.assertEquals(createMeetingDto.getDescription(), meeting.getDescription());
-		Assert.assertEquals(createMeetingDto.getProjectCode(), meeting.getProjectCode());
+		assertEquals(calendarStart.getTime(), meeting.getStartTime());
+		assertEquals(calendarEnd.getTime(), meeting.getEndTime());
+		assertEquals(createMeetingDto.getDescription(), meeting.getDescription());
+		assertEquals(createMeetingDto.getProjectCode(), meeting.getProjectCode());
+	}
+
+	@Test
+	public void testCreatePooledMeeting() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setMeetingType(MeetingType.POOL);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).getUnusedSchedulingInfoForOrganisation(Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).updateSchedulingInfo(Mockito.argThat(x -> x.getUuid().equals(input.getUuid().toString()) &&
+				x.getMeeting().getId().equals(result.getId())));
+	}
+
+	@Test(expected = NotValidDataException.class)
+	public void testCanNotCreateMeetingWhenNoScheduleAvailable() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setMeetingType(MeetingType.POOL);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenThrow(new NotValidDataException("hej hej"));
+
+		meetingService.createMeeting(input);
+	}
+
+	@Test
+	public void testCreateMeeting() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+	}
+
+	@Test(expected = NotValidDataException.class)
+	public void testCanNotCreateAdhocMeetingOnNonAdhocOrganisation() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setPoolSize(null);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setMeetingType(MeetingType.POOL);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		meetingService.createMeeting(input);
 	}
 }

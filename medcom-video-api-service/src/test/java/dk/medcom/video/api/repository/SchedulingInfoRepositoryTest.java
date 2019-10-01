@@ -16,7 +16,7 @@ import dk.medcom.video.api.dto.ProvisionStatus;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
-public class SchedulingInfoRepositoryTest extends RepositoryTest{
+public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
 	@Resource
     private SchedulingInfoRepository subject;
@@ -320,6 +320,17 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest{
 		Assert.assertNotNull(meetingUser);
 		assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 	
+	}
+
+	@Test
+	public void testFindUnusedSchedulingInfoForOrganization() {
+		Organisation organisation = new Organisation();
+		organisation.setId(7L);
+
+		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisation(organisation);
+		assertNotNull(schedulingInfos);
+		assertEquals(1, schedulingInfos.size());
+		assertEquals(new Long(207), schedulingInfos.get(0).getId());
 	}
 
 	@Test

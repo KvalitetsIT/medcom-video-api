@@ -389,4 +389,18 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 
 	}
+
+	SchedulingInfo getUnusedSchedulingInfoForOrganisation(Organisation organisation) throws NotValidDataException {
+		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisation(organisation);
+
+		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
+			throw new NotValidDataException("Unused scheduling information not found for organisation" + organisation.getOrganisationId());
+		}
+
+		return schedulingInfos.get(0);
+	}
+
+	SchedulingInfo updateSchedulingInfo(SchedulingInfo schedulingInfo) {
+		return schedulingInfoRepository.save(schedulingInfo);
+	}
 }

@@ -1,13 +1,12 @@
 package dk.medcom.video.api.dto;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
+import java.util.UUID;
 
 
 public class CreateMeetingDto {
@@ -31,7 +30,7 @@ public class CreateMeetingDto {
 	public String projectCode;
 	
 	@Email
-	public String organizedByEmail;
+	private String organizedByEmail;
 	
 	public int maxParticipants;
 	
@@ -39,7 +38,10 @@ public class CreateMeetingDto {
 	
 	private Long schedulingTemplateId;
 
-	
+	private MeetingType meetingType = MeetingType.NORMAL;
+
+	private UUID uuid;
+
 	public int getMaxParticipants() {
 		return maxParticipants;
 	}
@@ -112,4 +114,21 @@ public class CreateMeetingDto {
 		this.organizedByEmail = organizedByEmail;
 	}
 
+	public MeetingType getMeetingType() {
+		return meetingType;
+	}
+
+	public void setMeetingType(MeetingType meetingType) {
+		if(meetingType != null) {
+			this.meetingType = meetingType;
+		}
+	}
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
 }

@@ -3,6 +3,7 @@ package dk.medcom.video.api.repository;
 import java.util.Date;
 import java.util.List;
 
+import dk.medcom.video.api.dao.Organisation;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -22,4 +23,6 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	public List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);
 
 	public List<SchedulingInfo> findByMeetingIsNull();
+
+	public List<SchedulingInfo> findByMeetingIsNullAndOrganisation(Organisation organisationId);
 }
