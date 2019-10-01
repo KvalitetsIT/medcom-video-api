@@ -4,6 +4,7 @@ node {
 
 	stage('Clone repository') {
 		scmInfo = checkout scm
+		currentBuild.displayName = "$currentBuild.displayName-${scmInfo.GIT_COMMIT}"
 	}
 
 	stage('Run Maven build') {
