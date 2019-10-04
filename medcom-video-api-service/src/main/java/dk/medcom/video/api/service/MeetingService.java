@@ -24,6 +24,7 @@ import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Component
@@ -94,6 +95,7 @@ public class MeetingService {
 		return meeting;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException  {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
@@ -111,6 +113,10 @@ public class MeetingService {
 //		meeting.setUpdatedTime(calendarNow.getTime());
 //		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
+		if(meeting.getOrganisation().getPoolSize() == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
+			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
+		}
+
 		meeting = meetingRepository.save(meeting);
 		if (meeting != null) {
 			attachOrCreateSchedulingInfo(meeting, createMeetingDto);
@@ -119,10 +125,6 @@ public class MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
-		if(meeting.getOrganisation().getPoolSize() == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
-			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
-		}
-
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
 			schedulingInfo.setMeetingUser(meeting.getMeetingUser());
@@ -138,7 +140,6 @@ public class MeetingService {
 	}
 
 	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
-		
 		validateDate(createMeetingDto.getStartTime());
 		validateDate(createMeetingDto.getEndTime());
 		

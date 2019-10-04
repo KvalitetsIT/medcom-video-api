@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import dk.medcom.video.api.repository.MeetingRepository;
@@ -21,7 +23,6 @@ import dk.medcom.video.api.repository.SchedulingInfoRepository;
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
-//@EnableJpaRepositories(basePackageClasses = MeetingRepository.class)
 @EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
@@ -46,7 +47,7 @@ public class DatabaseConfiguration {
 		dataSource.setUrl(jdbcUrl);
 		dataSource.setUsername(jdbcUser);
 		dataSource.setPassword(jdbcPass);
+
 		return dataSource;
 	}
-
 }

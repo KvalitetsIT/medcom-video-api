@@ -307,7 +307,6 @@ public class SchedulingInfoService {
 		if(schedulingTemplate.getOrganisation() != null && !schedulingTemplate.getOrganisation().getOrganisationId().equals(createSchedulingInfoDto.getOrganizationId())) {
 			LOGGER.debug(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
 			throw new NotValidDataException(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
-
 		}
 
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
@@ -394,7 +393,7 @@ public class SchedulingInfoService {
 		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisation(organisation);
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
-			throw new NotValidDataException("Unused scheduling information not found for organisation" + organisation.getOrganisationId());
+			throw new NotValidDataException("Unused scheduling information not found for organisation " + organisation.getOrganisationId());
 		}
 
 		return schedulingInfos.get(0);
