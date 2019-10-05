@@ -1,7 +1,6 @@
 package dk.medcom.video.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,7 +28,6 @@ public class CreateMeetingDto {
 	@Size(max=100, message="Project Code should have a maximum of 100 characters")
 	public String projectCode;
 	
-	@Email
 	private String organizedByEmail;
 	
 	public int maxParticipants;

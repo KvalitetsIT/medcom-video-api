@@ -29,7 +29,6 @@ public class UpdateMeetingDto {
 	@Size(max=100, message="Project Code should have a maximum of 100 characters")
 	public String projectCode;
 	
-	@Email
 	public String organizedByEmail;
 
 	public String getSubject() {
