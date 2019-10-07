@@ -4,6 +4,7 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
@@ -19,8 +20,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +55,8 @@ public class SchedulingInfoServiceTest {
 
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         Mockito.when(schedulingInfoRepository.findOneByUuid(schedulingInfoUuid.toString())).thenReturn(schedulingInfo);
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).then(i -> i.getArgument(0));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisation(Mockito.any(Organisation.class))).thenReturn(Collections.singletonList(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
         organizationRepository = Mockito.mock(OrganisationRepository.class);
@@ -67,7 +68,6 @@ public class SchedulingInfoServiceTest {
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID)).thenReturn(createSchedulingTemplate(SCHEDULING_TEMPLATE_ID));
         Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(createSchedulingTemplateOtherOrg());
-
     }
 
 
@@ -90,7 +90,6 @@ public class SchedulingInfoServiceTest {
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Matchers.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
-
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 
@@ -178,6 +177,29 @@ public class SchedulingInfoServiceTest {
 
         schedulingInfoService.createSchedulingInfo(input);
     }
+
+    @Test
+    public void testAttachMeetingToSchedulingInfo() throws NotValidDataException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);;
+        Date vmrStartTime = calendar.getTime();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        assertNotNull(result);
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
+    }
+
 
     @Test(expected = NotValidDataException.class)
     public void testCanNotCreateSchedulingInfoOnNonPoolOrganisation() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {

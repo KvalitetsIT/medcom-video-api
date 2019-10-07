@@ -2,13 +2,11 @@ package dk.medcom.video.api.dto;
 
 import org.springframework.hateoas.ResourceSupport;
 
-import java.util.List;
-
 public class PoolInfoDto extends ResourceSupport {
     private String organizationId;
     private int desiredPoolSize;
     private int availablePoolSize;
-    private List<SchedulingTemplateDto> schedulingTemplates;
+    private SchedulingTemplateDto schedulingTemplate;
 
     public int getDesiredPoolSize() {
         return desiredPoolSize;
@@ -26,12 +24,12 @@ public class PoolInfoDto extends ResourceSupport {
         this.organizationId = organizationId;
     }
 
-    public List<SchedulingTemplateDto> getSchedulingTemplates() {
-        return schedulingTemplates;
+    public SchedulingTemplateDto getSchedulingTemplate() {
+        return schedulingTemplate;
     }
 
-    public void setSchedulingTemplates(List<SchedulingTemplateDto> schedulingTemplates) {
-        this.schedulingTemplates = schedulingTemplates;
+    public void setSchedulingTemplate(SchedulingTemplateDto schedulingTemplate) {
+        this.schedulingTemplate = schedulingTemplate;
     }
 
     public int getAvailablePoolSize() {

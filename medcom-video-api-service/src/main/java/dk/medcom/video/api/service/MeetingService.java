@@ -126,13 +126,7 @@ public class MeetingService {
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
-			SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
-			schedulingInfo.setMeetingUser(meeting.getMeetingUser());
-			schedulingInfo.setUpdatedTime(new Date());
-			schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
-			schedulingInfo.setUuid(meeting.getUuid());
-			schedulingInfo.setMeeting(meeting);
-			schedulingInfoService.updateSchedulingInfo(schedulingInfo);
+			schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 		}
 		else {
 			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
@@ -170,7 +164,8 @@ public class MeetingService {
 		}
 		
 		validateDate(updateMeetingDto.getEndTime());
-		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {  //only when this status must all but endTime be updated
+		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION ||
+				(schedulingInfo.getProvisionStatus() == ProvisionStatus.PROVISIONED_OK && schedulingInfo.getOrganisation().getPoolSize() != null)) {  //only when this status must all but endTime be updated
 			validateDate(updateMeetingDto.getStartTime());
 			
 			meeting.setSubject(updateMeetingDto.getSubject());
@@ -192,7 +187,6 @@ public class MeetingService {
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
-		
 		meeting = meetingRepository.save(meeting);
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");

@@ -394,7 +394,21 @@ public class SchedulingInfoService {
 		return schedulingInfos.get(0);
 	}
 
-	SchedulingInfo updateSchedulingInfo(SchedulingInfo schedulingInfo) {
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) throws NotValidDataException {
+		SchedulingInfo schedulingInfo = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
+		schedulingInfo.setUpdatedTime(new Date());
+		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
+		schedulingInfo.setUuid(meeting.getUuid());
+		schedulingInfo.setMeeting(meeting);
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(meeting.getStartTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
+
+		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
+
 		return schedulingInfoRepository.save(schedulingInfo);
 	}
 }

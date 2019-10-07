@@ -53,13 +53,13 @@ public class PoolInfoServiceTest {
         assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
-        assertEquals(1, firstPoolInfo.getSchedulingTemplates().size());
+        assertNotNull(firstPoolInfo.getSchedulingTemplate());
 
         PoolInfoDto secondPoolInfo = response.get(1);
         assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
-        assertEquals(1, secondPoolInfo.getSchedulingTemplates().size());
+        assertNotNull(secondPoolInfo.getSchedulingTemplate());
     }
 
     @Test

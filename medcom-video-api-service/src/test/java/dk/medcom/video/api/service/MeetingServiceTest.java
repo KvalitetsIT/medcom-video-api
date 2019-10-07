@@ -125,6 +125,8 @@ public class MeetingServiceTest {
 		Mockito.when(meetingRepository.findOneByUuid(Mockito.anyString())).thenReturn(meetingInService);
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setProvisionStatus(provisionStatus);
+		Organisation organisation = new Organisation();
+		schedulingInfo.setOrganisation(organisation);
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
 		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
@@ -276,9 +278,7 @@ public class MeetingServiceTest {
 		assertEquals(input.getStartTime(), result.getStartTime());
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
-		Mockito.verify(schedulingInfoService, times(1)).getUnusedSchedulingInfoForOrganisation(Mockito.any());
-		Mockito.verify(schedulingInfoService, times(1)).updateSchedulingInfo(Mockito.argThat(x -> x.getUuid().equals(input.getUuid().toString()) &&
-				x.getMeeting().getId().equals(result.getId())));
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -297,7 +297,7 @@ public class MeetingServiceTest {
 		input.setEndTime(new Date());
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
-		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenThrow(new NotValidDataException("hej hej"));
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
 		meetingService.createMeeting(input);
 	}

@@ -41,25 +41,23 @@ public class PoolInfoService {
 
             poolInfo.setAvailablePoolSize((int) schedulingInfos.stream().filter(x -> x.getOrganisation().getId().longValue() == o.getId()).count());
 
-            poolInfo.setSchedulingTemplates(getSchedulingTemplates(o));
+            poolInfo.setSchedulingTemplate(getSchedulingTemplate(o));
             
             return poolInfo;
         }).collect(Collectors.toList());
     }
 
-    private List<SchedulingTemplateDto> getSchedulingTemplates(Organisation o) {
+    private SchedulingTemplateDto getSchedulingTemplate(Organisation o) {
         List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(o, true);
 
-        return mapSchedulingTemplate(schedulingTemplates);
+        return mapSchedulingTemplate(schedulingTemplates.get(0));
     }
 
-    private List<SchedulingTemplateDto> mapSchedulingTemplate(List<SchedulingTemplate> schedulingTemplates) {
-        return schedulingTemplates.stream().map( s -> {
-            try {
-                return new SchedulingTemplateDto(s);
-            } catch (PermissionDeniedException e) {
-                throw new RuntimeException("Error mapping SchedulingTemplate.", e);
-            }
-        }).collect(Collectors.toList());
+    private SchedulingTemplateDto mapSchedulingTemplate(SchedulingTemplate schedulingTemplate) {
+        try {
+            return new SchedulingTemplateDto(schedulingTemplate);
+        } catch (PermissionDeniedException e) {
+            throw new RuntimeException("Error mapping SchedulingTemplate.", e);
+        }
     }
 }
