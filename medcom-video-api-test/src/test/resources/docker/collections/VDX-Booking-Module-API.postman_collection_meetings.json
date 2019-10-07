@@ -105,7 +105,7 @@
 								"exec": [
 									"pm.test(\"Portal link is as expected\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-12T11:15:00\");",
+									"    pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-12T\");",
 									"});",
 									"pm.test(\"Check that updated user organisation is null\", function () {",
 									"    pm.expect(pm.response.json().updatedBy.organisationId).equal(null);",
@@ -179,8 +179,8 @@
 								"id": "63015d02-5a15-4731-86a0-96d23ffe9b85",
 								"exec": [
 									"pm.globals.set(\"subject\", \"test møde meetingToUpdate01 v2\");",
-									"pm.globals.set(\"start_time\",    \"2018-11-12T12:30:00 +0200\");",
-									"pm.globals.set(\"start_timeGMT\", \"2018-11-12T10:30:00 +0000\");",
+									"pm.globals.set(\"start_time\",    \"2018-11-15T12:15:00 +0200\");",
+									"pm.globals.set(\"start_timeGMT\", \"2018-11-15T10:15:00 +0000\");",
 									"pm.globals.set(\"end_time\",    \"2018-11-12T12:30:00 +0100\");",
 									"pm.globals.set(\"end_timeGMT\", \"2018-11-12T11:30:00 +0000\");",
 									"pm.globals.set(\"meeting_description\", \"\");",
@@ -226,7 +226,7 @@
 								"exec": [
 									"pm.test(\"Portal link is as expected\", function () {",
 									"    var jsonData = pm.response.json();",
-									"        pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-12T11:30:00\");",
+									"        pm.expect(jsonData.portalLink).to.include(\"start_dato=2018-11-15T\");",
 									"});",
 									"pm.test(\"Check that updated user organisation is not null\", function () {",
 									"    pm.expect(pm.response.json().updatedBy.organisationId).not.equal(null);",
