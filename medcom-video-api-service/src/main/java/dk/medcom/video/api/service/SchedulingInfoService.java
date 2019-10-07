@@ -335,9 +335,6 @@ public class SchedulingInfoService {
 		}
 
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, schedulingTemplate.getVMRAvailableBefore() * -1);
-		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());
 
@@ -362,8 +359,6 @@ public class SchedulingInfoService {
 
 		schedulingInfo.setUriWithoutDomain(randomUri);
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
-
-		schedulingInfo.setPortalLink(createPortalLink(schedulingInfo.getvMRStartTime(), schedulingInfo));
 
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
 		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());

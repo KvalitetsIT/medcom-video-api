@@ -48,8 +48,7 @@ public class PoolInfoService {
     }
 
     private List<SchedulingTemplateDto> getSchedulingTemplates(Organisation o) {
-        List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(o);
-        schedulingTemplates.addAll(schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull());
+        List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(o, true);
 
         return mapSchedulingTemplate(schedulingTemplates);
     }

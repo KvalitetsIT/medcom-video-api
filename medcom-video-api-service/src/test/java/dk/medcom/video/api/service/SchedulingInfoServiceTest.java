@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
+import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -80,7 +81,8 @@ public class SchedulingInfoServiceTest {
     @Test
     public void testUpdateSchedulingInfo() throws RessourceNotFoundException, PermissionDeniedException {
         Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 00, 00);
+        Date startTime = calendar.getTime();
         calendar.add(Calendar.MINUTE, -10);
         Date calculatedStartTime = calendar.getTime();
 
@@ -92,7 +94,7 @@ public class SchedulingInfoServiceTest {
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), now);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -102,13 +104,13 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertTrue(calculatedStartTime.equals(capturedSchedulingInfo.getvMRStartTime()));
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
     }
 
     @Test
     public void testCreateSchedulingInfoPooling() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
-        DateFormat dateFormat = SimpleDateFormat.getInstance();
         Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 00, 00);
         calendar.add(Calendar.MINUTE, -10);
         Date calculatedStartTime = calendar.getTime();
 
@@ -132,10 +134,9 @@ public class SchedulingInfoServiceTest {
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertEquals(String.format("Exected start time %s does not match actual start time %s", dateFormat.format(calculatedStartTime), dateFormat.format(capturedSchedulingInfo.getvMRStartTime())), dateFormat.format(calculatedStartTime), dateFormat.format(capturedSchedulingInfo.getvMRStartTime()));
+        assertNull(capturedSchedulingInfo.getvMRStartTime());
         assertEquals("some theme", capturedSchedulingInfo.getIvrTheme());
-//        assertEquals("null/?url=1960@test_domain&pin=4669&start_dato=" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(calculatedStartTime), capturedSchedulingInfo.getPortalLink());
-        assertNotNull(capturedSchedulingInfo.getvMRStartTime());
+        assertNull(capturedSchedulingInfo.getPortalLink());
         assertEquals(createOrganisation().getId(), capturedSchedulingInfo.getOrganisation().getId());
         assertEquals(input.getProvisionVmrId(), capturedSchedulingInfo.getProvisionVMRId());
 //        assertEquals("", capturedSchedulingInfo.getProvisionTimestamp());
@@ -149,7 +150,6 @@ public class SchedulingInfoServiceTest {
         assertNotNull(capturedSchedulingInfo.getUriWithDomain());
         assertEquals(true, capturedSchedulingInfo.getEndMeetingOnEndTime());
         assertEquals(10, capturedSchedulingInfo.getMaxParticipants());
-        assertEquals(dateFormat.format(calculatedStartTime), dateFormat.format(capturedSchedulingInfo.getvMRStartTime()));
         assertEquals(10, capturedSchedulingInfo.getVMRAvailableBefore());
         assertNotNull(capturedSchedulingInfo.getGuestPin());
         assertNotNull(capturedSchedulingInfo.getHostPin());

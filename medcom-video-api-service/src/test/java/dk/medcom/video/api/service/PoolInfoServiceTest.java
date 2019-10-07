@@ -39,7 +39,7 @@ public class PoolInfoServiceTest {
 
         SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-        Mockito.when(schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull()).thenReturn(Collections.singletonList(schedulingTemplate));
+        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
 
         PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository);
 
@@ -53,13 +53,13 @@ public class PoolInfoServiceTest {
         assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
-        assertEquals(1, firstPoolInfo.getSchedulingTemplates().size()); // TODO Assert on more fields.
+        assertEquals(1, firstPoolInfo.getSchedulingTemplates().size());
 
         PoolInfoDto secondPoolInfo = response.get(1);
         assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
-        assertEquals(1, secondPoolInfo.getSchedulingTemplates().size()); // TODO Assert on more fields.
+        assertEquals(1, secondPoolInfo.getSchedulingTemplates().size());
     }
 
     @Test
