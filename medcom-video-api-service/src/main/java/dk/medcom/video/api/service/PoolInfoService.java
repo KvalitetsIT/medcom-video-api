@@ -50,7 +50,10 @@ public class PoolInfoService {
     private SchedulingTemplateDto getSchedulingTemplate(Organisation o) {
         List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(o, true);
 
-        return mapSchedulingTemplate(schedulingTemplates.get(0));
+        if(schedulingTemplates.size() > 0) {
+            return mapSchedulingTemplate(schedulingTemplates.get(0));
+        }
+        return null;
     }
 
     private SchedulingTemplateDto mapSchedulingTemplate(SchedulingTemplate schedulingTemplate) {
