@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.dao.SchedulingTemplate;;
+import dk.medcom.video.api.dao.SchedulingTemplate;
 
 public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
@@ -83,9 +83,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(ivrTheme, schedulingTemplate.getIvrTheme());
 				
 	}
-	
 
-	
 	@Test
 	public void testFindAllSchedulingTemplate() {
 		// Given
@@ -106,7 +104,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindSchedulingTemplateWithExistingId() {
 		// Given
-		Long id = new Long(1);
+		Long id = 1L;
 		
 		// When
 		SchedulingTemplate schedulingTemplate = subject.findOne(id);
@@ -118,15 +116,15 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		Assert.assertEquals("abc", schedulingTemplate.getUriPrefix());
 		Assert.assertEquals("test.dk", schedulingTemplate.getUriDomain());
-		Assert.assertEquals(true, schedulingTemplate.getHostPinRequired());
+		Assert.assertTrue(schedulingTemplate.getHostPinRequired());
 		Assert.assertEquals(1L, schedulingTemplate.getHostPinRangeLow().longValue());
 		Assert.assertEquals(91L, schedulingTemplate.getHostPinRangeHigh().longValue());
-		Assert.assertEquals(false, schedulingTemplate.getGuestPinRequired());
+		Assert.assertFalse(schedulingTemplate.getGuestPinRequired());
 		Assert.assertEquals(100L, schedulingTemplate.getGuestPinRangeLow().longValue());
 		Assert.assertEquals(991L, schedulingTemplate.getGuestPinRangeHigh().longValue());
 		Assert.assertEquals(15, schedulingTemplate.getVMRAvailableBefore());
 		Assert.assertEquals(10, schedulingTemplate.getMaxParticipants());
-		Assert.assertEquals(true, schedulingTemplate.getEndMeetingOnEndTime());
+		Assert.assertTrue(schedulingTemplate.getEndMeetingOnEndTime());
 		Assert.assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		Assert.assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
 		Assert.assertEquals("/api/admin/configuration/v1/ivr_theme/10/", schedulingTemplate.getIvrTheme());
@@ -135,7 +133,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindSchedulingTemplateWithNonExistingId() {
 		// Given
-		Long id = new Long(1999);
+		Long id = 1999L;
 		
 		// When
 		SchedulingTemplate schedulingTemplate = subject.findOne(id);
@@ -203,7 +201,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
 			schedulingTemplate.setIvrTheme(ivrTheme);
 
-			schedulingTemplate = subject.save(schedulingTemplate);
+			subject.save(schedulingTemplate);
 			schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
 			
 			Assert.assertNotNull(schedulingTemplates);
