@@ -4,6 +4,7 @@ import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.PoolInfoDto;
+import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -32,7 +33,7 @@ public class PoolInfoServiceTest {
     @Test
     public void testGetPoolInfo() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(createSchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
@@ -66,13 +67,12 @@ public class PoolInfoServiceTest {
     @Test
     public void testGetPoolInfoNoDefaultTemplate() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(createSchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
         Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
 
-        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.emptyList());
 
@@ -103,7 +103,7 @@ public class PoolInfoServiceTest {
         Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
 
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(Collections.emptyList());
+//        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(Collections.emptyList());
 
         SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);

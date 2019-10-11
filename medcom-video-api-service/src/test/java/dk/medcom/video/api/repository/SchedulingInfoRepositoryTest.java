@@ -327,7 +327,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Organisation organisation = new Organisation();
 		organisation.setId(7L);
 
-		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisation(organisation);
+		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation, ProvisionStatus.PROVISIONED_OK);
 		assertNotNull(schedulingInfos);
 		assertEquals(1, schedulingInfos.size());
 		assertEquals(new Long(207), schedulingInfos.get(0).getId());
@@ -335,7 +335,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetSchedulingInfoByMeetingsIdNull() {
-		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNull();
+		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
 		assertNotNull(schedulingInfos);
 		assertEquals(1, schedulingInfos.size());

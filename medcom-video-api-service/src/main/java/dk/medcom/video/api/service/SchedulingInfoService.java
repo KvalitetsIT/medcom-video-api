@@ -30,7 +30,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class SchedulingInfoService {
-	
 	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
 	@Autowired
@@ -364,28 +363,25 @@ public class SchedulingInfoService {
 		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
-		schedulingInfo.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
-		schedulingInfo.setProvisionStatusDescription("Pooled provisioning OK");
+		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
+		schedulingInfo.setProvisionStatusDescription("Pooled awaiting provisioning.");
 
 		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
 		schedulingInfo.setCreatedTime(new Date());
 
-//		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setOrganisation(organisation);
-		schedulingInfo.setProvisionVMRId(createSchedulingInfoDto.getProvisionVmrId());
-		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
+//		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
+		schedulingInfo.setUuid(UUID.randomUUID().toString());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
-
 	}
 
 	SchedulingInfo getUnusedSchedulingInfoForOrganisation(Organisation organisation) throws NotValidDataException {
-		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisation(organisation);
+		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation,  ProvisionStatus.PROVISIONED_OK);
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			throw new NotValidDataException("Unused scheduling information not found for organisation " + organisation.getOrganisationId());

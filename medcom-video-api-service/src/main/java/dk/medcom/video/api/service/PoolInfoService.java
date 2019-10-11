@@ -5,6 +5,7 @@ import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.PoolInfoDto;
+import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.SchedulingTemplateDto;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
@@ -28,7 +29,7 @@ public class PoolInfoService {
 
     public List<PoolInfoDto> getPoolInfo() {
         List<Organisation> organizations = organizationRepository.findByPoolSizeNotNull();
-        List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNull();
+        List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
         return mapPoolInfo(organizations, schedulingInfos);
     }

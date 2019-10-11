@@ -19,7 +19,7 @@ public class SchedulingStatusService {
 	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingStatusService.class);
 	
 	@Autowired
-	SchedulingStatusRepository schedulingStatusRepository;
+	private SchedulingStatusRepository schedulingStatusRepository;
 
 	public SchedulingStatus createSchedulingStatus(SchedulingInfo schedulingInfo) {
 		SchedulingStatus schedulingStatus = new SchedulingStatus();

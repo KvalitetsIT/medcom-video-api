@@ -14,10 +14,10 @@ import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.util.Calendar;
@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.UUID;
 
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
@@ -37,7 +36,6 @@ public class SchedulingInfoServiceTest {
     private SchedulingTemplateRepository schedulingTemplateRepository;
 
     private UUID schedulingInfoUuid;
-    private SchedulingInfo schedulingInfo;
 
     private MeetingUserService meetingUserService;
     private SchedulingTemplateService schedulingTemplateService;
@@ -51,12 +49,12 @@ public class SchedulingInfoServiceTest {
     @Before
     public void setupMocks() {
         schedulingInfoUuid = UUID.randomUUID();
-        schedulingInfo = createSchedulingInfo();
+        SchedulingInfo schedulingInfo = createSchedulingInfo();
 
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         Mockito.when(schedulingInfoRepository.findOneByUuid(schedulingInfoUuid.toString())).thenReturn(schedulingInfo);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).then(i -> i.getArgument(0));
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisation(Mockito.any(Organisation.class))).thenReturn(Collections.singletonList(schedulingInfo));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Organisation.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Collections.singletonList(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
         organizationRepository = Mockito.mock(OrganisationRepository.class);
@@ -81,7 +79,7 @@ public class SchedulingInfoServiceTest {
     @Test
     public void testUpdateSchedulingInfo() throws RessourceNotFoundException, PermissionDeniedException {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, Calendar.OCTOBER, 10, 9, 00, 00);
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         Date startTime = calendar.getTime();
         calendar.add(Calendar.MINUTE, -10);
         Date calculatedStartTime = calendar.getTime();
@@ -89,7 +87,7 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
-        Mockito.when(schedulingInfoRepository.save(Matchers.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
 
@@ -102,28 +100,27 @@ public class SchedulingInfoServiceTest {
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertTrue(calculatedStartTime.equals(capturedSchedulingInfo.getvMRStartTime()));
+        assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
         assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
     }
 
     @Test
     public void testCreateSchedulingInfoPooling() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, Calendar.OCTOBER, 10, 9, 00, 00);
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         calendar.add(Calendar.MINUTE, -10);
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
-        Mockito.when(schedulingInfoRepository.save(Matchers.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
 
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
         input.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
-        input.setProvisionVmrId("vmr id");
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(input);
 
         assertNotNull(schedulingInfo);
@@ -137,17 +134,17 @@ public class SchedulingInfoServiceTest {
         assertEquals("some theme", capturedSchedulingInfo.getIvrTheme());
         assertNull(capturedSchedulingInfo.getPortalLink());
         assertEquals(createOrganisation().getId(), capturedSchedulingInfo.getOrganisation().getId());
-        assertEquals(input.getProvisionVmrId(), capturedSchedulingInfo.getProvisionVMRId());
+        assertNull(capturedSchedulingInfo.getProvisionVMRId());
 //        assertEquals("", capturedSchedulingInfo.getProvisionTimestamp());
-        assertNotNull(capturedSchedulingInfo.getProvisionTimestamp());
-        assertEquals("Pooled provisioning OK", capturedSchedulingInfo.getProvisionStatusDescription());
-        assertEquals(ProvisionStatus.PROVISIONED_OK, capturedSchedulingInfo.getProvisionStatus());
+        assertNull(capturedSchedulingInfo.getProvisionTimestamp());
+        assertEquals("Pooled awaiting provisioning.", capturedSchedulingInfo.getProvisionStatusDescription());
+        assertEquals(ProvisionStatus.AWAITS_PROVISION, capturedSchedulingInfo.getProvisionStatus());
         assertEquals(1, capturedSchedulingInfo.getSchedulingTemplate().getId().intValue());
 //        assertEquals("1960", capturedSchedulingInfo.getUriWithoutDomain());
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 //        assertEquals("1960@test_domain", capturedSchedulingInfo.getUriWithDomain());
         assertNotNull(capturedSchedulingInfo.getUriWithDomain());
-        assertEquals(true, capturedSchedulingInfo.getEndMeetingOnEndTime());
+        Assert.assertTrue(capturedSchedulingInfo.getEndMeetingOnEndTime());
         assertEquals(10, capturedSchedulingInfo.getMaxParticipants());
         assertEquals(10, capturedSchedulingInfo.getVMRAvailableBefore());
         assertNotNull(capturedSchedulingInfo.getGuestPin());
@@ -158,7 +155,6 @@ public class SchedulingInfoServiceTest {
     public void testCanNotCreateSchedulingInfoOnNonExistingSchedulingTemplate() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
-        input.setProvisionVmrId("vmr id");
         input.setSchedulingTemplateId(10L);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
@@ -170,7 +166,6 @@ public class SchedulingInfoServiceTest {
     public void testCanNotCreateSchedulingInfoOnSchedulingTemplateForOtherOrg() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
-        input.setProvisionVmrId("vmr id");
         input.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
@@ -183,7 +178,7 @@ public class SchedulingInfoServiceTest {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
-        calendar.add(Calendar.MINUTE, -10);;
+        calendar.add(Calendar.MINUTE, -10);
         Date vmrStartTime = calendar.getTime();
 
         Meeting meeting = new Meeting();
@@ -205,7 +200,6 @@ public class SchedulingInfoServiceTest {
     public void testCanNotCreateSchedulingInfoOnNonPoolOrganisation() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(NON_POOL_ORG);
-        input.setProvisionVmrId("vmr id");
         input.setSchedulingTemplateId(2L);
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
@@ -217,7 +211,6 @@ public class SchedulingInfoServiceTest {
     public void testCanNotCreateSchedulingInfoOnNonExistingOrganisation() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId("non existing org");
-        input.setProvisionVmrId("vmr id");
         input.setSchedulingTemplateId(2L);
 
         SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
@@ -234,7 +227,7 @@ public class SchedulingInfoServiceTest {
         organisation.setPoolSize(10);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisation(organisation)).thenReturn(Collections.singletonList(createSchedulingInfo()));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation, ProvisionStatus.PROVISIONED_OK)).thenReturn(Collections.singletonList(createSchedulingInfo()));
 
         SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
         assertNotNull(schedulingInfo);
@@ -270,7 +263,7 @@ public class SchedulingInfoServiceTest {
         return schedulingTemplate;
     }
 
-    public SchedulingInfo createSchedulingInfo() {
+    private SchedulingInfo createSchedulingInfo() {
         SchedulingInfo schedulingInfo = new SchedulingInfo();
         schedulingInfo.setVMRAvailableBefore(10);
         schedulingInfo.setUuid(schedulingInfoUuid.toString());

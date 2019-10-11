@@ -22,7 +22,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
 	public List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);
 
-	public List<SchedulingInfo> findByMeetingIsNull();
+	List<SchedulingInfo> findByMeetingIsNullAndOrganisationAndProvisionStatus(Organisation organisation, ProvisionStatus provisionStatus);
 
-	public List<SchedulingInfo> findByMeetingIsNullAndOrganisation(Organisation organisationId);
+    List<SchedulingInfo> findByMeetingIsNullAndProvisionStatus(ProvisionStatus provisionStatus);
 }

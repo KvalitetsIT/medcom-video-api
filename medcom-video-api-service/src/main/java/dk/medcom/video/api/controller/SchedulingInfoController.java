@@ -38,7 +38,7 @@ public class SchedulingInfoController {
 		this.schedulingInfoService = schedulingInfoService;
 	}
 
-	@APISecurityAnnotation({UserRole.ADMIN})
+	@APISecurityAnnotation({UserRole.PROVISIONER_USER})
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.POST)
 	public Resource<SchedulingInfoDto> createSchedulingInfo(@Valid @RequestBody CreateSchedulingInfoDto createSchedulingInfoDto) throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry of /scheduling-info.post.");

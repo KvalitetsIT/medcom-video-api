@@ -17,6 +17,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import static junit.framework.TestCase.assertNull;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
@@ -31,13 +32,13 @@ public class SchedulingInfoControllerTest {
     @Test
     public void testCreateSchedulingInfo() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
-        input.setProvisionVmrId("vmr id");
         input.setSchedulingTemplateId(1L);
         input.setOrganizationId("pool-org");
 
         SchedulingInfoService schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
         Organisation organisation = TestDataHelper.createOrganisation(true, "pool-org", 1L);
         SchedulingInfo expectedSchedulingInfoResult = TestDataHelper.createSchedulingInfo(organisation);
+        expectedSchedulingInfoResult.setProvisionVMRId(null);
         Mockito.when(schedulingInfoService.createSchedulingInfo(input)).thenReturn(expectedSchedulingInfoResult);
 
 
@@ -47,6 +48,6 @@ public class SchedulingInfoControllerTest {
         assertNotNull(result);
         assertNotNull(result.getContent());
         SchedulingInfoDto schedulingInfoDto = result.getContent();
-        assertEquals("vmr id", schedulingInfoDto.getProvisionVmrId());
+        assertNull(schedulingInfoDto.getProvisionVmrId());
     }
 }
