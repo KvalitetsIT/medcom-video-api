@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
 public class PoolInfoServiceTest {
@@ -60,6 +61,40 @@ public class PoolInfoServiceTest {
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
         assertNotNull(secondPoolInfo.getSchedulingTemplate());
+    }
+
+    @Test
+    public void testGetPoolInfoNoDefaultTemplate() {
+        SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(createSchedulingInfo());
+
+        List<Organisation> organisations = createOrganisationList();
+        OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
+        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
+
+        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
+        SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
+        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.emptyList());
+
+        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository);
+
+        List<PoolInfoDto> response = poolInfoService.getPoolInfo();
+
+        assertNotNull(response);
+        assertEquals(2, response.size());
+
+        PoolInfoDto firstPoolInfo = response.get(0);
+        assertEquals(organisations.get(0).getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
+        assertEquals(2, firstPoolInfo.getAvailablePoolSize());
+
+        assertNull(firstPoolInfo.getSchedulingTemplate());
+
+        PoolInfoDto secondPoolInfo = response.get(1);
+        assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
+        assertEquals(0, secondPoolInfo.getAvailablePoolSize());
+        assertNull(secondPoolInfo.getSchedulingTemplate());
     }
 
     @Test
