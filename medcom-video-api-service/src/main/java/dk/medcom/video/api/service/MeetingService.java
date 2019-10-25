@@ -1,17 +1,5 @@
 package dk.medcom.video.api.service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
-
-import dk.medcom.video.api.dto.MeetingType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
@@ -21,10 +9,16 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.MeetingType;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 
 @Component
@@ -32,30 +26,15 @@ public class MeetingService {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
 	
-	@Autowired
-	MeetingRepository meetingRepository;
-	
-	@Autowired
-	MeetingUserService meetingUserService;
-	
-	@Autowired
-	SchedulingInfoService schedulingInfoService;
-	
-	@Autowired
-	SchedulingStatusService schedulingStatusService;
-	
-	@Autowired
-	OrganisationService organisationService;
+	private MeetingRepository meetingRepository;
+	private MeetingUserService meetingUserService;
+	private SchedulingInfoService schedulingInfoService;
+	private SchedulingStatusService schedulingStatusService;
+	private OrganisationService organisationService;
+	private UserContextService userService;
 
-	@Autowired
-	UserContextService userService;
-	
-	public MeetingService() {
-		
-	}
-	
-	public MeetingService(MeetingRepository meetingRepository, MeetingUserService meetingUserService, SchedulingInfoService schedulingInfoService, SchedulingStatusService schedulingStatusService, 
-			OrganisationService organisationService, UserContextService userService) {
+	MeetingService(MeetingRepository meetingRepository, MeetingUserService meetingUserService, SchedulingInfoService schedulingInfoService, SchedulingStatusService schedulingStatusService,
+				   OrganisationService organisationService, UserContextService userService) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -96,7 +75,7 @@ public class MeetingService {
 	}
 
 	@Transactional(rollbackFor = Throwable.class)
-	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException  {
+	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException  {
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
@@ -124,7 +103,7 @@ public class MeetingService {
 		return meeting;
 	}
 
-	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
+	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 		}
@@ -133,7 +112,7 @@ public class MeetingService {
 		}
 	}
 
-	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
+	Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
 		validateDate(createMeetingDto.getStartTime());
 		validateDate(createMeetingDto.getEndTime());
 		
@@ -196,7 +175,6 @@ public class MeetingService {
 	}
 	
 	public void deleteMeeting(String uuid) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
-		
 		Meeting meeting = getMeetingByUuid(uuid);
 		
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
@@ -211,8 +189,7 @@ public class MeetingService {
 
 	}
 
-	private void validateDate(Date date) throws PermissionDeniedException, NotValidDataException {
-		
+	private void validateDate(Date date) throws NotValidDataException {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		if (calendar.get(Calendar.YEAR) > 9999) {
