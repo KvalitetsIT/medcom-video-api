@@ -19,7 +19,6 @@ import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,33 +31,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class SchedulingInfoService {
 	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
-	@Autowired
-	SchedulingInfoRepository schedulingInfoRepository;
-	
-	@Autowired
-	SchedulingTemplateRepository schedulingTemplateRepository;
-	
-	@Autowired
-	SchedulingTemplateService schedulingTemplateService;
-	
-	@Autowired
-	SchedulingStatusService schedulingStatusService;
-	
-	@Autowired
-	UserContextService userService;
-	
-	@Autowired
-	MeetingUserService meetingUserService;
-
-	@Autowired
+	private SchedulingInfoRepository schedulingInfoRepository;
+	private SchedulingTemplateRepository schedulingTemplateRepository;
+	private SchedulingTemplateService schedulingTemplateService;
+	private SchedulingStatusService schedulingStatusService;
+	private UserContextService userService;
+	private MeetingUserService meetingUserService;
 	private OrganisationRepository organisationRepository;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
 	
-	public SchedulingInfoService() {
-
-	}
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService,
 			SchedulingStatusService schedulingStatusService, UserContextService userService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
@@ -108,28 +91,9 @@ public class SchedulingInfoService {
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		
 		schedulingInfo.setUuid(meeting.getUuid());
-		if (schedulingTemplate.getHostPinRequired()) {
-			LOGGER.debug("HostPin is required");
-			if (schedulingTemplate.getHostPinRangeLow() != null && schedulingTemplate.getHostPinRangeHigh() != null &&
-					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
-				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
-			} else {	
-				LOGGER.debug("The host pincode assignment failed due to invalid setup on the template used.");
-				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
-			}
-			
-		}
-		if (schedulingTemplate.getGuestPinRequired()) {
-			LOGGER.debug("GuestPin is required");
-			if (schedulingTemplate.getGuestPinRangeLow() != null && schedulingTemplate.getGuestPinRangeHigh() != null &&
-					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
-				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
-			} else {
-				LOGGER.debug("The guest pincode assignment failed due to invalid setup on the template used");
-				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
-			}
-		}
-		
+		schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
+		schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
+
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meeting.getStartTime());
@@ -137,27 +101,9 @@ public class SchedulingInfoService {
 		schedulingInfo.setvMRStartTime(cal.getTime());
 		
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
-		
-		String randomUri;
-		int whileCount = 0;
-		int whileMax = 100;
 
-		SchedulingInfo schedulingInfoUri;
-		
-		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
-			LOGGER.debug("The Uri assignment failed due to invalid setup on the template used.");
-			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
-		}
-		do {  			//loop x number of times until a no-duplicate url is found
-			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
-			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
-			} while (schedulingInfoUri != null && whileCount++ < whileMax); 
-		if (whileCount > whileMax ) {
-			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
-			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
-		}
-		
-		schedulingInfo.setUriWithoutDomain(randomUri);		
+		String randomUri = generateUriWithoutDomain(schedulingTemplate);
+		schedulingInfo.setUriWithoutDomain(randomUri);
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 	
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
@@ -192,7 +138,60 @@ public class SchedulingInfoService {
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}
-	
+
+	private String generateUriWithoutDomain(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {
+		String randomUri;
+		int whileCount = 0;
+		int whileMax = 100;
+
+		SchedulingInfo schedulingInfoUri;
+
+		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
+			LOGGER.debug("The Uri assignment failed due to invalid setup on the template used.");
+			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
+		}
+		do {            //loop x number of times until a no-duplicate url is found
+			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
+			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
+		} while (schedulingInfoUri != null && whileCount++ < whileMax);
+		if (whileCount > whileMax) {
+			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
+			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
+		}
+
+		return randomUri;
+	}
+
+	private Long createGuestPin(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {
+		if (schedulingTemplate.getGuestPinRequired()) {
+			LOGGER.debug("GuestPin is required");
+			if (schedulingTemplate.getGuestPinRangeLow() != null && schedulingTemplate.getGuestPinRangeHigh() != null &&
+					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
+				return ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh());
+			} else {
+				LOGGER.debug("The guest pincode assignment failed due to invalid setup on the template used");
+				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
+			}
+		}
+
+		return null;
+	}
+
+	private Long createHostPin(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {
+		if (schedulingTemplate.getHostPinRequired()) {
+			LOGGER.debug("HostPin is required");
+			if (schedulingTemplate.getHostPinRangeLow() != null && schedulingTemplate.getHostPinRangeHigh() != null &&
+					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
+				return ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh());
+			} else {
+				LOGGER.debug("The host pincode assignment failed due to invalid setup on the template used.");
+				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
+			}
+		}
+
+		return null;
+	}
+
 	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException  {
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -310,52 +309,12 @@ public class SchedulingInfoService {
 
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 
-		if (schedulingTemplate.getHostPinRequired()) {
-			LOGGER.debug("HostPin is required");
-			if (schedulingTemplate.getHostPinRangeLow() != null &&
-					schedulingTemplate.getHostPinRangeHigh() != null &&
-					schedulingTemplate.getHostPinRangeLow() < schedulingTemplate.getHostPinRangeHigh()) {
-				schedulingInfo.setHostPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh()));
-			} else {
-				LOGGER.debug("The host pincode assignment failed due to invalid setup on the template used.");
-				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
-			}
-
-		}
-		if (schedulingTemplate.getGuestPinRequired()) {
-			LOGGER.debug("GuestPin is required");
-			if (schedulingTemplate.getGuestPinRangeLow() != null && schedulingTemplate.getGuestPinRangeHigh() != null &&
-					schedulingTemplate.getGuestPinRangeLow() < schedulingTemplate.getGuestPinRangeHigh()) {
-				schedulingInfo.setGuestPin(ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh()));
-			} else {
-				LOGGER.debug("The guest pincode assignment failed due to invalid setup on the template used");
-				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
-			}
-		}
-
+		schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
+		schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
-
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());
 
-		String randomUri;
-		int whileCount = 0;
-		int whileMax = 100;
-
-		SchedulingInfo schedulingInfoUri;
-
-		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
-			LOGGER.debug("The Uri assignment failed due to invalid setup on the template used.");
-			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
-		}
-		do {  			//loop x number of times until a no-duplicate url is found
-			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
-			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
-		} while (schedulingInfoUri != null && whileCount++ < whileMax);
-		if (whileCount > whileMax ) {
-			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
-			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
-		}
-
+		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
 		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 
@@ -371,7 +330,6 @@ public class SchedulingInfoService {
 		schedulingInfo.setCreatedTime(new Date());
 
 		schedulingInfo.setOrganisation(organisation);
-//		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
 		schedulingInfo.setUuid(UUID.randomUUID().toString());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);

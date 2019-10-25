@@ -18,8 +18,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.Assert.assertEquals;
 
 public class SchedulingInfoControllerTest {
 
@@ -41,7 +41,6 @@ public class SchedulingInfoControllerTest {
         expectedSchedulingInfoResult.setProvisionVMRId(null);
         Mockito.when(schedulingInfoService.createSchedulingInfo(input)).thenReturn(expectedSchedulingInfoResult);
 
-
         SchedulingInfoController controller = new SchedulingInfoController(schedulingInfoService);
         Resource<SchedulingInfoDto> result = controller.createSchedulingInfo(input);
 
@@ -49,5 +48,8 @@ public class SchedulingInfoControllerTest {
         assertNotNull(result.getContent());
         SchedulingInfoDto schedulingInfoDto = result.getContent();
         assertNull(schedulingInfoDto.getProvisionVmrId());
+        assertTrue("Host pin must be greater than 0.", schedulingInfoDto.getHostPin() > 0);
     }
+
+
 }
