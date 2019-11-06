@@ -26,12 +26,12 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://localhost:8081/api/info",
+					"raw": "http://{{host}}:{{port}}/api/info",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "8081",
+					"port": "{{port}}",
 					"path": [
 						"api",
 						"info"
