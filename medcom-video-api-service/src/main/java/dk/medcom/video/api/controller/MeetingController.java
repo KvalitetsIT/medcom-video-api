@@ -37,7 +37,6 @@ import dk.medcom.video.api.service.MeetingService;
 
 @RestController
 public class MeetingController {
-	
 	private static Logger LOGGER = LoggerFactory.getLogger(MeetingController.class);
 
 	@Autowired
@@ -66,7 +65,73 @@ public class MeetingController {
 		LOGGER.debug("Exit of /meetings.get resources: " + resources.toString());
 		return resources;
 	}
-	
+
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "subject")
+	public Resources <MeetingDto> getMeetings(String subject) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by subject: " + subject);
+
+		List<Meeting> meetings = meetingService.getMeetingsBySubject(subject);
+		List<MeetingDto> meetingDtos = new LinkedList<>();
+		for (Meeting meeting : meetings) {
+			MeetingDto meetingDto = new MeetingDto(meeting);
+
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
+			meetingDtos.add(meetingDto);
+		}
+		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetings(subject)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by subject: " + resources.toString());
+		return resources;
+	}
+
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "organizedBy")
+	public Resources <MeetingDto> getMeetingsOrganizedBy(String organizedBy) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by organized by: " + organizedBy);
+
+		List<Meeting> meetings = meetingService.getMeetingsByOrganizedBy(organizedBy);
+		List<MeetingDto> meetingDtos = new LinkedList<>();
+		for (Meeting meeting : meetings) {
+			MeetingDto meetingDto = new MeetingDto(meeting);
+
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
+			meetingDtos.add(meetingDto);
+		}
+		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsOrganizedBy(organizedBy)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by organized by: " + resources.toString());
+		return resources;
+	}
+
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "uriWithDomain")
+	public Resources <MeetingDto> getMeetingsUriWithDomain(String uriWithDomain) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by uri with domain: " + uriWithDomain);
+
+		List<Meeting> meetings = meetingService.getMeetingsByUriWithDomain(uriWithDomain);
+		List<MeetingDto> meetingDtos = new LinkedList<>();
+		for (Meeting meeting : meetings) {
+			MeetingDto meetingDto = new MeetingDto(meeting);
+
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
+			meetingDtos.add(meetingDto);
+		}
+		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsUriWithDomain(uriWithDomain)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by uri with domain: " + resources.toString());
+		return resources;
+	}
+
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.GET)
 	public Resource <MeetingDto> getMeetingByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		LOGGER.debug("Entry of /meetings.get uuid: " + uuid);

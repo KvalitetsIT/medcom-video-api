@@ -7,12 +7,17 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.assertj.core.internal.cglib.asm.$Opcodes;
 import org.junit.Assert;
 import org.junit.Test;
 
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
+import org.springframework.data.jpa.repository.Query;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MeetingRepositoryTest extends RepositoryTest{
 
@@ -66,18 +71,18 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		meeting = subject.save(meeting);
 		
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertNotNull(meeting.getId());
-		Assert.assertEquals(uuid,  meeting.getUuid());
-		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
-		Assert.assertEquals(meeting.getMeetingUser(), meeting.getOrganizedByUser());
-		Assert.assertEquals(meetingUserId, meeting.getUpdatedByUser().getId());
-		Assert.assertEquals(organisationId, meeting.getOrganisation().getId());
-		Assert.assertEquals(calendarStart.getTime(), meeting.getStartTime());
-		Assert.assertEquals(calendarEnd.getTime(), meeting.getEndTime());
-		Assert.assertEquals(projectCode, meeting.getProjectCode());
-		Assert.assertEquals(calendarCreate.getTime(), meeting.getCreatedTime());
-		Assert.assertEquals(calendarCreate.getTime(), meeting.getUpdatedTime());
+		assertNotNull(meeting);
+		assertNotNull(meeting.getId());
+		assertEquals(uuid,  meeting.getUuid());
+		assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		assertEquals(meeting.getMeetingUser(), meeting.getOrganizedByUser());
+		assertEquals(meetingUserId, meeting.getUpdatedByUser().getId());
+		assertEquals(organisationId, meeting.getOrganisation().getId());
+		assertEquals(calendarStart.getTime(), meeting.getStartTime());
+		assertEquals(calendarEnd.getTime(), meeting.getEndTime());
+		assertEquals(projectCode, meeting.getProjectCode());
+		assertEquals(calendarCreate.getTime(), meeting.getCreatedTime());
+		assertEquals(calendarCreate.getTime(), meeting.getUpdatedTime());
 	}
 	
 	@Test
@@ -88,13 +93,13 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Iterable<Meeting> meetings = subject.findAll();
 		
 		// Then
-		Assert.assertNotNull(meetings);
+		assertNotNull(meetings);
 		int numberOfMeetings = 0;
 		for (Meeting meeting : meetings) {
-			Assert.assertNotNull(meeting);
+			assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		Assert.assertEquals(6, numberOfMeetings);
+		assertEquals(6, numberOfMeetings);
 	}
 	
 	@Test
@@ -108,11 +113,11 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Meeting meeting = subject.findOne(id);
 		
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(id, meeting.getId());
-		Assert.assertEquals("TestMeeting-xyz", meeting.getSubject());
-		Assert.assertEquals(organisation.getOrganisationId(), meeting.getOrganisation().getOrganisationId());
-		Assert.assertEquals("Mødebeskrivelse 1", meeting.getDescription());
+		assertNotNull(meeting);
+		assertEquals(id, meeting.getId());
+		assertEquals("TestMeeting-xyz", meeting.getSubject());
+		assertEquals(organisation.getOrganisationId(), meeting.getOrganisation().getOrganisationId());
+		assertEquals("Mødebeskrivelse 1", meeting.getDescription());
 
 	}
 
@@ -137,11 +142,11 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Meeting meeting = subject.findOneByUuid(exitstingUUid);
 		
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(new Long(3), meeting.getId());
-		Assert.assertEquals(exitstingUUid, meeting.getUuid());
-		Assert.assertEquals("TestMeeting-123", meeting.getSubject());
-		Assert.assertEquals("test-org", meeting.getOrganisation().getOrganisationId());
+		assertNotNull(meeting);
+		assertEquals(new Long(3), meeting.getId());
+		assertEquals(exitstingUUid, meeting.getUuid());
+		assertEquals("TestMeeting-123", meeting.getSubject());
+		assertEquals("test-org", meeting.getOrganisation().getOrganisationId());
 	}
 
 	@Test
@@ -170,8 +175,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		List<Meeting> meetings = subject.findByOrganisationAndStartTimeBetween(organisation, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
-		Assert.assertNotNull(meetings);
-		Assert.assertEquals(4, meetings.size());
+		assertNotNull(meetings);
+		assertEquals(4, meetings.size());
 	}
 	
 	@Test
@@ -187,8 +192,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		List<Meeting> meetings = subject.findByOrganisationAndStartTimeBetween(organisation, calendarFrom.getTime(), calendarTo.getTime());
 		
 		// Then
-		Assert.assertNotNull(meetings);
-		Assert.assertEquals(0, meetings.size());
+		assertNotNull(meetings);
+		assertEquals(0, meetings.size());
 	}
 	
 	@Test
@@ -202,8 +207,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Meeting meeting = subject.findOne(meetingId);
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		assertNotNull(meeting);
+		assertEquals(meetingUserId, meeting.getMeetingUser().getId());
 
 	}
 
@@ -220,9 +225,9 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    meeting.setMeetingUser(meetingUser);	    
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(meetingUserId, meeting.getMeetingUser().getId());
+		assertNotNull(meeting);
+		assertNotNull(meetingUser);
+		assertEquals(meetingUserId, meeting.getMeetingUser().getId());
 	
 	}
 	@Test
@@ -236,8 +241,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Meeting meeting = subject.findOne(meetingId);
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
+		assertNotNull(meeting);
+		assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
 
 	}
 
@@ -254,9 +259,9 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    meeting.setOrganizedByUser(meetingUser);	    
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
+		assertNotNull(meeting);
+		assertNotNull(meetingUser);
+		assertEquals(organizedByUserId, meeting.getOrganizedByUser().getId());
 	
 	}
 
@@ -271,8 +276,8 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		Meeting meeting = subject.findOne(meetingId);
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
+		assertNotNull(meeting);
+		assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
 
 	}
 
@@ -289,10 +294,71 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    meeting.setUpdatedByUser(meetingUser);	    
 			
 		// Then
-		Assert.assertNotNull(meeting);
-		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
+		assertNotNull(meeting);
+		assertNotNull(meetingUser);
+		assertEquals(updatedByUserId, meeting.getUpdatedByUser().getId());
 	
 	}
-	
+
+	@Test
+	public void testGetByOrganizedByAndSubject() {
+		MeetingUser organizedBy = subjectMU.findOne(102L);
+		String meetingSubject = "MyMeeting4";
+
+		List<Meeting> result = subject.findByOrganizedByAndSubject(organizedBy, meetingSubject);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(4, meeting.getId().longValue());
+		assertEquals(meetingSubject, meeting.getSubject());
+		assertEquals(organizedBy.getId(), meeting.getOrganizedByUser().getId());
+	}
+
+	@Test
+	public void testGetByOrganisationByAndSubject() {
+		Organisation organisation = subjectO.findOne(6L);
+		String meetingSubject = "MyMeeting4";
+
+		List<Meeting> result = subject.findByOrganisationAndSubject(organisation, meetingSubject);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(4, meeting.getId().longValue());
+		assertEquals(meetingSubject, meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
+
+	@Test
+	public void testGetByOrganisationAndOrganizedBy() {
+		Organisation organisation = subjectO.findOne(5L);
+		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
+
+		List<Meeting> result = subject.findByOrganisationAndOrganizedBy(organisation, organizedBy);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(5, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz5", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+		assertEquals(organizedBy.getEmail(), meeting.getOrganizedByUser().getEmail());
+	}
+
+
+	@Test
+	public void testGetByuriWithDomain() {
+		Organisation organisation = subjectO.findOne(5L);
+		String uriWithDomain  = "1236@test.dk";
+
+		List<Meeting> result = subject.findByUriWithDomain(organisation, uriWithDomain);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(6, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz6", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
 }

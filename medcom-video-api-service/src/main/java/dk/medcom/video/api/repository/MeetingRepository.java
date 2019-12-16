@@ -4,6 +4,7 @@ package dk.medcom.video.api.repository;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import dk.medcom.video.api.dao.Meeting;
@@ -16,4 +17,13 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 	List<Meeting> findByOrganizedByAndStartTimeBetween(MeetingUser organizedBy, Date startTime, Date endTime);
 	
 	Meeting findOneByUuid(String uuid);
+
+	List<Meeting> findByOrganizedByAndSubject(MeetingUser organizedBy, String subject);
+
+	List<Meeting> findByOrganisationAndSubject(Organisation organisation, String subject);
+
+	List<Meeting> findByOrganisationAndOrganizedBy(Organisation userOrganisation, MeetingUser organizedBy);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organisation = ?1")
+	List<Meeting> findByUriWithDomain(Organisation userOrganisation, String uriWithDomain);
 }

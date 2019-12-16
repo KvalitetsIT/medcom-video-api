@@ -7,6 +7,7 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingType;
@@ -196,5 +197,24 @@ public class MeetingService {
 			LOGGER.debug("Date must be less than 9999 but is not. Actual value is: " + calendar.get(Calendar.YEAR));
 			throw new NotValidDataException("Date format is wrong, year must only have 4 digits");
 		}
+	}
+
+	public List<Meeting> getMeetingsBySubject(String subject) throws PermissionDeniedException {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByOrganizedByAndStartTimeBetween");
+			return meetingRepository.findByOrganizedByAndSubject(meetingUserService.getOrCreateCurrentMeetingUser(),subject);
+		} else {
+			LOGGER.debug("Finding meetings using findByOrganisationAndStartTimeBetween");
+			return meetingRepository.findByOrganisationAndSubject(organisationService.getUserOrganisation(),subject);
+		}
+	}
+
+	public List<Meeting> getMeetingsByOrganizedBy(String organizedBy) throws PermissionDeniedException {
+		MeetingUser meetingUser = meetingUserService.getOrCreateCurrentMeetingUser(organizedBy);
+		return meetingRepository.findByOrganisationAndOrganizedBy(organisationService.getUserOrganisation(), meetingUser);
+	}
+
+	public List<Meeting> getMeetingsByUriWithDomain(String uriWithDomain) throws PermissionDeniedException {
+		return meetingRepository.findByUriWithDomain(organisationService.getUserOrganisation(), uriWithDomain);
 	}
 }
