@@ -2,6 +2,7 @@ package dk.medcom.video.api.dto;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,6 +13,11 @@ import java.util.TimeZone;
 import static org.junit.Assert.assertEquals;
 
 public class CreateMeetingDtoTest {
+    @Before
+    public void adjustTimezone() {
+        TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+    }
+
     @Test
     public void deserializeDateFields() throws IOException {
         System.out.println(TimeZone.getDefault().getRawOffset());
