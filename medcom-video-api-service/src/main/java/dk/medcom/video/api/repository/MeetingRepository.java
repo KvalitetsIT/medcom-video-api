@@ -1,4 +1,3 @@
-//TODO: Database indexes matching requests?
 package dk.medcom.video.api.repository;
 
 import java.util.Date;
@@ -24,6 +23,17 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	List<Meeting> findByOrganisationAndOrganizedBy(Organisation userOrganisation, MeetingUser organizedBy);
 
+	List<Meeting> findByOrganizedBy(MeetingUser organizedBy);
+
 	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organisation = ?1")
-	List<Meeting> findByUriWithDomain(Organisation userOrganisation, String uriWithDomain);
+	List<Meeting> findByUriWithDomainAndOrganisation(Organisation userOrganisation, String uriWithDomain);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organizedBy = ?1")
+	List<Meeting> findByUriWithDomainAndOrganizedBy(MeetingUser organizedBy, String uriWithDomain);
+
+	@Query("select l.meeting from MeetingLabel l inner join l.meeting m where l.label = ?2 and m.organisation = ?1")
+    List<Meeting> findByLabelAndOrganisation(Organisation userOrganisation, String label);
+
+	@Query("select l.meeting from MeetingLabel l inner join l.meeting m where l.label = ?2 and m.organizedBy = ?1")
+	List<Meeting> findByLabelAndOrganizedBy(MeetingUser organizedBy, String label);
 }

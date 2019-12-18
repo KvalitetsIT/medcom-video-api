@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -39,6 +41,16 @@ public class CreateMeetingDto {
 	private MeetingType meetingType = MeetingType.NORMAL;
 
 	private UUID uuid;
+
+	private List<String> labels = new ArrayList<>();
+
+	public List<String> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
+	}
 
 	public int getMaxParticipants() {
 		return maxParticipants;

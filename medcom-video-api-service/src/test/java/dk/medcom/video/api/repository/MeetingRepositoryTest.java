@@ -1,16 +1,14 @@
 package dk.medcom.video.api.repository;
 
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.annotation.Resource;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -59,7 +57,17 @@ public class MeetingRepositoryTest extends RepositoryTest{
 	    Calendar calendarCreate = new GregorianCalendar(2018, Calendar.SEPTEMBER, 1,13,30, 0);
 	    meeting.setCreatedTime(calendarCreate.getTime());
 	    meeting.setUpdatedTime(calendarCreate.getTime());
-	    
+
+	    HashSet<MeetingLabel> meetingLabels = new HashSet<>();
+	    MeetingLabel label = new MeetingLabel();
+	    label.setLabel("first label");
+	    meetingLabels.add(label);
+
+	    label = new MeetingLabel();
+	    label.setLabel("second label");
+	    meetingLabels.add(label);
+	    meeting.setMeetingLabels(meetingLabels);
+
 		// When
 		meeting = subject.save(meeting);
 		
@@ -92,7 +100,7 @@ public class MeetingRepositoryTest extends RepositoryTest{
 			assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		assertEquals(6, numberOfMeetings);
+		assertEquals(7, numberOfMeetings);
 	}
 	
 	@Test
@@ -339,19 +347,81 @@ public class MeetingRepositoryTest extends RepositoryTest{
 		assertEquals(organizedBy.getEmail(), meeting.getOrganizedByUser().getEmail());
 	}
 
+	@Test
+	public void testGetByOrganizedBy() {
+		Organisation organisation = subjectO.findOne(5L);
+		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
+
+		List<Meeting> result = subject.findByOrganizedBy(organizedBy);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(5, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz5", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+		assertEquals(organizedBy.getEmail(), meeting.getOrganizedByUser().getEmail());
+	}
+
+
 
 	@Test
-	public void testGetByuriWithDomain() {
+	public void testGetByUriWithDomainAndOrganisation() {
 		Organisation organisation = subjectO.findOne(5L);
 		String uriWithDomain  = "1236@test.dk";
 
-		List<Meeting> result = subject.findByUriWithDomain(organisation, uriWithDomain);
+		List<Meeting> result = subject.findByUriWithDomainAndOrganisation(organisation, uriWithDomain);
 
 		assertEquals(1, result.size());
 
 		Meeting meeting = result.get(0);
 		assertEquals(6, meeting.getId().longValue());
 		assertEquals("TestMeeting-xyz6", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
+
+	@Test
+	public void testGetByUriWithDomainAndOrganizedBy() {
+		Organisation organisation = subjectO.findOne(5L);
+		String uriWithDomain  = "1236@test.dk";
+
+		List<Meeting> result = subject.findByUriWithDomainAndOrganizedBy(subjectMU.findOne(101L), uriWithDomain);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(6, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz6", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
+
+	@Test
+	public void testGetByLabelAndOrganisation() {
+		Organisation organisation = subjectO.findOne(5L);
+		String label  = "second label";
+
+		List<Meeting> result = subject.findByLabelAndOrganisation(organisation, label);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(7, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz7", meeting.getSubject());
+		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
+
+	@Test
+	public void testGetByLabelAndOrganizedBy() {
+		Organisation organisation = subjectO.findOne(5L);
+		String label  = "second label";
+
+		List<Meeting> result = subject.findByLabelAndOrganizedBy(subjectMU.findOne(101L), label);
+
+		assertEquals(1, result.size());
+
+		Meeting meeting = result.get(0);
+		assertEquals(7, meeting.getId().longValue());
+		assertEquals("TestMeeting-xyz7", meeting.getSubject());
 		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
 	}
 }

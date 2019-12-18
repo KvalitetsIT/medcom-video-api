@@ -1,6 +1,8 @@
 package dk.medcom.video.api.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,6 +32,7 @@ public class UpdateMeetingDto {
 	public String projectCode;
 	
 	public String organizedByEmail;
+	private List<String> labels = new ArrayList<>();
 
 	public String getSubject() {
 		return subject;
@@ -73,5 +76,13 @@ public class UpdateMeetingDto {
 
 	public void setOrganizedByEmail(String organizedByEmail) {
 		this.organizedByEmail = organizedByEmail;
+	}
+
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
+	}
+
+	public List<String> getLabels() {
+		return labels;
 	}
 }

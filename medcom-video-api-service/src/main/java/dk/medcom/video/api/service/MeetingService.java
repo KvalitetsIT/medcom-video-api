@@ -7,12 +7,14 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingType;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.repository.MeetingLabelRepository;
 import dk.medcom.video.api.repository.MeetingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,15 +35,22 @@ public class MeetingService {
 	private SchedulingStatusService schedulingStatusService;
 	private OrganisationService organisationService;
 	private UserContextService userService;
+	private MeetingLabelRepository meetingLabelRepository;
 
-	MeetingService(MeetingRepository meetingRepository, MeetingUserService meetingUserService, SchedulingInfoService schedulingInfoService, SchedulingStatusService schedulingStatusService,
-				   OrganisationService organisationService, UserContextService userService) {
+	MeetingService(MeetingRepository meetingRepository,
+				   MeetingUserService meetingUserService,
+				   SchedulingInfoService schedulingInfoService,
+				   SchedulingStatusService schedulingStatusService,
+				   OrganisationService organisationService,
+				   UserContextService userService,
+				   MeetingLabelRepository meetingLabelRepository) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
 	 	this.schedulingStatusService = schedulingStatusService;
 	 	this.organisationService = organisationService;
 	 	this.userService = userService;
+		this.meetingLabelRepository = meetingLabelRepository;
 	}
 	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
@@ -98,9 +107,10 @@ public class MeetingService {
 		}
 
 		meeting = meetingRepository.save(meeting);
-		if (meeting != null) {
-			attachOrCreateSchedulingInfo(meeting, createMeetingDto);
-		}
+		meetingLabelRepository.save(meeting.getMeetingLabels());
+
+		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
+
 		return meeting;
 	}
 
@@ -131,9 +141,17 @@ public class MeetingService {
 		meeting.setDescription(createMeetingDto.getDescription());
 		meeting.setProjectCode(createMeetingDto.getProjectCode());
 
+		createMeetingDto.getLabels().forEach(x -> {
+			MeetingLabel meetingLabel = new MeetingLabel();
+			meetingLabel.setLabel(x);
+
+			meeting.addMeetingLabel(meetingLabel);
+		});
+
 		return meeting;
 	}
-	
+
+	@Transactional(rollbackFor = Throwable.class)
 	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		Meeting meeting = getMeetingByUuid(uuid);
 				
@@ -168,6 +186,21 @@ public class MeetingService {
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		meeting = meetingRepository.save(meeting);
+
+		meetingLabelRepository.deleteByMeeting(meeting);
+
+		List<MeetingLabel> meetingLabels = new ArrayList<>();
+		Meeting finalMeeting = meeting;
+		updateMeetingDto.getLabels().forEach(x -> {
+			MeetingLabel meetingLabel = new MeetingLabel();
+			meetingLabel.setLabel(x);
+			meetingLabel.setMeeting(finalMeeting);
+
+			meetingLabels.add(meetingLabel);
+		});
+
+		meetingLabelRepository.save(meetingLabels);
+
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");
 			schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
@@ -183,9 +216,10 @@ public class MeetingService {
 			LOGGER.debug("Meeting does not have the correct Status for deletion. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
 			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be deleted");
 		}
-		
+
 		schedulingInfoService.deleteSchedulingInfo(uuid);
 		schedulingStatusService.deleteSchedulingStatus(meeting);
+		meetingLabelRepository.deleteByMeeting(meeting);
 		meetingRepository.delete(meeting);
 
 	}
@@ -210,11 +244,40 @@ public class MeetingService {
 	}
 
 	public List<Meeting> getMeetingsByOrganizedBy(String organizedBy) throws PermissionDeniedException {
-		MeetingUser meetingUser = meetingUserService.getOrCreateCurrentMeetingUser(organizedBy);
-		return meetingRepository.findByOrganisationAndOrganizedBy(organisationService.getUserOrganisation(), meetingUser);
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByOrganizedBy");
+
+			MeetingUser meetingUser = meetingUserService.getOrCreateCurrentMeetingUser();
+			if(organizedBy.equals(meetingUser.getEmail())) {
+				return meetingRepository.findByOrganizedBy(meetingUser);
+			}
+
+			LOGGER.debug("Returning empty list as query email is not same as context email.");
+			return Collections.emptyList();
+		} else {
+			LOGGER.debug("Finding meetings using findByOrganisationAndOrganizedBy");
+			MeetingUser meetingUser = meetingUserService.getOrCreateCurrentMeetingUser(organizedBy);
+			return meetingRepository.findByOrganisationAndOrganizedBy(organisationService.getUserOrganisation(), meetingUser);
+		}
 	}
 
 	public List<Meeting> getMeetingsByUriWithDomain(String uriWithDomain) throws PermissionDeniedException {
-		return meetingRepository.findByUriWithDomain(organisationService.getUserOrganisation(), uriWithDomain);
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganizedBy");
+			return meetingRepository.findByUriWithDomainAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), uriWithDomain);
+		} else {
+			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganisation");
+			return meetingRepository.findByUriWithDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithDomain);
+		}
+	}
+
+	public List<Meeting> getMeetingsByLabel(String label) throws PermissionDeniedException {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByLabelAndOrganizedBy");
+			return meetingRepository.findByLabelAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), label);
+		} else {
+			LOGGER.debug("Finding meetings using findByLabelAndOrganisation");
+			return meetingRepository.findByLabelAndOrganisation(organisationService.getUserOrganisation(), label);
+		}
 	}
 }

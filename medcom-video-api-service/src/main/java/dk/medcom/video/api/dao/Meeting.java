@@ -1,14 +1,10 @@
 package dk.medcom.video.api.dao;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 @Entity
@@ -45,8 +41,10 @@ public class Meeting {
 	private String description;
 	
 	private String projectCode;
-	
-	
+
+	@OneToMany(mappedBy = "meeting")
+	private Set<MeetingLabel> meetingLabels = new HashSet<>();
+
 	public Long getId() {
 		return id;
 	}
@@ -140,5 +138,18 @@ public class Meeting {
 	}
 	public void setUpdatedTime(Date updatedTime) {
 		this.updatedTime = updatedTime;
+	}
+
+	public Set<MeetingLabel> getMeetingLabels() {
+		return meetingLabels;
+	}
+
+	public void setMeetingLabels(Set<MeetingLabel> meetingLabels) {
+		this.meetingLabels = meetingLabels;
+	}
+
+	public void addMeetingLabel(MeetingLabel meetingLabel) {
+		meetingLabel.setMeeting(this);
+		meetingLabels.add(meetingLabel);
 	}
 }

@@ -1,20 +1,21 @@
 package dk.medcom.video.api.dto;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import java.util.Date;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import dk.medcom.video.api.controller.MeetingController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
+import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.ResourceSupport;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 public class MeetingDto extends ResourceSupport {
 
@@ -37,7 +38,8 @@ public class MeetingDto extends ResourceSupport {
 	public Date createdTime;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
 	public Date updatedTime;
-	
+	private List<String> labels;
+
 	public MeetingDto(Meeting meeting) {
 		
 		subject = meeting.getSubject();
@@ -61,11 +63,14 @@ public class MeetingDto extends ResourceSupport {
 		projectCode = meeting.getProjectCode();
 		createdTime = meeting.getCreatedTime();
 		updatedTime = meeting.getUpdatedTime();
-		
+
+		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
+
 		try { 
 			Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("self");
 			add(selfLink);
 		} catch (RessourceNotFoundException | PermissionDeniedException e) {
+			// Empty
 		}
 	}
 
@@ -123,5 +128,13 @@ public class MeetingDto extends ResourceSupport {
 	
 	public void setOrganizedBy(MeetingUserDto meetingUserDto) {
 		this.organizedBy =  meetingUserDto;
+	}
+
+	public List<String> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(List<String> labels) {
+		this.labels = labels;
 	}
 }

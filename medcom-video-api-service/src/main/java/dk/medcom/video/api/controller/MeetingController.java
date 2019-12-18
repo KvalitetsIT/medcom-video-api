@@ -49,7 +49,7 @@ public class MeetingController {
 		LOGGER.debug("Entry of /meetings.get fromStartTime: "+ fromStartTime.toString() + " toStartTime: " + toStartTime.toString());
 		
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
-		List<MeetingDto> meetingDtos = new LinkedList<MeetingDto>();
+		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
 			MeetingDto meetingDto = new MeetingDto(meeting);
 
@@ -132,25 +132,47 @@ public class MeetingController {
 		return resources;
 	}
 
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "label")
+	public Resources <MeetingDto> getMeetingsByLabel(String label) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by label with label: " + label);
+
+		List<Meeting> meetings = meetingService.getMeetingsByLabel(label);
+		List<MeetingDto> meetingDtos = new LinkedList<>();
+		for (Meeting meeting : meetings) {
+			MeetingDto meetingDto = new MeetingDto(meeting);
+
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
+			meetingDtos.add(meetingDto);
+		}
+		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsByLabel(label)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by label with label: " + resources.toString());
+		return resources;
+	}
+
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.GET)
 	public Resource <MeetingDto> getMeetingByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		LOGGER.debug("Entry of /meetings.get uuid: " + uuid);
 		
 		Meeting meeting = meetingService.getMeetingByUuid(uuid);
 		MeetingDto meetingDto = new MeetingDto(meeting);
-		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
+		Resource <MeetingDto> resource = new Resource<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.get resource: " + resource);
 		return resource;
 	}
 	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
-	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
+	public Resource <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		LOGGER.debug("Entry of /meetings.post");
 		
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
-		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
+		Resource<MeetingDto> resource = new Resource<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.post resource: " + resource);
 		return resource;
@@ -163,7 +185,7 @@ public class MeetingController {
 		
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
 		MeetingDto meetingDto = new MeetingDto(meeting);
-		Resource <MeetingDto> resource = new Resource <MeetingDto>(meetingDto);
+		Resource <MeetingDto> resource = new Resource<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.put resource: " + resource);
 		return resource;

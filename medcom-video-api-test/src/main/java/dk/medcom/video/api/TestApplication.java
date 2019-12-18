@@ -46,8 +46,8 @@ public class TestApplication extends SpringBootServletInitializer {
 
         HashMap<String, String> environmentMap = new HashMap<>();
         environmentMap.put("PMA_HOST", (String) mysql.getNetworkAliases().get(0));
-        environmentMap.put("PMA_USER", "root");
-        environmentMap.put("PMA_PASSWORD", "test");
+        environmentMap.put("PMA_USER", "videouser");
+        environmentMap.put("PMA_PASSWORD", "secret1234");
         GenericContainer phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").
                 withEnv(environmentMap).
                 withNetwork(n).
