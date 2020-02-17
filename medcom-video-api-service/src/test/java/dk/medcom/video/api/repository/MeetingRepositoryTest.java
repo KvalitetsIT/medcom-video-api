@@ -13,7 +13,7 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class MeetingRepositoryTest extends RepositoryTest{
+public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Resource
     private MeetingRepository subject;

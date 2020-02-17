@@ -338,11 +338,11 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	SchedulingInfo getUnusedSchedulingInfoForOrganisation(Organisation organisation) throws NotValidDataException {
+	SchedulingInfo getUnusedSchedulingInfoForOrganisation(Organisation organisation) { // TODO Refactor so this can be private
 		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation,  ProvisionStatus.PROVISIONED_OK);
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
-			throw new NotValidDataException("Unused scheduling information not found for organisation " + organisation.getOrganisationId());
+			return null;
 		}
 
 		return schedulingInfos.get(0);
@@ -350,6 +350,11 @@ public class SchedulingInfoService {
 
 	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) throws NotValidDataException {
 		SchedulingInfo schedulingInfo = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+
+		if(schedulingInfo == null) {
+			return null;
+		}
+
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());

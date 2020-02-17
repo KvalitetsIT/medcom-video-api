@@ -134,6 +134,7 @@ public class MeetingServiceTest {
 		schedulingInfo.setProvisionStatus(provisionStatus);
 		Organisation organisation = new Organisation();
 		schedulingInfo.setOrganisation(organisation);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(new SchedulingInfo());
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
 		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
@@ -184,7 +185,7 @@ public class MeetingServiceTest {
 
 		// When
 		updateMeetingDto.setLabels(Arrays.asList("first label", "second label"));
-		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
+		meetingService.updateMeeting(uuid, updateMeetingDto);
 
 		// Then
 		Mockito.verify(meetingLabelRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
@@ -386,7 +387,9 @@ public class MeetingServiceTest {
 		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
 		assertEquals(input.getStartTime(), result.getStartTime());
 
-		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
+
 		ArgumentCaptor<Set<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Set.class);
 		Mockito.verify(meetingLabelRepository, times(1)).save(labelsCaptor.capture());
 		Set<MeetingLabel> savedLabels = labelsCaptor.getValue();
@@ -395,14 +398,10 @@ public class MeetingServiceTest {
 		Optional<MeetingLabel> firstSavedLabel = savedLabels.stream().filter(x -> x.getLabel().equals("first label")).findFirst();
 		assertTrue(firstSavedLabel.isPresent());
 		assertEquals(firstLabel.getLabel(), firstSavedLabel.get().getLabel());
-//		assertEquals(firstLabel.getId(), firstSavedLabel.get().getId());
-//		assertEquals(firstLabel.getMeeting().getId(), firstSavedLabel.get().getMeeting().getId());
 
 		Optional<MeetingLabel> secondSavedLabel = savedLabels.stream().filter(x -> x.getLabel().equals("second label")).findFirst();
 		assertTrue(secondSavedLabel.isPresent());
 		assertEquals(secondLabel.getLabel(), secondSavedLabel.get().getLabel());
-//		assertEquals(secondLabel.getId(), secondSavedLabel.get().getId());
-//		assertEquals(secondLabel.getMeeting().getId(), secondSavedLabel.get().getMeeting().getId());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 	}
@@ -464,7 +463,7 @@ public class MeetingServiceTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
-		List<Meeting> result = meetingService.getMeetingsByOrganizedBy("test@test.dk");
+		meetingService.getMeetingsByOrganizedBy("test@test.dk");
 
 		Mockito.verify(meetingRepository).findByOrganisationAndOrganizedBy(Mockito.any(Organisation.class), Mockito.any(MeetingUser.class));
 	}
@@ -477,7 +476,7 @@ public class MeetingServiceTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
-		List<Meeting> result = meetingService.getMeetingsByUriWithDomain("uriWithDomain");
+		meetingService.getMeetingsByUriWithDomain("uriWithDomain");
 
 		Mockito.verify(meetingRepository).findByUriWithDomainAndOrganizedBy(Mockito.any(MeetingUser.class), Mockito.anyString());
 	}
@@ -490,7 +489,7 @@ public class MeetingServiceTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
-		List<Meeting> result = meetingService.getMeetingsByUriWithDomain("uriWithDomain");
+		meetingService.getMeetingsByUriWithDomain("uriWithDomain");
 
 		Mockito.verify(meetingRepository).findByUriWithDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
 	}
@@ -504,7 +503,7 @@ public class MeetingServiceTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
-		List<Meeting> result = meetingService.getMeetingsByLabel("uriWithDomain");
+		meetingService.getMeetingsByLabel("uriWithDomain");
 
 		Mockito.verify(meetingRepository).findByLabelAndOrganizedBy(Mockito.any(MeetingUser.class), Mockito.eq("uriWithDomain"));
 	}
@@ -517,8 +516,100 @@ public class MeetingServiceTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenThrow(new NotValidDataException("hej hej"));
 
-		List<Meeting> result = meetingService.getMeetingsByLabel("uriWithDomain");
+		meetingService.getMeetingsByLabel("uriWithDomain");
 
 		Mockito.verify(meetingRepository).findByLabelAndOrganisation(Mockito.any(Organisation.class), Mockito.eq("uriWithDomain"));
+	}
+
+	@Test
+	public void testCreateMeetingFromPooledOrganization() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
+	}
+
+	@Test
+	public void testCreateMeetingFromPooledOrganizationNoFreePool() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(null);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
+	}
+
+	@Test
+	public void testCreateMeetingFromNonPooledOrganization() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		meetingUser = new MeetingUser();
+		Organisation organisation = new Organisation();
+		organisation.setOrganisationId("RH");
+		organisation.setName("some name");
+		organisation.setId(1234L);
+//		organisation.setPoolSize(10);
+
+		meetingUser.setOrganisation(organisation);
+		meetingUser.setEmail("test@test.dk");
+
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(null);
+
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}
 }

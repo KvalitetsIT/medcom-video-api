@@ -226,6 +226,27 @@ public class SchedulingInfoServiceTest {
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
+    @Test
+    public void testAttachMeetingToSchedulingInfoNoFreePool() throws NotValidDataException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        assertNull(result);
+    }
+
 
     @Test(expected = NotValidDataException.class)
     public void testCanNotCreateSchedulingInfoOnNonPoolOrganisation() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
@@ -250,7 +271,7 @@ public class SchedulingInfoServiceTest {
     }
 
     @Test
-    public void testGetUnusedSchedulingInfoForOrganisation() throws NotValidDataException {
+    public void testGetUnusedSchedulingInfoForOrganisation() {
         Organisation organisation = new Organisation();
         organisation.setId(1234L);
         organisation.setName("this is org name");
@@ -263,6 +284,22 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
         assertNotNull(schedulingInfo);
     }
+
+    @Test
+    public void testGetUnusedSchedulingInfoForOrganisationNoMoreUnused() {
+        Organisation organisation = new Organisation();
+        organisation.setId(1234L);
+        organisation.setName("this is org name");
+        organisation.setOrganisationId("RH");
+        organisation.setPoolSize(10);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation, ProvisionStatus.PROVISIONED_OK)).thenReturn(Collections.emptyList());
+
+        SchedulingInfo schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
+        assertNull(schedulingInfo);
+    }
+
 
     private SchedulingTemplate createSchedulingTemplate(long id) {
         SchedulingTemplate schedulingTemplate = new SchedulingTemplate();

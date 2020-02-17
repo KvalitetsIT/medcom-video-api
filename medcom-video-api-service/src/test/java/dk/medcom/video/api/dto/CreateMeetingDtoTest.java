@@ -20,7 +20,6 @@ public class CreateMeetingDtoTest {
 
     @Test
     public void deserializeDateFields() throws IOException {
-        System.out.println(TimeZone.getDefault().getRawOffset());
         String input = "{\n" +
                 "    \"subject\": \"this is subject\", \n" +
                 "    \"startTime\": \"2019-12-11T16:01:11 +0100\",\n" +

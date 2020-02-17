@@ -115,11 +115,17 @@ public class MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
+		SchedulingInfo schedulingInfo = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
-			schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+			if(schedulingInfo == null) {
+				throw new NotValidDataException("Unused scheduling information not found for organisation " + meeting.getOrganisation().getOrganisationId());
+			}
 		}
 		else {
-			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+			if(schedulingInfo == null) {
+				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+			}
 		}
 	}
 
