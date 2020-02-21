@@ -74,7 +74,7 @@ public class SchedulingInfoServiceTest {
 
     @Test(expected = RessourceNotFoundException.class)
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, null, organizationRepository);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository);
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date());
     }
@@ -92,7 +92,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
 
@@ -211,7 +211,7 @@ public class SchedulingInfoServiceTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfo() throws NotValidDataException {
+    public void testAttachMeetingToSchedulingInfo() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -233,7 +233,7 @@ public class SchedulingInfoServiceTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoNoFreePool() throws NotValidDataException {
+    public void testAttachMeetingToSchedulingInfoNoFreePool() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -260,7 +260,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository);
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -271,7 +271,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, meetingUserService, organizationRepository);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository);
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -347,7 +347,7 @@ public class SchedulingInfoServiceTest {
     }
 
     private SchedulingInfoService createSchedulingInfoService() {
-        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, null, meetingUserService, organizationRepository);
+        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository);
     }
 
     private Organisation createNonPoolOrganisation()  {

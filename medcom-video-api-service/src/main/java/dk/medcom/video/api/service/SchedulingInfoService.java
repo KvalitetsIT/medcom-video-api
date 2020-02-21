@@ -1,7 +1,6 @@
 package dk.medcom.video.api.service;
 
 
-import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -35,7 +34,6 @@ public class SchedulingInfoService {
 	private SchedulingTemplateRepository schedulingTemplateRepository;
 	private SchedulingTemplateService schedulingTemplateService;
 	private SchedulingStatusService schedulingStatusService;
-	private UserContextService userService;
 	private MeetingUserService meetingUserService;
 	private OrganisationRepository organisationRepository;
 
@@ -43,22 +41,20 @@ public class SchedulingInfoService {
 	private String citizenPortal;		
 	
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService,
-			SchedulingStatusService schedulingStatusService, UserContextService userService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository) {
+			SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
 		this.schedulingStatusService = schedulingStatusService;
-		this.userService = userService;
 		this.meetingUserService = meetingUserService;
 		this.organisationRepository = organisationRepository;
 	}
-	
-	
+
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
 		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
 
-	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException {
 		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		if (schedulingInfo == null) {
@@ -192,7 +188,7 @@ public class SchedulingInfoService {
 		return null;
 	}
 
-	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException  {
+	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException {
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 	//	LOGGER.debug("shedulingInfo found is with uuid:" + schedulingInfo.getUuid());
@@ -244,7 +240,7 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException {
 		LOGGER.debug("Entry deleteSchedulingInfo. uuid=" + uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -348,7 +344,7 @@ public class SchedulingInfoService {
 		return schedulingInfos.get(0);
 	}
 
-	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) throws NotValidDataException {
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
 		SchedulingInfo schedulingInfo = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
 
 		if(schedulingInfo == null) {
