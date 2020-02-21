@@ -104,7 +104,7 @@ public class SchedulingInfoService {
 
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
-		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 	
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		
@@ -316,7 +316,7 @@ public class SchedulingInfoService {
 
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
-		schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());
 		schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());

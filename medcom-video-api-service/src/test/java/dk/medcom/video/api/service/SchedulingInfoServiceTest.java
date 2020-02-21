@@ -45,8 +45,12 @@ public class SchedulingInfoServiceTest {
     private static final long SCHEDULING_TEMPLATE_ID = 1L;
     private static final long SCHEDULING_TEMPLATE_ID_OTHER_ORG = 2L;
 
+    private SchedulingTemplate schedulingTemplateIdOne;
+
     @Before
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
+        schedulingTemplateIdOne = createSchedulingTemplate(SCHEDULING_TEMPLATE_ID);
+
         schedulingInfoUuid = UUID.randomUUID();
         SchedulingInfo schedulingInfo = createSchedulingInfo();
 
@@ -61,10 +65,10 @@ public class SchedulingInfoServiceTest {
         Mockito.when(organizationRepository.findByOrganisationId(POOL_ORG)).thenReturn(createOrganisation());
 
         schedulingTemplateService = Mockito.mock(SchedulingTemplateService.class);
-        Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(createSchedulingTemplate(SCHEDULING_TEMPLATE_ID));
+        Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
 
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-        Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID)).thenReturn(createSchedulingTemplate(SCHEDULING_TEMPLATE_ID));
+        Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
         Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(createSchedulingTemplateOtherOrg());
     }
 
@@ -140,7 +144,7 @@ public class SchedulingInfoServiceTest {
         assertEquals(ProvisionStatus.AWAITS_PROVISION, capturedSchedulingInfo.getProvisionStatus());
         assertEquals(1, capturedSchedulingInfo.getSchedulingTemplate().getId().intValue());
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
-//        assertEquals("1960@test_domain", capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
         assertNotNull(capturedSchedulingInfo.getUriWithDomain());
         assertTrue(capturedSchedulingInfo.getEndMeetingOnEndTime());
         assertEquals(10, capturedSchedulingInfo.getMaxParticipants());
@@ -180,6 +184,8 @@ public class SchedulingInfoServiceTest {
         assertTrue("Host pin should be greater than 0.", capturedSchedulingInfo.getHostPin() > 0);
         assertTrue("Guest pin should be greater than 0.", capturedSchedulingInfo.getGuestPin() > 0);
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+
+        assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
     }
 
     @Test(expected = NotValidDataException.class)
