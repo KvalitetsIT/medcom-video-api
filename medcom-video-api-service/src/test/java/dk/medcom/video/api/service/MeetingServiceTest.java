@@ -612,4 +612,94 @@ public class MeetingServiceTest {
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}
+
+	@Test
+	public void testGenericSearchAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		Calendar oneWeekAgo = Calendar.getInstance();
+		oneWeekAgo.add(Calendar.DATE, -7);
+
+		Calendar now = Calendar.getInstance();
+
+		Meeting meetingOne = createMeeting(1L, now.getTime());
+		Meeting meetingOneDuplicate = createMeeting(1L, now.getTime());
+		Meeting meetingTwo = createMeeting(2L, now.getTime());
+		Meeting meetingPastExcluded = createMeeting(5L, oneWeekAgo.getTime());
+		Meeting meetingThree = createMeeting(3L, now.getTime());
+		Meeting meetingFour = createMeeting(4L, now.getTime());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(null);
+
+		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
+		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
+		Mockito.when(meetingRepository.findByOrganisationAndSubject(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPastExcluded));
+
+		Calendar yesterdayCal = Calendar.getInstance();
+		yesterdayCal.add(Calendar.DATE, -1);
+		Date yesterday = yesterdayCal.getTime();
+		Calendar tomorrowCal = Calendar.getInstance();
+		tomorrowCal.add(Calendar.DATE, 1);
+		Date tomorrow = tomorrowCal.getTime();
+		List<Meeting> result = meetingService.searchMeetings("search", yesterday, tomorrow);
+
+		assertEquals(4, result.size());
+		assertEquals(1, result.get(0).getId().longValue());
+		assertEquals(2, result.get(1).getId().longValue());
+		assertEquals(3, result.get(2).getId().longValue());
+		assertEquals(4, result.get(3).getId().longValue());
+	}
+
+	@Test
+	public void testGenericSearchAdminWithoutDates() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		Calendar oneWeekAgo = Calendar.getInstance();
+		oneWeekAgo.add(Calendar.DATE, -7);
+
+		Calendar now = Calendar.getInstance();
+
+		Meeting meetingOne = createMeeting(1L, now.getTime());
+		Meeting meetingOneDuplicate = createMeeting(1L, now.getTime());
+		Meeting meetingTwo = createMeeting(2L, now.getTime());
+		Meeting meetingPast = createMeeting(5L, oneWeekAgo.getTime());
+		Meeting meetingThree = createMeeting(3L, now.getTime());
+		Meeting meetingFour = createMeeting(4L, now.getTime());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(null);
+
+		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
+		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
+		Mockito.when(meetingRepository.findByOrganisationAndSubject(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPast));
+
+		List<Meeting> result = meetingService.searchMeetings("search", null, null);
+
+		assertEquals(5, result.size());
+		assertEquals(1, result.get(0).getId().longValue());
+		assertEquals(2, result.get(1).getId().longValue());
+		assertEquals(3, result.get(2).getId().longValue());
+		assertEquals(4, result.get(3).getId().longValue());
+		assertEquals(5, result.get(4).getId().longValue());
+	}
+
+	private List<Meeting> wrapInList(Meeting... meeting) {
+		ArrayList<Meeting> list = new ArrayList<>();
+		list.addAll(Arrays.asList(meeting));
+
+		return list;
+	}
+
+	private Meeting createMeeting(Long id, Date startDate) {
+		Meeting meeting = new Meeting();
+		meeting.setId(id);
+		meeting.setStartTime(startDate);
+
+		return meeting;
+	}
 }

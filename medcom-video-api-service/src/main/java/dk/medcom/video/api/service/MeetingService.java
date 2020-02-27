@@ -286,4 +286,28 @@ public class MeetingService {
 			return meetingRepository.findByLabelAndOrganisation(organisationService.getUserOrganisation(), label);
 		}
 	}
+
+    public List<Meeting> searchMeetings(String search, Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
+		Map<Long, Meeting> distinctMeetnings = new HashMap<>();
+
+		List<Meeting> meetings = getMeetingsByOrganizedBy(search);
+		meetings.addAll(getMeetingsByLabel(search));
+		meetings.addAll(getMeetingsBySubject(search));
+		meetings.addAll(getMeetingsByUriWithDomain(search));
+
+		meetings.forEach(meeting -> {
+			boolean includeMeeting = true;
+			if(fromStartTime != null && toStartTime != null) {
+				if (!fromStartTime.before(meeting.getStartTime()) || !toStartTime.after(meeting.getStartTime())) {
+					includeMeeting = false;
+				}
+			}
+
+			if(includeMeeting) {
+				distinctMeetnings.putIfAbsent(meeting.getId(), meeting);
+			}
+		});
+
+		return new ArrayList<>(distinctMeetnings.values());
+    }
 }

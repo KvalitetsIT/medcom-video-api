@@ -1,28 +1,6 @@
 package dk.medcom.video.api.controller;
 
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
@@ -34,6 +12,22 @@ import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.service.MeetingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class MeetingController {
@@ -129,6 +123,34 @@ public class MeetingController {
 		resources.add(selfRelLink);
 
 		LOGGER.debug("end og get meeting by uri with domain: " + resources.toString());
+		return resources;
+	}
+
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params="search")
+	public Resources<MeetingDto> genericSearchMeetings(@RequestParam(name ="search") String search,
+													   @RequestParam(name="from-start-time", required = false) @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ") Date fromStartTime,
+													   @RequestParam(name = "to-start-time", required = false) @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ") Date toStartTime) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
+		LOGGER.debug(String.format("Searching for meetings. Search: %s, fromStartTime: %s, toStartTime: %s.", search, fromStartTime, toStartTime));
+
+		if((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+			throw new NotValidDataException("Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+		}
+
+		List<Meeting> meetings = meetingService.searchMeetings(search, fromStartTime, toStartTime);
+		List<MeetingDto> meetingDtos = new LinkedList<>();
+		for (Meeting meeting : meetings) {
+			MeetingDto meetingDto = new MeetingDto(meeting);
+
+			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+			meetingDto.add(schedulingInfoLink);
+			meetingDtos.add(meetingDto);
+		}
+		Resources<MeetingDto> resources = new Resources<>(meetingDtos);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).genericSearchMeetings(search, fromStartTime, toStartTime)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("End generic search meetings: " + resources.toString());
 		return resources;
 	}
 
