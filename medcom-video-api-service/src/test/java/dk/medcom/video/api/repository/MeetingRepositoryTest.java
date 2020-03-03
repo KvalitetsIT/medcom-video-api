@@ -10,8 +10,7 @@ import org.junit.Test;
 import javax.annotation.Resource;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class MeetingRepositoryTest extends RepositoryTest {
 
@@ -423,5 +422,28 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(7, meeting.getId().longValue());
 		assertEquals("TestMeeting-xyz7", meeting.getSubject());
 		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+	}
+
+	@Test
+	public void testFindByOrganisationAndSubjectLike() {
+		Organisation organisation = subjectO.findOne(5L);
+		String label  = "%Meeting-xyz%";
+
+		List<Meeting> result = subject.findByOrganisationAndSubjectLike(organisation, label);
+
+		assertEquals(4, result.size());
+		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz")));
+	}
+
+	@Test
+	public void testFindOneByOrganisationAndEmail() {
+		Organisation organisation = subjectO.findOne(5L);
+		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
+		String label  = "%Meeting-xyz%";
+
+		List<Meeting> result = subject.findByOrganizedByAndSubjectLike(organizedBy, label);
+
+		assertEquals(1, result.size());
+		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz")));
 	}
 }

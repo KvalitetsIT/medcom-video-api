@@ -21,6 +21,10 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	List<Meeting> findByOrganisationAndSubject(Organisation organisation, String subject);
 
+	List<Meeting> findByOrganizedByAndSubjectLike(MeetingUser organizedBy, String subject);
+
+	List<Meeting> findByOrganisationAndSubjectLike(Organisation organisation, String subject);
+
 	List<Meeting> findByOrganisationAndOrganizedBy(Organisation userOrganisation, MeetingUser organizedBy);
 
 	List<Meeting> findByOrganizedBy(MeetingUser organizedBy);
