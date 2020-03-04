@@ -635,7 +635,7 @@ public class MeetingServiceTest {
 
 		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
 		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
-		Mockito.when(meetingRepository.findByOrganisationAndSubjectLike(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
 		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPastExcluded));
 
 		Calendar yesterdayCal = Calendar.getInstance();
@@ -675,7 +675,7 @@ public class MeetingServiceTest {
 
 		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
 		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
-		Mockito.when(meetingRepository.findByOrganisationAndSubjectLike(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
 		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPast));
 
 		List<Meeting> result = meetingService.searchMeetings("search", null, null);

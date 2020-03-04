@@ -249,13 +249,13 @@ public class MeetingService {
 		}
 	}
 
-	public List<Meeting> getMeetingsBySubjectLike(String subject) throws PermissionDeniedException {
+	public List<Meeting> getMeetingsBySubjectLikeOrDescriptionLike(String searchString) throws PermissionDeniedException {
 		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
 			LOGGER.debug("Finding meetings using findByOrganizedByAndSubjectLike");
-			return meetingRepository.findByOrganizedByAndSubjectLike(meetingUserService.getOrCreateCurrentMeetingUser(),subject);
+			return meetingRepository.findByOrganizedByAndSubjectLikeOrDescriptionLike(meetingUserService.getOrCreateCurrentMeetingUser(), searchString, searchString);
 		} else {
 			LOGGER.debug("Finding meetings using findByOrganisationAndSubjectLike");
-			return meetingRepository.findByOrganisationAndSubjectLike(organisationService.getUserOrganisation(),subject);
+			return meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(organisationService.getUserOrganisation(), searchString, searchString);
 		}
 	}
 
@@ -302,7 +302,7 @@ public class MeetingService {
 
 		List<Meeting> meetings = getMeetingsByOrganizedBy(search);
 		meetings.addAll(getMeetingsByLabel(search));
-		meetings.addAll(getMeetingsBySubjectLike(String.format("%%%s%%", search)));
+		meetings.addAll(getMeetingsBySubjectLikeOrDescriptionLike(String.format("%%%s%%", search)));
 		meetings.addAll(getMeetingsByUriWithDomain(search));
 
 		meetings.forEach(meeting -> {

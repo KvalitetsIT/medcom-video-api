@@ -21,10 +21,6 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	List<Meeting> findByOrganisationAndSubject(Organisation organisation, String subject);
 
-	List<Meeting> findByOrganizedByAndSubjectLike(MeetingUser organizedBy, String subject);
-
-	List<Meeting> findByOrganisationAndSubjectLike(Organisation organisation, String subject);
-
 	List<Meeting> findByOrganisationAndOrganizedBy(Organisation userOrganisation, MeetingUser organizedBy);
 
 	List<Meeting> findByOrganizedBy(MeetingUser organizedBy);
@@ -40,4 +36,10 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	@Query("select l.meeting from MeetingLabel l inner join l.meeting m where l.label = ?2 and m.organizedBy = ?1")
 	List<Meeting> findByLabelAndOrganizedBy(MeetingUser organizedBy, String label);
+
+	@Query("select m from Meeting m where m.organisation = ?1 and (m.subject like ?2 or m.description like ?3)")
+	List<Meeting> findByOrganisationAndSubjectLikeOrDescriptionLike(Organisation userOrganisation, String subject, String description);
+
+	@Query("select m from Meeting m where m.organizedBy = ?1 and (m.subject like ?2 or m.description like ?3)")
+	List<Meeting> findByOrganizedByAndSubjectLikeOrDescriptionLike(MeetingUser orCreateCurrentMeetingUser, String subject, String description);
 }

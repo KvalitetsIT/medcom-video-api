@@ -362,8 +362,6 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(organizedBy.getEmail(), meeting.getOrganizedByUser().getEmail());
 	}
 
-
-
 	@Test
 	public void testGetByUriWithDomainAndOrganisation() {
 		Organisation organisation = subjectO.findOne(5L);
@@ -428,22 +426,24 @@ public class MeetingRepositoryTest extends RepositoryTest {
 	public void testFindByOrganisationAndSubjectLike() {
 		Organisation organisation = subjectO.findOne(5L);
 		String label  = "%Meeting-xyz%";
+		String description = "%beskrivelse%";
 
-		List<Meeting> result = subject.findByOrganisationAndSubjectLike(organisation, label);
+		List<Meeting> result = subject.findByOrganisationAndSubjectLikeOrDescriptionLike(organisation, label, description);
 
-		assertEquals(4, result.size());
-		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz")));
+		assertEquals(5, result.size());
+		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz") || x.getDescription().contains("beskrivelse")));
 	}
 
 	@Test
 	public void testFindOneByOrganisationAndEmail() {
 		Organisation organisation = subjectO.findOne(5L);
-		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
+		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me101.dk");
 		String label  = "%Meeting-xyz%";
+		String description = "%beskrivelse%";
 
-		List<Meeting> result = subject.findByOrganizedByAndSubjectLike(organizedBy, label);
+		List<Meeting> result = subject.findByOrganizedByAndSubjectLikeOrDescriptionLike(organizedBy, label, description);
 
-		assertEquals(1, result.size());
-		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz")));
+		assertEquals(4, result.size());
+		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz") || x.getDescription().contains("beskrivelse")));
 	}
 }
