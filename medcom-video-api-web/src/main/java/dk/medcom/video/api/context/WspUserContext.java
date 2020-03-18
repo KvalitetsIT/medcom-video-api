@@ -103,10 +103,10 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 
 	public SessionData getSessionData() {
 		String sessionDataFromHeader = getSessiondataFromHeader();
-		if (sessionDataFromHeader != null && sessionDataFromHeader.isBlank()) {
-			
+		if (sessionDataFromHeader != null && !sessionDataFromHeader.equals("")) {
+			return parseSessionDataValue(sessionDataFromHeader);
 		}
-		
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(sessionId, getSessionId());
 		HttpEntity<Void> request = new HttpEntity<>(headers);
