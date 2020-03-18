@@ -24,3 +24,12 @@ Integrations testen udføres fra Postman scripts. Se video infrastuktur projekte
 https://github.com/KvalitetsIT/medcom-video-infrastructure/tree/master/postman
 
 For at køre disse scripts mod udviklings versionen i f.eks. eclipse, køres klassen TestApplication.java i MVN modulet medcom-video-api-test. User context sættes inden i klassen TestUserContext i samme modul. User Context har indvirkning på, hvilke data der kan oprettes, hentes og rettes. I samme modul findes også script til test data V901__insert _test_data.sql, som indlæses i en tom database når TestApplication.java køres.
+
+
+## Drift
+### Environment variables
+Video api'et afvikles i docker. Følgende environment variable kan sættes op:
+
+| Environment variable       | Beskrivelse                                                                                    |           Tvunget / Default  |
+| -------------------------- |------------------------------------------------------------------------------------------------| -----------------------------|
+| sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn | Ikke tvunget/ Ingen default  |

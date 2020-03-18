@@ -1,5 +1,7 @@
 package dk.medcom.video.api.context;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,14 +20,22 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Component
 public class WspUserContext extends RestTemplate implements UserContextFactory {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(WspUserContext.class);
 
+	private ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+	
 	@Value("${SESSION.ID:SESSION}")
 	private String sessionId;
 
+	@Value("${sessiondata.headername:}")
+	private String sessionDataHttpHeaderInput;
+	
 	@Value("${userservice.url}")
 	private String userServiceUrl;
 
@@ -92,6 +102,11 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	}
 
 	public SessionData getSessionData() {
+		String sessionDataFromHeader = getSessiondataFromHeader();
+		if (sessionDataFromHeader != null && sessionDataFromHeader.isBlank()) {
+			
+		}
+		
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(sessionId, getSessionId());
 		HttpEntity<Void> request = new HttpEntity<>(headers);
@@ -104,6 +119,35 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 		}
 	}		
 
+	public SessionData parseSessionDataValue(String encoded) {
+		String decoded = "";
+		try {
+			decoded = new String(Base64.getDecoder().decode(encoded));
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("Failed to decode headervalue: "+encoded);
+			return null;
+		}
+	    try {
+			SessionData sessionData = mapper.readValue(decoded, SessionData.class);
+			if (!sessionData.containsUserAttributes()) {
+				return null;
+			}
+			return sessionData;
+		} catch (IOException e) {
+			LOGGER.error("Failed to parse headervalue: "+decoded);
+			return null;
+		}
+		
+	}
+	
+	private String getSessiondataFromHeader() {
+		if (sessionDataHttpHeaderInput != null && !sessionDataHttpHeaderInput.equals("")) {
+			HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			return servletRequest.getHeader(sessionDataHttpHeaderInput);
+		}
+		return null;
+	}
+	
 	private String getSessionId() {
 		HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		return servletRequest.getHeader(sessionId);
