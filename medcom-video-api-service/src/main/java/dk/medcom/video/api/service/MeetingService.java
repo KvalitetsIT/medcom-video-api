@@ -115,6 +115,11 @@ public class MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
+		if(isFutureMeeting(createMeetingDto)) {
+			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+			return;
+		}
+
 		SchedulingInfo schedulingInfo = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
@@ -127,6 +132,13 @@ public class MeetingService {
 				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			}
 		}
+	}
+
+	private boolean isFutureMeeting(CreateMeetingDto createMeetingDto) {
+		Calendar now = Calendar.getInstance();
+		now.add(Calendar.MINUTE, 1);
+
+		return createMeetingDto.getStartTime().after(now.getTime());
 	}
 
 	Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
