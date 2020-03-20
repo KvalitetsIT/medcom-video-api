@@ -36,4 +36,8 @@ public class SessionData {
 		}
 		return null;
 	}
+	
+	public boolean containsUserAttributes() {
+		return UserAttributes != null;
+	}
 }
