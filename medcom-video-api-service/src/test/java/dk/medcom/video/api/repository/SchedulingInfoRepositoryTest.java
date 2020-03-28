@@ -1,6 +1,7 @@
 package dk.medcom.video.api.repository;
 
 
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -327,10 +328,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Organisation organisation = new Organisation();
 		organisation.setId(7L);
 
-		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation, ProvisionStatus.PROVISIONED_OK);
+		List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name());
 		assertNotNull(schedulingInfos);
 		assertEquals(1, schedulingInfos.size());
-		assertEquals(new Long(207), schedulingInfos.get(0).getId());
+		assertEquals(207, schedulingInfos.get(0).intValue());
 	}
 
 	@Test

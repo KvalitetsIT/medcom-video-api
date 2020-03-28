@@ -20,7 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -65,6 +67,7 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException {
 		LOGGER.debug("Entry createSchedulingInfo");
 		SchedulingTemplate schedulingTemplate = null;
@@ -188,6 +191,7 @@ public class SchedulingInfoService {
 		return null;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException {
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -218,6 +222,7 @@ public class SchedulingInfoService {
 	}
 	
 	//used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
 		
@@ -240,6 +245,7 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException {
 		LOGGER.debug("Entry deleteSchedulingInfo. uuid=" + uuid);
 		
@@ -275,6 +281,7 @@ public class SchedulingInfoService {
 		return portalLink;
 	}
 
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		LOGGER.debug("Entry createSchedulingInfo");
 
@@ -334,18 +341,23 @@ public class SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	SchedulingInfo getUnusedSchedulingInfoForOrganisation(Organisation organisation) { // TODO Refactor so this can be private
-		List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation,  ProvisionStatus.PROVISIONED_OK);
+	@Transactional(rollbackFor = Throwable.class)
+	Long getUnusedSchedulingInfoForOrganisation(Organisation organisation) { // TODO Refactor so this can be private
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			return null;
 		}
 
-		return schedulingInfos.get(0);
+		return schedulingInfos.get(0).longValue();
 	}
 
 	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
-		SchedulingInfo schedulingInfo = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+		SchedulingInfo schedulingInfo = null;
+		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+		if (unusedId != null) {
+			schedulingInfo = schedulingInfoRepository.findOne(unusedId);
+		}
 
 		if(schedulingInfo == null) {
 			return null;

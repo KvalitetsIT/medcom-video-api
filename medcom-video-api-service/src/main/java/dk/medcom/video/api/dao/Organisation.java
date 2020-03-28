@@ -56,5 +56,4 @@ public class Organisation {
 	public String toString() {
 		return name;
 	}
-
 }
