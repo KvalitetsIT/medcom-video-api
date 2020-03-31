@@ -213,7 +213,10 @@ public class SchedulingInfoService {
 		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
-		
+		if(schedulingInfo.getProvisionStatus() == ProvisionStatus.DEPROVISION_OK) {
+			schedulingInfo.setUriWithoutDomain(null);
+		}
+
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
 		

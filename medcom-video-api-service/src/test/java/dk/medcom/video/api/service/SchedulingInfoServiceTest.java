@@ -11,6 +11,7 @@ import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
@@ -47,6 +48,7 @@ public class SchedulingInfoServiceTest {
     private static final long SCHEDULING_TEMPLATE_ID_OTHER_ORG = 2L;
 
     private SchedulingTemplate schedulingTemplateIdOne;
+    private SchedulingStatusService schedulingStatusService;
 
     @Before
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
@@ -74,6 +76,8 @@ public class SchedulingInfoServiceTest {
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
         Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(createSchedulingTemplateOtherOrg());
+
+        schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
     }
 
     @Test(expected = RessourceNotFoundException.class)
@@ -110,6 +114,69 @@ public class SchedulingInfoServiceTest {
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
         assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
     }
+
+    @Test
+    public void testUpdateSchedulingInfoDeProvision() throws RessourceNotFoundException, PermissionDeniedException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository);
+
+        UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
+        input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
+        input.setProvisionStatusDescription("OK");
+        input.setProvisionVmrId("vmr");
+
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), input);
+
+        assertNotNull(schedulingInfo);
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertNull(capturedSchedulingInfo.getUriWithoutDomain());
+    }
+
+    @Test
+    public void testUpdateSchedulingInfoProvisionedOk() throws RessourceNotFoundException, PermissionDeniedException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository);
+
+        UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
+        input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
+        input.setProvisionStatusDescription("OK");
+        input.setProvisionVmrId("vmr");
+
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), input);
+
+        assertNotNull(schedulingInfo);
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+    }
+
 
     @Test
     public void testCreateSchedulingInfoPooling() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
@@ -346,6 +413,7 @@ public class SchedulingInfoServiceTest {
         schedulingInfo.setVMRAvailableBefore(10);
         schedulingInfo.setUuid(schedulingInfoUuid.toString());
         schedulingInfo.setOrganisation(createOrganisation());
+        schedulingInfo.setUriWithoutDomain("random_uri");
 
         return schedulingInfo;
     }
