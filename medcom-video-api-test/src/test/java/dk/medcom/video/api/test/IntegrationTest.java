@@ -17,6 +17,10 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,6 +45,8 @@ public class IntegrationTest {
 
 	private static Network dockerNetwork;
 	private static GenericContainer resourceContainer;
+	private static GenericContainer videoApi;
+	private static Integer videoApiPort;
 
 	@BeforeClass
 	public static void setup() {
@@ -80,14 +86,14 @@ public class IntegrationTest {
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// VideoAPI
-		GenericContainer videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api-web:latest")
+		videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api-web:latest")
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
 				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb")
 				.withEnv("jdbc_user", "videouser")
 				.withEnv("jdbc_pass", "secret1234")
-				.withEnv("userservice_url", "http://userservice")
+				.withEnv("userservice_url", "http://userservice:1080")
 				.withEnv("userservice_token_attribute_organisation", "organisation_id")
 				.withEnv("userservice_token_attribute_username", "username")
 				.withEnv("userservice.token.attribute.email", "email")
@@ -112,9 +118,13 @@ public class IntegrationTest {
 				.withEnv("mapping.role.admin", "dk:medcom:role:admin")
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
 				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
+				.withEnv("LOG_LEVEL", "debug")
+				.withEnv("flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/info").forStatusCode(200));
 		videoApi.start();
+		videoApiPort = videoApi.getMappedPort(8080);
 		attachLogger(videoApi, videoApiLogger);
 
 
@@ -172,8 +182,36 @@ public class IntegrationTest {
 		assertEquals(0, errors);
 	}
 
+	@Test(expected = ForbiddenException.class)
+	public void testCanNotReadOtherOrganisation()  {
+		String result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc1")
+				.request()
+				.get(String.class);
+	}
+
+	@Test
+	public void testCanReadMeeting() {
+		String result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc2")
+				.request()
+				.get(String.class);
+		System.out.println("hejsa");
+	}
+
+	WebTarget getClient() {
+		WebTarget target =  ClientBuilder.newClient()
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort)));
+
+
+
+		return target;
+	}
+
 	private static HttpResponse getResponse() {
-		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"ADMIN\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
 	}
 }
 
