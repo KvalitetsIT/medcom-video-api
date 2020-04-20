@@ -5,6 +5,7 @@ import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.PoolInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -38,12 +39,16 @@ public class PoolInfoServiceTest {
         List<Organisation> organisations = createOrganisationList();
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
         Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
+        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
 
         SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
 
-        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository);
+        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
+
+        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -76,7 +81,10 @@ public class PoolInfoServiceTest {
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.emptyList());
 
-        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository);
+        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
+
+        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -109,7 +117,10 @@ public class PoolInfoServiceTest {
         SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull()).thenReturn(Collections.singletonList(schedulingTemplate));
 
-        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository);
+        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
+
+        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -138,6 +149,24 @@ public class PoolInfoServiceTest {
         organisations.add(createOrganiztion(2));
 
         return organisations;
+    }
+
+    private List<dk.medcom.video.api.organisation.Organisation> createStrategyOrganisationList() {
+        List<Organisation> organisations = new ArrayList<>();
+
+        organisations.add(createOrganiztion(1));
+        organisations.add(createOrganiztion(2));
+
+        List<dk.medcom.video.api.organisation.Organisation> returnOrganisations = new ArrayList<>();
+        organisations.forEach(x -> {
+            dk.medcom.video.api.organisation.Organisation organisation = new dk.medcom.video.api.organisation.Organisation();
+            organisation.setCode(x.getOrganisationId());
+            organisation.setPoolSize(x.getPoolSize());
+
+            returnOrganisations.add(organisation);
+        });
+
+        return returnOrganisations;
     }
 
     private Organisation createOrganiztion(int organizationId) {

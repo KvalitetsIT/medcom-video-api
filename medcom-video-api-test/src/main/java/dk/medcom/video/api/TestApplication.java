@@ -9,9 +9,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -23,11 +26,14 @@ import java.util.function.Consumer;
 @Configuration
 @ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration"})
 public class TestApplication extends SpringBootServletInitializer {
-	private DataSource dataSource;
+    private static GenericContainer testOrganisationFrontend;
+    private DataSource dataSource;
 
 	public static void main(String[] args) {
         Network n = Network.newNetwork();
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5")
+	    createOrganisationService(n);
+
+		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
                 .withDatabaseName("videodb")
                 .withUsername("videouser")
                 .withPassword("secret1234")
@@ -36,6 +42,7 @@ public class TestApplication extends SpringBootServletInitializer {
         mysql.start();
         String jdbcUrl = mysql.getJdbcUrl();
         System.setProperty("jdbc.url", jdbcUrl);
+        System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
@@ -54,10 +61,54 @@ public class TestApplication extends SpringBootServletInitializer {
                 withCreateContainerCmdModifier(cmd);
         phpMyAdmin.start();
 
+
 		SpringApplication.run(new Object[] { TestApplication.class }, args);
 	}
 
-	public TestApplication(DataSource dataSource) {
+    private static void createOrganisationService(Network n) {
+        MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+                .withDatabaseName("organisationdb")
+                .withUsername("orguser")
+                .withPassword("secret1234")
+                .withNetwork(n)
+                .withNetworkAliases("organisationdb")
+                ;
+
+        organisationMysql.start();
+
+        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+                .withNetwork(n)
+                .withNetworkAliases("organisationservice")
+                .withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
+                .withEnv("jdbc_user", "orguser")
+                .withEnv("jdbc_pass", "secret1234")
+                .withEnv("usercontext_header_name", "X-Test-Auth")
+                .withEnv("userattributes_role_key", "UserRoles")
+                .withEnv("userattributes_org_key", "organisation")
+                .withEnv("userrole_admin_values", "adminrole")
+                .withEnv("userrole_user_values", "userrole1,userrole2")
+                .withEnv("userrole_monitor_values", "monitorrole")
+                .withEnv("userrole_provisioner_values", "provisionerrole")
+                .withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+                .withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
+                .withExposedPorts(8080)
+                ;
+
+        organisationContainer.start();
+        organisationContainer.withLogConsumer(outputFrame -> System.out.println(outputFrame));
+        testOrganisationFrontend = new GenericContainer("kvalitetsit/gooioidwsrest:1.1.14")
+                .withNetwork(n)
+                .withNetworkAliases("organisationfrontend")
+                .withCommand("-config", "/caddy/config.json")
+                .withClasspathResourceMapping("organisation/caddy.json", "/caddy/config.json", BindMode.READ_ONLY)
+                .withExposedPorts(80)
+                .waitingFor(Wait.forLogMessage(".*", 1));
+
+        testOrganisationFrontend.start();
+
+    }
+
+    public TestApplication(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 

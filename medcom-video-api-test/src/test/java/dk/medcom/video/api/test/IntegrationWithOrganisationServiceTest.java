@@ -35,7 +35,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
-public class IntegrationTest {
+public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
@@ -47,10 +47,13 @@ public class IntegrationTest {
 	private static GenericContainer resourceContainer;
 	private static GenericContainer videoApi;
 	private static Integer videoApiPort;
+	private static GenericContainer testOrganisationFrontend;
 
 	@BeforeClass
 	public static void setup() {
 		dockerNetwork = Network.newNetwork();
+
+		createOrganisationService(dockerNetwork);
 
         resourceContainer = new GenericContainer<>(new ImageFromDockerfile()
                 .withFileFromClasspath("/collections/medcom-video-api.postman_collection.json", "docker/collections/medcom-video-api.postman_collection.json")
@@ -118,18 +121,16 @@ public class IntegrationTest {
 				.withEnv("mapping.role.admin", "dk:medcom:role:admin")
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
 				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
-				.withEnv("LOG_LEVEL", "debug")
+//				.withEnv("LOG_LEVEL", "debug")
 				.withEnv("flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
-				.withEnv("organisation.service.enabled", "false")
-				.withEnv("organisation.service.endpoint", "http://localhost:8080")
+				.withEnv("organisation.service.enabled", "true")
+				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		attachLogger(videoApi, videoApiLogger);
-
-
 	}
 
 	private static void attachLogger(GenericContainer container, Logger logger) {
@@ -211,6 +212,50 @@ public class IntegrationTest {
 
 	private static HttpResponse getResponse() {
 		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+	}
+
+
+	private static void createOrganisationService(Network n) {
+		MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+				.withDatabaseName("organisationdb")
+				.withUsername("orguser")
+				.withPassword("secret1234")
+				.withNetwork(n)
+				.withNetworkAliases("organisationdb")
+				;
+
+		organisationMysql.start();
+
+		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+				.withNetwork(n)
+				.withNetworkAliases("organisationservice")
+				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
+				.withEnv("jdbc_user", "orguser")
+				.withEnv("jdbc_pass", "secret1234")
+				.withEnv("usercontext_header_name", "X-Test-Auth")
+				.withEnv("userattributes_role_key", "UserRoles")
+				.withEnv("userattributes_org_key", "organisation")
+				.withEnv("userrole_admin_values", "adminrole")
+				.withEnv("userrole_user_values", "userrole1,userrole2")
+				.withEnv("userrole_monitor_values", "monitorrole")
+				.withEnv("userrole_provisioner_values", "provisionerrole")
+				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+				.withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
+				.withExposedPorts(8080)
+				;
+
+		organisationContainer.start();
+		organisationContainer.withLogConsumer(outputFrame -> System.out.println(outputFrame));
+		testOrganisationFrontend = new GenericContainer("kvalitetsit/gooioidwsrest:1.1.14")
+				.withNetwork(n)
+				.withNetworkAliases("organisationfrontend")
+				.withCommand("-config", "/caddy/config.json")
+				.withClasspathResourceMapping("organisation/caddy.json", "/caddy/config.json", BindMode.READ_ONLY)
+				.withExposedPorts(80)
+				.waitingFor(Wait.forLogMessage(".*", 1));
+
+		testOrganisationFrontend.start();
+
 	}
 }
 

@@ -13,6 +13,7 @@ import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
@@ -38,18 +39,20 @@ public class SchedulingInfoService {
 	private SchedulingStatusService schedulingStatusService;
 	private MeetingUserService meetingUserService;
 	private OrganisationRepository organisationRepository;
+	private OrganisationStrategy organisationStrategy;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
 	
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService,
-			SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository) {
+			SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
 		this.schedulingStatusService = schedulingStatusService;
 		this.meetingUserService = meetingUserService;
 		this.organisationRepository = organisationRepository;
+		this.organisationStrategy = organisationStrategy;
 	}
 
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
@@ -290,13 +293,13 @@ public class SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 
-		Organisation organisation = organisationRepository.findByOrganisationId(createSchedulingInfoDto.getOrganizationId());
+		dk.medcom.video.api.organisation.Organisation organisation = organisationStrategy.findOrganisationByCode(createSchedulingInfoDto.getOrganizationId());
 		if(organisation == null) {
 			throw new NotValidDataException(String.format("OrganisationId %s in request not found.", createSchedulingInfoDto.getOrganizationId()));
 		}
 
 		if(organisation.getPoolSize() == null) {
-			throw new NotValidDataException(String.format("Scheduling information can not be created on organisation %s that is not pool enabled.", organisation.getOrganisationId()));
+			throw new NotValidDataException(String.format("Scheduling information can not be created on organisation %s that is not pool enabled.", organisation.getCode()));
 		}
 
 		//if template is input and is related to the users organisation use that. Otherwise find default.
@@ -335,13 +338,26 @@ public class SchedulingInfoService {
 
 		schedulingInfo.setCreatedTime(new Date());
 
-		schedulingInfo.setOrganisation(organisation);
+		schedulingInfo.setOrganisation(ensureOrganisationCreated(createSchedulingInfoDto.getOrganizationId()));
 		schedulingInfo.setUuid(UUID.randomUUID().toString());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
+	}
+
+	private Organisation ensureOrganisationCreated(String organisationCode) {
+		Organisation dbOrganisation = organisationRepository.findByOrganisationId(organisationCode);
+		if(dbOrganisation == null) {
+			dbOrganisation = new Organisation();
+			dbOrganisation.setOrganisationId(organisationCode);
+
+			dbOrganisation = organisationRepository.save(dbOrganisation);
+		}
+
+		return dbOrganisation;
+
 	}
 
 	@Transactional(rollbackFor = Throwable.class)

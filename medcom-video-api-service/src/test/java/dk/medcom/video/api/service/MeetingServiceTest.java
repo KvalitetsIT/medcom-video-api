@@ -106,10 +106,14 @@ public class MeetingServiceTest {
 	}
 
 	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException {
-		return createMeetingServiceMocked(userContext, meetingUser, meetingUuid, provisionStatus, meetingLabelRepository);
+		return createMeetingServiceMocked(userContext, meetingUser, meetingUuid, provisionStatus, meetingLabelRepository, null);
 	}
 
-	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, MeetingLabelRepository meetingLabelRepository) throws PermissionDeniedException, RessourceNotFoundException {
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, Integer userOrganisationPoolSize) throws PermissionDeniedException, RessourceNotFoundException {
+		return createMeetingServiceMocked(userContext, meetingUser, meetingUuid, provisionStatus, meetingLabelRepository, userOrganisationPoolSize);
+	}
+
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, MeetingLabelRepository meetingLabelRepository, Integer userOrganistionPoolSize) throws PermissionDeniedException, RessourceNotFoundException {
 
 		meetingRepository = Mockito.mock(MeetingRepository.class);
 		MeetingUserService meetingUserService = Mockito.mock(MeetingUserService.class);
@@ -128,6 +132,9 @@ public class MeetingServiceTest {
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser(Mockito.anyString())).thenReturn(meetingUserOrganizer);
 
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
+		Mockito.when(organisationService.getPoolSizeForOrganisation(null)).thenReturn(null);
+		Mockito.when(organisationService.getPoolSizeForUserOrganisation()).thenReturn(userOrganistionPoolSize);
+
 		Meeting meetingInService = getMeetingWithDefaultValues(meetingUser, meetingUuid);
 		Mockito.when(meetingRepository.findOneByUuid(Mockito.anyString())).thenReturn(meetingInService);
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
@@ -322,7 +329,7 @@ public class MeetingServiceTest {
 		// Stuff
 		input.setEndTime(new Date());
 
-		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
 		assertEquals(uuid.toString(), result.getUuid());
@@ -351,7 +358,7 @@ public class MeetingServiceTest {
 		// Stuff
 		input.setEndTime(new Date());
 
-		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
 		assertEquals(uuid.toString(), result.getUuid());
@@ -409,7 +416,7 @@ public class MeetingServiceTest {
 		input.setEndTime(new Date());
 		input.setLabels(Arrays.asList("first label", "second label"));
 
-		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository);
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
 		assertEquals(uuid.toString(), result.getUuid());
@@ -463,7 +470,7 @@ public class MeetingServiceTest {
 		input.setEndTime(new Date());
 		input.setLabels(Arrays.asList("first label", "second label"));
 
-		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository);
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
 		assertEquals(uuid.toString(), result.getUuid());

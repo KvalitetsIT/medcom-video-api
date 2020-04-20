@@ -102,7 +102,8 @@ public class MeetingService {
 //		meeting.setUpdatedTime(calendarNow.getTime());
 //		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
-		if(meeting.getOrganisation().getPoolSize() == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
+		Integer poolSize = organisationService.getPoolSizeForUserOrganisation();
+		if(poolSize == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
 		}
 
@@ -180,8 +181,9 @@ public class MeetingService {
 		}
 		
 		validateDate(updateMeetingDto.getEndTime());
+		Integer poolSize = organisationService.getPoolSizeForOrganisation(schedulingInfo.getOrganisation().getOrganisationId());
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION ||
-				(schedulingInfo.getProvisionStatus() == ProvisionStatus.PROVISIONED_OK && schedulingInfo.getOrganisation().getPoolSize() != null)) {  //only when this status must all but endTime be updated
+				(schedulingInfo.getProvisionStatus() == ProvisionStatus.PROVISIONED_OK && poolSize != null)) {  //only when this status must all but endTime be updated
 			validateDate(updateMeetingDto.getStartTime());
 			
 			meeting.setSubject(updateMeetingDto.getSubject());
