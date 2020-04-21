@@ -34,7 +34,6 @@ abstract public class RepositoryTest {
 		mysql.start();
 				
 		String jdbcUrl = mysql.getJdbcUrl() + "?useSSL=false";
-		System.out.println(jdbcUrl);
 		System.setProperty("jdbc.url", jdbcUrl);
 	}
 }
