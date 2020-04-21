@@ -1,4 +1,4 @@
-#! /bin/ash
+#! /bin/bash
 if [ "$CONTAINER_TIMEZONE" = "" ]
 then
    echo "Using default timezone"

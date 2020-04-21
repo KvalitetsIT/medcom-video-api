@@ -12,7 +12,7 @@ import dk.medcom.video.api.service.SchedulingInfoService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -42,7 +42,7 @@ public class SchedulingInfoControllerTest {
         Mockito.when(schedulingInfoService.createSchedulingInfo(input)).thenReturn(expectedSchedulingInfoResult);
 
         SchedulingInfoController controller = new SchedulingInfoController(schedulingInfoService);
-        Resource<SchedulingInfoDto> result = controller.createSchedulingInfo(input);
+        EntityModel<SchedulingInfoDto> result = controller.createSchedulingInfo(input);
 
         assertNotNull(result);
         assertNotNull(result.getContent());

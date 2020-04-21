@@ -36,10 +36,10 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		meeting.setSubject("Test meeting");
 		meeting.setUuid(uuid);
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		meeting.setOrganisation(organisation);
 		
-		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
 	    meeting.setMeetingUser(meetingUser);
 	    
 	    meeting.setOrganizedByUser(meetingUser);
@@ -107,10 +107,10 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		// Given
 		Long id = 1L;
 		Long organisationId = 5L;
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		// When
-		Meeting meeting = subject.findOne(id);
+		Meeting meeting = subject.findById(id).orElse(null);
 		
 		// Then
 		assertNotNull(meeting);
@@ -127,7 +127,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long id = 1999L;
 		
 		// When
-		Meeting meeting = subject.findOne(id);
+		Meeting meeting = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(meeting);
@@ -168,7 +168,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.FEBRUARY, 1, 1, 1, 1);
 		Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER,31,23,59, 0);
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 	    
 		
 		// When
@@ -186,7 +186,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.FEBRUARY, 1, 1, 1, 1);
 		Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER,31,23,59, 0);
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		// When
 		List<Meeting> meetings = subject.findByOrganisationAndStartTimeBetween(organisation, calendarFrom.getTime(), calendarTo.getTime());
@@ -204,7 +204,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long meetingUserId = 101L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
 			
 		// Then
 		assertNotNull(meeting);
@@ -220,8 +220,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long meetingUserId = 103L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
-	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
+	    MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
 	    meeting.setMeetingUser(meetingUser);	    
 			
 		// Then
@@ -238,7 +238,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long organizedByUserId = 101L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
 			
 		// Then
 		assertNotNull(meeting);
@@ -254,8 +254,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long organizedByUserId = 105L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
-	    MeetingUser meetingUser = subjectMU.findOne(organizedByUserId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
+	    MeetingUser meetingUser = subjectMU.findById(organizedByUserId).orElse(null);
 	    meeting.setOrganizedByUser(meetingUser);	    
 			
 		// Then
@@ -273,7 +273,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long updatedByUserId = 101L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
 			
 		// Then
 		assertNotNull(meeting);
@@ -289,8 +289,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		Long updatedByUserId = 105L;
 			
 		// When
-		Meeting meeting = subject.findOne(meetingId);
-	    MeetingUser meetingUser = subjectMU.findOne(updatedByUserId);
+		Meeting meeting = subject.findById(meetingId).orElse(null);
+	    MeetingUser meetingUser = subjectMU.findById(updatedByUserId).orElse(null);
 	    meeting.setUpdatedByUser(meetingUser);	    
 			
 		// Then
@@ -302,7 +302,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByOrganizedByAndSubject() {
-		MeetingUser organizedBy = subjectMU.findOne(102L);
+		MeetingUser organizedBy = subjectMU.findById(102L).orElse(null);
 		String meetingSubject = "MyMeeting4";
 
 		List<Meeting> result = subject.findByOrganizedByAndSubject(organizedBy, meetingSubject);
@@ -317,7 +317,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByOrganisationByAndSubject() {
-		Organisation organisation = subjectO.findOne(6L);
+		Organisation organisation = subjectO.findById(6L).orElse(null);
 		String meetingSubject = "MyMeeting4";
 
 		List<Meeting> result = subject.findByOrganisationAndSubject(organisation, meetingSubject);
@@ -332,7 +332,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByOrganisationAndOrganizedBy() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
 
 		List<Meeting> result = subject.findByOrganisationAndOrganizedBy(organisation, organizedBy);
@@ -348,7 +348,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByOrganizedBy() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me105organizer.dk");
 
 		List<Meeting> result = subject.findByOrganizedBy(organizedBy);
@@ -364,7 +364,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByUriWithDomainAndOrganisation() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		String uriWithDomain  = "1236@test.dk";
 
 		List<Meeting> result = subject.findByUriWithDomainAndOrganisation(organisation, uriWithDomain);
@@ -379,10 +379,10 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByUriWithDomainAndOrganizedBy() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		String uriWithDomain  = "1236@test.dk";
 
-		List<Meeting> result = subject.findByUriWithDomainAndOrganizedBy(subjectMU.findOne(101L), uriWithDomain);
+		List<Meeting> result = subject.findByUriWithDomainAndOrganizedBy(subjectMU.findById(101L).orElse(null), uriWithDomain);
 
 		assertEquals(1, result.size());
 
@@ -394,7 +394,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByLabelAndOrganisation() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		String label  = "second label";
 
 		List<Meeting> result = subject.findByLabelAndOrganisation(organisation, label);
@@ -409,10 +409,10 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetByLabelAndOrganizedBy() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		String label  = "second label";
 
-		List<Meeting> result = subject.findByLabelAndOrganizedBy(subjectMU.findOne(101L), label);
+		List<Meeting> result = subject.findByLabelAndOrganizedBy(subjectMU.findById(101L).orElse(null), label);
 
 		assertEquals(1, result.size());
 
@@ -424,7 +424,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testFindByOrganisationAndSubjectLike() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		String label  = "%Meeting-xyz%";
 		String description = "%beskrivelse%";
 
@@ -436,7 +436,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testFindOneByOrganisationAndEmail() {
-		Organisation organisation = subjectO.findOne(5L);
+		Organisation organisation = subjectO.findById(5L).orElse(null);
 		MeetingUser organizedBy = subjectMU.findOneByOrganisationAndEmail(organisation, "me@me101.dk");
 		String label  = "%Meeting-xyz%";
 		String description = "%beskrivelse%";

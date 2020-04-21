@@ -3,9 +3,9 @@ package dk.medcom.video.api.dto;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
-public class CreateSchedulingTemplateDto extends ResourceSupport {
+public class CreateSchedulingTemplateDto extends RepresentationModel {
 	@NotNull
 	private Long conferencingSysId;
 	

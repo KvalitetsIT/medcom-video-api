@@ -1,14 +1,12 @@
 package dk.medcom.video.api.repository;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import dk.medcom.video.api.dao.Organisation;
+import dk.medcom.video.api.dao.SchedulingTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.dao.SchedulingTemplate;
+import javax.annotation.Resource;
+import java.util.List;
 
 public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
@@ -39,7 +37,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long uriNumberRangeHigh = 9997L;
 		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 		schedulingTemplate.setOrganisation(organisation);
@@ -107,7 +105,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long id = 1L;
 		
 		// When
-		SchedulingTemplate schedulingTemplate = subject.findOne(id);
+		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNotNull(schedulingTemplate);
@@ -136,7 +134,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long id = 1999L;
 		
 		// When
-		SchedulingTemplate schedulingTemplate = subject.findOne(id);
+		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(schedulingTemplate);
@@ -144,7 +142,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindScheduligTemplateWithExistingOrganisation() {
 		// Given
-		Organisation organisation = subjectO.findOne(1L);
+		Organisation organisation = subjectO.findById(1L).orElse(null);
 		
 		// When	
 		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndDeletedTimeIsNull(organisation); 
@@ -219,7 +217,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindScheduligTemplateWithExistingOrganisationAndIsDefault() {
 		// Given
-		Organisation organisation = subjectO.findOne(3L);
+		Organisation organisation = subjectO.findById(3L).orElse(null);
 		
 		// When	
 		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true); 
@@ -232,7 +230,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindScheduligTemplateWithExistingOrganisationAndId() {
 		// Given
-		Organisation organisation = subjectO.findOne(3L);
+		Organisation organisation = subjectO.findById(3L).orElse(null);
 		Long id = 5L;
 		
 		// When	
@@ -247,7 +245,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindScheduligTemplateWithExistingOrganisationAndIdNotFound() {
 		// Given
-		Organisation organisation = subjectO.findOne(3L);
+		Organisation organisation = subjectO.findById(3L).orElse(null);
 		Long id = 777L;
 		
 		// When	

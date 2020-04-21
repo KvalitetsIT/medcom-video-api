@@ -1,11 +1,11 @@
 package dk.medcom.video.api.dto;
 
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import java.util.Date;
 
@@ -18,7 +18,7 @@ import dk.medcom.video.api.dao.SchedulingInfo;
 
 
 
-public class SchedulingInfoDto extends ResourceSupport {
+public class SchedulingInfoDto extends RepresentationModel {
 
 	
 	public String uuid;

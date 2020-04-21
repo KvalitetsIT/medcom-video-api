@@ -1,12 +1,10 @@
 package dk.medcom.video.api.repository;
 
-import javax.annotation.Resource;
-
+import dk.medcom.video.api.dao.Organisation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dao.Organisation;
-
+import javax.annotation.Resource;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -64,7 +62,7 @@ public class OrganisationTest extends RepositoryTest {
 		Long id = new Long(1);
 		
 		// When
-		Organisation organisation = subject.findOne(id);
+		Organisation organisation = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNotNull(organisation);
@@ -80,7 +78,7 @@ public class OrganisationTest extends RepositoryTest {
 		Long id = new Long(1999);
 		
 		// When
-		Organisation organisation = subject.findOne(id);
+		Organisation organisation = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(organisation);

@@ -1,7 +1,7 @@
 package dk.medcom.video.api.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +39,7 @@ public class SchedulingTemplateController {
 	SchedulingTemplateService schedulingTemplateService;
 	
 	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.GET)
-	public Resources <SchedulingTemplateDto> getSchedulingTemplates() throws PermissionDeniedException  {
+	public CollectionModel <SchedulingTemplateDto> getSchedulingTemplates() throws PermissionDeniedException  {
 		LOGGER.debug("Entry of /scheduling-templates.get");
 		
 		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateService.getSchedulingTemplates();
@@ -48,7 +48,7 @@ public class SchedulingTemplateController {
 			SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 			schedulingTemplateDtos.add(schedulingTemplateDto);
 		}
-		Resources<SchedulingTemplateDto> resources = new Resources<>(schedulingTemplateDtos);
+		CollectionModel<SchedulingTemplateDto> resources = new CollectionModel<>(schedulingTemplateDtos);
 		
 		Link selfRelLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplates()).withSelfRel();
 		resources.add(selfRelLink);
@@ -59,12 +59,12 @@ public class SchedulingTemplateController {
 	}
 	
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.GET)
-	public Resource <SchedulingTemplateDto> getSchedulingTemplateById(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException {
+	public EntityModel <SchedulingTemplateDto> getSchedulingTemplateById(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException {
 		LOGGER.debug("Entry of /scheduling-templates.get id: " + id);
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(id); 
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		Resource <SchedulingTemplateDto> resource = new Resource <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.get resource: " + resource);
 		return resource;
@@ -73,12 +73,12 @@ public class SchedulingTemplateController {
 	
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.POST)
-	public Resource <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException {
+	public EntityModel <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException {
 		LOGGER.debug("Entry of /scheduling-template.post");
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		Resource <SchedulingTemplateDto> resource = new Resource <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
 		return resource;
@@ -86,13 +86,13 @@ public class SchedulingTemplateController {
 	}	
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.PUT)
-	public Resource <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException  {
+	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException  {
 	
 		LOGGER.debug("Entry of /scheduling-template.put id: " + id);
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(id, updateSchedulingTemplateDto);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		Resource <SchedulingTemplateDto> resource = new Resource <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.put resource: " + resource);
 		return resource;
@@ -101,7 +101,7 @@ public class SchedulingTemplateController {
 	
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.DELETE)
-	public Resource <SchedulingTemplateDto> deleteSchedulingTemplate(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException  {
+	public EntityModel <SchedulingTemplateDto> deleteSchedulingTemplate(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException  {
 		LOGGER.debug("Entry of /schedulingTemplate.delete id: " + id);
 		
 		schedulingTemplateService.deleteSchedulingTemplate(id);

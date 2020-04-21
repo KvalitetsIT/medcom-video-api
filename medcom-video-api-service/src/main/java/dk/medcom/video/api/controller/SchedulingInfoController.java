@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,8 +25,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class SchedulingInfoController {
@@ -40,19 +40,19 @@ public class SchedulingInfoController {
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER})
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.POST)
-	public Resource<SchedulingInfoDto> createSchedulingInfo(@Valid @RequestBody CreateSchedulingInfoDto createSchedulingInfoDto) throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
+	public EntityModel<SchedulingInfoDto> createSchedulingInfo(@Valid @RequestBody CreateSchedulingInfoDto createSchedulingInfoDto) throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry of /scheduling-info.post.");
 
 		SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(createSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
+		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 
 		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource.toString());
 		return resource;
 	}
 
 	@RequestMapping(value = "/scheduling-info", method = RequestMethod.GET)
-	public Resources <SchedulingInfoDto> getSchedulingInfo(
+	public CollectionModel <SchedulingInfoDto> getSchedulingInfo(
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime, 
 			@RequestParam(value = "to-end-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toEndTime,
 			@RequestParam(value = "provision-status", required = false, defaultValue = "AWAITS_PROVISION") ProvisionStatus provisionStatus) {
@@ -64,7 +64,7 @@ public class SchedulingInfoController {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
 			schedulingInfoDtos.add(schedulingInfoDto);
 		}
-		Resources<SchedulingInfoDto> resources = new Resources<>(schedulingInfoDtos);
+		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
 		
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfo(fromStartTime, toEndTime, provisionStatus)).withSelfRel();
 		resources.add(selfRelLink);
@@ -74,21 +74,21 @@ public class SchedulingInfoController {
 	}
 	
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.GET)
-	public Resource <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
 
-		return  new Resource<>(schedulingInfoDto);
+		return  new EntityModel<>(schedulingInfoDto);
 	}
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER}) //full user context is required in order to update, because of updatedbyuser
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
-	public Resource <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
+	public EntityModel <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
 		LOGGER.debug("Entry of /scheduling-info.put uuid: " + uuid);
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
-		Resource <SchedulingInfoDto> resource = new Resource<>(schedulingInfoDto);
+		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 		
 		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());
 		return resource;

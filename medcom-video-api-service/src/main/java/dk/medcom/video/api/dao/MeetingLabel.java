@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "meeting_labels")
 public class MeetingLabel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String label;
 

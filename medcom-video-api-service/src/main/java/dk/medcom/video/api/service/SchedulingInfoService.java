@@ -304,7 +304,7 @@ public class SchedulingInfoService {
 
 		//if template is input and is related to the users organisation use that. Otherwise find default.
 		LOGGER.debug("Searching for schedulingTemplate using id: " + createSchedulingInfoDto.getSchedulingTemplateId());
-		SchedulingTemplate schedulingTemplate  = schedulingTemplateRepository.findOne(createSchedulingInfoDto.getSchedulingTemplateId());
+		SchedulingTemplate schedulingTemplate  = schedulingTemplateRepository.findById(createSchedulingInfoDto.getSchedulingTemplateId()).orElse(null);
 
 		if (schedulingTemplate == null) {
 			LOGGER.debug(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
@@ -375,7 +375,7 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfo = null;
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
 		if (unusedId != null) {
-			schedulingInfo = schedulingInfoRepository.findOne(unusedId);
+			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
 		}
 
 		if(schedulingInfo == null) {

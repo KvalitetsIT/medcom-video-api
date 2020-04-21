@@ -6,14 +6,13 @@ import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.annotation.PostConstruct;
@@ -62,7 +61,7 @@ public class TestApplication extends SpringBootServletInitializer {
         phpMyAdmin.start();
 
 
-		SpringApplication.run(new Object[] { TestApplication.class }, args);
+		SpringApplication.run(TestApplication.class, args);
 	}
 
     private static void createOrganisationService(Network n) {

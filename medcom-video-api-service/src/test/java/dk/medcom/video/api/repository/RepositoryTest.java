@@ -30,10 +30,11 @@ abstract public class RepositoryTest {
 
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
+		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
 		mysql.start();
 				
-		String jdbcUrl = mysql.getJdbcUrl();
+		String jdbcUrl = mysql.getJdbcUrl() + "?useSSL=false";
+		System.out.println(jdbcUrl);
 		System.setProperty("jdbc.url", jdbcUrl);
 	}
 }

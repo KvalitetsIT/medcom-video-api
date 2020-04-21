@@ -26,7 +26,7 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://{{host}}:{{port}}/api/info",
+					"raw": "http://{{host}}:{{port}}/api/actuator/info",
 					"protocol": "http",
 					"host": [
 						"{{host}}"
@@ -34,6 +34,7 @@
 					"port": "{{port}}",
 					"path": [
 						"api",
+						"actuator",
 						"info"
 					]
 				}

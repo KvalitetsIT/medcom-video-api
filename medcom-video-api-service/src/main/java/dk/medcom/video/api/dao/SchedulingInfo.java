@@ -20,7 +20,7 @@ import dk.medcom.video.api.dto.ProvisionStatus;
 public class SchedulingInfo {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
 	private String uuid;

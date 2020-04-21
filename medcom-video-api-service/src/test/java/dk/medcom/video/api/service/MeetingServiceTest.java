@@ -198,7 +198,7 @@ public class MeetingServiceTest {
 		// Then
 		Mockito.verify(meetingLabelRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
 		ArgumentCaptor<Iterable<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Iterable.class);
-		Mockito.verify(meetingLabelRepository, times(1)).save(labelsCaptor.capture());
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(labelsCaptor.capture());
 
 		List<MeetingLabel> labels = new ArrayList<>();
 		labelsCaptor.getValue().forEach(labels::add);
@@ -406,7 +406,7 @@ public class MeetingServiceTest {
 		secondLabel.setLabel("second label");
 
 		List<MeetingLabel> labels = Arrays.asList(firstLabel, secondLabel);
-		Mockito.when(meetingLabelRepository.save(Mockito.anyList())).thenReturn(labels);
+		Mockito.when(meetingLabelRepository.saveAll(Mockito.anyList())).thenReturn(labels);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -428,7 +428,7 @@ public class MeetingServiceTest {
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 
 		ArgumentCaptor<Set<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Set.class);
-		Mockito.verify(meetingLabelRepository, times(1)).save(labelsCaptor.capture());
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(labelsCaptor.capture());
 		Set<MeetingLabel> savedLabels = labelsCaptor.getValue();
 		assertEquals(2, savedLabels.size());
 
@@ -458,7 +458,7 @@ public class MeetingServiceTest {
 		secondLabel.setLabel("second label");
 
 		List<MeetingLabel> labels = Arrays.asList(firstLabel, secondLabel);
-		Mockito.when(meetingLabelRepository.save(Mockito.anyList())).thenReturn(labels);
+		Mockito.when(meetingLabelRepository.saveAll(Mockito.anyList())).thenReturn(labels);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -482,7 +482,7 @@ public class MeetingServiceTest {
 		Mockito.verify(schedulingInfoService, times(0)).attachMeetingToSchedulingInfo(result);
 
 		ArgumentCaptor<Set<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Set.class);
-		Mockito.verify(meetingLabelRepository, times(1)).save(labelsCaptor.capture());
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(labelsCaptor.capture());
 		Set<MeetingLabel> savedLabels = labelsCaptor.getValue();
 		assertEquals(2, savedLabels.size());
 

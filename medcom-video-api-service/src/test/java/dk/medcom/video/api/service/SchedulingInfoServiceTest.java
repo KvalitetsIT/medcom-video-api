@@ -24,10 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
@@ -64,9 +61,9 @@ public class SchedulingInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findOneByUuid(schedulingInfoUuid.toString())).thenReturn(schedulingInfo);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).then(i -> i.getArgument(0));
         BigInteger id = new BigInteger("123");
-        
+
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Long.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()))).thenReturn(Collections.singletonList(id));
-        Mockito.when(schedulingInfoRepository.findOne(Mockito.eq(123L))).thenReturn(schedulingInfo);
+        Mockito.when(schedulingInfoRepository.findById(Mockito.eq(123L))).thenReturn(Optional.of(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
         organizationRepository = Mockito.mock(OrganisationRepository.class);
@@ -77,8 +74,8 @@ public class SchedulingInfoServiceTest {
         Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
 
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-        Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
-        Mockito.when(schedulingTemplateRepository.findOne(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(createSchedulingTemplateOtherOrg());
+        Mockito.when(schedulingTemplateRepository.findById(SCHEDULING_TEMPLATE_ID)).thenReturn(Optional.of(schedulingTemplateIdOne));
+        Mockito.when(schedulingTemplateRepository.findById(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(Optional.of(createSchedulingTemplateOtherOrg()));
 
         schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
 

@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import javax.annotation.Resource;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		String provisionStatusDescription = "All is okay yet";
 		Long meetingId = 4L;
 		Calendar calendar = new GregorianCalendar(2018, Calendar.NOVEMBER,1,13,15,0);
-		Meeting meeting = subjectM.findOne(meetingId);
+		Meeting meeting = subjectM.findById(meetingId).orElse(null);
 	    
 		SchedulingStatus schedulingStatus = new SchedulingStatus();
 		schedulingStatus.setTimeStamp(calendar.getTime());
@@ -52,7 +53,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Long id = 301L;
 		
 		// When
-		SchedulingStatus schedulingStatus = subject.findOne(id);
+		SchedulingStatus schedulingStatus = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNotNull(schedulingStatus);
@@ -67,7 +68,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Long id = 1999L;
 		
 		// When
-		SchedulingStatus schedulingStatus = subject.findOne(id);
+		SchedulingStatus schedulingStatus = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(schedulingStatus);
@@ -81,7 +82,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Long meetingId = 1L;
 			
 		// When
-		SchedulingStatus schedulingStatus = subject.findOne(schedulingStatusId);
+		SchedulingStatus schedulingStatus = subject.findById(schedulingStatusId).orElse(null);
 			
 		// Then
 		Assert.assertNotNull(schedulingStatus);
@@ -96,8 +97,8 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		Long meetingId = 2L;
 			
 		// When
-		SchedulingStatus schedulingStatus = subject.findOne(schedulingStatusId);
-	    Meeting meeting = subjectM.findOne(meetingId);
+		SchedulingStatus schedulingStatus = subject.findById(schedulingStatusId).orElse(null);
+	    Meeting meeting = subjectM.findById(meetingId).orElse(null);
 	    schedulingStatus.setMeeting(meeting);
 			
 		// Then

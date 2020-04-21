@@ -108,7 +108,7 @@ public class MeetingService {
 		}
 
 		meeting = meetingRepository.save(meeting);
-		meetingLabelRepository.save(meeting.getMeetingLabels());
+		meetingLabelRepository.saveAll(meeting.getMeetingLabels());
 
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
 
@@ -219,7 +219,7 @@ public class MeetingService {
 			meetingLabels.add(meetingLabel);
 		});
 
-		meetingLabelRepository.save(meetingLabels);
+		meetingLabelRepository.saveAll(meetingLabels);
 
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");

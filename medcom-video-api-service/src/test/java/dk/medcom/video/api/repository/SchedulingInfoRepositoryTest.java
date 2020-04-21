@@ -1,18 +1,17 @@
 package dk.medcom.video.api.repository;
 
 
-import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import dk.medcom.video.api.dao.*;
+import dk.medcom.video.api.dto.ProvisionStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dto.ProvisionStatus;
+import javax.annotation.Resource;
+import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -72,7 +71,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		schedulingInfo.setProvisionTimestamp(calendar.getTime());
 		schedulingInfo.setProvisionVMRId(provisionVMRId);
 		
-		Meeting meeting = subjectM.findOne(meetingId);
+		Meeting meeting = subjectM.findById(meetingId).orElse(null);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setUuid(meeting.getUuid());
 		
@@ -81,7 +80,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 		
-		MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
 		schedulingInfo.setMeetingUser(meetingUser);
 	    schedulingInfo.setUpdatedByUser(meetingUser);
 		
@@ -89,7 +88,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	    schedulingInfo.setCreatedTime(calendarCreate.getTime());
 	    schedulingInfo.setUpdatedTime(calendarCreate.getTime());
 
-		SchedulingTemplate schedulingTemplate = subjectST.findOne(schedulingTemplateId);
+		SchedulingTemplate schedulingTemplate = subjectST.findById(schedulingTemplateId).orElse(null);
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setPortalLink(portalLink);
 		schedulingInfo.setIvrTheme(ivrTheme);
@@ -153,7 +152,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long id = new Long(201);
 		
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(id);
+		SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNotNull(schedulingInfo);
@@ -172,7 +171,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long id = new Long(1999);
 		
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(id);
+		SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(schedulingInfo);
@@ -186,8 +185,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingId = new Long(1);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
-		Meeting meeting = subjectM.findOne(meetingId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
+		Meeting meeting = subjectM.findById(meetingId).orElse(null);
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
@@ -203,8 +202,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingId = new Long(2);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
-	    Meeting meeting = subjectM.findOne(meetingId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
+	    Meeting meeting = subjectM.findById(meetingId).orElse(null);
 	    schedulingInfo.setMeeting(meeting);
 	    schedulingInfo.setUuid(meeting.getUuid());
 			
@@ -238,13 +237,14 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testFindOneInIntervalAndProvisionStatus0() {
 		// Given
 		
-	    Calendar calendarFrom = new GregorianCalendar(2018,11,01,15,15,00); //month is zero-based
-	    Calendar calendarTo = new GregorianCalendar(2018,11,02,14,31,00);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00', vmrstart_time is '2018-12-02 14:30:00') 
+	    Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1,15,15, 0); //month is zero-based
+	    Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2,14,31, 0);   //Interval hits meeting id 3 ('2018-12-02 15:00:00', '2018-12-02 16:00:00', vmrstart_time is '2018-12-02 14:30:00')
 	    ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 	
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
-		
+		Date from = calendarFrom.getTime();
+		Date to = calendarTo.getTime();
 		// Then
 		Assert.assertNotNull(schedulingInfos);
 		int numberOfSchedulingInfo = 0;
@@ -262,7 +262,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingUserId = new Long(102);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
@@ -278,8 +278,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingUserId = new Long(102);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
-	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
+	    MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
 	    schedulingInfo.setMeetingUser(meetingUser);	    
 			
 		// Then
@@ -296,7 +296,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingUserId = new Long(102);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 			
 		// Then
 		Assert.assertNotNull(schedulingInfo);
@@ -312,8 +312,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Long meetingUserId = new Long(102);
 			
 		// When
-		SchedulingInfo schedulingInfo = subject.findOne(schedulingInfoId);
-	    MeetingUser meetingUser = subjectMU.findOne(meetingUserId);
+		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
+	    MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
 	    schedulingInfo.setUpdatedByUser(meetingUser);	    
 			
 		// Then

@@ -1,8 +1,8 @@
 package dk.medcom.video.api.dto;
 
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
-public class PoolInfoDto extends ResourceSupport {
+public class PoolInfoDto extends RepresentationModel {
     private String organizationId;
     private int desiredPoolSize;
     private int availablePoolSize;

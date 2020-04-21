@@ -19,7 +19,7 @@ import dk.medcom.video.api.dto.ProvisionStatus;
 public class SchedulingStatus {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private Date timeStamp;
 	@Enumerated(EnumType.STRING)

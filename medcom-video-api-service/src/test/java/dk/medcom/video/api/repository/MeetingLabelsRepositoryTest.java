@@ -27,7 +27,7 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
 
     @Test
     public void tesFindAllLabels() {
-        Meeting meeting = meetingRepository.findOne(7L);
+        Meeting meeting = meetingRepository.findById(7L).orElse(null);
 
         List<MeetingLabel> meetingLabels = meetingLabelRepository.findByMeeting(meeting);
 
@@ -53,10 +53,10 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         meeting.setSubject("Test meeting");
         meeting.setUuid(uuid);
 
-        Organisation organisation = organisationRepository.findOne(organisationId);
+        Organisation organisation = organisationRepository.findById(organisationId).orElse(null);
         meeting.setOrganisation(organisation);
 
-        MeetingUser meetingUser = meetingUserRepository.findOne(meetingUserId);
+        MeetingUser meetingUser = meetingUserRepository.findById(meetingUserId).orElse(null);
         meeting.setMeetingUser(meetingUser);
 
         meeting.setOrganizedByUser(meetingUser);
@@ -98,10 +98,10 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         meeting.setSubject("Test meeting");
         meeting.setUuid(uuid);
 
-        Organisation organisation = organisationRepository.findOne(organisationId);
+        Organisation organisation = organisationRepository.findById(organisationId).orElse(null);
         meeting.setOrganisation(organisation);
 
-        MeetingUser meetingUser = meetingUserRepository.findOne(meetingUserId);
+        MeetingUser meetingUser = meetingUserRepository.findById(meetingUserId).orElse(null);
         meeting.setMeetingUser(meetingUser);
 
         meeting.setOrganizedByUser(meetingUser);
@@ -130,7 +130,7 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         secondMeetingLabel.setLabel("this is a label");
         secondMeetingLabel.setMeeting(meeting);
 
-        Iterable<MeetingLabel> labels = meetingLabelRepository.save(Arrays.asList(firstMeetingLabel, secondMeetingLabel));
+        Iterable<MeetingLabel> labels = meetingLabelRepository.saveAll(Arrays.asList(firstMeetingLabel, secondMeetingLabel));
         AtomicInteger count = new AtomicInteger();
         labels.forEach(x -> count.getAndIncrement());
         assertEquals(2, count.get());

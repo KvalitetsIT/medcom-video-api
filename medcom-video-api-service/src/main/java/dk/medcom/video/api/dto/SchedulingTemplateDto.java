@@ -1,12 +1,12 @@
 package dk.medcom.video.api.dto;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.Date;
 
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +17,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingTemplate;
 
-public class SchedulingTemplateDto extends ResourceSupport {
+public class SchedulingTemplateDto extends RepresentationModel {
 	@JsonProperty("id")
 	private Long templateId;
 	public String organisationId;

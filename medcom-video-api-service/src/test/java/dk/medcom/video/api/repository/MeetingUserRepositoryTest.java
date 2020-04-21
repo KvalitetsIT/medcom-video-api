@@ -1,13 +1,13 @@
 package dk.medcom.video.api.repository;
 
-import javax.annotation.Resource;
-
+import dk.medcom.video.api.dao.MeetingUser;
+import dk.medcom.video.api.dao.Organisation;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.annotation.Resource;
+
 //import dk.medcom.video.api.context.UserContext;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
 
 public class MeetingUserRepositoryTest extends RepositoryTest{
 	
@@ -24,7 +24,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	    Long organisationId = 1L;
 	    String email = "you@you.dk";
 	    
-	    Organisation organisation = subjectO.findOne(organisationId);
+	    Organisation organisation = subjectO.findById(organisationId).orElse(null);
 	    
 		MeetingUser meetingUser = new MeetingUser();
 		meetingUser.setOrganisation(organisation);
@@ -46,7 +46,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		Long id = new Long(101);
 		
 		// When
-		MeetingUser meetingUser = subject.findOne(id);
+		MeetingUser meetingUser = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNotNull(meetingUser);
@@ -62,7 +62,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		Long id = new Long(3);
 		
 		// When
-		MeetingUser meetingUser = subject.findOne(id);
+		MeetingUser meetingUser = subject.findById(id).orElse(null);
 		
 		// Then
 		Assert.assertNull(meetingUser);
@@ -75,7 +75,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		
 		String existingEmail = "me@me102.dk";
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		// When
 		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, existingEmail);
@@ -93,7 +93,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		Long organisationId = new Long(3);
 		String nonExistingEmail = "xxxxx";
 		
-		Organisation organisation = subjectO.findOne(organisationId);
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		// When
 		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, nonExistingEmail);

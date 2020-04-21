@@ -8,16 +8,16 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-public class MeetingDto extends ResourceSupport {
+public class MeetingDto extends RepresentationModel {
 
 	public String subject;
 	public String uuid;

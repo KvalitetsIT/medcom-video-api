@@ -67,7 +67,7 @@ public class IntegrationTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.5")
+		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
 				.withDatabaseName("videodb")
 				.withUsername("videouser")
 				.withPassword("secret1234")
@@ -90,7 +90,7 @@ public class IntegrationTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb")
+				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false")
 				.withEnv("jdbc_user", "videouser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("userservice_url", "http://userservice:1080")
@@ -119,12 +119,12 @@ public class IntegrationTest {
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
 				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
 				.withEnv("LOG_LEVEL", "debug")
-				.withEnv("flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "false")
 				.withEnv("organisation.service.endpoint", "http://localhost:8080")
 				.withExposedPorts(8080)
-				.waitingFor(Wait.forHttp("/api/info").forStatusCode(200));
+				.waitingFor(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		attachLogger(videoApi, videoApiLogger);
