@@ -73,6 +73,8 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         Calendar calendarCreate = new GregorianCalendar(2018, Calendar.SEPTEMBER, 1,13,30, 0);
         meeting.setCreatedTime(calendarCreate.getTime());
         meeting.setUpdatedTime(calendarCreate.getTime());
+        meeting.setShortId(createShortId());
+
 
         // When
         meeting = meetingRepository.save(meeting);
@@ -85,6 +87,10 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         assertNotNull(result);
         assertEquals(meetingLabel.getLabel(), result.getLabel());
         assertEquals(meeting.getId(), result.getMeeting().getId());
+    }
+
+    private String createShortId() {
+        return UUID.randomUUID().toString().substring(1, 8);
     }
 
     @Test
@@ -118,7 +124,7 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
         Calendar calendarCreate = new GregorianCalendar(2018, Calendar.SEPTEMBER, 1,13,30, 0);
         meeting.setCreatedTime(calendarCreate.getTime());
         meeting.setUpdatedTime(calendarCreate.getTime());
-
+        meeting.setShortId(createShortId());
         // When
         meeting = meetingRepository.save(meeting);
 

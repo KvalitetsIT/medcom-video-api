@@ -31,8 +31,11 @@ public class TestUserContext implements UserContextFactory {
 					//		return new UserContextImpl("test-org", "me@me105organizer.dk", UserRole.USER);  	//2 meeting for this user in test data
 //		return new UserContextImpl("test-org", "me@me101.dk", UserRole.USER);  				//3 meetings for this user in test data
 					//		return new UserContextImpl("company 2", "me@me107.dk", UserRole.USER);  				//testing schedulingTemplate
-					//		return new UserContextImpl("company 2", "me@me107.dk", UserRole.PROVISIONER_USER); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 20
-		return new UserContextImpl(testuserorg, "me@me101.dk", UserRole.ADMIN);	//4 meetings for this user in test data (two as organizer, one as creator
+//							return new UserContextImpl("company 2", "me@me107.dk", UserRole.PROVISIONER_USER); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
+		return new UserContextImpl("pool-test-org1", "me@me107.dk", UserRole.ADMIN); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
+//		return new UserContextImpl("pool-test-org", "me@me107.dk", UserRole.ADMIN); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
+		// 0
+//		return new UserContextImpl(testuserorg, "me@me101.dk", UserRole.ADMIN);	//4 meetings for this user in test data (two as organizer, one as creator
 //		return new UserContextImpl("test-org", "me@me102.dk", UserRole.ADMIN);	 //use this to test schedulingTemplates in postman
 //
 					//		return new UserContextImpl("test-org", "", UserRole.MEETING_PLANNER);	//4 meetings for this user in test data (two as organizer, one as creator

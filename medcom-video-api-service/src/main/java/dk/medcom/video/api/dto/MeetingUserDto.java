@@ -7,6 +7,10 @@ public class MeetingUserDto {
 	public String organisationId;
 	public String email;
 
+	public MeetingUserDto() {
+		// Empty constructor
+	}
+
 	public MeetingUserDto(MeetingUser meetingUser) {
 		if (meetingUser == null) {
 			return;

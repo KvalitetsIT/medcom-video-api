@@ -4,10 +4,14 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.Organisation;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -22,6 +26,9 @@ public class MeetingRepositoryTest extends RepositoryTest {
 	
 	@Resource
     private OrganisationRepository subjectO;
+
+	@Resource
+	private EntityManager entityManager;
 	
 	@Test
 	public void testCreateMeeting() {
@@ -67,6 +74,9 @@ public class MeetingRepositoryTest extends RepositoryTest {
 	    meetingLabels.add(label);
 	    meeting.setMeetingLabels(meetingLabels);
 
+		var shortId = UUID.randomUUID().toString().substring(1, 8);
+	    meeting.setShortId(shortId);
+
 		// When
 		meeting = subject.save(meeting);
 		
@@ -83,6 +93,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(projectCode, meeting.getProjectCode());
 		assertEquals(calendarCreate.getTime(), meeting.getCreatedTime());
 		assertEquals(calendarCreate.getTime(), meeting.getUpdatedTime());
+		assertEquals(shortId, meeting.getShortId());
 	}
 	
 	@Test
@@ -101,7 +112,83 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		}
 		assertEquals(7, numberOfMeetings);
 	}
-	
+
+	@Test
+	public void testDuplicateLinkId() {
+
+		// Given
+		String uuid = UUID.randomUUID().toString();
+		Long meetingUserId = 101L;
+		Long organisationId = 5L;
+		String projectCode = "PROJECT1";
+
+		Meeting meeting = new Meeting();
+		meeting.setSubject("Test meeting");
+		meeting.setUuid(uuid);
+
+		Organisation organisation = subjectO.findById(organisationId).orElse(null);
+		meeting.setOrganisation(organisation);
+
+		MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
+		meeting.setMeetingUser(meetingUser);
+
+		meeting.setOrganizedByUser(meetingUser);
+		meeting.setUpdatedByUser(meetingUser);
+
+		Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,15, 0);
+		meeting.setStartTime(calendarStart.getTime());
+
+		Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,30, 0);
+		meeting.setEndTime(calendarEnd.getTime());
+		meeting.setDescription("Lang beskrivelse af, hvad der foregår");
+		meeting.setProjectCode(projectCode);
+
+		Calendar calendarCreate = new GregorianCalendar(2018, Calendar.SEPTEMBER, 1,13,30, 0);
+		meeting.setCreatedTime(calendarCreate.getTime());
+		meeting.setUpdatedTime(calendarCreate.getTime());
+
+		HashSet<MeetingLabel> meetingLabels = new HashSet<>();
+		MeetingLabel label = new MeetingLabel();
+		label.setLabel("first label");
+		meetingLabels.add(label);
+
+		label = new MeetingLabel();
+		label.setLabel("second label");
+		meetingLabels.add(label);
+		meeting.setMeetingLabels(meetingLabels);
+
+		meeting.setShortId("abcdefgh");
+
+		// When
+		try {
+			subject.save(meeting);
+			fail();
+		}
+		catch(DataIntegrityViolationException e) {
+			if(e.getCause() instanceof ConstraintViolationException) {
+				ConstraintViolationException constraint = (ConstraintViolationException) e.getCause();
+				assertEquals("short_id", constraint.getConstraintName());
+			}
+			else {
+				fail();
+			}
+		}
+	}
+
+	@Test
+	public void testFindMeetingByShortId() {
+		// Given
+		var shortId = "abcdefgh";
+
+		// When
+		Meeting meeting = subject.findOneByShortId(shortId);
+
+		// Then
+		assertNotNull(meeting);
+		assertEquals(7, meeting.getId().intValue());
+		assertEquals("TestMeeting-xyz7", meeting.getSubject());
+	}
+
 	@Test
 	public void testFindMeetingWithExistingId() {
 		// Given

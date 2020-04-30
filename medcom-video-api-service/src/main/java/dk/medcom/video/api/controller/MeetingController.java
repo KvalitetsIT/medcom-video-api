@@ -60,6 +60,25 @@ public class MeetingController {
 		return resources;
 	}
 
+	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "short-id")
+	public EntityModel <MeetingDto> getMeetingByShortId(@RequestParam(value = "short-id")String shortId) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Entry of /meetings.get shortId: "+ shortId);
+
+		Meeting meeting = meetingService.getMeetingByShortId(shortId);
+
+		MeetingDto meetingDto = new MeetingDto(meeting);
+
+		Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
+		meetingDto.add(schedulingInfoLink);
+		EntityModel<MeetingDto> resources = new EntityModel<>(meetingDto);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingByShortId(shortId)).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("Exit of /meetings.get resources: " + resources.toString());
+		return resources;
+	}
+
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params = "subject")
 	public CollectionModel <MeetingDto> getMeetings(String subject) throws PermissionDeniedException, RessourceNotFoundException {
 		LOGGER.debug("Getting meetings by subject: " + subject);
@@ -193,6 +212,7 @@ public class MeetingController {
 		LOGGER.debug("Entry of /meetings.post");
 		
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
+		LOGGER.info(meeting.getShortId());
 		MeetingDto meetingDto = new MeetingDto(meeting);
 		EntityModel<MeetingDto> resource = new EntityModel<>(meetingDto);
 		

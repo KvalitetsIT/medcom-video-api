@@ -39,6 +39,11 @@ public class MeetingDto extends RepresentationModel {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
 	public Date updatedTime;
 	private List<String> labels;
+	private String shortId;
+
+	public MeetingDto() {
+		// Empty constructor
+	}
 
 	public MeetingDto(Meeting meeting) {
 		
@@ -63,6 +68,7 @@ public class MeetingDto extends RepresentationModel {
 		projectCode = meeting.getProjectCode();
 		createdTime = meeting.getCreatedTime();
 		updatedTime = meeting.getUpdatedTime();
+		shortId = meeting.getShortId();
 
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
 
@@ -136,5 +142,13 @@ public class MeetingDto extends RepresentationModel {
 
 	public void setLabels(List<String> labels) {
 		this.labels = labels;
+	}
+
+	public String getShortId() {
+		return shortId;
+	}
+
+	public void setShortId(String shortId) {
+		this.shortId = shortId;
 	}
 }

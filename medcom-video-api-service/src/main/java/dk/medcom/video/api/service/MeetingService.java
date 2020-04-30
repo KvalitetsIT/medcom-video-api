@@ -16,8 +16,10 @@ import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingLabelRepository;
 import dk.medcom.video.api.repository.MeetingRepository;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +30,8 @@ import java.util.*;
 public class MeetingService {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
-	
+	private final IdGenerator idGenerator;
+
 	private MeetingRepository meetingRepository;
 	private MeetingUserService meetingUserService;
 	private SchedulingInfoService schedulingInfoService;
@@ -51,6 +54,7 @@ public class MeetingService {
 	 	this.organisationService = organisationService;
 	 	this.userService = userService;
 		this.meetingLabelRepository = meetingLabelRepository;
+		this.idGenerator = new IdGeneratorImpl();
 	}
 	
 	public List<Meeting> getMeetings(Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
@@ -107,12 +111,30 @@ public class MeetingService {
 			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
 		}
 
-		meeting = meetingRepository.save(meeting);
+		meeting = saveMeetingWithShortLink(meeting, 0);
 		meetingLabelRepository.saveAll(meeting.getMeetingLabels());
 
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
 
 		return meeting;
+	}
+
+	private Meeting saveMeetingWithShortLink(Meeting meeting, int count) {
+		try {
+			meeting.setShortId(idGenerator.generateId(UUID.randomUUID()));
+			return meetingRepository.save(meeting);
+		}
+		catch(DuplicateKeyException e) {
+			if(e.getCause() instanceof ConstraintViolationException) {
+				var constraint = (ConstraintViolationException) e.getCause();
+				if(constraint.getConstraintName().equals("short_id")) {
+					if(count < 5) {
+						return saveMeetingWithShortLink(meeting, ++count);
+					}
+				}
+			}
+			throw e;
+		}
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
@@ -334,4 +356,24 @@ public class MeetingService {
 
 		return new ArrayList<>(distinctMeetnings.values());
     }
+
+	public Meeting getMeetingByShortId(String shortId) throws RessourceNotFoundException, PermissionDeniedException {
+		Meeting meeting = meetingRepository.findOneByShortId(shortId);
+		if (meeting == null) {
+			LOGGER.debug("The meeting was not found. Short Id: " + shortId );
+			throw new RessourceNotFoundException("meeting", "shortId");
+		}
+		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
+			LOGGER.debug("The user does not have the same organization as the meeting: ");
+			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getOrganisationId() + ", + meetingOrganizing user" + meeting.getOrganisation().getOrganisationId());
+			throw new PermissionDeniedException();
+		}
+
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER) && !(meeting.getOrganizedByUser() == meetingUserService.getOrCreateCurrentMeetingUser())) {
+			LOGGER.debug("The user only has the role USER and cannot see meetings not organized by this user. Calling user: " + meetingUserService.getOrCreateCurrentMeetingUser().getEmail() + ", + meetingOrganizing user" + meeting.getOrganizedByUser().getEmail());
+			throw new PermissionDeniedException();
+		}
+
+		return meeting;
+	}
 }

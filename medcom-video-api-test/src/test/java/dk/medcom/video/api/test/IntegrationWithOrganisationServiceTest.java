@@ -1,5 +1,12 @@
 package dk.medcom.video.api.test;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.MeetingDto;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -19,7 +26,10 @@ import org.xml.sax.SAXException;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,8 +42,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
@@ -126,6 +140,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
+//				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
@@ -203,8 +218,50 @@ public class IntegrationWithOrganisationServiceTest {
 				.get(String.class);
 	}
 
+	@Test
+	public void testCanCreateMeetingAndSearchByShortId() {
+		var createMeeting = new CreateMeetingDto();
+		createMeeting.setDescription("This is a description");
+		var now = Calendar.getInstance();
+		var inOneHour = createDate(now, 1);
+		var inTwoHours = createDate(now, 2);
+
+		createMeeting.setStartTime(inOneHour);
+		createMeeting.setEndTime(inTwoHours);
+		createMeeting.setSubject("This is a subject!");
+
+		var response = getClient()
+				.path("meetings")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.post(Entity.entity(createMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+
+		assertNotNull(response.getUuid());
+
+		var searchResponse = getClient()
+				.path("meetings")
+				.queryParam("short-id", response.getShortId()) // short id
+				.request()
+				.get(MeetingDto.class);
+
+		assertNotNull(searchResponse);
+		assertEquals(response.getUuid(), searchResponse.getUuid());
+	}
+
+	private Date createDate(Calendar calendar, int hoursToAdd) {
+		Calendar cal = (Calendar) calendar.clone();
+		cal.add(Calendar.HOUR, hoursToAdd);
+
+		return cal.getTime();
+	}
+
 	WebTarget getClient() {
-		WebTarget target =  ClientBuilder.newClient()
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		provider.setMapper(objectMapper);
+		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
 				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort)));
 
 		return target;

@@ -42,6 +42,8 @@ public class Meeting {
 	
 	private String projectCode;
 
+	private String shortId;
+
 	@OneToMany(mappedBy = "meeting")
 	private Set<MeetingLabel> meetingLabels = new HashSet<>();
 
@@ -151,5 +153,13 @@ public class Meeting {
 	public void addMeetingLabel(MeetingLabel meetingLabel) {
 		meetingLabel.setMeeting(this);
 		meetingLabels.add(meetingLabel);
+	}
+
+	public String getShortId() {
+		return shortId;
+	}
+
+	public void setShortId(String shortId) {
+		this.shortId = shortId;
 	}
 }

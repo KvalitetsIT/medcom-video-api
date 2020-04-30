@@ -15,12 +15,15 @@ import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
 import dk.medcom.video.api.repository.MeetingLabelRepository;
 import dk.medcom.video.api.repository.MeetingRepository;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.dao.DuplicateKeyException;
 
+import java.sql.SQLException;
 import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -441,6 +444,13 @@ public class MeetingServiceTest {
 		assertEquals(secondLabel.getLabel(), secondSavedLabel.get().getLabel());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+
+		var meetingCaptor = ArgumentCaptor.forClass(Meeting.class);
+		Mockito.verify(meetingRepository).save(meetingCaptor.capture());
+		var savedMeeting = meetingCaptor.getValue();
+		assertNotNull(savedMeeting);
+		assertNotNull(savedMeeting.getShortId());
+		assertEquals("This is a description", savedMeeting.getDescription());
 	}
 
 	@Test
@@ -516,6 +526,89 @@ public class MeetingServiceTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		meetingService.createMeeting(input);
+	}
+
+	@Test
+	public void testHandleDuplicateShortId() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+
+		Mockito.reset(meetingRepository);
+		ConstraintViolationException constraintException = new ConstraintViolationException("Duplicate short_id", new SQLException(), "short_id");
+		DuplicateKeyException duplicateKeyException = new DuplicateKeyException("Duplicate Key", constraintException);
+
+		Mockito.when(meetingRepository.save(Mockito.argThat(x -> x.getUuid().equals(uuid.toString()))))
+				.thenThrow(duplicateKeyException)
+				.thenAnswer(i -> {
+			Meeting meeting = (Meeting) i.getArguments()[0];
+			meeting.setId(57483L);
+			return meeting;
+		});
+
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+		assertEquals(8, result.getShortId().length());
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
+	}
+
+	@Test(expected = DuplicateKeyException.class)
+	public void testFailureOnManyDuplicateShortId() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+
+		Mockito.reset(meetingRepository);
+		ConstraintViolationException constraintException = new ConstraintViolationException("Duplicate short_id", new SQLException(), "short_id");
+		DuplicateKeyException duplicateKeyException = new DuplicateKeyException("Duplicate Key", constraintException);
+
+		Mockito.when(meetingRepository.save(Mockito.argThat(x -> x.getUuid().equals(uuid.toString()))))
+				.thenThrow(duplicateKeyException)
+				.thenThrow(duplicateKeyException)
+				.thenThrow(duplicateKeyException)
+				.thenThrow(duplicateKeyException)
+				.thenThrow(duplicateKeyException)
+//				.thenAnswer(i -> {
+//					Meeting meeting = (Meeting) i.getArguments()[0];
+//					meeting.setId(57483L);
+//					return meeting;
+//				});
+		;
+
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}
 
 	@Test

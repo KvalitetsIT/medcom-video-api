@@ -42,4 +42,6 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 
 	@Query("select m from Meeting m where m.organizedBy = ?1 and (m.subject like ?2 or m.description like ?3)")
 	List<Meeting> findByOrganizedByAndSubjectLikeOrDescriptionLike(MeetingUser orCreateCurrentMeetingUser, String subject, String description);
+
+    Meeting findOneByShortId(String shortId);
 }
