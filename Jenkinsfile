@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('','dockerhub') {
-                        image = docker.image("kvalitetsit/medcom-video-api-web:${env.GIT_COMMIT}")
+                        image = docker.image("kvalitetsit/medcom-video-api:${env.GIT_COMMIT}")
                         image.push("${env.GIT_COMMIT}")
                         image.push("dev")
 

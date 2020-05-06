@@ -103,7 +103,7 @@ public class IntegrationWithOrganisationServiceTest {
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// VideoAPI
-		videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api-web:latest")
+		videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api:latest")
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
