@@ -1,24 +1,69 @@
-node {
+pipeline {
+      agent {
+        kubernetes {
+          defaultContainer 'docker'
+          yaml """
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        some-label: some-label-value
+    spec:
+      containers:
+      - name: docker
+        image: docker
+        command:
+        - cat
+        tty: true
+        volumeMounts:
+          - name: docker-sock
+            mountPath: /var/run/docker.sock
+      volumes:
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
+    """
+        }
+      }
 
-	def scmInfo
+    stages {
+        stage('Initialize') {
+            steps{
+                script {
+                    currentBuild.displayName = "$currentBuild.displayName-${env.GIT_COMMIT}"
+                }
+            }
+        }
+        stage('Build And Test') {
+            steps {
+                script {
+                    def maven = docker.image('maven:3-jdk-11')
+                    maven.pull()
+                    maven.inside("-v /var/run/docker.sock:/var/run/docker.sock") {
+                        sh 'mvn install'
+                    }
 
-	stage('Clone repository') {
-		scmInfo = checkout scm
-		currentBuild.displayName = "$currentBuild.displayName-${scmInfo.GIT_COMMIT}"
-	}
+                    junit '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml'
+//                    jacoco changeBuildStatus: true, maximumLineCoverage: '80', minimumLineCoverage: '60', exclusionPattern: '**/org/openapitools/**/*.*'
+                }
+            }
+        }
+        stage('Tag Docker Images And Push') {
+            steps {
+                script {
+                    docker.withRegistry('','dockerhub') {
+                        image = docker.image("kvalitetsit/medcom-video-api-web:${env.GIT_COMMIT}")
+                        image.push("${env.GIT_COMMIT}")
+                        image.push("dev")
 
-	stage('Run Maven build') {
-
-		def maven = docker.image('maven:3-jdk-11')
-		maven.pull()
-		maven.inside {
-			sh 'mvn install'
-		}
-	}
-	
-	stage('Tag Docker image and push to registry') {
-		docker.withRegistry('https://kitdocker.kvalitetsit.dk/') {
-			docker.image("kvalitetsit/medcom-video-api-web:${scmInfo.GIT_COMMIT}").push("${scmInfo.GIT_COMMIT}")
-		}
-	}
+                        if(env.TAG_NAME != null && env.TAG_NAME.matches("^v[0-9]*\\.[0-9]*\\.[0-9]*")) {
+                            echo "Tagging version"
+                            image.push(env.TAG_NAME.substring(1))
+                            image.push("latest")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
