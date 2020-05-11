@@ -9,6 +9,6 @@ public class IdGeneratorImpl implements IdGenerator {
     public String generateId(UUID uuid) {
         String sha256hex = DigestUtils.sha256Hex(uuid.toString());
 
-        return sha256hex.substring(0, 8);
+        return sha256hex.substring(0, 12);
     }
 }

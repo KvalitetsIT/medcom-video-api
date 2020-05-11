@@ -562,7 +562,7 @@ public class MeetingServiceTest {
 		assertEquals(input.getDescription(), result.getDescription());
 		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
 		assertEquals(input.getStartTime(), result.getStartTime());
-		assertEquals(8, result.getShortId().length());
+		assertEquals(12, result.getShortId().length());
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}

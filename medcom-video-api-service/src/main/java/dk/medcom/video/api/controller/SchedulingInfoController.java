@@ -14,6 +14,7 @@ import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.service.SchedulingInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.EntityModel;
@@ -33,9 +34,11 @@ public class SchedulingInfoController {
 	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
 	
 	private SchedulingInfoService schedulingInfoService;
+	private String shortLinkBaseUrl;
 
-	SchedulingInfoController(SchedulingInfoService schedulingInfoService) {
+	SchedulingInfoController(SchedulingInfoService schedulingInfoService, @Value("${short.link.base.url}") String shortLinkBaseUrl) {
 		this.schedulingInfoService = schedulingInfoService;
+		this.shortLinkBaseUrl = shortLinkBaseUrl;
 	}
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER})
@@ -44,7 +47,7 @@ public class SchedulingInfoController {
 		LOGGER.debug("Entry of /scheduling-info.post.");
 
 		SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(createSchedulingInfoDto);
-		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 
 		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource.toString());
@@ -61,7 +64,7 @@ public class SchedulingInfoController {
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
 		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();
 		for (SchedulingInfo schedulingInfo : schedulingInfos) {
-			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 			schedulingInfoDtos.add(schedulingInfoDto);
 		}
 		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
@@ -76,7 +79,7 @@ public class SchedulingInfoController {
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.GET)
 	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
-		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 
 		return  new EntityModel<>(schedulingInfoDto);
 	}
@@ -87,7 +90,7 @@ public class SchedulingInfoController {
 		LOGGER.debug("Entry of /scheduling-info.put uuid: " + uuid);
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
-		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo);
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 		
 		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());

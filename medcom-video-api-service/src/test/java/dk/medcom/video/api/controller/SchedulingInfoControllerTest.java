@@ -41,7 +41,7 @@ public class SchedulingInfoControllerTest {
         expectedSchedulingInfoResult.setProvisionVMRId(null);
         Mockito.when(schedulingInfoService.createSchedulingInfo(input)).thenReturn(expectedSchedulingInfoResult);
 
-        SchedulingInfoController controller = new SchedulingInfoController(schedulingInfoService);
+        SchedulingInfoController controller = new SchedulingInfoController(schedulingInfoService, "base_url");
         EntityModel<SchedulingInfoDto> result = controller.createSchedulingInfo(input);
 
         assertNotNull(result);
@@ -50,6 +50,4 @@ public class SchedulingInfoControllerTest {
         assertNull(schedulingInfoDto.getProvisionVmrId());
         assertTrue("Host pin must be greater than 0.", schedulingInfoDto.getHostPin() > 0);
     }
-
-
 }

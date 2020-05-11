@@ -118,11 +118,12 @@ public class IntegrationTest {
 				.withEnv("mapping.role.admin", "dk:medcom:role:admin")
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
 				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
-				.withEnv("LOG_LEVEL", "debug")
+				//.withEnv("LOG_LEVEL", "debug")
 				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "false")
 				.withEnv("organisation.service.endpoint", "http://localhost:8080")
+				.withEnv("short.link.base.url", "https://video.link/")
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();

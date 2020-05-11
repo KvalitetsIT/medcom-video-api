@@ -140,6 +140,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
+				.withEnv("short.link.base.url", "https://video.link/")
 //				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/actuator/info").forStatusCode(200));
@@ -211,12 +212,17 @@ public class IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testCanReadMeeting() {
-		String result = getClient()
+		var result = getClient()
 				.path("meetings")
 				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc2")
 				.request()
-				.get(String.class);
+				.get(MeetingDto.class);
+
+		assertNotNull(result);
+		assertEquals(12, result.getShortId().length());
+		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
 	}
+
 
 	@Test
 	public void testCanCreateMeetingAndSearchByShortId() {
@@ -245,6 +251,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 		assertNotNull(searchResponse);
 		assertEquals(response.getUuid(), searchResponse.getUuid());
+		assertEquals("https://video.link/" + searchResponse.getShortId(), searchResponse.getShortLink());
 	}
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {

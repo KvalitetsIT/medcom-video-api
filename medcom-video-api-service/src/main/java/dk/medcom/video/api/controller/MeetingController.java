@@ -15,6 +15,7 @@ import dk.medcom.video.api.service.MeetingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.EntityModel;
@@ -35,6 +36,9 @@ public class MeetingController {
 
 	@Autowired
 	MeetingService meetingService;
+
+	@Value("${short.link.base.url}")
+	private String shortLinkBaseUrl;
 	
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET)
 	public CollectionModel <MeetingDto> getMeetings( 
@@ -45,7 +49,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.getMeetings(fromStartTime, toStartTime);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -66,7 +70,7 @@ public class MeetingController {
 
 		Meeting meeting = meetingService.getMeetingByShortId(shortId);
 
-		MeetingDto meetingDto = new MeetingDto(meeting);
+		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 		Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 		meetingDto.add(schedulingInfoLink);
@@ -86,7 +90,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.getMeetingsBySubject(subject);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -108,7 +112,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.getMeetingsByOrganizedBy(organizedBy);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -130,7 +134,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.getMeetingsByUriWithDomain(uriWithDomain);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -158,7 +162,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.searchMeetings(search, fromStartTime, toStartTime);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -180,7 +184,7 @@ public class MeetingController {
 		List<Meeting> meetings = meetingService.getMeetingsByLabel(label);
 		List<MeetingDto> meetingDtos = new LinkedList<>();
 		for (Meeting meeting : meetings) {
-			MeetingDto meetingDto = new MeetingDto(meeting);
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 
 			Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
 			meetingDto.add(schedulingInfoLink);
@@ -200,7 +204,7 @@ public class MeetingController {
 		LOGGER.debug("Entry of /meetings.get uuid: " + uuid);
 		
 		Meeting meeting = meetingService.getMeetingByUuid(uuid);
-		MeetingDto meetingDto = new MeetingDto(meeting);
+		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 		EntityModel <MeetingDto> resource = new EntityModel<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.get resource: " + resource);
@@ -213,7 +217,7 @@ public class MeetingController {
 		
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		LOGGER.info(meeting.getShortId());
-		MeetingDto meetingDto = new MeetingDto(meeting);
+		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 		EntityModel<MeetingDto> resource = new EntityModel<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.post resource: " + resource);
@@ -226,7 +230,7 @@ public class MeetingController {
 		LOGGER.debug("Entry of /meetings.put uuid: " + uuid);
 		
 		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
-		MeetingDto meetingDto = new MeetingDto(meeting);
+		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 		EntityModel <MeetingDto> resource = new EntityModel<>(meetingDto);
 		
 		LOGGER.debug("Exit of /meetings.put resource: " + resource);

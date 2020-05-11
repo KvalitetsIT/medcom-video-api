@@ -50,7 +50,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 	public SchedulingInfoDto() {	
 	}
 	
-	public SchedulingInfoDto(SchedulingInfo schedulingInfo) {
+	public SchedulingInfoDto(SchedulingInfo schedulingInfo, String shortLinkBaseurl) {
 		
 		uuid = schedulingInfo.getUuid();
 		hostPin = schedulingInfo.getHostPin();
@@ -80,7 +80,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		
 		Meeting meeting = schedulingInfo.getMeeting();
 		if(meeting != null) {
-			meetingDetails = new MeetingDto(meeting);
+			meetingDetails = new MeetingDto(meeting, shortLinkBaseurl);
 		}
 
 		try {  

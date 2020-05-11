@@ -35,4 +35,4 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn | Ikke tvunget/ Ingen default  |
 |organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information.| Ikke tvungen. Default false. |
 |organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services         | Ikke tvungen. Skal være sat hvis organisation.service.enabled er sat til true. |
- 
+ |short.link.base.url        | Base url to prefix short id with. ±

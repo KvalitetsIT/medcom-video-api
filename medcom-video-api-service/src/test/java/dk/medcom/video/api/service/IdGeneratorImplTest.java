@@ -16,7 +16,7 @@ public class IdGeneratorImplTest {
         var result = generator.generateId(input);
 
         assertNotNull(result);
-        assertEquals(result, 8, result.length());
+        assertEquals(result, 12, result.length());
     }
 
     @Test
