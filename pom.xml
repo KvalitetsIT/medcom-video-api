@@ -173,5 +173,6 @@
 		<module>medcom-video-api-web</module>
 		<module>medcom-video-api-test</module>
 		<module>medcom-video-api-qa</module>
-	</modules>
+        <module>documentation</module>
+    </modules>
 </project>

@@ -13,6 +13,13 @@
 			<artifactId>medcom-video-api-web</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>dk.medcom.video.api</groupId>
+			<artifactId>documentation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>mysql</artifactId>
@@ -30,6 +37,8 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.47</version>
 		</dependency>
+
+
 	</dependencies>
 	<build>
 		<plugins>
