@@ -40,7 +40,7 @@ public class MeetingDto extends RepresentationModel {
 	public Date updatedTime;
 	private List<String> labels;
 	private String shortId;
-	private String shortLink;
+//	private String shortLink;
 
 	public MeetingDto() {
 		// Empty constructor
@@ -70,7 +70,7 @@ public class MeetingDto extends RepresentationModel {
 		createdTime = meeting.getCreatedTime();
 		updatedTime = meeting.getUpdatedTime();
 		shortId = meeting.getShortId();
-		shortLink = shortLinkBaseUrl + shortId;
+//		shortLink = shortLinkBaseUrl + shortId;
 
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
 
@@ -154,11 +154,11 @@ public class MeetingDto extends RepresentationModel {
 		this.shortId = shortId;
 	}
 
-	public String getShortLink() {
-		return shortLink;
-	}
+//	public String getShortLink() {
+//		return shortLink;
+//	}
 
-	public void setShortLink(String shortLink) {
-		this.shortLink = shortLink;
-	}
+//	public void setShortLink(String shortLink) {
+//		this.shortLink = shortLink;
+//	}
 }
