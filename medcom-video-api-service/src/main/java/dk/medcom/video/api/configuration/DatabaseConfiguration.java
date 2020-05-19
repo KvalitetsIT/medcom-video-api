@@ -4,7 +4,9 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -39,6 +41,15 @@ public class DatabaseConfiguration {
 
 	@Value("${jdbc.pass}")
 	private String jdbcPass;
+
+	@Bean
+	@ConditionalOnProperty(value="baseline.flyway", havingValue = "true")
+	public FlywayMigrationStrategy cleanMigrateStrategy() {
+		return flyway -> {
+			flyway.baseline();
+			throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
+		};
+	}
 
 	@Bean
 	public DataSource dataSource() {
