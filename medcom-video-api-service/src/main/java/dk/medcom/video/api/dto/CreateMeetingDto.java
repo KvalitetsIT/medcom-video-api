@@ -44,6 +44,9 @@ public class CreateMeetingDto {
 
 	private List<String> labels = new ArrayList<>();
 
+	@Size(max = 200, message = "externalId should have a maximum of 200 characters.")
+	private String externalId;
+
 	public List<String> getLabels() {
 		return labels;
 	}
@@ -141,4 +144,12 @@ public class CreateMeetingDto {
     public UUID getUuid() {
         return uuid;
     }
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
 }

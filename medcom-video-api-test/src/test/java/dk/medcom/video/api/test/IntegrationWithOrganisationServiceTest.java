@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
+import dk.medcom.video.api.dto.UpdateMeetingDto;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
@@ -46,8 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
@@ -221,8 +221,60 @@ public class IntegrationWithOrganisationServiceTest {
 		assertNotNull(result);
 		assertEquals(12, result.getShortId().length());
 //		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
+		assertEquals("external_id", result.getExternalId());
 	}
 
+	@Test
+	public void testCanRemoveExternalId() {
+		var meeting = createMeeting();
+
+		var updateMeeting = new UpdateMeetingDto();
+		updateMeeting.setDescription(meeting.getDescription());
+		updateMeeting.setEndTime(meeting.getEndTime());
+		updateMeeting.setStartTime(meeting.getStartTime());
+		updateMeeting.setSubject(meeting.getSubject());
+		updateMeeting.setExternalId("external_id");
+
+		var updateResponse = getClient()
+				.path("meetings")
+				.path(meeting.getUuid())
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+
+		assertNotNull(updateResponse);
+		assertEquals("external_id", updateResponse.getExternalId());
+
+		// Remove external id
+		updateMeeting.setExternalId(null);
+		updateResponse = getClient()
+				.path("meetings")
+				.path(meeting.getUuid())
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+		assertNotNull(updateResponse);
+		assertNull(updateResponse.getExternalId());
+	}
+
+	private MeetingDto createMeeting() {
+		var createMeeting = new CreateMeetingDto();
+		createMeeting.setDescription("This is a description");
+		var now = Calendar.getInstance();
+		var inOneHour = createDate(now, 1);
+		var inTwoHours = createDate(now, 2);
+
+		createMeeting.setStartTime(inOneHour);
+		createMeeting.setEndTime(inTwoHours);
+		createMeeting.setSubject("This is a subject!");
+
+		var response = getClient()
+				.path("meetings")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.post(Entity.entity(createMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+
+		assertNotNull(response.getUuid());
+
+		return response;
+	}
 
 	@Test
 	public void testCanCreateMeetingAndSearchByShortId() {

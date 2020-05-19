@@ -540,6 +540,7 @@ components:
         - startTime
         - endTime
         - _links
+        - shortId
       properties:
         subject:
           type: string
@@ -579,6 +580,15 @@ components:
           type: string
           format: date-time
           example: 2018-10-01T11:00:00 +0000
+        shortId:
+          type: string
+          minLength: 12
+          maxLength: 12
+          example: abcdefghijkl
+        externalId:
+          type: string
+          maxLength: 200
+          example: 87527808-147f-4c54-88be-aec56c7194a3
         _links:
           properties:
             self:
@@ -646,6 +656,10 @@ components:
           type: string
           format: uuid
           example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        externalId:
+          type: string
+          maxLength: 200
+          example: dacb0d32-11ff-47c4-89bc-7893139a92a7
     update-meeting:
       type: object
       required:
@@ -676,6 +690,10 @@ components:
         organizedByEmail:
           type: string
           example: mail@mail.dk
+        externalId:
+          type: string
+          maxLength: 200
+          example: dacb0d32-11ff-47c4-89bc-7893139a92a7
     scheduling-info:
       type: object
       required:
