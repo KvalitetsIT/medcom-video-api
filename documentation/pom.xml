@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.19</version>
+                <version>3.0.20</version>
                 <executions>
                     <execution>
                         <goals>
@@ -124,6 +124,7 @@
                             <language>java</language>
                             <configOptions>
                                 <sourceFolder>src/generated-sources/java/main</sourceFolder>
+                                <dateLibrary>java8</dateLibrary>
                             </configOptions>
                         </configuration>
                     </execution>

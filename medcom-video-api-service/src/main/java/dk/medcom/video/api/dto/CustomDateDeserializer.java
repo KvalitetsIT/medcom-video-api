@@ -14,7 +14,8 @@ import java.util.List;
 
 public class CustomDateDeserializer extends JsonDeserializer<Date> {
     private List<String> validDateFormats = Arrays.asList("yyyy-MM-dd'T'HH:mm:ss Z",
-                                                          "yyyy-MM-dd'T'HH:mm:ssZ");
+                                                          "yyyy-MM-dd'T'HH:mm:ssZ",
+                                                          "yyyy-MM-dd'T'HH:mm:ss X");
 
     @Override
     public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {

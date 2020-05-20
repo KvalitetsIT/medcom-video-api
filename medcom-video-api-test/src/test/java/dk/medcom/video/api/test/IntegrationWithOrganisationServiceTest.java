@@ -6,6 +6,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
 import dk.medcom.video.api.dto.UpdateMeetingDto;
+import io.swagger.client.ApiClient;
+import io.swagger.client.ApiException;
+import io.swagger.client.api.VideoMeetingsApi;
+import io.swagger.client.model.CreateMeeting;
+import okio.BufferedSink;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
@@ -29,7 +34,6 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
@@ -44,6 +48,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -141,7 +148,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
 				.withEnv("short.link.base.url", "https://video.link/")
-//				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
+				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080)
 				.waitingFor(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
@@ -225,19 +232,26 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testCanRemoveExternalId() {
-		var meeting = createMeeting();
+	public void testCanUpdateAndRemoveExternalId() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+		var videoMeetings = new VideoMeetingsApi(apiClient);
+
+		var createMeeting = createMeeting();
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
 
 		var updateMeeting = new UpdateMeetingDto();
 		updateMeeting.setDescription(meeting.getDescription());
-		updateMeeting.setEndTime(meeting.getEndTime());
-		updateMeeting.setStartTime(meeting.getStartTime());
+		updateMeeting.setEndTime(new Date(meeting.getEndTime().toInstant().toEpochMilli()));
+		updateMeeting.setStartTime(new Date(meeting.getStartTime().toInstant().toEpochMilli()));
 		updateMeeting.setSubject(meeting.getSubject());
 		updateMeeting.setExternalId("external_id");
 
 		var updateResponse = getClient()
 				.path("meetings")
-				.path(meeting.getUuid())
+				.path(meeting.getUuid().toString())
 				.request(MediaType.APPLICATION_JSON_TYPE)
 				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
 
@@ -248,32 +262,25 @@ public class IntegrationWithOrganisationServiceTest {
 		updateMeeting.setExternalId(null);
 		updateResponse = getClient()
 				.path("meetings")
-				.path(meeting.getUuid())
+				.path(meeting.getUuid().toString())
 				.request(MediaType.APPLICATION_JSON_TYPE)
 				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
 		assertNotNull(updateResponse);
 		assertNull(updateResponse.getExternalId());
 	}
 
-	private MeetingDto createMeeting() {
-		var createMeeting = new CreateMeetingDto();
+	private CreateMeeting createMeeting() {
+		var createMeeting = new CreateMeeting();
 		createMeeting.setDescription("This is a description");
 		var now = Calendar.getInstance();
 		var inOneHour = createDate(now, 1);
 		var inTwoHours = createDate(now, 2);
 
-		createMeeting.setStartTime(inOneHour);
-		createMeeting.setEndTime(inTwoHours);
+		createMeeting.setStartTime(OffsetDateTime.ofInstant(inOneHour.toInstant(), ZoneId.systemDefault()));
+		createMeeting.setEndTime(OffsetDateTime.ofInstant(inTwoHours.toInstant(), ZoneId.systemDefault()));
 		createMeeting.setSubject("This is a subject!");
 
-		var response = getClient()
-				.path("meetings")
-				.request(MediaType.APPLICATION_JSON_TYPE)
-				.post(Entity.entity(createMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
-
-		assertNotNull(response.getUuid());
-
-		return response;
+		return createMeeting;
 	}
 
 	@Test
