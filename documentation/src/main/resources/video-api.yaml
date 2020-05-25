@@ -690,10 +690,6 @@ components:
         organizedByEmail:
           type: string
           example: mail@mail.dk
-        externalId:
-          type: string
-          maxLength: 200
-          example: dacb0d32-11ff-47c4-89bc-7893139a92a7
     scheduling-info:
       type: object
       required:

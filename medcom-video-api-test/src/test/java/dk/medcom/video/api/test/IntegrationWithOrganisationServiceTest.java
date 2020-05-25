@@ -53,6 +53,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -232,7 +233,7 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testCanUpdateAndRemoveExternalId() throws ApiException {
+	public void testCanCreateExternalId() throws ApiException {
 		var apiClient = new ApiClient()
 				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
@@ -241,32 +242,8 @@ public class IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting();
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
-
-		var updateMeeting = new UpdateMeetingDto();
-		updateMeeting.setDescription(meeting.getDescription());
-		updateMeeting.setEndTime(new Date(meeting.getEndTime().toInstant().toEpochMilli()));
-		updateMeeting.setStartTime(new Date(meeting.getStartTime().toInstant().toEpochMilli()));
-		updateMeeting.setSubject(meeting.getSubject());
-		updateMeeting.setExternalId("external_id");
-
-		var updateResponse = getClient()
-				.path("meetings")
-				.path(meeting.getUuid().toString())
-				.request(MediaType.APPLICATION_JSON_TYPE)
-				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
-
-		assertNotNull(updateResponse);
-		assertEquals("external_id", updateResponse.getExternalId());
-
-		// Remove external id
-		updateMeeting.setExternalId(null);
-		updateResponse = getClient()
-				.path("meetings")
-				.path(meeting.getUuid().toString())
-				.request(MediaType.APPLICATION_JSON_TYPE)
-				.put(Entity.entity(updateMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
-		assertNotNull(updateResponse);
-		assertNull(updateResponse.getExternalId());
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 	}
 
 	private CreateMeeting createMeeting() {
@@ -279,6 +256,7 @@ public class IntegrationWithOrganisationServiceTest {
 		createMeeting.setStartTime(OffsetDateTime.ofInstant(inOneHour.toInstant(), ZoneId.systemDefault()));
 		createMeeting.setEndTime(OffsetDateTime.ofInstant(inTwoHours.toInstant(), ZoneId.systemDefault()));
 		createMeeting.setSubject("This is a subject!");
+		createMeeting.setExternalId(UUID.randomUUID().toString());
 
 		return createMeeting;
 	}

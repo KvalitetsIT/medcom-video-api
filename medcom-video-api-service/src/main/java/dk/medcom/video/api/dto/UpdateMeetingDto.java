@@ -34,9 +34,6 @@ public class UpdateMeetingDto {
 	public String organizedByEmail;
 	private List<String> labels = new ArrayList<>();
 
-	@Size(max=200, message = "externalId should have a maximum of 200 characters.")
-	private String externalId;
-
 	public String getSubject() {
 		return subject;
 	}
@@ -87,13 +84,5 @@ public class UpdateMeetingDto {
 
 	public List<String> getLabels() {
 		return labels;
-	}
-
-	public String getExternalId() {
-		return externalId;
-	}
-
-	public void setExternalId(String externalId) {
-		this.externalId = externalId;
 	}
 }

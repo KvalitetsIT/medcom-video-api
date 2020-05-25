@@ -226,8 +226,6 @@ public class MeetingService {
 		} 
 		meeting.setEndTime(updateMeetingDto.getEndTime());		
 
-		meeting.setExternalId(updateMeetingDto.getExternalId());
-
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
