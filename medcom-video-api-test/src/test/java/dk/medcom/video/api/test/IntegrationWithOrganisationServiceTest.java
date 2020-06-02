@@ -239,14 +239,34 @@ public class IntegrationWithOrganisationServiceTest {
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 		var videoMeetings = new VideoMeetingsApi(apiClient);
 
-		var createMeeting = createMeeting();
+		var createMeeting = createMeeting("another_external_id");
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 	}
 
-	private CreateMeeting createMeeting() {
+	@Test
+	public void testUniqueOrganisationExternalId() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+		var videoMeetings = new VideoMeetingsApi(apiClient);
+
+		var createMeeting = createMeeting("external_id");
+
+		try {
+			videoMeetings.meetingsPostWithHttpInfo(createMeeting);
+			fail();
+		}
+		catch(ApiException e) {
+			assertTrue(e.getResponseBody().contains("ExternalId not unique within organisation."));
+			assertEquals(400, e.getCode());
+		}
+	}
+
+
+	private CreateMeeting createMeeting(String externalId) {
 		var createMeeting = new CreateMeeting();
 		createMeeting.setDescription("This is a description");
 		var now = Calendar.getInstance();
@@ -256,7 +276,7 @@ public class IntegrationWithOrganisationServiceTest {
 		createMeeting.setStartTime(OffsetDateTime.ofInstant(inOneHour.toInstant(), ZoneId.systemDefault()));
 		createMeeting.setEndTime(OffsetDateTime.ofInstant(inTwoHours.toInstant(), ZoneId.systemDefault()));
 		createMeeting.setSubject("This is a subject!");
-		createMeeting.setExternalId(UUID.randomUUID().toString());
+		createMeeting.setExternalId(externalId);
 
 		return createMeeting;
 	}

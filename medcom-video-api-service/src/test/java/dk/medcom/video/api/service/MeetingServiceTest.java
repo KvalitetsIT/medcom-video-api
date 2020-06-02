@@ -567,7 +567,7 @@ public class MeetingServiceTest {
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
 	}
 
-	@Test(expected = DuplicateKeyException.class)
+	@Test(expected = NotValidDataException.class)
 	public void testFailureOnManyDuplicateShortId() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);

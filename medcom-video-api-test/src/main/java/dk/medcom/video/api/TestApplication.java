@@ -42,6 +42,7 @@ public class TestApplication extends SpringBootServletInitializer {
         String jdbcUrl = mysql.getJdbcUrl();
         System.setProperty("jdbc.url", jdbcUrl);
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
+        System.setProperty("short.link.base.url", "http://shortlink");
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;

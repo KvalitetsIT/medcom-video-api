@@ -19,7 +19,7 @@ import dk.medcom.video.api.repository.MeetingRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -119,12 +119,12 @@ public class MeetingService {
 		return meeting;
 	}
 
-	private Meeting saveMeetingWithShortLink(Meeting meeting, int count) {
+	private Meeting saveMeetingWithShortLink(Meeting meeting, int count) throws NotValidDataException {
 		try {
 			meeting.setShortId(idGenerator.generateId(UUID.randomUUID()));
 			return meetingRepository.save(meeting);
 		}
-		catch(DuplicateKeyException e) {
+		catch(DataIntegrityViolationException e) {
 			if(e.getCause() instanceof ConstraintViolationException) {
 				var constraint = (ConstraintViolationException) e.getCause();
 				if(constraint.getConstraintName().equals("short_id")) {
@@ -132,8 +132,13 @@ public class MeetingService {
 						return saveMeetingWithShortLink(meeting, ++count);
 					}
 				}
+
+				if(constraint.getConstraintName().equals("organisation_external_id")) {
+					throw new NotValidDataException("ExternalId not unique within organisation.");
+
+				}
 			}
-			throw e;
+			throw new NotValidDataException("Unable to generate unique shortId. Try again.");
 		}
 	}
 
