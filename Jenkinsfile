@@ -61,6 +61,16 @@ pipeline {
                             image.push(env.TAG_NAME.substring(1))
                             image.push("latest")
                         }
+
+                        image = docker.image("kvalitetsit/medcom-video-api-documentation:${env.GIT_COMMIT}")
+                        image.push("${env.GIT_COMMIT}")
+                        image.push("dev")
+
+                        if(env.TAG_NAME != null && env.TAG_NAME.matches("^v[0-9]*\\.[0-9]*\\.[0-9]*")) {
+                            echo "Tagging version"
+                            image.push(env.TAG_NAME.substring(1))
+                            image.push("latest")
+                        }
                     }
                 }
             }

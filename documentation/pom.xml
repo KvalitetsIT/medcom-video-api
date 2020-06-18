@@ -75,7 +75,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>kvalitetsit/medcom-vdx-pexip-sink-documentation</name>
+                            <name>kvalitetsit/medcom-video-api-documentation</name>
                             <build>
                                 <tags>
                                     <tag>dev</tag>
