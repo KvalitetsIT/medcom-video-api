@@ -107,6 +107,7 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 			return parseSessionDataValue(sessionDataFromHeader);
 		}
 
+		LOGGER.debug("Calling user service to get session data.");
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(sessionId, getSessionId());
 		HttpEntity<Void> request = new HttpEntity<>(headers);
@@ -120,16 +121,20 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	}		
 
 	public SessionData parseSessionDataValue(String encoded) {
+		LOGGER.debug("Parsing session data");
 		String decoded = "";
 		try {
+			LOGGER.debug("Decoding session data.");
 			decoded = new String(Base64.getDecoder().decode(encoded));
 		} catch (IllegalArgumentException e) {
 			LOGGER.error("Failed to decode headervalue: "+encoded);
 			return null;
 		}
 	    try {
+			LOGGER.debug("Parsing session data.");
 			SessionData sessionData = mapper.readValue(decoded, SessionData.class);
 			if (!sessionData.containsUserAttributes()) {
+				LOGGER.debug("Session data does not contain user attributes.");
 				return null;
 			}
 			return sessionData;
@@ -142,9 +147,11 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	
 	private String getSessiondataFromHeader() {
 		if (sessionDataHttpHeaderInput != null && !sessionDataHttpHeaderInput.equals("")) {
+			LOGGER.debug("Trying to get session data from HTTP header: " + sessionDataHttpHeaderInput);
 			HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 			return servletRequest.getHeader(sessionDataHttpHeaderInput);
 		}
+		LOGGER.debug("Session data not found in HTTP header");
 		return null;
 	}
 	
