@@ -370,6 +370,12 @@ public class MeetingService {
 			LOGGER.debug("The meeting was not found. Short Id: " + shortId );
 			throw new RessourceNotFoundException("meeting", "shortId");
 		}
+
+		if(userService.getUserContext().hasOnlyRole(UserRole.ADMIN)) {
+			LOGGER.info("Search short-id called with ADMIN role.");
+			return meeting;
+		}
+
 		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
 			LOGGER.debug("The user does not have the same organization as the meeting: ");
 			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getOrganisationId() + ", + meetingOrganizing user" + meeting.getOrganisation().getOrganisationId());
