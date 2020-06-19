@@ -1,4 +1,4 @@
-FROM swaggerapi/swagger-ui:v3.24.3
+FROM swaggerapi/swagger-ui:v3.25.5
 
 ENV SWAGGER_JSON /documentation/*.yaml
 
