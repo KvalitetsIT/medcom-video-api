@@ -61,6 +61,7 @@ public class TestApplication extends SpringBootServletInitializer {
                 withCreateContainerCmdModifier(cmd);
         phpMyAdmin.start();
 
+        System.setProperty("SERVER_SERVLET_CONTEXT_PATH", "/videoapi");
 
 		SpringApplication.run(TestApplication.class, args);
 	}

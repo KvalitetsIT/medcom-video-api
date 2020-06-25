@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
-import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.dto.OrganisationDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.model.CreateMeeting;
-import okio.BufferedSink;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
@@ -53,7 +52,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -310,6 +308,19 @@ public class IntegrationWithOrganisationServiceTest {
 		assertEquals(response.getUuid(), searchResponse.getUuid());
 //		assertEquals("https://video.link/" + searchResponse.getShortId(), searchResponse.getShortLink());
 	}
+
+	@Test
+	public void testReadOrganisation() {
+		var response = getClient()
+				.path("services").path("organisation").path("test-org")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.get(OrganisationDto.class);
+
+		assertNotNull(response);
+		assertEquals("test-org", response.getCode());
+		assertEquals("company name test-org", response.getName());
+	}
+
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {
 		Calendar cal = (Calendar) calendar.clone();
