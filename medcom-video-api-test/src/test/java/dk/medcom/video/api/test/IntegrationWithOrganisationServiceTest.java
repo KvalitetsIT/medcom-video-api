@@ -226,7 +226,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 		assertNotNull(result);
 		assertEquals(12, result.getShortId().length());
-//		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
+		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
 		assertEquals("external_id", result.getExternalId());
 	}
 

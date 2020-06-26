@@ -585,6 +585,9 @@ components:
           minLength: 12
           maxLength: 12
           example: abcdefghijkl
+        shortLink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
         externalId:
           type: string
           maxLength: 200
