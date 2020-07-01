@@ -6,9 +6,11 @@ import dk.medcom.video.api.dao.SchedulingTemplate;
 import dk.medcom.video.api.dto.PoolInfoDto;
 import dk.medcom.video.api.dto.ProvisionStatus;
 import dk.medcom.video.api.dto.SchedulingTemplateDto;
+import dk.medcom.video.api.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.repository.PoolInfoRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
 import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 import org.springframework.stereotype.Component;
@@ -22,15 +24,22 @@ public class PoolInfoService {
     private SchedulingInfoRepository schedulingInfoRepository;
     private SchedulingTemplateRepository schedulingTemplateRepository;
     private OrganisationRepository organisationRepository;
+    private PoolInfoRepository poolInfoRepository;
 
-    PoolInfoService(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy) {
+    PoolInfoService(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
         this.organisationStrategy = organisationStrategy;
         this.schedulingInfoRepository = schedulingInfoRepository;
         this.schedulingTemplateRepository = schedulingTemplateRepository;
         this.organisationRepository = organisationRepository;
+        this.poolInfoRepository = poolInfoRepository;
     }
 
+    public List<PoolInfoEntity> getAllPoolInfo() {
+    	return poolInfoRepository.getPoolInfos();
+    }
+    
     public List<PoolInfoDto> getPoolInfo() {
+    	
         List<Organisation> organizations = organisationStrategy.findByPoolSizeNotNull();
         List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 

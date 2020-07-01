@@ -1,14 +1,16 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.Organisation;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.annotation.Resource;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import dk.medcom.video.api.dao.Organisation;
 
 public class OrganisationTest extends RepositoryTest {
 
@@ -53,7 +55,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		assertEquals(7, numberOfOrganisations);
+		assertEquals(8, numberOfOrganisations);
 	}
 	
 	@Test
@@ -128,10 +130,15 @@ public class OrganisationTest extends RepositoryTest {
 		List<Organisation> organizations = subject.findByPoolSizeNotNull();
 
 		assertNotNull(organizations);
-		assertEquals(1, organizations.size());
+		assertEquals(2, organizations.size());
 
-		Organisation organization = organizations.get(0);
-		assertEquals("company name another-test-org", organization.getName());
+		Organisation organization = null;
+		for (Organisation org : organizations) {
+			if ("company name another-test-org".equals(org.getName())) {
+				organization = org;
+			}
+		}
+		assertNotNull(organization);
 		assertEquals("pool-test-org", organization.getOrganisationId());
 		assertEquals(10, organization.getPoolSize().intValue());
 	}

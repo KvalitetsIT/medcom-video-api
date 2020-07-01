@@ -1,6 +1,7 @@
 package dk.medcom.video.api.test;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockserver.client.server.MockServerClient;
@@ -35,6 +36,7 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
+@Ignore
 public class IntegrationTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");

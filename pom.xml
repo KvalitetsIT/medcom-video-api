@@ -168,11 +168,11 @@
 		</pluginManagement>
 	</build>
 	<modules>
+        <module>documentation</module>
 		<module>medcom-video-api-interface</module>
 		<module>medcom-video-api-service</module>
 		<module>medcom-video-api-web</module>
 		<module>medcom-video-api-test</module>
 		<module>medcom-video-api-qa</module>
-        <module>documentation</module>
     </modules>
 </project>
