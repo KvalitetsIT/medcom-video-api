@@ -19,8 +19,6 @@ import dk.medcom.video.api.dao.SchedulingInfo;
 
 
 public class SchedulingInfoDto extends RepresentationModel {
-
-	
 	public String uuid;
 	public Long hostPin; 		
 	public Long guestPin;
@@ -44,7 +42,8 @@ public class SchedulingInfoDto extends RepresentationModel {
 	public Date createdTime;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
 	public Date updatedTime;
-	
+	private String shortLink;
+
 	public MeetingDto meetingDetails;
 	
 	public SchedulingInfoDto() {	
@@ -81,6 +80,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		Meeting meeting = schedulingInfo.getMeeting();
 		if(meeting != null) {
 			meetingDetails = new MeetingDto(meeting, shortLinkBaseurl);
+			shortLink = shortLinkBaseurl + meeting.getShortId();
 		}
 
 		try {  
@@ -195,5 +195,13 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setIvrTheme(String ivrTheme) {
 		this.ivrTheme = ivrTheme;
+	}
+
+	public String getShortLink() {
+		return shortLink;
+	}
+
+	public void setShortLink(String shortLink) {
+		this.shortLink = shortLink;
 	}
 }
