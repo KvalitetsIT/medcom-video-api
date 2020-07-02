@@ -1,14 +1,10 @@
 package dk.medcom.video.api.configuration;
 
-import dk.medcom.video.api.interceptor.OrganisationInterceptor;
-import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -18,17 +14,27 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
+import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
+import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
+import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.repository.OrganisationRepository;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.prometheus.client.CollectorRegistry;
 
 @Configuration
 @EnableAspectJAutoProxy
 @ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect"})
-public class ServiceConfiguration extends WebMvcConfigurerAdapter {
+public class ServiceConfiguration implements WebMvcConfigurer {
 	private static Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
 	@Autowired
@@ -37,14 +43,15 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 	@Autowired
 	private OrganisationRepository organisationRepository;
 
+	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
 		registry.addInterceptor(loggingInterceptor());
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
-	} 
-
+	} 	
+	
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
 		return new OrganisationInterceptor(organisationStrategy, organisationRepository);
