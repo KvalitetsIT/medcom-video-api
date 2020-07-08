@@ -1,5 +1,6 @@
 FROM kvalitetsit/medcom-video-api-documentation:1.0.3 AS oldDoc
 COPY /maven/*.yaml /etc/nginx/html/
+COPY /old/*.yaml /etc/nginx/html/
 
 FROM swaggerapi/swagger-ui:v3.27.0
 

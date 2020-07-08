@@ -1,0 +1,349 @@
+openapi: 3.0.0
+info:
+  title: VDX Booking Module API
+  description: API description for the VDX Booking interface which allow for scheduling of video meetings. <br> <br> Version 0.1 does not have a complete list of response codes for errors. <br> <br>
+  version: '0.1'
+  contact:
+    email: development@kvalitetitsit.dk
+tags:
+  - name: Video Meetings
+    description: End user related
+  - name: Video Scheduling Information
+    description: Admin related
+servers:
+  - url: 'http://localhost:8081'
+paths:
+  /api/meetings:
+    get:
+      tags:
+        - Video Meetings
+      summary: gets a list of meetings
+      description: Gets a list of meetings based on a date interval. The start time of the meeting must be within the date interval in order to be included in the response. <br> NB! using + in timezone should be encoded as %2B. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/meetings?from-start-time=2018-01-01T03:12:30%2B0100&to-start-time=2023-12-31T05:12:30%2B0100".
+      parameters:
+        - name: from-start-time
+          in: query
+          description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2018-01-01T03:12:30%2B0100'
+        - name: to-start-time
+          in: query
+          description: to start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2023-12-31T03:12:30-0100'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meeting'
+    post:
+      tags:
+        - Video Meetings
+      summary: adds a new meeting
+      description: Adds a new meeting based on the given input data.
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+      requestBody:
+        description: meeting details to use while adding
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-meeting'
+  /api/meetings/{ccsid}:
+    get:
+      tags:
+        - Video Meetings
+      summary: gets a specific meeting
+      description: Gets a specific meeting based on the given ccsid
+      parameters:
+        - name: ccsid
+          in: path
+          description: the ccsid for the wanted meeting
+          required: true
+          schema:
+            type: string
+            format: ccsid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+  /api/scheduling-info:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a list of scheduling informations from meetings
+      description: Gets a a list of scheduling informations based on date interval and provision status. The start (minus VMR available before) or end time of the meeting must be within the date interval in order to be included in the response. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to provision. <br> NB! using + in timezone should be encoded as %2B. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info??from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION"
+      parameters:
+        - name: from-start-time
+          in: query
+          description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2018-01-01T03:12:30%2B0100'
+        - name: to-end-time
+          in: query
+          description: to end time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2023-12-31T03:12:30-0100'
+        - name: provision-status
+          in: query
+          description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
+          required: false
+          schema:
+            $ref: '#/components/schemas/provisionStatus'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+  /api/scheduling-info/{ccsid}:
+    put:
+      tags:
+        - Video Scheduling Information
+      summary: updates an existing scheduling-info
+      description: Updates a specific scheduling information. Scheduling information is the "technically" part of a meeting
+      parameters:
+        - name: ccsid
+          in: path
+          description: the ccsid for the wanted sheduling information
+          required: true
+          schema:
+            type: string
+            format: ccsid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+      requestBody:
+        description: scheduling information to update with
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-scheduling-info'
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a specific scheduling information
+      description: Gets a specific scheduling information based on the given ccsid
+      parameters:
+        - name: ccsid
+          in: path
+          description: the ccsid for the wanted sheduling information
+          required: true
+          schema:
+            type: string
+            format: ccsid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+components:
+  schemas:
+    meeting:
+      type: object
+      required:
+        - subject
+        - uuid
+        - createdBy
+        - startTime
+        - endTime
+        - _links
+      properties:
+        subject:
+          type: string
+          maxLength: 100
+          example: Short talk about hiring new people
+        uuid:
+          type: string
+          format: uuid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        createdBy:
+          $ref: '#/components/schemas/meetingUser'
+        startTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:00:00 +0000
+        endTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:30:00 +0000
+        description:
+          type: string
+          maxLength: 500
+          example: We need to agree on the process should be. And what deadlines we have during the next 14 days.
+        _links:
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: http://localhost:8081/api/meetings/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+            scheduling-info:
+              description: this link is only returned for "/api/meetings" get operation.
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+    create-meeting:
+      type: object
+      required:
+        - subject
+        - startTime
+        - endTime
+      properties:
+        subject:
+          type: string
+          maxLength: 100
+          example: Short talk about hiring new people
+        startTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:00:00 +0000
+        endTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:30:00 +0000
+        description:
+          type: string
+          maxLength: 500
+          example: We need to agree on the process should be. And what deadlines we have during the next 14 days.
+    scheduling-info:
+      type: object
+      required:
+        - uuid
+        - vmrAvailableBefore
+        - maxParticipants
+        - endMeetingOnEndTime
+        - uriWithDomain
+        - uriWithoutDomain
+        - provisionStatus
+        - meetingDetails
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        hostPin:
+          type: integer
+          format: int32
+          example: 1234
+        guestPin:
+          type: integer
+          format: int32
+          example: 1234
+        vmrAvailableBefore:
+          type: integer
+          format: int32
+          example: 30
+          description: the number of minutes VMR meeting must be available before start
+        maxParticipants:
+          type: integer
+          format: int32
+          example: 5
+        endMeetingOnEndTime:
+          type: boolean
+          example: true
+        uriWithDomain:
+          type: string
+          maxLength: 100
+          example: 1782@test.dk
+        uriWithoutDomain:
+          type: string
+          maxLength: 100
+          example: 1782
+        provisionStatus:
+          $ref: '#/components/schemas/provisionStatus'
+        provisionTimestamp:
+          type: string
+          format: date-time
+          example: 2018-10-01T10:00:00 +0000
+        provisionVmrId:
+          type: string
+          maxLength: 50
+        meetingDetails:
+          $ref: '#/components/schemas/meeting'
+        _links:
+          properties:
+            self:
+              type: object
+              properties:
+                href:
+                  type: string
+                  format: uri
+                  example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+    update-scheduling-info:
+      type: object
+      required:
+        - provisionStatus
+      properties:
+        provisionStatus:
+          $ref: '#/components/schemas/provisionStatus'
+        provisionVmrId:
+          type: string
+          maxLength: 50
+    meetingUser:
+      type: object
+      required:
+        - organisationId
+        - email
+      properties:
+        organisationId:
+          type: string
+          maxLength: 30
+        email:
+          type: string
+          format: email
+          maxLength: 45
+    provisionStatus:
+      example: AWAITS_PROVISION
+      description: Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6.
+      type: string
+      enum:
+        - AWAITS_PROVISION
+        - STARTING_TO_PROVISION
+        - PROVISION_PROBLEMS
+        - PROVISIONED_OK
+        - STARTING_TO_DEPROVISION
+        - DEPROVISION_PROBLEMS
+        - DEPROVISION_OK

@@ -37,11 +37,9 @@ echo "Creating file with version and path"
    done
 )
 
-
-
 echo "Updates version in doc file"
 for file in $DOC_FILES
 do
    file_name=${file##*/}
-   yq w -i $file 'info.version' $(echo ${file_name%.*})
+   yq w -i $file 'info.version' $(echo ${file_name%.*} | cut -d "v" -f 2)
 done
