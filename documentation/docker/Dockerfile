@@ -1,6 +1,5 @@
-FROM kvalitetsit/medcom-video-api-documentation:1.0.3 AS oldDoc
+FROM kvalitetsit/medcom-video-api-documentation:1.0.4 AS oldDoc
 COPY /maven/*.yaml /etc/nginx/html/
-COPY /old/*.yaml /etc/nginx/html/
 
 FROM swaggerapi/swagger-ui:v3.27.0
 
@@ -14,7 +13,7 @@ COPY /maven/runningVersion.json /kit/runningVersion.json
 
 RUN apk update && \
     apk add jq && \
-    apk add nano && \
+#    apk add nano && \
     wget -O /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/3.3.2/yq_linux_amd64" && \
     chmod +x /usr/bin/yq && \
     chmod +x /kit/setVersion.sh && \
