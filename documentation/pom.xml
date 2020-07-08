@@ -87,8 +87,12 @@
                                     <inline>
                                         <files>
                                             <file>
-                                                <source>${project.basedir}/src/main/resources/video-api.yaml
-                                                </source>
+                                                <source>${project.basedir}/src/main/resources/video-api.yaml</source>
+                                                <destName>${git.branch}.yaml</destName>
+                                            </file>
+                                            <file>
+                                                <source>${project.build.outputDirectory}/git.properties</source>
+                                                <destName>runningVersion.json</destName>
                                             </file>
                                         </files>
                                     </inline>
@@ -147,6 +151,29 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>git.branch</includeOnlyProperty>
+                    </includeOnlyProperties>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                    <format>json</format>
+                </configuration>
             </plugin>
         </plugins>
     </build>
