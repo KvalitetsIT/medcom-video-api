@@ -1,6 +1,6 @@
 #! /bin/sh
 
-export DOC_FILES=/etc/nginx/html/*.yaml
+export DOC_FILES=/usr/share/nginx/html/*.yaml
 
 echo "Running set version"
 /kit/setVersion.sh
