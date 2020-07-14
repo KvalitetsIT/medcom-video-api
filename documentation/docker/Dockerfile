@@ -1,10 +1,9 @@
-FROM kvalitetsit/medcom-video-api-documentation:1.0.4 AS oldDoc
+FROM kvalitetsit/medcom-video-api-documentation:latest AS oldDoc
 COPY /maven/*.yaml /usr/share/nginx/html/
 
 FROM swaggerapi/swagger-ui:v3.27.0
 
 COPY --from=oldDoc /usr/share/nginx/html/*.yaml /usr/share/nginx/html/
-COPY --from=oldDoc /etc/nginx/html/*.yaml /usr/share/nginx/html/
 COPY /versions /kit/versions
 COPY /config/setVersion.sh /kit/setVersion.sh
 COPY /config/setServers.sh /kit/setServers.sh
