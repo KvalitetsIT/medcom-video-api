@@ -1,21 +1,5 @@
 package dk.medcom.video.api.configuration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
@@ -26,10 +10,21 @@ import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
 import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.service.PoolInfoService;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.CollectorRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -88,5 +83,30 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	public UserContextService userContextService() {
 		UserContextServiceImpl ucs = new UserContextServiceImpl();
 		return ucs;
+	}
+
+
+
+	@Autowired
+	PrometheusConfig prometheusConfig;
+
+	@Autowired
+	Clock clock;
+
+	@Autowired
+	CollectorRegistry collectorRegistry;
+
+	@Autowired
+	PoolInfoService poolInfoService;
+
+	@Bean
+	public PrometheusScrapeEndpoint prometheus() {
+		return new PrometheusScrapeEndpoint(collectorRegistry);
+	}
+
+	@Bean
+	public PrometheusScrapeEndpoint appmetricsScrapeEndpoint() {
+		PrometheusMeterRegistry registry = new PrometheusMeterRegistry(prometheusConfig, new CollectorRegistry(false), clock);
+		return new VdxApiMetrics(registry.getPrometheusRegistry(), poolInfoService);
 	}
 }
