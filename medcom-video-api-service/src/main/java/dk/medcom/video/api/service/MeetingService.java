@@ -2,10 +2,7 @@ package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
-import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
@@ -108,7 +105,7 @@ public class MeetingService {
 
 		Integer poolSize = organisationService.getPoolSizeForUserOrganisation();
 		if(poolSize == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
-			throw new NotValidDataException("Can not create ad hoc meeting on non ad hoc organization: " + meeting.getOrganisation().getOrganisationId());
+			throw new NotValidDataException(NotValidDataErrors.NON_AD_HOC_ORGANIZATION, meeting.getOrganisation().getOrganisationId());
 		}
 
 		meeting = saveMeetingWithShortLink(meeting, 0);
@@ -134,11 +131,11 @@ public class MeetingService {
 				}
 
 				if(constraint.getConstraintName().equals("organisation_external_id")) {
-					throw new NotValidDataException("ExternalId not unique within organisation.");
+					throw new NotValidDataException(NotValidDataErrors.EXTERNAL_ID_NOT_UNIQUE);
 
 				}
 			}
-			throw new NotValidDataException("Unable to generate unique shortId. Try again.");
+			throw new NotValidDataException(NotValidDataErrors.UNABLE_TO_GENERATE_SHORT_ID);
 		}
 	}
 
@@ -152,7 +149,7 @@ public class MeetingService {
 
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			if(schedulingInfo == null) {
-				throw new NotValidDataException("Unused scheduling information not found for organisation " + meeting.getOrganisation().getOrganisationId());
+				throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_NOT_FOUND_ORGANISATION, meeting.getOrganisation().getOrganisationId());
 			}
 		}
 		else {
@@ -206,7 +203,7 @@ public class MeetingService {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION && schedulingInfo.getProvisionStatus() != ProvisionStatus.PROVISIONED_OK) {
 			LOGGER.debug("Meeting does not have the correct Status for updating. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
-			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated");
+			throw new NotAcceptableException(NotAcceptableErrors.MUST_HAVE_STATUS_AWAITS_PROVISION_OR_PROVISIONED_OK);
 		}
 		
 		validateDate(updateMeetingDto.getEndTime());
@@ -263,7 +260,7 @@ public class MeetingService {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Meeting does not have the correct Status for deletion. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
-			throw new NotAcceptableException("Meeting must have status AWAITS_PROVISION (0) in order to be deleted");
+			throw new NotAcceptableException(NotAcceptableErrors.MUST_HAVE_STATUS_AWAITS_PROVISION);
 		}
 
 		schedulingInfoService.deleteSchedulingInfo(uuid);
@@ -278,7 +275,7 @@ public class MeetingService {
 		calendar.setTime(date);
 		if (calendar.get(Calendar.YEAR) > 9999) {
 			LOGGER.debug("Date must be less than 9999 but is not. Actual value is: " + calendar.get(Calendar.YEAR));
-			throw new NotValidDataException("Date format is wrong, year must only have 4 digits");
+			throw new NotValidDataException(NotValidDataErrors.DATA_FORMAT_WRONG);
 		}
 	}
 

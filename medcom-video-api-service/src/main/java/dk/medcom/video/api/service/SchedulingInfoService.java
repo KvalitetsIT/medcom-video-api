@@ -1,10 +1,6 @@
 package dk.medcom.video.api.service;
 
-
-import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
@@ -150,7 +146,7 @@ public class SchedulingInfoService {
 
 		if (!(schedulingTemplate.getUriNumberRangeLow() < schedulingTemplate.getUriNumberRangeHigh())) {
 			LOGGER.debug("The Uri assignment failed due to invalid setup on the template used.");
-			throw new NotAcceptableException("The Uri assignment failed due to invalid setup on the template used");
+			throw new NotAcceptableException(NotAcceptableErrors.URI_ASSIGNMENT_FAILED_INVALID_TEMPLATE_USED);
 		}
 		do {            //loop x number of times until a no-duplicate url is found
 			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
@@ -158,7 +154,7 @@ public class SchedulingInfoService {
 		} while (schedulingInfoUri != null && whileCount++ < whileMax);
 		if (whileCount > whileMax) {
 			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
-			throw new NotAcceptableException("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
+			throw new NotAcceptableException(NotAcceptableErrors.URI_ASSIGNMENT_FAILED_NOT_POSSIBLE_TO_CREATE_UNIQUE);
 		}
 
 		return randomUri;
@@ -172,7 +168,7 @@ public class SchedulingInfoService {
 				return ThreadLocalRandom.current().nextLong(schedulingTemplate.getGuestPinRangeLow(), schedulingTemplate.getGuestPinRangeHigh());
 			} else {
 				LOGGER.debug("The guest pincode assignment failed due to invalid setup on the template used");
-				throw new NotAcceptableException("The guest pincode assignment failed due to invalid setup on the template used");
+				throw new NotAcceptableException(NotAcceptableErrors.GUEST_PINCODE_ASSIGNMENT_FAILED);
 			}
 		}
 
@@ -187,7 +183,7 @@ public class SchedulingInfoService {
 				return ThreadLocalRandom.current().nextLong(schedulingTemplate.getHostPinRangeLow(), schedulingTemplate.getHostPinRangeHigh());
 			} else {
 				LOGGER.debug("The host pincode assignment failed due to invalid setup on the template used.");
-				throw new NotAcceptableException("The host pincode assignment failed due to invalid setup on the template used");
+				throw new NotAcceptableException(NotAcceptableErrors.HOST_PINCODE_ASSIGNMENT_FAILED);
 			}
 		}
 
@@ -295,11 +291,11 @@ public class SchedulingInfoService {
 
 		dk.medcom.video.api.organisation.Organisation organisation = organisationStrategy.findOrganisationByCode(createSchedulingInfoDto.getOrganizationId());
 		if(organisation == null) {
-			throw new NotValidDataException(String.format("OrganisationId %s in request not found.", createSchedulingInfoDto.getOrganizationId()));
+			throw new NotValidDataException(NotValidDataErrors.ORGANISATION_ID_NOT_FOUND ,createSchedulingInfoDto.getOrganizationId());
 		}
 
 		if(organisation.getPoolSize() == null) {
-			throw new NotValidDataException(String.format("Scheduling information can not be created on organisation %s that is not pool enabled.", organisation.getCode()));
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_CAN_NOT_BE_CREATED, organisation.getCode());
 		}
 
 		//if template is input and is related to the users organisation use that. Otherwise find default.
@@ -308,12 +304,12 @@ public class SchedulingInfoService {
 
 		if (schedulingTemplate == null) {
 			LOGGER.debug(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
-			throw new NotValidDataException(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND, createSchedulingInfoDto.getSchedulingTemplateId().toString());
 		}
 
 		if(schedulingTemplate.getOrganisation() != null && !schedulingTemplate.getOrganisation().getOrganisationId().equals(createSchedulingInfoDto.getOrganizationId())) {
 			LOGGER.debug(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
-			throw new NotValidDataException(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION, createSchedulingInfoDto.getSchedulingTemplateId().toString(), createSchedulingInfoDto.getOrganizationId());
 		}
 
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
