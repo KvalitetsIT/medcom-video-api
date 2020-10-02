@@ -26,15 +26,14 @@
 				"header": [],
 				"body": {},
 				"url": {
-					"raw": "http://{{host}}:{{port}}/api/actuator/info",
+					"raw": "http://{{host}}:{{port}}/manage/info",
 					"protocol": "http",
 					"host": [
 						"{{host}}"
 					],
 					"port": "{{port}}",
 					"path": [
-						"api",
-						"actuator",
+						"manage",
 						"info"
 					]
 				}

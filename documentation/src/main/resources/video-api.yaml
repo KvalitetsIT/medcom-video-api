@@ -42,7 +42,9 @@ info:
     <Li> 0.6.0 <Ul>
     <Li> added post scheduling-info
     <Li> added get pool-info
-    <Li> added meetingType and uuid to create-meeting
+    <Li> added meetingType and uuid to create-meeting </Ul>
+    <Li> 1.0.5 <Ul>
+    <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request </Ul>
     </Ul>
   version: "0.6.0"
   contact:
@@ -505,6 +507,10 @@ components:
   responses:
     '400':
       description: "Bad Request. This could be because: <br> * invalid date format in date format parameters/properties <br> * a uuid parameter does not have the correct format <br>  * one of the required parameters/properties are missing or is empty <br> * length of input is exeeding maximum length <br> * referenced entities like organisation, templates etc has some problems <br> (See a possible detailed error message in the in the response.)"
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/Bad-Request'
     '401':
       description: "Unauthorized. This could be because: <br> * the role of the user may not use the request (only PROVISIONER can use the scheduling-info post request and only ADMIN can use the scheduling-template post and put request) <br> * the role mapping between 'user context' and the video API does not match <br> * the user is not correct configured. It could be missing email or organisation"
     '403':
@@ -513,6 +519,10 @@ components:
       description: "Not Found. This could be because: <br> * the uuid being requested has been deleted <br> * the uuid being requested has never existed <br> * the id (scheduling template) being requested does not exist"
     '406':
       description: "Not Acceptable. This could be because: <br> * Status of the meeting is not AWAITS_PROVISION or PROVISIONED_OK<br> * template configuration was inadequate <br> (See a possible detailed error message in the in the response.)"
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/Not-Acceptable'
   schemas:
     info:
       type: object
@@ -1122,3 +1132,43 @@ components:
           format: int32
         schedulingTemplate:
           $ref: '#/components/schemas/scheduling-template'
+    Not-Acceptable:
+      type: integer
+      format: int32
+      enum:
+        - errorCode: 10
+          errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated'
+        - errorCode: 11
+          errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted'
+        - errorCode: 20
+          errorText: 'The Uri assignment failed due to invalid setup on the template used'
+        - errorCode: 21
+          errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template'
+        - errorCode: 30
+          errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
+        - errorCode: 31
+          errorText: 'The host pincode assignment failed due to invalid setup on the template used'
+    Bad-Request:
+      type: integer
+      format: int32
+      enum:
+        - errorCode: 10
+          errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
+        - errorCode: 11
+          errorText: 'Unused scheduling information not found for organisation xxx'
+        - errorCode: 12
+          errorText: 'ExternalId not unique within organisation.'
+        - errorCode: 13
+          errorText: 'OrganisationId xxx in request not found.'
+        - errorCode: 14
+          errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.'
+        - errorCode: 20
+          errorText: 'Unable to generate unique shortId. Try again.'
+        - errorCode: 30
+          errorText: 'Date format is wrong, year must only have 4 digits'
+        - errorCode: 40
+          errorText: 'Scheduling template xxx not found.'
+        - errorCode: 41
+          errorText: 'Scheduling template yyy does not belong to organisation xxx.'
+        - errorCode: 50
+          errorText: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.'

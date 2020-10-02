@@ -1,14 +1,24 @@
 package dk.medcom.video.api.controller.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
 public class NotAcceptableException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private final int errorCode;
+    private final String errorText;
 
-	public NotAcceptableException(String msg) {
-		super(msg);
-	}
+    public NotAcceptableException(NotAcceptableErrors error) {
+        super(error.getErrorText());
+        errorCode = error.getErrorCode();
+        errorText = error.getErrorText();
+    }
+
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorText() {
+        return errorText;
+    }
 }
+

@@ -3,10 +3,7 @@ package dk.medcom.video.api.controller;
 
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
-import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dto.CreateMeetingDto;
 import dk.medcom.video.api.dto.MeetingDto;
@@ -17,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -156,7 +153,7 @@ public class MeetingController {
 		LOGGER.debug(String.format("Searching for meetings. Search: %s, fromStartTime: %s, toStartTime: %s.", search, fromStartTime, toStartTime));
 
 		if((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
-			throw new NotValidDataException("Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+			throw new NotValidDataException(NotValidDataErrors.BOTH_FROM_AND_TO_START_TIME_MUST_BE_PROVIDED_OR_NONE);
 		}
 
 		List<Meeting> meetings = meetingService.searchMeetings(search, fromStartTime, toStartTime);

@@ -45,7 +45,8 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private String shortLink;
 
 	public MeetingDto meetingDetails;
-	
+	private String shortlink;
+
 	public SchedulingInfoDto() {	
 	}
 	
@@ -81,6 +82,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		if(meeting != null) {
 			meetingDetails = new MeetingDto(meeting, shortLinkBaseurl);
 			shortLink = shortLinkBaseurl + meeting.getShortId();
+			shortlink = shortLink;
 		}
 
 		try {  
@@ -203,5 +205,13 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setShortLink(String shortLink) {
 		this.shortLink = shortLink;
+	}
+
+	public String getShortlink() {
+		return shortlink;
+	}
+
+	public void setShortlink(String shortlink) {
+		this.shortlink = shortlink;
 	}
 }
