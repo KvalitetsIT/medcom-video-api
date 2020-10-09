@@ -18,7 +18,7 @@
 
 		<!-- Actuator so it possible to get metrics -->
 		<dependency>
-			<groupId>dk.medcom.video-link-handler</groupId>
+			<groupId>dk.medcom.video.api</groupId>
 			<artifactId>app-info</artifactId>
 			<version>${project.version}</version>
 		</dependency>
