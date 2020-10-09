@@ -181,7 +181,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 		organisationMysql.start();
 
-		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
 				.withNetwork(n)
 				.withNetworkAliases("organisationservice")
 				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
