@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.Test;
 
 public class PrometeusIT extends IntegrationWithOrganisationServiceTest {
-
-	
-	
 	@Test
 	public void testCanReadPrometheusEndpoint() {
 		var result = getAdminClient().path("actuator").path("prometheus")
