@@ -131,8 +131,6 @@ public class IntegrationTest {
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		attachLogger(videoApi, videoApiLogger);
-
-
 	}
 
 	private static void attachLogger(GenericContainer container, Logger logger) {

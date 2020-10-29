@@ -1,6 +1,7 @@
 package dk.medcom.video.api.test;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -125,7 +126,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
-				.waitingFor(Wait.forListeningPort());//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
+				.withStartupTimeout(Duration.ofSeconds(120))
+				.waitingFor(Wait.forListeningPort()).withStartupTimeout(Duration.ofSeconds(120));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		videoAdminApiPort = videoApi.getMappedPort(8081);
@@ -181,7 +183,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 		organisationMysql.start();
 
-		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
 				.withNetwork(n)
 				.withNetworkAliases("organisationservice")
 				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")

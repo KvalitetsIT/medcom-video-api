@@ -22,7 +22,7 @@ public class OrganisationController {
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
 	@RequestMapping(value = "/services/organisation/{code}", method = RequestMethod.GET)
-	public OrganisationDto updateMeeting(@PathVariable("code") String code) throws RessourceNotFoundException {
+	public OrganisationDto getOrganisation(@PathVariable("code") String code) throws RessourceNotFoundException {
 		LOGGER.debug("Entry of /services/organisation.get code: " + code);
 
 		var optionalOrganisation = organisationService.getOrganisationById(code);
@@ -31,6 +31,8 @@ public class OrganisationController {
 		var response = new OrganisationDto();
 		response.setName(organisation.getName());
 		response.setCode(organisation.getOrganisationId());
+		int poolSize = organisation.getPoolSize() == null ? 0 : organisation.getPoolSize();
+		response.setPoolSize(poolSize);
 
 		return response;
 	}
