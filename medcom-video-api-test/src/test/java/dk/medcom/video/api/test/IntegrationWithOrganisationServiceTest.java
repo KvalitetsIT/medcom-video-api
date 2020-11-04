@@ -126,8 +126,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
-				.withStartupTimeout(Duration.ofSeconds(120))
-				.waitingFor(Wait.forListeningPort()).withStartupTimeout(Duration.ofSeconds(120));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
+				.withStartupTimeout(Duration.ofSeconds(180))
+				.waitingFor(Wait.forListeningPort()).withStartupTimeout(Duration.ofSeconds(180));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		videoAdminApiPort = videoApi.getMappedPort(8081);
@@ -198,6 +198,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("userrole_provisioner_values", "provisionerrole")
 				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
+				.withStartupTimeout(Duration.ofSeconds(180))
 				.withExposedPorts(8080)
 				;
 
