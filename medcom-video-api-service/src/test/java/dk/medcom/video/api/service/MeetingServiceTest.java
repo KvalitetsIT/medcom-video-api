@@ -32,11 +32,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 
 public class MeetingServiceTest {
-	private Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1, 13, 15, 0);
-	private Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 15, 0);
-	private Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 45, 0);
-	private Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 15, 0);
-	private Calendar calendarEndUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 45, 0);
+	private final Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1, 13, 15, 0);
+	private final Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 15, 0);
+	private final Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 45, 0);
+	private final Calendar calendarEnd = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 15, 0);
+	private final Calendar calendarEndUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 14, 45, 0);
 
 	private CreateMeetingDto createMeetingDto;
 	private UpdateMeetingDto updateMeetingDto;
@@ -353,7 +353,7 @@ public class MeetingServiceTest {
 		input.setDescription("This is a description");
 		input.setOrganizedByEmail("some@email.com");
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.MINUTE, 2);
+		now.add(Calendar.MINUTE, (24*60)+1);
 		input.setStartTime(now.getTime());
 		input.setUuid(uuid);
 		input.setMeetingType(MeetingType.POOL);
@@ -474,7 +474,7 @@ public class MeetingServiceTest {
 		input.setDescription("This is a description");
 		input.setOrganizedByEmail("some@email.com");
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.MINUTE, 2);
+		now.add(Calendar.MINUTE, (24*60)+1);
 		input.setStartTime(now.getTime());
 		input.setUuid(uuid);
 		input.setEndTime(new Date());
