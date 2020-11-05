@@ -22,3 +22,11 @@ jobs:
         java-version: 11
     - name: Build with Maven
       run: pwd && mvn clean install
+    - name: Push to docker
+      uses: actions/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: jonaspkit/video-api-test
+        tag_with_ref: true
+
