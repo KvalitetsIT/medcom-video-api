@@ -52,5 +52,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      name: hej hej
-      run: docker image ls
+      . name: hej hej
+        run: docker image ls
