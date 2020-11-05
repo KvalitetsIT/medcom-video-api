@@ -15,18 +15,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+# Checkout source code
     - uses: actions/checkout@v2
+
+# Cache maven stuff
+    - name: Cache local Maven repository
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+# Setup Java environment including maven
     - name: Set up JDK 1.11
       uses: actions/setup-java@v1
       with:
         java-version: 11
+
+# Build solution. Also creates docker image.
     - name: Build with Maven
-      run: pwd && mvn clean install
-    - name: Push to docker
-      uses: docker/build-push-action@v1
+      run: mvn clean install
+
+# Login to docker hub using secrets in GitHub.
+    - name: Login to docker
+      uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: jonaspkit/video-api-test
-        tag_with_ref: true
+
+    - name: Tag dev
+      run: docker tag kvalitetsit/medcom-video-api:latest jonaspkit/video-api-test:dev
+
+    - name: Push to docker
+      run: docker push jonaspkit/video-api-test:dev
 
