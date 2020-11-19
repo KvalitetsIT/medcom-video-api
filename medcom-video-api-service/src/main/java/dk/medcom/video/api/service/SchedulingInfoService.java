@@ -55,6 +55,14 @@ public class SchedulingInfoService {
 		return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(fromStartTime, toEndTime, provisionStatus);
 	}
 
+	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
+		return schedulingInfoRepository.findAllWithinStartTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+	}
+
+	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
+		return schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
+	}
+
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException {
 		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);

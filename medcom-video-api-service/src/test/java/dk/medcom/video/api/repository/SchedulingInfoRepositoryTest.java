@@ -143,7 +143,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		assertEquals(6, numberOfSchedulingInfo);
+		assertEquals(7, numberOfSchedulingInfo);
 	}
 	
 	@Test
@@ -253,6 +253,80 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 			numberOfSchedulingInfo++;
 		}
 		assertEquals(1, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testFindAllWithStartTimeLessThenAndProvisionStatus0() {
+		// Given
+		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1,15,15, 0); //month is zero-based
+		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
+		Date from = calendarFrom.getTime();
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+			numberOfSchedulingInfo++;
+		}
+		assertEquals(2, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testFindAllWithStartTimeLessThenAndProvisionStatus0HandingZeroResult() {
+		// Given
+		Calendar calendarFrom = new GregorianCalendar(2050, Calendar.DECEMBER, 1,15,15, 0); //month is zero-based
+		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
+		Date from = calendarFrom.getTime();
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+			numberOfSchedulingInfo++;
+		}
+		assertEquals(0, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testFindAllWithEndTimeLessThenAndProvisionStatus3() {
+		// Given
+		Calendar calendarTo = new GregorianCalendar(2019,10,03,16,00,05);
+		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
+
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinEndTimeLessThenAndStatus(calendarTo.getTime(), provisionStatus);
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+			numberOfSchedulingInfo++;
+		}
+		assertEquals(1, numberOfSchedulingInfo);
+	}
+	@Test
+	public void testFindAllWithEndTimeLessThenAndProvisionStatus3HandingZeroResult() {
+		// Given
+		Calendar calendarTo = new GregorianCalendar(2018,10,02,16,00,05);
+		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
+
+		// When
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinEndTimeLessThenAndStatus(calendarTo.getTime(), provisionStatus);
+		// Then
+		Assert.assertNotNull(schedulingInfos);
+		int numberOfSchedulingInfo = 0;
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			Assert.assertNotNull(schedulingInfo);
+			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+			numberOfSchedulingInfo++;
+		}
+		assertEquals(0, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testGetMeetingUserOnExistingSchedulingInfo() {

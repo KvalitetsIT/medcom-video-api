@@ -16,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -95,5 +95,45 @@ public class SchedulingInfoController {
 		
 		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());
 		return resource;
+	}
+
+	@APISecurityAnnotation({UserRole.PROVISIONER_USER})
+	@RequestMapping(value = "/scheduling-info-provision", method = RequestMethod.GET)
+	public CollectionModel<SchedulingInfoDto> getSchedulingInfoAwaitsProvision() {
+		LOGGER.debug("Entry of /scheduling-info-provision.get");
+
+		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfoAwaitsProvision();
+		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
+			schedulingInfoDtos.add(schedulingInfoDto);
+		}
+		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
+
+		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsProvision()).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("Exit of /scheduling-info-provision.get resources: " + resources.toString());
+		return resources;
+	}
+
+	@APISecurityAnnotation({UserRole.PROVISIONER_USER})
+	@RequestMapping(value = "/scheduling-info-deprovision", method = RequestMethod.GET)
+	public CollectionModel<SchedulingInfoDto> getSchedulingInfoAwaitsDeProvision() {
+		LOGGER.debug("Entry of /scheduling-info-deprovision.get");
+
+		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
+		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();
+		for (SchedulingInfo schedulingInfo : schedulingInfos) {
+			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
+			schedulingInfoDtos.add(schedulingInfoDto);
+		}
+		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
+
+		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsDeProvision()).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources.toString());
+		return resources;
 	}
 }

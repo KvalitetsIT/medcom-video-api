@@ -46,7 +46,11 @@ info:
     <Li> 1.0.5 <Ul>
     <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request </Ul>
     </Ul>
-  version: "0.6.0"
+    <Li> 1.1.0 <Ul>
+    <Li> added get scheduling-info-provision </Ul>
+    <Li> added get scheduling-info-deprovision </Ul>
+    </Ul>
+  version: "1.1.0"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -463,6 +467,44 @@ paths:
           $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+  /scheduling-info-provision:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a list of scheduling informations on meetings waiting to be provisioned
+      description: Gets a a list of scheduling informations to provision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to provision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-provision/".
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+  /scheduling-info-deprovision:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
+      description: Gets a a list of scheduling informations to deprovision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to deprovision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-deprovision/".
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
   /pool:
     get:
       tags:

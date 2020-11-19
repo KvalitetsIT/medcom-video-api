@@ -8,7 +8,6 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -110,7 +109,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 			assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		assertEquals(7, numberOfMeetings);
+		assertEquals(8, numberOfMeetings);
 	}
 
 	@Test
