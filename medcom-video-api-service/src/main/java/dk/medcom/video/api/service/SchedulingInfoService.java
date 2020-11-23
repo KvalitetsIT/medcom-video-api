@@ -5,10 +5,7 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.CreateMeetingDto;
-import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
-import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
+import dk.medcom.video.api.dto.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
 import dk.medcom.video.api.repository.SchedulingInfoRepository;
@@ -286,18 +283,25 @@ public class SchedulingInfoService {
 				}
 		}
 
-		String microphone;
+		String microphone = null;
 		if (schedulingInfo.getMeeting() != null && schedulingInfo.getMeeting().getGuestMicrophone() != null){
-			microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
-			LOGGER.debug("Guest microphone is: "+ microphone);
+			if (schedulingInfo.getMeeting().getGuestMicrophone() != GuestMicrophone.ON){
+				microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
+			}
+			LOGGER.debug("Guest microphone is: "+ schedulingInfo.getMeeting().getGuestMicrophone());
 		}else {
-			microphone = "on";
-			LOGGER.debug("Guest microphone is set to default 'on'");
+			LOGGER.debug("Guest microphone is not set");
 		}
-		
-		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate + "&microphone=" + microphone; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=on
+
+		StringBuilder portalLink = new StringBuilder();
+		//Minimum portal link
+		portalLink.append(citizenPortal).append("/?url=").append(schedulingInfo.getUriWithDomain()).append("&pin=").append(portalPin).append("&start_dato=").append(portalDate);
+
+		if (microphone != null){
+			portalLink.append("&microphone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=off
+		}
 		LOGGER.debug("portalLink is " + portalLink);
-		return portalLink;
+		return portalLink.toString();
 	}
 
 	@Transactional(rollbackFor = Throwable.class)

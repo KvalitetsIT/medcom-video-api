@@ -114,7 +114,7 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00&microphone=on", capturedSchedulingInfo.getPortalLink());
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
     }
 
     @Test
@@ -301,7 +301,7 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=on", result.getPortalLink());
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
