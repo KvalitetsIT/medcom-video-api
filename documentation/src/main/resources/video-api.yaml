@@ -553,7 +553,98 @@ components:
       content:
         application/hal+json:
           schema:
-            $ref: '#/components/schemas/Bad-Request'
+            $ref: '#/components/schemas/bad-request'
+          examples:
+            10:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 10
+                errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
+            11:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 11
+                errorText: 'Unused scheduling information not found for organisation xxx'
+            12:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 12
+                errorText: 'ExternalId not unique within organisation.'
+            13:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 13
+                errorText: 'OrganisationId xxx in request not found.'
+            14:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 14
+                errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.'
+            20:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 20
+                errorText: 'Unable to generate unique shortId. Try again.'
+            30:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 30
+                errorText: 'Date format is wrong, year must only have 4 digits'
+            40:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 40
+                errorText: 'Scheduling template xxx not found.'
+            41:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 41
+                errorText: 'Scheduling template xxx not found.'
+            50:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 50
+                errorText: 'Scheduling template xxx not found.'
     '401':
       description: "Unauthorized. This could be because: <br> * the role of the user may not use the request (only PROVISIONER can use the scheduling-info post request and only ADMIN can use the scheduling-template post and put request) <br> * the role mapping between 'user context' and the video API does not match <br> * the user is not correct configured. It could be missing email or organisation"
     '403':
@@ -565,7 +656,62 @@ components:
       content:
         application/hal+json:
           schema:
-            $ref: '#/components/schemas/Not-Acceptable'
+            $ref: '#/components/schemas/not-acceptable'
+          examples:
+            10:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 10
+                errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated'
+            11:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 11
+                errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted'
+            20:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 20
+                errorText: 'The Uri assignment failed due to invalid setup on the template used'
+            21:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 21
+                errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template'
+            30:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 30
+                errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
+            31:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 31
+                errorText: 'The host pincode assignment failed due to invalid setup on the template used'
   schemas:
     info:
       type: object
@@ -1195,7 +1341,7 @@ components:
           format: int32
         schedulingTemplate:
           $ref: '#/components/schemas/scheduling-template'
-    Not-Acceptable:
+    not-acceptable:
       type: integer
       format: int32
       enum:
@@ -1211,9 +1357,8 @@ components:
           errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
         - errorCode: 31
           errorText: 'The host pincode assignment failed due to invalid setup on the template used'
-    Bad-Request:
+    bad-request:
       type: integer
-      format: int32
       enum:
         - errorCode: 10
           errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
