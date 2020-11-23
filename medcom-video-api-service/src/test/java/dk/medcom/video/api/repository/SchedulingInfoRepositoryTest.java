@@ -271,12 +271,12 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
 			numberOfSchedulingInfo++;
 		}
-		assertEquals(2, numberOfSchedulingInfo);
+		assertEquals(3, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testFindAllWithStartTimeLessThenAndProvisionStatus0HandingZeroResult() {
 		// Given
-		Calendar calendarFrom = new GregorianCalendar(2050, Calendar.DECEMBER, 1,15,15, 0); //month is zero-based
+		Calendar calendarFrom = new GregorianCalendar(2018, 8, 1,15,15, 0); //month is zero-based
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 
 		// When
