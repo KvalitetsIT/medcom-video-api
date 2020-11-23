@@ -7,10 +7,7 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingLabel;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
-import dk.medcom.video.api.dto.CreateMeetingDto;
-import dk.medcom.video.api.dto.MeetingType;
-import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.dto.*;
 import dk.medcom.video.api.repository.MeetingLabelRepository;
 import dk.medcom.video.api.repository.MeetingRepository;
 import org.hibernate.exception.ConstraintViolationException;
@@ -192,6 +189,12 @@ public class MeetingService {
 		});
 
 		meeting.setExternalId(createMeetingDto.getExternalId());
+
+		if(createMeetingDto.getGuestMicrophone() != null){
+			meeting.setGuestMicrophone(createMeetingDto.getGuestMicrophone());
+		} else {
+			meeting.setGuestMicrophone(GuestMicrophone.ON);
+		}
 
 		return meeting;
 	}

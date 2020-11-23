@@ -5,7 +5,7 @@ Video api'ets database er struktureret som følger
 
 ## API dokumentation
 API'ets snitflade dokumentation kan findes på swaggerhub:
-https://app.swaggerhub.com/apis/Kvalitetsit/VDX-Booking-Module-API/0.4.0
+https://api-docs.vconf.dk/videoapi/v1/videoapi/
 
 ## Test
 ### Unit test
@@ -35,5 +35,5 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn | Ikke tvunget/ Ingen default  |
 |organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information.| Ikke tvungen. Default false. |
 |organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services         | Ikke tvungen. Skal være sat hvis organisation.service.enabled er sat til true. |
- |short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/ | Tvunget
- |baseline.flyway           | Set to true to create new new flyway baseline starting from version 40. Needed to Flyway 3 to 6 migration. | Ikke tvunget. 
+|short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/ | Tvunget
+|baseline.flyway           | Set to true to create new new flyway baseline starting from version 40. Needed to Flyway 3 to 6 migration. | Ikke tvunget. 

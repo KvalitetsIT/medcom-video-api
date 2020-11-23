@@ -1,10 +1,11 @@
 package dk.medcom.video.api.dao;
 
+import dk.medcom.video.api.dto.GuestMicrophone;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.persistence.*;
 
 
 @Entity
@@ -48,6 +49,9 @@ public class Meeting {
 
 	@OneToMany(mappedBy = "meeting")
 	private Set<MeetingLabel> meetingLabels = new HashSet<>();
+
+	@Enumerated(EnumType.STRING)
+	private GuestMicrophone guestMicrophone;
 
 	public Long getId() {
 		return id;
@@ -171,5 +175,13 @@ public class Meeting {
 
 	public void setExternalId(String externalId) {
 		this.externalId = externalId;
+	}
+
+	public GuestMicrophone getGuestMicrophone() {
+		return guestMicrophone;
+	}
+
+	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
+		this.guestMicrophone = guestMicrophone;
 	}
 }

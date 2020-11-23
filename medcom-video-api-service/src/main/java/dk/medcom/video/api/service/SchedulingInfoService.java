@@ -111,7 +111,10 @@ public class SchedulingInfoService {
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
 		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
-	
+
+		schedulingInfo.setMeeting(meeting);
+		schedulingInfo.setOrganisation(meeting.getOrganisation());
+
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		
 		
@@ -135,9 +138,6 @@ public class SchedulingInfoService {
 		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
-		
-		schedulingInfo.setMeeting(meeting);
-		schedulingInfo.setOrganisation(meeting.getOrganisation());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
@@ -285,8 +285,17 @@ public class SchedulingInfoService {
 					LOGGER.debug("Portal pin used is empty");
 				}
 		}
+
+		String microphone;
+		if (schedulingInfo.getMeeting() != null && schedulingInfo.getMeeting().getGuestMicrophone() != null){
+			microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
+			LOGGER.debug("Guest microphone is: "+ microphone);
+		}else {
+			microphone = "on";
+			LOGGER.debug("Guest microphone is set to default 'on'");
+		}
 		
-		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54
+		String portalLink = citizenPortal + "/?url=" + schedulingInfo.getUriWithDomain() + "&pin=" + portalPin + "&start_dato=" + portalDate + "&microphone=" + microphone; 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=on
 		LOGGER.debug("portalLink is " + portalLink);
 		return portalLink;
 	}

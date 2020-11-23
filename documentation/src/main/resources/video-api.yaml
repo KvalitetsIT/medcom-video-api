@@ -47,8 +47,9 @@ info:
     <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request </Ul>
     </Ul>
     <Li> 1.1.0 <Ul>
-    <Li> added get scheduling-info-provision </Ul>
-    <Li> added get scheduling-info-deprovision </Ul>
+    <Li> added get scheduling-info-provision
+    <Li> added get scheduling-info-deprovision
+    <Li> added guestMicrophone to create-meeting </Ul>
     </Ul>
   version: "1.1.0"
   contact:
@@ -644,6 +645,16 @@ components:
           type: string
           maxLength: 200
           example: 87527808-147f-4c54-88be-aec56c7194a3
+        guestMicrophone:
+          example: MUTED
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - OFF
+            - ON
+            - MUTED
+            - null
         _links:
           properties:
             self:
@@ -715,6 +726,16 @@ components:
           type: string
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
+        guestMicrophone:
+          example: MUTED
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - OFF
+            - ON
+            - MUTED
+            - null
     update-meeting:
       type: object
       required:

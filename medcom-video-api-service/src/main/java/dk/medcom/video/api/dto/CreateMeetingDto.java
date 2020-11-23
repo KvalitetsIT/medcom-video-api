@@ -47,6 +47,8 @@ public class CreateMeetingDto {
 	@Size(max = 200, message = "externalId should have a maximum of 200 characters.")
 	private String externalId;
 
+	private GuestMicrophone guestMicrophone;
+
 	public List<String> getLabels() {
 		return labels;
 	}
@@ -151,5 +153,13 @@ public class CreateMeetingDto {
 
 	public void setExternalId(String externalId) {
 		this.externalId = externalId;
+	}
+
+	public GuestMicrophone getGuestMicrophone() {
+		return guestMicrophone;
+	}
+
+	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
+		this.guestMicrophone = guestMicrophone;
 	}
 }

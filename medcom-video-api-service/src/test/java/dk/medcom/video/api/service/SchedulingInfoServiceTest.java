@@ -8,10 +8,7 @@ import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
 import dk.medcom.video.api.dao.SchedulingInfo;
 import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.CreateMeetingDto;
-import dk.medcom.video.api.dto.CreateSchedulingInfoDto;
-import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.UpdateSchedulingInfoDto;
+import dk.medcom.video.api.dto.*;
 import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
@@ -20,7 +17,6 @@ import dk.medcom.video.api.repository.SchedulingTemplateRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.math.BigInteger;
@@ -118,7 +114,7 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00&microphone=on", capturedSchedulingInfo.getPortalLink());
     }
 
     @Test
@@ -305,7 +301,7 @@ public class SchedulingInfoServiceTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=on", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -383,6 +379,51 @@ public class SchedulingInfoServiceTest {
         assertNull(schedulingInfo);
     }
 
+    @Test
+    public void testAttachMeetingToSchedulingInfoMicrophoneOff() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+        Date vmrStartTime = calendar.getTime();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+        meeting.setGuestMicrophone(GuestMicrophone.OFF);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        assertNotNull(result);
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=off", result.getPortalLink());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
+    }
+
+    @Test
+    public void testAttachMeetingToSchedulingInfoMicrophoneMuted() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+        Date vmrStartTime = calendar.getTime();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+        meeting.setGuestMicrophone(GuestMicrophone.MUTED);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        assertNotNull(result);
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=muted", result.getPortalLink());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
+    }
 
     private SchedulingTemplate createSchedulingTemplate(long id) {
         SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
@@ -420,6 +461,7 @@ public class SchedulingInfoServiceTest {
         schedulingInfo.setUuid(schedulingInfoUuid.toString());
         schedulingInfo.setOrganisation(createOrganisation());
         schedulingInfo.setUriWithoutDomain("random_uri");
+        schedulingInfo.setMeeting(new Meeting());
 
         return schedulingInfo;
     }

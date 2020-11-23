@@ -1,12 +1,14 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.GuestMicrophone;
 import dk.medcom.video.api.dto.MeetingDto;
 import dk.medcom.video.api.dto.OrganisationDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.model.CreateMeeting;
+import io.swagger.client.model.Meeting;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -124,6 +126,37 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testCanCreateWithMicIsMuted() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+		var videoMeetings = new VideoMeetingsApi(apiClient);
+
+		var createMeeting = createMeeting("another_external_id3");
+		createMeeting.setGuestMicrophone(CreateMeeting.GuestMicrophoneEnum.MUTED);
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
+		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, meeting.getGuestMicrophone());
+	}
+
+	@Test
+	public void testCanCreateWithMicNotSet() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+		var videoMeetings = new VideoMeetingsApi(apiClient);
+
+		var createMeeting = createMeeting("another_external_id2");
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
+		assertNull(meeting.getGuestMicrophone());
+	}
+
+	@Test
 	public void testUniqueOrganisationExternalId() throws ApiException {
 		var apiClient = new ApiClient()
 				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
@@ -143,6 +176,31 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		}
 	}
 
+	@Test
+	public void testGuestMicIsMuted() {
+		var result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc2")
+				.request()
+				.get(MeetingDto.class);
+
+		assertNotNull(result);
+		assertEquals("external_id", result.getExternalId());
+		assertEquals(GuestMicrophone.MUTED, result.getGuestMicrophone());
+	}
+
+	@Test
+	public void testGuestMicIsNull() {
+		var result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc3")
+				.request()
+				.get(MeetingDto.class);
+
+		assertNotNull(result);
+		assertEquals("external_id_2", result.getExternalId());
+		assertNull(result.getGuestMicrophone());
+	}
 
 	private CreateMeeting createMeeting(String externalId) {
 		var createMeeting = new CreateMeeting();

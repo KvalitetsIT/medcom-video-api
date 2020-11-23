@@ -43,6 +43,7 @@ public class MeetingDto extends RepresentationModel {
 	private String externalId;
 	private String shortLink;
 	private String shortlink;
+	private GuestMicrophone guestMicrophone;
 
 	public MeetingDto() {
 		// Empty constructor
@@ -75,6 +76,7 @@ public class MeetingDto extends RepresentationModel {
 		shortLink = shortLinkBaseUrl + shortId;
 		shortlink = shortLink;
 		externalId = meeting.getExternalId();
+		guestMicrophone = meeting.getGuestMicrophone();
 
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
 
@@ -180,5 +182,13 @@ public class MeetingDto extends RepresentationModel {
 
 	public void setShortlink(String shortlink) {
 		this.shortlink = shortlink;
+	}
+
+	public GuestMicrophone getGuestMicrophone() {
+		return guestMicrophone;
+	}
+
+	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
+		this.guestMicrophone = guestMicrophone;
 	}
 }
