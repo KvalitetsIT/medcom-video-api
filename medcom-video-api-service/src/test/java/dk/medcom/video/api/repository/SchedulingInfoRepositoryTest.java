@@ -261,7 +261,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 
 		// When
-		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
 		Date from = calendarFrom.getTime();
 		// Then
 		Assert.assertNotNull(schedulingInfos);
@@ -280,7 +280,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 
 		// When
-		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
+		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
 		Date from = calendarFrom.getTime();
 		// Then
 		Assert.assertNotNull(schedulingInfos);

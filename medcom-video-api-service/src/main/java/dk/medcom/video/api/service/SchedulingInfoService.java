@@ -53,7 +53,7 @@ public class SchedulingInfoService {
 	}
 
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
-		return schedulingInfoRepository.findAllWithinStartTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+		return schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
 	}
 
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
