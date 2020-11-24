@@ -257,12 +257,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllWithStartTimeLessThenAndProvisionStatus0() {
 		// Given
-		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1,15,15, 0); //month is zero-based
+		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.NOVEMBER, 2,15,15, 0); //month is zero-based
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
-		Date from = calendarFrom.getTime();
 		// Then
 		Assert.assertNotNull(schedulingInfos);
 		int numberOfSchedulingInfo = 0;
@@ -271,17 +270,16 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 			Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
 			numberOfSchedulingInfo++;
 		}
-		assertEquals(3, numberOfSchedulingInfo);
+		assertEquals(1, numberOfSchedulingInfo);
 	}
 	@Test
 	public void testFindAllWithStartTimeLessThenAndProvisionStatus0HandingZeroResult() {
 		// Given
-		Calendar calendarFrom = new GregorianCalendar(2018, 8, 1,15,15, 0); //month is zero-based
+		Calendar calendarFrom = new GregorianCalendar(2018, Calendar.AUGUST, 1,15,15, 0); //month is zero-based
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
-		Date from = calendarFrom.getTime();
 		// Then
 		Assert.assertNotNull(schedulingInfos);
 		int numberOfSchedulingInfo = 0;
@@ -295,7 +293,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllWithEndTimeLessThenAndProvisionStatus3() {
 		// Given
-		Calendar calendarTo = new GregorianCalendar(2019,10,03,16,00,05);
+		Calendar calendarTo = new GregorianCalendar(2019,Calendar.OCTOBER,02,16,00,05);
 		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
 
 		// When
@@ -313,7 +311,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllWithEndTimeLessThenAndProvisionStatus3HandingZeroResult() {
 		// Given
-		Calendar calendarTo = new GregorianCalendar(2018,10,02,16,00,05);
+		Calendar calendarTo = new GregorianCalendar(2018,Calendar.OCTOBER,02,16,00,05);
 		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
 
 		// When
