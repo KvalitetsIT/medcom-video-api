@@ -31,10 +31,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class SchedulingInfoController {
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoController.class);
 	
-	private SchedulingInfoService schedulingInfoService;
-	private String shortLinkBaseUrl;
+	private final SchedulingInfoService schedulingInfoService;
+	private final String shortLinkBaseUrl;
 
 	SchedulingInfoController(SchedulingInfoService schedulingInfoService, @Value("${short.link.base.url}") String shortLinkBaseUrl) {
 		this.schedulingInfoService = schedulingInfoService;
@@ -77,7 +77,7 @@ public class SchedulingInfoController {
 	}
 	
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.GET)
-	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
+	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 
@@ -86,7 +86,7 @@ public class SchedulingInfoController {
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER}) //full user context is required in order to update, because of updatedbyuser
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
-	public EntityModel <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException {
+	public EntityModel <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException {
 		LOGGER.debug("Entry of /scheduling-info.put uuid: " + uuid);
 				
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
