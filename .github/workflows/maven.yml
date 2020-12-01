@@ -24,6 +24,15 @@ jobs:
         GH: ${{ tojson(github) }}
       run: echo "$GH"
 
+    - uses: olegtarasov/get-tag@v2
+      id: tagName
+      with:
+        tagRegex: "v(.*)"  # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
+        tagRegexGroup: 1 # Optional. Default is 1.
+
+    - name: Yet another step # Environment variabl usage example
+      run: echo $GIT_TAG_NAME
+
       # Cache maven stuff
     - name: Cache local Maven repository
       uses: actions/cache@v2
