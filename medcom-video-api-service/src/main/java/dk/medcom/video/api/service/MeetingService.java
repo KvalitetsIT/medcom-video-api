@@ -23,16 +23,16 @@ import java.util.*;
 @Component
 public class MeetingService {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
 	private final IdGenerator idGenerator;
 
-	private MeetingRepository meetingRepository;
-	private MeetingUserService meetingUserService;
-	private SchedulingInfoService schedulingInfoService;
-	private SchedulingStatusService schedulingStatusService;
-	private OrganisationService organisationService;
-	private UserContextService userService;
-	private MeetingLabelRepository meetingLabelRepository;
+	private final MeetingRepository meetingRepository;
+	private final MeetingUserService meetingUserService;
+	private final SchedulingInfoService schedulingInfoService;
+	private final SchedulingStatusService schedulingStatusService;
+	private final OrganisationService organisationService;
+	private final UserContextService userService;
+	private final MeetingLabelRepository meetingLabelRepository;
 
 	MeetingService(MeetingRepository meetingRepository,
 				   MeetingUserService meetingUserService,
@@ -137,6 +137,11 @@ public class MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
+		if(createMeetingDto.getSchedulingInfoReservationId() != null) {
+			attachReservedSchedulingInfo(meeting, createMeetingDto);
+			return;
+		}
+
 		if(isFutureMeeting(createMeetingDto)) {
 			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			return;
@@ -153,6 +158,23 @@ public class MeetingService {
 			if(schedulingInfo == null) {
 				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			}
+		}
+	}
+
+	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
+		try {
+			var schedulingInfo = schedulingInfoService.getSchedulingInforByReseveration(createMeetingDto.getSchedulingInfoReservationId());
+
+			if(!schedulingInfo.getOrganisation().getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
+				LOGGER.info("ReservationId {} belongs to organisation {} and user organisation is {}.", createMeetingDto.getSchedulingInfoReservationId(), schedulingInfo.getOrganisation().getOrganisationId(), userService.getUserContext().getUserOrganisation());
+				throw new NotValidDataException(NotValidDataErrors.INVALID_RESERVATION_ID, createMeetingDto.getSchedulingInfoReservationId().toString());
+			}
+
+			schedulingInfoService.attachMeetingToSchedulingInfo(meeting, schedulingInfo);
+		}
+		catch(RessourceNotFoundException e) {
+			LOGGER.info("ReservationId {} not found.", createMeetingDto.getSchedulingInfoReservationId());
+			throw new NotValidDataException(NotValidDataErrors.INVALID_RESERVATION_ID, createMeetingDto.getSchedulingInfoReservationId().toString());
 		}
 	}
 

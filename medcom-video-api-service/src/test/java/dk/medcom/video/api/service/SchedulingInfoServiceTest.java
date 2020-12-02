@@ -1,5 +1,9 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextImpl;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -33,6 +37,8 @@ public class SchedulingInfoServiceTest {
 
     private UUID schedulingInfoUuid;
 
+    private UUID reservationId;
+
     private MeetingUserService meetingUserService;
     private SchedulingTemplateService schedulingTemplateService;
 
@@ -45,9 +51,12 @@ public class SchedulingInfoServiceTest {
     private SchedulingTemplate schedulingTemplateIdOne;
     private SchedulingStatusService schedulingStatusService;
     private OrganisationStrategy organisationStrategy;
+    private UserContextService userContextService;
 
     @Before
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
+        reservationId = UUID.randomUUID();
+
         schedulingTemplateIdOne = createSchedulingTemplate(SCHEDULING_TEMPLATE_ID);
 
         schedulingInfoUuid = UUID.randomUUID();
@@ -56,6 +65,7 @@ public class SchedulingInfoServiceTest {
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         Mockito.when(schedulingInfoRepository.findOneByUuid(schedulingInfoUuid.toString())).thenReturn(schedulingInfo);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).then(i -> i.getArgument(0));
+        Mockito.when(schedulingInfoRepository.findOneByReservationId(reservationId.toString())).thenReturn(schedulingInfo);
         BigInteger id = new BigInteger("123");
 
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Long.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()))).thenReturn(Collections.singletonList(id));
@@ -78,13 +88,15 @@ public class SchedulingInfoServiceTest {
         organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findOrganisationByCode(NON_POOL_ORG)).thenReturn(createNonPoolStrategyOrganisation());
         Mockito.when(organisationStrategy.findOrganisationByCode(POOL_ORG)).thenReturn(createStrategyOrganisation());
+
+        userContextService = Mockito.mock(UserContextService.class);
     }
 
 
 
     @Test(expected = RessourceNotFoundException.class)
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository, null);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService);
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date());
     }
@@ -102,7 +114,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
 
@@ -129,7 +141,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -160,7 +172,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -333,7 +345,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService);
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -344,7 +356,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService);
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -425,6 +437,60 @@ public class SchedulingInfoServiceTest {
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
+    @Test
+    public void testReserveSchedulingInfo() throws RessourceNotFoundException {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfoService = createSchedulingInfoService();
+
+        var result = schedulingInfoService.reserveSchedulingInfo();
+        assertNotNull(result);
+
+        Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(1L, "PROVISIONED_OK");
+        var schedulingInfoCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoCaptor.capture());
+        assertNotNull(schedulingInfoCaptor.getValue());
+        var schedulingInfo = schedulingInfoCaptor.getValue();
+        assertNotNull(schedulingInfo.getReservationId());
+    }
+
+    @Test(expected = RessourceNotFoundException.class)
+    public void testReserveSchedulingInfoNoFree() throws RessourceNotFoundException {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        Mockito.reset(schedulingInfoRepository);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+        var schedulingInfoService = createSchedulingInfoService();
+
+        var result = schedulingInfoService.reserveSchedulingInfo();
+    }
+
+    @Test
+    public void testGetSchedulingInfoByReservation() throws RessourceNotFoundException {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfoService = createSchedulingInfoService();
+
+        var result = schedulingInfoService.getSchedulingInforByReseveration(reservationId);
+        assertNotNull(result);
+
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByReservationId(reservationId.toString());
+    }
+
+    @Test(expected = RessourceNotFoundException.class)
+    public void testGetSchedulingInfoByReservationNotFound() throws RessourceNotFoundException {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfoService = createSchedulingInfoService();
+
+        schedulingInfoService.getSchedulingInforByReseveration(UUID.randomUUID());
+    }
+
     private SchedulingTemplate createSchedulingTemplate(long id) {
         SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
         schedulingTemplate.setId(id);
@@ -449,6 +515,7 @@ public class SchedulingInfoServiceTest {
     }
 
     private SchedulingTemplate createSchedulingTemplateOtherOrg() {
+
         SchedulingTemplate schedulingTemplate = createSchedulingTemplate(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
         schedulingTemplate.setOrganisation(createOrganisation(false, "some org id", 10L));
 
@@ -467,7 +534,7 @@ public class SchedulingInfoServiceTest {
     }
 
     private SchedulingInfoService createSchedulingInfoService() {
-        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy);
+        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService);
     }
 
     private Organisation createNonPoolOrganisation()  {

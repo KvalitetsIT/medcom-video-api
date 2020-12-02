@@ -8,13 +8,10 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
@@ -56,7 +53,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		
 		String portalLink = "https://portal-test.vconf.dk/?url=7777@test.dk&pin=2010&start_dato=2018-12-02T15:00:00";
 		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
-		
+
+		var reservationId = UUID.randomUUID();
+
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
@@ -70,7 +69,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		schedulingInfo.setProvisionStatusDescription(provisionStatusDescription);
 		schedulingInfo.setProvisionTimestamp(calendar.getTime());
 		schedulingInfo.setProvisionVMRId(provisionVMRId);
-		
+
+		schedulingInfo.setReservationId(reservationId.toString());
+
 		Meeting meeting = subjectM.findById(meetingId).orElse(null);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setUuid(meeting.getUuid());
@@ -127,6 +128,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 
 		assertEquals(organization.getOrganisationId(), schedulingInfo.getOrganisation().getOrganisationId());
+
+		assertEquals(reservationId.toString(), schedulingInfo.getReservationId());
 	}
 	
 	@Test
@@ -143,7 +146,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 			Assert.assertNotNull(schedulingInfo);
 			numberOfSchedulingInfo++;
 		}
-		assertEquals(7, numberOfSchedulingInfo);
+		assertEquals(9, numberOfSchedulingInfo);
 	}
 	
 	@Test
@@ -174,7 +177,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNull(schedulingInfo);
+		assertNull(schedulingInfo);
 	}
 	
 	@Test
@@ -396,6 +399,20 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
+	public void testGetSchedulingInfoByReservationId() {
+		var result = subject.findOneByReservationId("1331e914-9488-482d-9d9e-d1302c44a1de");
+		assertNotNull(result);
+		assertEquals("1331e914-9488-482d-9d9e-d1302c44a1de", result.getReservationId());
+		assertEquals(210L, result.getId().longValue());
+	}
+
+	@Test
+	public void testGetSchedulingInfoByReservationIdNotFound() {
+		var result = subject.findOneByReservationId("1331e914-9488-482d-9d9e-d1302c44a1df");
+		assertNull(result);
+	}
+
+	@Test
 	public void testFindUnusedSchedulingInfoForOrganization() {
 		Organisation organisation = new Organisation();
 		organisation.setId(7L);
@@ -407,10 +424,23 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	}
 
 	@Test
+	public void testUpdateReservationid()  {
+		var reservationId = UUID.randomUUID();
+
+		var optionalSchedulingInfo = subject.findById(209L);
+		assertTrue(optionalSchedulingInfo.isPresent());
+
+		optionalSchedulingInfo.get().setReservationId(reservationId.toString());
+		var schedulingInfo = subject.save(optionalSchedulingInfo.get());
+		assertNotNull(schedulingInfo);
+		assertEquals(reservationId.toString(), optionalSchedulingInfo.get().getReservationId());
+	}
+
+	@Test
 	public void testGetSchedulingInfoByMeetingsIdNull() {
 		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
 		assertNotNull(schedulingInfos);
-		assertEquals(1, schedulingInfos.size());
+		assertEquals(3, schedulingInfos.size());
 	}
 }

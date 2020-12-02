@@ -66,7 +66,14 @@ VALUES (207, 1001, 2001, 15, '2018-10-02 14:45:00', 10, 1, '1236@test.dk', '1237
 INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_status_description, provision_timestamp,  provisionvmrid, portal_link, ivr_theme, created_by, created_time, updated_by, updated_time, organisation_id)
 VALUES (208, (select uuid from meetings where id = 8) , 1001, 2001, 15, '2019-10-02 14:45:00', 10, 1, 8, '1238@test.dk', '1238', 1, 'PROVISIONED_OK', 'all ok', null, null, 'https://portal-test.vconf.dk/?url=1238@test.dk&pin=2001&start_dato=2019-10-02T15:00:00', '/api/admin/configuration/v1/ivr_theme/10/', 104, NULL, NULL, NULL, 5);
 
--- * scheduling_status * 			
+INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_status_description, provision_timestamp,  provisionvmrid, portal_link, ivr_theme, created_by, created_time, updated_by, updated_time, organisation_id)
+VALUES (209, null, 1001, 2001, 15, '2020-10-02 14:45:00', 10, 1, null, '1239@test.dk', '1239', 1, 'PROVISIONED_OK', 'all ok', null, null, 'https://portal-test.vconf.dk/?url=1238@test.dk&pin=2001&start_dato=2019-10-02T15:00:00', '/api/admin/configuration/v1/ivr_theme/10/', 104, NULL, NULL, NULL, 5);
+
+INSERT INTO scheduling_info (id, uuid, host_pin, guest_pin, vmravailable_before, vmrstart_time, max_participants, end_meeting_on_end_time, meetings_id, uri_with_domain, uri_without_domain, scheduling_template_id, provision_status, provision_status_description, provision_timestamp,  provisionvmrid, portal_link, ivr_theme, created_by, created_time, updated_by, updated_time, organisation_id, reservation_id)
+VALUES (210, null, 1001, 2001, 15, '2020-10-02 14:45:00', 10, 1, null, '1240@test.dk', '1240', 1, 'PROVISIONED_OK', 'all ok', null, null, 'https://portal-test.vconf.dk/?url=1238@test.dk&pin=2001&start_dato=2019-10-02T15:00:00', '/api/admin/configuration/v1/ivr_theme/10/', 104, NULL, NULL, NULL, 5, '1331e914-9488-482d-9d9e-d1302c44a1de');
+
+
+-- * scheduling_status *
 INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_status_description, meetings_id) VALUES (301, NOW(), 'AWAITS_PROVISION', 'all ok', 1);
 INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_status_description, meetings_id) VALUES (302, NOW(), 'AWAITS_PROVISION', '', 2);
 INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_status_description, meetings_id) VALUES (303, NOW(), 'AWAITS_PROVISION', '', 3);

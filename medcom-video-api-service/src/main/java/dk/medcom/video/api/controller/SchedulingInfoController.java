@@ -136,4 +136,18 @@ public class SchedulingInfoController {
 		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources.toString());
 		return resources;
 	}
+
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@GetMapping(value ="/scheduling-info-reserve")
+	public EntityModel<SchedulingInfoDto> reserveSchedulingInfo() throws RessourceNotFoundException {
+		LOGGER.debug("Entry of /scheduling-info-reserve.");
+
+		SchedulingInfo schedulingInfo = schedulingInfoService.reserveSchedulingInfo();
+		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
+		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
+
+		LOGGER.debug("Exit of /scheduling-info-reserve");
+
+		return resource;
+	}
 }

@@ -85,8 +85,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		return ucs;
 	}
 
-
-
 	@Autowired
 	PrometheusConfig prometheusConfig;
 

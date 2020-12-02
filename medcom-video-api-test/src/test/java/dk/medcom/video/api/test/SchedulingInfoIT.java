@@ -1,15 +1,15 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.dto.SchedulingInfoDto;
+import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
+import io.swagger.client.api.VideoMeetingsApi;
+import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.CreateMeeting;
-import io.swagger.client.model.MeetingType;
 import org.junit.Test;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.*;
 
@@ -31,7 +31,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testGetSchedulingInfoProvision() throws ApiException {
+	public void testGetSchedulingInfoProvision() {
 		var result = getClient()
 				.path("scheduling-info-provision")
 				.request()
@@ -54,26 +54,44 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertTrue(result.contains("PROVISIONED_OK"));
 	}
 
-	private CreateMeeting createMeeting(String externalId) {
-		var createMeeting = new CreateMeeting();
-		createMeeting.setDescription("This is a description");
-		var now = Calendar.getInstance();
-		var inTwoHours = createDate(now, 2);
+	@Test
+	public void testReserveSchedulingInformation() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
-		createMeeting.setStartTime(OffsetDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault()));
-		createMeeting.setEndTime(OffsetDateTime.ofInstant(inTwoHours.toInstant(), ZoneId.systemDefault()));
-		createMeeting.setSubject("This is a subject!");
-		createMeeting.setExternalId(externalId);
-		createMeeting.setMeetingType(MeetingType.POOL);
-		createMeeting.setSchedulingTemplateId(1);
+		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
 
-		return createMeeting;
+		var result = schedulingInfo.schedulingInfoReserveGet();
+		assertNotNull(result);
+		assertNotNull(result.getReservationId());
 	}
 
-	private Date createDate(Calendar calendar, int hoursToAdd) {
-		Calendar cal = (Calendar) calendar.clone();
-		cal.add(Calendar.HOUR, hoursToAdd);
+	@Test
+	public void testUseReservedSchedulingInfo() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
-		return cal.getTime();
+		var videoMeetingApi = new VideoMeetingsApi(apiClient);
+		var schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
+
+		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet();
+		assertNotNull(schedulingInfo);
+		var reservationId = schedulingInfo.getReservationId();
+
+		var createMeeting = new CreateMeeting();
+		createMeeting.setDescription("This is a description");
+		createMeeting.setStartTime(OffsetDateTime.now());
+		createMeeting.setEndTime(OffsetDateTime.now().plusHours(2));
+		createMeeting.setSubject("This is a subject!");
+		createMeeting.setSchedulingInfoReservationId(schedulingInfo.getReservationId());
+
+		var result = videoMeetingApi.meetingsPost(createMeeting);
+		assertNotNull(result);
+
+		schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(result.getUuid());
+		assertNotNull(schedulingInfo);
+		assertEquals(reservationId, schedulingInfo.getReservationId());
 	}
 }

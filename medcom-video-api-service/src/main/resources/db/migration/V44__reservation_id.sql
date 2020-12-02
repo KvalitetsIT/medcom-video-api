@@ -1,0 +1,1 @@
+alter table scheduling_info add column reservation_id varchar(36) NULL;

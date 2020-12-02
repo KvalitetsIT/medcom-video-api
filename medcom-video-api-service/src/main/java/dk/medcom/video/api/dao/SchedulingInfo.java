@@ -64,6 +64,7 @@ public class SchedulingInfo {
     @JoinColumn(name="updated_by")
 	private MeetingUser updatedBy;
 	private Date updatedTime;
+	private String reservationId;
 
 	public Long getId() {
 		return id;
@@ -205,4 +206,12 @@ public class SchedulingInfo {
 	public void setOrganisation(Organisation organisation) {
 		this.organisation = organisation;
 	}
+
+    public void setReservationId(String reservationId) {
+        this.reservationId = reservationId;
+    }
+
+    public String getReservationId() {
+        return reservationId;
+    }
 }

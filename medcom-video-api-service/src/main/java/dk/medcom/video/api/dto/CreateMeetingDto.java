@@ -29,7 +29,9 @@ public class CreateMeetingDto {
 	
 	@Size(max=100, message="Project Code should have a maximum of 100 characters")
 	public String projectCode;
-	
+
+	private UUID schedulingInfoReservationId;
+
 	private String organizedByEmail;
 	
 	public int maxParticipants;
@@ -161,5 +163,13 @@ public class CreateMeetingDto {
 
 	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
 		this.guestMicrophone = guestMicrophone;
+	}
+
+	public UUID getSchedulingInfoReservationId() {
+		return schedulingInfoReservationId;
+	}
+
+	public void setSchedulingInfoReservationId(UUID schedulingInfoReservationId) {
+		this.schedulingInfoReservationId = schedulingInfoReservationId;
 	}
 }

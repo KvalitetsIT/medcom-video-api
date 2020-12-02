@@ -1,24 +1,23 @@
 package dk.medcom.video.api.dto;
 
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
-import java.util.Date;
-
 import dk.medcom.video.api.controller.SchedulingInfoController;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.MeetingUser;
 import dk.medcom.video.api.dao.SchedulingInfo;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
 
+import java.util.Date;
+import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 public class SchedulingInfoDto extends RepresentationModel {
+	private UUID reservationId;
 	public String uuid;
 	public Long hostPin; 		
 	public Long guestPin;
@@ -66,7 +65,10 @@ public class SchedulingInfoDto extends RepresentationModel {
 		ivrTheme = schedulingInfo.getIvrTheme();
 		provisionTimestamp = schedulingInfo.getProvisionTimestamp();	
 		provisionVmrId = schedulingInfo.getProvisionVMRId();
-		
+		if(schedulingInfo.getReservationId() != null) {
+			reservationId = UUID.fromString(schedulingInfo.getReservationId());
+		}
+
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
 		
@@ -89,7 +91,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");
 			add(selfLink);
 			
-		} catch (RessourceNotFoundException | PermissionDeniedException e) {
+		} catch (RessourceNotFoundException e) {
 		}
 	}
 	
@@ -213,5 +215,13 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setShortlink(String shortlink) {
 		this.shortlink = shortlink;
+	}
+
+	public UUID getReservationId() {
+		return reservationId;
+	}
+
+	public void setReservationId(UUID reservationId) {
+		this.reservationId = reservationId;
 	}
 }

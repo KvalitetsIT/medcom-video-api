@@ -11,13 +11,13 @@ public enum NotValidDataErrors {
     DATA_FORMAT_WRONG(30, "Date format is wrong, year must only have 4 digits"),
     SCHEDULING_TEMPLATE_NOT_FOUND(40, "Scheduling template %s not found."),
     SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION(41, "Scheduling template %s does not belong to organisation %s."),
-    BOTH_FROM_AND_TO_START_TIME_MUST_BE_PROVIDED_OR_NONE(50, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
-
+    BOTH_FROM_AND_TO_START_TIME_MUST_BE_PROVIDED_OR_NONE(50, "Either both from-start-time and to-start-time must be provided or none of them must be provided."),
+    INVALID_RESERVATION_ID(60, "ReservationId not owned by organisation or not found.");
 
     private final int errorCode;
     private final String errorText;
 
-    private NotValidDataErrors(int code, String text) {
+    NotValidDataErrors(int code, String text) {
         this.errorCode = code;
         this.errorText = text;
     }

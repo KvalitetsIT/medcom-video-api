@@ -1,5 +1,9 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextImpl;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
@@ -24,21 +28,22 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class SchedulingInfoService {
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
-	private SchedulingInfoRepository schedulingInfoRepository;
-	private SchedulingTemplateRepository schedulingTemplateRepository;
-	private SchedulingTemplateService schedulingTemplateService;
-	private SchedulingStatusService schedulingStatusService;
-	private MeetingUserService meetingUserService;
-	private OrganisationRepository organisationRepository;
-	private OrganisationStrategy organisationStrategy;
+	private final SchedulingInfoRepository schedulingInfoRepository;
+	private final SchedulingTemplateRepository schedulingTemplateRepository;
+	private final SchedulingTemplateService schedulingTemplateService;
+	private final SchedulingStatusService schedulingStatusService;
+	private final MeetingUserService meetingUserService;
+	private final OrganisationRepository organisationRepository;
+	private final OrganisationStrategy organisationStrategy;
+	private final UserContextService userContextService;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
 	
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService,
-			SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
+								 SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, UserContextService userContextService) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -46,6 +51,7 @@ public class SchedulingInfoService {
 		this.meetingUserService = meetingUserService;
 		this.organisationRepository = organisationRepository;
 		this.organisationStrategy = organisationStrategy;
+		this.userContextService = userContextService;
 	}
 
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
@@ -388,17 +394,7 @@ public class SchedulingInfoService {
 		return schedulingInfos.get(0).longValue();
 	}
 
-	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
-		SchedulingInfo schedulingInfo = null;
-		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
-		if (unusedId != null) {
-			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
-		}
-
-		if(schedulingInfo == null) {
-			return null;
-		}
-
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo) {
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
@@ -413,5 +409,44 @@ public class SchedulingInfoService {
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 
 		return schedulingInfoRepository.save(schedulingInfo);
+	}
+
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
+		SchedulingInfo schedulingInfo = null;
+		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+		if (unusedId != null) {
+			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
+		}
+
+		if(schedulingInfo == null) {
+			return null;
+		}
+
+		return attachMeetingToSchedulingInfo(meeting, schedulingInfo);
+	}
+
+	public SchedulingInfo reserveSchedulingInfo() throws RessourceNotFoundException {
+		var organisation = organisationRepository.findByOrganisationId(userContextService.getUserContext().getUserOrganisation());
+
+		var id = getUnusedSchedulingInfoForOrganisation(organisation);
+
+		if(id == null) {
+			throw new RessourceNotFoundException("SchwdulingInfo", "SchedulingInfo");
+		}
+
+		var schedulingInfo = schedulingInfoRepository.findById(id).get();
+		schedulingInfo.setReservationId(UUID.randomUUID().toString());
+		return schedulingInfoRepository.save(schedulingInfo);
+	}
+
+	public SchedulingInfo getSchedulingInforByReseveration(UUID schedulingInfoReservationId) throws RessourceNotFoundException {
+		LOGGER.debug("Entry getSchedulingInforByReseveration. reservationId=" + schedulingInfoReservationId);
+		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByReservationId(schedulingInfoReservationId.toString());
+		if (schedulingInfo == null) {
+			LOGGER.debug("SchedulingInfo not found.");
+			throw new RessourceNotFoundException("schedulingInfo", "reservationId");
+		}
+		LOGGER.debug("Exit getSchedulingInfoByUuid");
+		return schedulingInfo;
 	}
 }
