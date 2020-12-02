@@ -27,13 +27,12 @@ jobs:
       # If tag push tag to docker
     - name: Tag name
       id: tag
-      if:  ${{ startsWith(github.refs, '/refs/tags/v') }}
+      if:  ${{ startsWith(github.ref, '/refs/tags/v') }}
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
 
     - name: Pring tag
       if: ${{ steps.tag.outputs.VERSION != '' }}
       run: echo $${{ steps.tag.outputs.VERSION }}
-
 
       # Cache maven stuff
     - name: Cache local Maven repository
@@ -74,11 +73,3 @@ jobs:
 # Push to docker hub
     - name: Push to docker
       run: docker push jonaspkit/video-api-test:dev
-
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      -  name: hej hej
-         run: docker image ls
-
