@@ -70,7 +70,7 @@ jobs:
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
 
     - name: Pring tag
-      if: ${{ steps.tag.outputs.VERSION != "" }}
+      if: ${{ steps.tag.outputs.VERSION != '' }}
       run: echo $${{ steps.tag.outputs.VERSION }}
 
   test:
