@@ -16,12 +16,7 @@ jobs:
 # Checkout source code
     - uses: actions/checkout@v2
 
-    - name: echo
-      env:
-        GH: ${{ tojson(github) }}
-      run: echo "$GH"
-
-      # Cache maven stuff
+# Cache maven stuff
     - name: Cache local Maven repository
       uses: actions/cache@v2
       with:
@@ -29,12 +24,6 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
-
-      # Cache docker images
-    - uses: satackey/action-docker-layer-caching@v0.0.8
-      name: Cache docker layers
-      # Ignore the failure of a step and avoid terminating the job.
-      continue-on-error: true
 
 # Setup Java environment including maven
     - name: Set up JDK 1.11
@@ -78,3 +67,9 @@ jobs:
     - name: Push tagged image
       if: ${{ steps.tag.outputs.VERSION != '' }}
       run: docker push jonaspkit/video-api-test:${{ steps.tag.outputs.VERSION }}
+
+# Cache docker images
+    - uses: satackey/action-docker-layer-caching@v0.0.8
+      name: Cache docker layers
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
