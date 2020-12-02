@@ -117,7 +117,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.20</version>
+                <version>3.0.23</version>
                 <executions>
                     <execution>
                         <goals>
@@ -126,6 +126,9 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/video-api.yaml</inputSpec>
                             <language>java</language>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
+
                             <configOptions>
                                 <sourceFolder>src/generated-sources/java/main</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
