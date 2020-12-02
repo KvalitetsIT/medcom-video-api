@@ -25,6 +25,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
+# Cache docker images
+    - uses: satackey/action-docker-layer-caching@v0.0.8
+      name: Cache docker layers
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
+      with:
+        key: vdx-api-{hash}
+        restore-keys: |
+          vdx-api-
+
+
 # Setup Java environment including maven
     - name: Set up JDK 1.11
       uses: actions/setup-java@v1
@@ -68,8 +79,3 @@ jobs:
       if: ${{ steps.tag.outputs.VERSION != '' }}
       run: docker push jonaspkit/video-api-test:${{ steps.tag.outputs.VERSION }}
 
-# Cache docker images
-    - uses: satackey/action-docker-layer-caching@v0.0.8
-      name: Cache docker layers
-      # Ignore the failure of a step and avoid terminating the job.
-      continue-on-error: true
