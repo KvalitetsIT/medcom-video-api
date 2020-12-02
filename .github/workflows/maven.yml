@@ -27,7 +27,7 @@ jobs:
       # If tag push tag to docker
     - name: Tag name
       id: tag
-      if:  ${{ startsWith(github.refs, '\/refs\/tags\/v' }}
+      if:  ${{ startsWith(github.refs, '/refs/tags/v') }}
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
 
     - name: Pring tag
