@@ -24,12 +24,19 @@ jobs:
         GH: ${{ tojson(github) }}
       run: echo "$GH"
 
-    - name: 'Get Previous tag'
-      id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@master"
-    
-    - name: Yet another step # Environment variabl usage example
-      run: echo ${{ steps.previoustag.outputs.tag }}
+    - name: Find Tag
+      id: tagger
+      uses: jimschubert/query-tag-action@v1
+      with:
+        include: 'v*'
+        exclude: '*-rc*'
+        commit-ish: 'HEAD~'
+        # if you unshallow in a separate step, use the following option:
+        # skip-unshallow: 'true'
+    - name: Show Tag
+      id: display
+      run: |
+        echo 'Output from Find Tag: ${{steps.tagger.outputs.tag}}'
 
       # Cache maven stuff
     - name: Cache local Maven repository
