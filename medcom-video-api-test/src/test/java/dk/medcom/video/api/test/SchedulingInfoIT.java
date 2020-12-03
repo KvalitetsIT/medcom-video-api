@@ -65,6 +65,12 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		var result = schedulingInfo.schedulingInfoReserveGet();
 		assertNotNull(result);
 		assertNotNull(result.getReservationId());
+
+		var reservationId = result.getReservationId();
+
+		result = schedulingInfo.schedulingInfoReserveUuidGet(result.getReservationId());
+		assertNotNull(result);
+		assertEquals(reservationId, result.getReservationId());
 	}
 
 	@Test

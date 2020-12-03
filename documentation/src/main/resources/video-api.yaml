@@ -534,6 +534,28 @@ paths:
         '404':
           $ref: '#/components/responses/404'
 
+  /scheduling-info-reserve/{uuid}:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: Get scheduling info by reservation id.
+      description: Read a single scheduling info by id.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+
   /pool:
     get:
       tags:

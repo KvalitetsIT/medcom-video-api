@@ -151,7 +151,7 @@ public class MeetingServiceTest {
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class))).thenReturn(new SchedulingInfo());
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
 		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(meetingUser.getOrganisation())).thenReturn(schedulingInfo.getId());
-		Mockito.when(schedulingInfoService.getSchedulingInforByReseveration(reservationId)).thenReturn(schedulingInfo);
+		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(reservationId)).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
 		Mockito.when(meetingRepository.save((Meeting) Mockito.argThat(x -> ((Meeting) x).getUuid().equals(meetingUuid)))).thenAnswer(i -> {
 			Meeting meeting = (Meeting) i.getArguments()[0];
@@ -386,7 +386,7 @@ public class MeetingServiceTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
 		Mockito.reset(schedulingInfoService);
-		Mockito.when(schedulingInfoService.getSchedulingInforByReseveration(Mockito.any())).thenThrow(new RessourceNotFoundException("NOT FOUND", "reservationID"));
+		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(Mockito.any())).thenThrow(new RessourceNotFoundException("NOT FOUND", "reservationID"));
 
 		meetingService.createMeeting(input);
 	}

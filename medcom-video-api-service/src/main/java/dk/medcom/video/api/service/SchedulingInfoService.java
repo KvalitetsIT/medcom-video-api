@@ -439,8 +439,8 @@ public class SchedulingInfoService {
 		return schedulingInfoRepository.save(schedulingInfo);
 	}
 
-	public SchedulingInfo getSchedulingInforByReseveration(UUID schedulingInfoReservationId) throws RessourceNotFoundException {
-		LOGGER.debug("Entry getSchedulingInforByReseveration. reservationId=" + schedulingInfoReservationId);
+	public SchedulingInfo getSchedulingInfoByReservation(UUID schedulingInfoReservationId) throws RessourceNotFoundException {
+		LOGGER.debug("Entry getSchedulingInfoByReservation. reservationId=" + schedulingInfoReservationId);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByReservationId(schedulingInfoReservationId.toString());
 		if (schedulingInfo == null) {
 			LOGGER.debug("SchedulingInfo not found.");

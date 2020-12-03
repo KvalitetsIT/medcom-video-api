@@ -163,7 +163,7 @@ public class MeetingService {
 
 	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
 		try {
-			var schedulingInfo = schedulingInfoService.getSchedulingInforByReseveration(createMeetingDto.getSchedulingInfoReservationId());
+			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
 
 			if(!schedulingInfo.getOrganisation().getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
 				LOGGER.info("ReservationId {} belongs to organisation {} and user organisation is {}.", createMeetingDto.getSchedulingInfoReservationId(), schedulingInfo.getOrganisation().getOrganisationId(), userService.getUserContext().getUserOrganisation());

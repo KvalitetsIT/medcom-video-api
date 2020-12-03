@@ -475,7 +475,7 @@ public class SchedulingInfoServiceTest {
 
         var schedulingInfoService = createSchedulingInfoService();
 
-        var result = schedulingInfoService.getSchedulingInforByReseveration(reservationId);
+        var result = schedulingInfoService.getSchedulingInfoByReservation(reservationId);
         assertNotNull(result);
 
         Mockito.verify(schedulingInfoRepository, times(1)).findOneByReservationId(reservationId.toString());
@@ -488,7 +488,7 @@ public class SchedulingInfoServiceTest {
 
         var schedulingInfoService = createSchedulingInfoService();
 
-        schedulingInfoService.getSchedulingInforByReseveration(UUID.randomUUID());
+        schedulingInfoService.getSchedulingInfoByReservation(UUID.randomUUID());
     }
 
     private SchedulingTemplate createSchedulingTemplate(long id) {
