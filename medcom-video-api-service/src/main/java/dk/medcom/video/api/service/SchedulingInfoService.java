@@ -1,9 +1,6 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.context.UserContext;
-import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.Meeting;
 import dk.medcom.video.api.dao.Organisation;
@@ -431,7 +428,8 @@ public class SchedulingInfoService {
 		var id = getUnusedSchedulingInfoForOrganisation(organisation);
 
 		if(id == null) {
-			throw new RessourceNotFoundException("SchwdulingInfo", "SchedulingInfo");
+			LOGGER.info("Unused scheduling info not found for organisation {}.", userContextService.getUserContext().getUserOrganisation());
+			throw new RessourceNotFoundException("SchedulingInfo", "SchedulingInfo");
 		}
 
 		var schedulingInfo = schedulingInfoRepository.findById(id).get();
