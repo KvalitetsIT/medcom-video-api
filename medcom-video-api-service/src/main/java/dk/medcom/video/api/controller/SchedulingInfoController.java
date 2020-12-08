@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -136,33 +135,5 @@ public class SchedulingInfoController {
 
 		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources.toString());
 		return resources;
-	}
-
-	@APISecurityAnnotation({UserRole.ADMIN})
-	@GetMapping(value ="/scheduling-info-reserve")
-	public EntityModel<SchedulingInfoDto> reserveSchedulingInfo() throws RessourceNotFoundException {
-		LOGGER.debug("Entry of /scheduling-info-reserve.");
-
-		SchedulingInfo schedulingInfo = schedulingInfoService.reserveSchedulingInfo();
-		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
-
-		LOGGER.debug("Exit of /scheduling-info-reserve");
-
-		return resource;
-	}
-
-	@APISecurityAnnotation({UserRole.ADMIN})
-	@GetMapping(value ="/scheduling-info-reserve/{reservationId}")
-	public EntityModel<SchedulingInfoDto> getByReservationId(@PathVariable("reservationId") UUID reservationId) throws RessourceNotFoundException {
-		LOGGER.debug("Entry of /scheduling-info-reserve/{reservationId}. Id: {}", reservationId);
-
-		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(reservationId);
-		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
-
-		LOGGER.debug("Exit of /scheduling-info-reserve/{reservationId}");
-
-		return resource;
 	}
 }
