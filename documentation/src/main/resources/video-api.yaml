@@ -57,6 +57,7 @@ info:
     <Li> 1.2.0 <Ul>
     <Li> added scheduling-info-reserve
     <Li> Extended create meeting with optional field schedulingInfoReservationId</Ul>
+    <Li> Document labels.</Ul>
     </Ul>
   version: "1.2.0"
   contact:
@@ -851,6 +852,11 @@ components:
             - ON
             - MUTED
             - null
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
         _links:
           properties:
             self:
@@ -937,6 +943,11 @@ components:
           format: uuid
           description: Scheduling info reservation ID to use for this meeting. The ID must belong to the same organisation and not used by other meeting.
           example: 8103c61c-eb64-4148-984b-1236f4ff5849
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
     update-meeting:
       type: object
       required:
@@ -967,6 +978,11 @@ components:
         organizedByEmail:
           type: string
           example: mail@mail.dk
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
     scheduling-info:
       type: object
       required:

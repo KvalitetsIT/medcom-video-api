@@ -1,14 +1,13 @@
 package dk.medcom.video.api.test;
 
-import dk.medcom.video.api.dto.CreateMeetingDto;
-import dk.medcom.video.api.dto.GuestMicrophone;
-import dk.medcom.video.api.dto.MeetingDto;
-import dk.medcom.video.api.dto.OrganisationDto;
+import dk.medcom.video.api.dto.*;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.model.CreateMeeting;
 import io.swagger.client.model.Meeting;
+import io.swagger.client.model.UpdateMeeting;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -34,12 +33,24 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
+	private VideoMeetingsApi videoMeetings;
+
+	@Before
+	public void setupApiClient() {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+
+		videoMeetings = new VideoMeetingsApi(apiClient);
+	}
 
 	@Test
 	@Ignore //Can't GET /manage/info
@@ -112,12 +123,40 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testCanCreateExternalId() throws ApiException {
-		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
-				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
-		var videoMeetings = new VideoMeetingsApi(apiClient);
+	public void testCanCreateUpdateAndReadMeeting() throws ApiException {
+		var createMeeting = createMeeting(UUID.randomUUID().toString());
+		createMeeting.setLabels(new ArrayList<String>());
+		createMeeting.getLabels().add("Label One");
+		createMeeting.getLabels().add("Label Two");
 
+		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(createdMeeting);
+		assertEquals(createMeeting.getExternalId(), createdMeeting.getExternalId());
+		assertEquals(2, createdMeeting.getLabels().size());
+		assertTrue(createMeeting.getLabels().containsAll(createdMeeting.getLabels()));
+
+		var updateMeeting = new UpdateMeeting();
+		updateMeeting.setSubject("SUBJECT");
+		updateMeeting.setStartTime(OffsetDateTime.now());
+		updateMeeting.setEndTime(OffsetDateTime.now().plusHours(1));
+		updateMeeting.setLabels(new ArrayList());
+		updateMeeting.getLabels().add("Another Label");
+
+		var updatedMeeting = videoMeetings.meetingsUuidPut(updateMeeting, createdMeeting.getUuid());
+		assertNotNull(updatedMeeting);
+		assertEquals(createMeeting.getExternalId(), updatedMeeting.getExternalId());
+		assertEquals(1, updatedMeeting.getLabels().size());
+		assertTrue(updateMeeting.getLabels().containsAll(updatedMeeting.getLabels()));
+
+		var readMeeting = videoMeetings.meetingsUuidGet(createdMeeting.getUuid());
+		assertNotNull(readMeeting);
+		assertEquals(createMeeting.getExternalId(), readMeeting.getExternalId());
+		assertEquals(1, readMeeting.getLabels().size());
+		assertTrue(updateMeeting.getLabels().containsAll(readMeeting.getLabels()));
+	}
+
+	@Test
+	public void testCanCreateExternalId() throws ApiException {
 		var createMeeting = createMeeting("another_external_id");
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
@@ -127,11 +166,6 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testCanCreateWithMicIsMuted() throws ApiException {
-		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
-				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
-		var videoMeetings = new VideoMeetingsApi(apiClient);
-
 		var createMeeting = createMeeting("another_external_id3");
 		createMeeting.setGuestMicrophone(CreateMeeting.GuestMicrophoneEnum.MUTED);
 
@@ -143,11 +177,6 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testCanCreateWithMicNotSet() throws ApiException {
-		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
-				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
-		var videoMeetings = new VideoMeetingsApi(apiClient);
-
 		var createMeeting = createMeeting("another_external_id2");
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
@@ -158,11 +187,6 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testUniqueOrganisationExternalId() throws ApiException {
-		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
-				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
-		var videoMeetings = new VideoMeetingsApi(apiClient);
-
 		var createMeeting = createMeeting("external_id");
 
 		try {
@@ -259,12 +283,10 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("company name test-org", response.getName());
 	}
 
-
 	private Date createDate(Calendar calendar, int hoursToAdd) {
 		Calendar cal = (Calendar) calendar.clone();
 		cal.add(Calendar.HOUR, hoursToAdd);
 
 		return cal.getTime();
 	}
-
 }

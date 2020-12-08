@@ -1,15 +1,12 @@
 package dk.medcom.video.api.dto;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class UpdateMeetingDto {
 
@@ -18,11 +15,11 @@ public class UpdateMeetingDto {
 	public String subject;
 	
 	@NotNull
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	public Date startTime;
 
 	@NotNull
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	public Date endTime;
 	
 	@Size(max=500, message="description should have a maximum of 500 characters")
