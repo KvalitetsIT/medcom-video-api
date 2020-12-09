@@ -31,5 +31,6 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 
     List<SchedulingInfo> findByMeetingIsNullAndProvisionStatus(ProvisionStatus provisionStatus);
 
+	@Query(value = "SELECT * FROM scheduling_info s WHERE s.reservation_id = ?1 and meetings_id is null for update", nativeQuery=true)
     SchedulingInfo findOneByReservationId(String reservationId);
 }
