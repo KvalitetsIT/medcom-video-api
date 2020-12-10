@@ -843,14 +843,14 @@ components:
           maxLength: 200
           example: 87527808-147f-4c54-88be-aec56c7194a3
         guestMicrophone:
-          example: MUTED
+          example: muted
           description: Corresponds to numeric status 0, 1 and 2.
           type: string
           nullable: true
           enum:
-            - OFF
-            - ON
-            - MUTED
+            - off
+            - on
+            - muted
             - null
         labels:
           type: array
@@ -929,14 +929,14 @@ components:
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
         guestMicrophone:
-          example: MUTED
+          example: muted
           description: Corresponds to numeric status 0, 1 and 2.
           type: string
           nullable: true
           enum:
-            - OFF
-            - ON
-            - MUTED
+            - off
+            - on
+            - muted
             - null
         schedulingInfoReservationId:
           type: string

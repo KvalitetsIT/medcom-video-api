@@ -288,7 +288,7 @@ public class SchedulingInfoService {
 
 		String microphone = null;
 		if (schedulingInfo.getMeeting() != null && schedulingInfo.getMeeting().getGuestMicrophone() != null){
-			if (schedulingInfo.getMeeting().getGuestMicrophone() != GuestMicrophone.ON){
+			if (schedulingInfo.getMeeting().getGuestMicrophone() != GuestMicrophone.on){
 				microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
 			}
 			LOGGER.debug("Guest microphone is: "+ schedulingInfo.getMeeting().getGuestMicrophone());

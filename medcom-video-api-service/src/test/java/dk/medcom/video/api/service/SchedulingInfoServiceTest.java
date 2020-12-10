@@ -404,7 +404,7 @@ public class SchedulingInfoServiceTest {
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
-        meeting.setGuestMicrophone(GuestMicrophone.OFF);
+        meeting.setGuestMicrophone(GuestMicrophone.off);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
@@ -427,7 +427,7 @@ public class SchedulingInfoServiceTest {
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
-        meeting.setGuestMicrophone(GuestMicrophone.MUTED);
+        meeting.setGuestMicrophone(GuestMicrophone.muted);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);

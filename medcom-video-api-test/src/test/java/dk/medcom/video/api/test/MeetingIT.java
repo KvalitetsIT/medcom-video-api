@@ -1,6 +1,9 @@
 package dk.medcom.video.api.test;
 
-import dk.medcom.video.api.dto.*;
+import dk.medcom.video.api.dto.CreateMeetingDto;
+import dk.medcom.video.api.dto.GuestMicrophone;
+import dk.medcom.video.api.dto.MeetingDto;
+import dk.medcom.video.api.dto.OrganisationDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
@@ -210,7 +213,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 		assertNotNull(result);
 		assertEquals("external_id", result.getExternalId());
-		assertEquals(GuestMicrophone.MUTED, result.getGuestMicrophone());
+		assertEquals(GuestMicrophone.muted, result.getGuestMicrophone());
 	}
 
 	@Test

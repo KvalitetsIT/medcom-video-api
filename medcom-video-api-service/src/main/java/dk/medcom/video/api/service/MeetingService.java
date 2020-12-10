@@ -215,7 +215,7 @@ public class MeetingService {
 		if(createMeetingDto.getGuestMicrophone() != null){
 			meeting.setGuestMicrophone(createMeetingDto.getGuestMicrophone());
 		} else {
-			meeting.setGuestMicrophone(GuestMicrophone.ON);
+			meeting.setGuestMicrophone(GuestMicrophone.on);
 		}
 
 		return meeting;

@@ -1,9 +1,9 @@
 package dk.medcom.video.api.dto;
 
 public enum GuestMicrophone {
-    OFF(0),
-    ON(1),
-    MUTED(2);
+    off(0),
+    on(1),
+    muted(2);
 
     private final int value;
 
