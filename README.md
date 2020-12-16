@@ -3,6 +3,7 @@
 Video api'ets database er struktureret som følger
 ![databasemodel](/medcom-video-api-qa/docs/database.png)
 
+
 ## API dokumentation
 API'ets snitflade dokumentation kan findes på swaggerhub:
 https://app.swaggerhub.com/apis/Kvalitetsit/VDX-Booking-Module-API/0.4.0
