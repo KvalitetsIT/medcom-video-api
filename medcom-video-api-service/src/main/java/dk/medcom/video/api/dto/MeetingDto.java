@@ -44,6 +44,7 @@ public class MeetingDto extends RepresentationModel {
 	private String shortLink;
 	private String shortlink;
 	private GuestMicrophone guestMicrophone;
+	private boolean guestPinRequired;
 
 	public MeetingDto() {
 		// Empty constructor
@@ -77,6 +78,7 @@ public class MeetingDto extends RepresentationModel {
 		shortlink = shortLink;
 		externalId = meeting.getExternalId();
 		guestMicrophone = meeting.getGuestMicrophone();
+		guestPinRequired = meeting.getGuestPinRequired();
 
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
 
@@ -190,5 +192,13 @@ public class MeetingDto extends RepresentationModel {
 
 	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
 		this.guestMicrophone = guestMicrophone;
+	}
+
+	public boolean isGuestPinRequired() {
+		return guestPinRequired;
+	}
+
+	public void setGuestPinRequired(boolean guestPinRequired) {
+		this.guestPinRequired = guestPinRequired;
 	}
 }
