@@ -56,7 +56,7 @@ info:
     <Li> added guestMicrophone to create-meeting </Ul>
     <Li> 1.2.0 <Ul>
     <Li> added scheduling-info-reserve
-    <Li> Extended create meeting with optional field schedulingInfoReservationId</Ul>
+    <Li> Extended create meeting with optional field schedulingInfoReservationId
     <Li> Document labels.</Ul>
     <Li> 1.3.0 <Ul>
     <Li> added guestPingRequired to create-meeting </UL>
