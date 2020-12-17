@@ -50,10 +50,6 @@ info:
     <Li> added get scheduling-info-provision
     <Li> added get scheduling-info-deprovision
     <Li> added guestMicrophone to create-meeting </Ul>
-    <Li> 1.1.0 <Ul>
-    <Li> added get scheduling-info-provision
-    <Li> added get scheduling-info-deprovision
-    <Li> added guestMicrophone to create-meeting </Ul>
     <Li> 1.2.0 <Ul>
     <Li> added scheduling-info-reserve
     <Li> Extended create meeting with optional field schedulingInfoReservationId
