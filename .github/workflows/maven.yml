@@ -44,7 +44,7 @@ jobs:
 
 # Build solution. Also creates docker image.
     - name: Build with Maven
-      run: mvn clean install -DskipTests=true
+      run: mvn clean install 
 
 # Login to docker hub using secrets in GitHub.
     - name: Login to docker
