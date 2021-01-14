@@ -419,6 +419,7 @@ public class SchedulingInfoService {
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		if(!meeting.getOrganisation().getOrganisationId().equals(schedulingInfo.getOrganisation().getOrganisationId())) {
 			schedulingInfo.setPoolOverflow(true);
+			schedulingInfo.setOrganisation(meeting.getOrganisation());
 		}
 
 		return schedulingInfoRepository.save(schedulingInfo);

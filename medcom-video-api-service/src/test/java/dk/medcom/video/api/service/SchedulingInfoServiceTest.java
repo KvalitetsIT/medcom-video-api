@@ -318,6 +318,7 @@ public class SchedulingInfoServiceTest {
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
+        assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
     }
 
     @Test
@@ -342,6 +343,7 @@ public class SchedulingInfoServiceTest {
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
+        assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
     }
 
     @Test
