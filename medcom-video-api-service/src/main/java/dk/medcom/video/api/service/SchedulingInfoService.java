@@ -404,6 +404,9 @@ public class SchedulingInfoService {
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
+		if(!meeting.getOrganisation().getOrganisationId().equals(schedulingInfo.getOrganisation().getOrganisationId())) {
+			schedulingInfo.setPoolOverflow(true);
+		}
 
 		return schedulingInfoRepository.save(schedulingInfo);
 	}
@@ -411,6 +414,7 @@ public class SchedulingInfoService {
 	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
 		SchedulingInfo schedulingInfo = null;
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+
 		if (unusedId != null) {
 			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
 		}

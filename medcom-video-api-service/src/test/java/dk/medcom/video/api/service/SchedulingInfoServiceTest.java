@@ -315,6 +315,31 @@ public class SchedulingInfoServiceTest {
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
+        assertFalse(result.getPoolOverflow());
+    }
+
+    @Test
+    public void testAttachMeetingToSchedulingInfoOverflowPool() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+        Date vmrStartTime = calendar.getTime();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+        meeting.getOrganisation().setOrganisationId("some_other_id");
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        assertNotNull(result);
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
+        assertTrue(result.getPoolOverflow());
     }
 
     @Test

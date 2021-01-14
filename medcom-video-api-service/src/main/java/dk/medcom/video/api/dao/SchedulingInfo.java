@@ -34,6 +34,8 @@ public class SchedulingInfo {
 	
 	private String uriWithDomain;		
 	private String uriWithoutDomain;	//uri before the @
+
+	private boolean poolOverflow;
 	
 	@ManyToOne
 	@JoinColumn(name="scheduling_template_id")
@@ -214,4 +216,12 @@ public class SchedulingInfo {
     public String getReservationId() {
         return reservationId;
     }
+
+	public void setPoolOverflow(boolean poolOverflow) {
+		this.poolOverflow = poolOverflow;
+	}
+
+	public boolean getPoolOverflow() {
+		return poolOverflow;
+	}
 }

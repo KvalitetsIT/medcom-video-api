@@ -96,6 +96,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
 		Organisation organization = subjectOrganisationRepository.findByOrganisationId("test-org");
 		schedulingInfo.setOrganisation(organization);
+		schedulingInfo.setPoolOverflow(true);
 		
 		// When
 		schedulingInfo = subject.save(schedulingInfo);
@@ -130,6 +131,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		assertEquals(organization.getOrganisationId(), schedulingInfo.getOrganisation().getOrganisationId());
 
 		assertEquals(reservationId.toString(), schedulingInfo.getReservationId());
+		assertTrue(schedulingInfo.getPoolOverflow());
 	}
 	
 	@Test
