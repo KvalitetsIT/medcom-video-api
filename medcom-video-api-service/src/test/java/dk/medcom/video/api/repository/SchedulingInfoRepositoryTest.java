@@ -46,7 +46,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		String provisionStatusDescription = "All okay untill now";
 		String provisionVMRId = "PVMRID";
-	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
+	    Calendar calendar = new GregorianCalendar(2018, Calendar.NOVEMBER, 1,13,15, 0);
 		
 		Long meetingId = 4L;
 		Long schedulingTemplateId = 1L;
@@ -73,6 +73,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		schedulingInfo.setReservationId(reservationId.toString());
 
 		Meeting meeting = subjectM.findById(meetingId).orElse(null);
+		assertNotNull(meeting);
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setUuid(meeting.getUuid());
 		
@@ -85,7 +86,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		schedulingInfo.setMeetingUser(meetingUser);
 	    schedulingInfo.setUpdatedByUser(meetingUser);
 		
-		Calendar calendarCreate = new GregorianCalendar(2018,8,01,13,30,00);
+		Calendar calendarCreate = new GregorianCalendar(2018, Calendar.SEPTEMBER, 1,13,30, 0);
 	    schedulingInfo.setCreatedTime(calendarCreate.getTime());
 	    schedulingInfo.setUpdatedTime(calendarCreate.getTime());
 
@@ -194,6 +195,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		Meeting meeting = subjectM.findById(meetingId).orElse(null);
 			
 		// Then
+		assertNotNull(meeting);
 		Assert.assertNotNull(schedulingInfo);
 		assertEquals(meetingId, schedulingInfo.getMeeting().getId());
 		assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
@@ -209,6 +211,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 	    Meeting meeting = subjectM.findById(meetingId).orElse(null);
+	    assertNotNull(schedulingInfo);
+	    assertNotNull(meeting);
 	    schedulingInfo.setMeeting(meeting);
 	    schedulingInfo.setUuid(meeting.getUuid());
 			
@@ -222,8 +226,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllInIntervalAndProvisionStatus0() {
 		// Given
-	    Calendar calendarFrom = new GregorianCalendar(2012,10,01,13,15,00);
-	    Calendar calendarTo = new GregorianCalendar(2050,10,01,13,15,00);
+	    Calendar calendarFrom = new GregorianCalendar(2012, Calendar.NOVEMBER, 1,13,15, 0);
+	    Calendar calendarTo = new GregorianCalendar(2050, Calendar.NOVEMBER, 1,13,15, 0);
 	    ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		
 		// When
@@ -248,8 +252,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	
 		// When
 		Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
-		Date from = calendarFrom.getTime();
-		Date to = calendarTo.getTime();
+
 		// Then
 		Assert.assertNotNull(schedulingInfos);
 		int numberOfSchedulingInfo = 0;
@@ -298,7 +301,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllWithEndTimeLessThenAndProvisionStatus3() {
 		// Given
-		Calendar calendarTo = new GregorianCalendar(2019,Calendar.OCTOBER,02,16,00,05);
+		Calendar calendarTo = new GregorianCalendar(2019,Calendar.OCTOBER, 2,16, 0, 5);
 		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
 
 		// When
@@ -316,7 +319,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindAllWithEndTimeLessThenAndProvisionStatus3HandingZeroResult() {
 		// Given
-		Calendar calendarTo = new GregorianCalendar(2018,Calendar.OCTOBER,02,16,00,05);
+		Calendar calendarTo = new GregorianCalendar(2018,Calendar.OCTOBER, 2,16, 0, 5);
 		ProvisionStatus provisionStatus = ProvisionStatus.PROVISIONED_OK;
 
 		// When
@@ -357,6 +360,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 	    MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
+
+	    assertNotNull(schedulingInfo);
+	    assertNotNull(meetingUser);
 	    schedulingInfo.setMeetingUser(meetingUser);	    
 			
 		// Then
@@ -391,6 +397,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 	    MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
+
+	    assertNotNull(schedulingInfo);
 	    schedulingInfo.setUpdatedByUser(meetingUser);	    
 			
 		// Then
