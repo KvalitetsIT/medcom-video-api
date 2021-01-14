@@ -117,6 +117,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
 				.withEnv("short.link.base.url", "https://video.link/")
+				.withEnv("overflow.pool.organisation.id", "overflow")
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
@@ -209,4 +210,3 @@ public class IntegrationWithOrganisationServiceTest {
 
 	}
 }
-

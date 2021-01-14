@@ -35,12 +35,20 @@ public class SchedulingInfoService {
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationStrategy organisationStrategy;
 	private final UserContextService userContextService;
+	private final String overflowPoolOrganisationId;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
 	
-	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, SchedulingTemplateService schedulingTemplateService,
-								 SchedulingStatusService schedulingStatusService, MeetingUserService meetingUserService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, UserContextService userContextService) {
+	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
+								 SchedulingTemplateRepository schedulingTemplateRepository,
+								 SchedulingTemplateService schedulingTemplateService,
+								 SchedulingStatusService schedulingStatusService,
+								 MeetingUserService meetingUserService,
+								 OrganisationRepository organisationRepository,
+								 OrganisationStrategy organisationStrategy,
+								 UserContextService userContextService,
+								@Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -49,6 +57,11 @@ public class SchedulingInfoService {
 		this.organisationRepository = organisationRepository;
 		this.organisationStrategy = organisationStrategy;
 		this.userContextService = userContextService;
+
+		if(overflowPoolOrganisationId == null)  {
+			throw new RuntimeException("overflow.pool.organisation.id not set.");
+		}
+		this.overflowPoolOrganisationId = overflowPoolOrganisationId;
 	}
 
 	public List<SchedulingInfo> getSchedulingInfo(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus) {
@@ -415,6 +428,10 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfo = null;
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
 
+		if(unusedId == null) {
+			unusedId = getSchedulingInfoFromOverflowPool();
+		}
+
 		if (unusedId != null) {
 			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
 		}
@@ -424,6 +441,19 @@ public class SchedulingInfoService {
 		}
 
 		return attachMeetingToSchedulingInfo(meeting, schedulingInfo);
+	}
+
+	private Long getSchedulingInfoFromOverflowPool() {
+		LOGGER.info("Organisation {} is using scheduling info from overflow pool organisation {}.", userContextService.getUserContext().getUserOrganisation(), overflowPoolOrganisationId);
+		var organisation = organisationRepository.findByOrganisationId(overflowPoolOrganisationId);
+		LOGGER.debug("Organisation found: {}", organisation != null);
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name());
+
+		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
+			return null;
+		}
+
+		return schedulingInfos.get(0).longValue();
 	}
 
 	public SchedulingInfo reserveSchedulingInfo() throws RessourceNotFoundException {

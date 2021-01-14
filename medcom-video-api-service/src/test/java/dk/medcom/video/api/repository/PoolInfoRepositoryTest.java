@@ -28,11 +28,11 @@ public class PoolInfoRepositoryTest extends RepositoryTest {
 		
 		// Then
 		Assert.assertNotNull(poolInfos);
-		Assert.assertEquals(2, poolInfos.size());
+		Assert.assertEquals(3, poolInfos.size());
 		
-		Map<String, PoolInfoEntity> resultMap = new HashMap<String, PoolInfoEntity>();
-		for (int i = 0; i < poolInfos.size(); i++) {
-			resultMap.put(poolInfos.get(i).getOrganisationCode(), poolInfos.get(i));
+		Map<String, PoolInfoEntity> resultMap = new HashMap<>();
+		for (PoolInfoEntity poolInfo : poolInfos) {
+			resultMap.put(poolInfo.getOrganisationCode(), poolInfo);
 		}
 		
 		Assert.assertTrue(resultMap.containsKey(POOL_TEST_ORG));

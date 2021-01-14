@@ -2,6 +2,7 @@ package dk.medcom.video.api.repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		assertEquals(8, numberOfOrganisations);
+		assertEquals(9, numberOfOrganisations);
 	}
 	
 	@Test
@@ -130,15 +131,12 @@ public class OrganisationTest extends RepositoryTest {
 		List<Organisation> organizations = subject.findByPoolSizeNotNull();
 
 		assertNotNull(organizations);
-		assertEquals(2, organizations.size());
+		assertEquals(3, organizations.size());
 
-		Organisation organization = null;
-		for (Organisation org : organizations) {
-			if ("company name another-test-org".equals(org.getName())) {
-				organization = org;
-			}
-		}
-		assertNotNull(organization);
+		var optionalOorganization = organizations.stream().filter(x -> x.getName().equals("company name another-test-org")).findFirst();
+
+		assertTrue(optionalOorganization.isPresent());
+		var organization = optionalOorganization.get();
 		assertEquals("pool-test-org", organization.getOrganisationId());
 		assertEquals(10, organization.getPoolSize().intValue());
 	}

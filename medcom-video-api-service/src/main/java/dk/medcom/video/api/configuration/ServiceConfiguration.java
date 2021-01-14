@@ -10,7 +10,9 @@ import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
 import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.repository.OrganisationRepository;
-import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.repository.SchedulingInfoRepository;
+import dk.medcom.video.api.repository.SchedulingTemplateRepository;
+import dk.medcom.video.api.service.*;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -77,7 +79,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		LOGGER.debug("Creating userSecurityInterceptor");
 		return new UserSecurityInterceptor();
 	}
-	
+
 	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
 	public UserContextService userContextService() {

@@ -6,6 +6,7 @@ INSERT INTO organisation (id, organisation_id, name) VALUES (4, 'kvak', 'company
 INSERT INTO organisation (id, organisation_id, name) VALUES (5, 'test-org', 'company name test-org');
 INSERT INTO organisation (id, organisation_id, name) VALUES (6, 'another-test-org', 'company name another-test-org');
 INSERT INTO organisation (id, organisation_id, name, pool_size) VALUES (7, 'pool-test-org', 'company name another-test-org', 10);
+INSERT INTO organisation (id, organisation_id, name, pool_size) VALUES (8, 'overflow', 'overflow pool org', 10);
 
 -- * meeting_users *
 INSERT INTO meeting_users (id, organisation_id, email) VALUES (101,  5, 'me@me101.dk');
