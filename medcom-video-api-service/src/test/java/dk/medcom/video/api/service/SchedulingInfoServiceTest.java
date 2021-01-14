@@ -490,7 +490,7 @@ public class SchedulingInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
         var schedulingInfoService = createSchedulingInfoService();
 
-        var result = schedulingInfoService.reserveSchedulingInfo();
+        schedulingInfoService.reserveSchedulingInfo();
     }
 
     @Test

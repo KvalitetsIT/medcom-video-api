@@ -41,15 +41,15 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 		boolean endMeetingOnEndTime = true;
 		String uriWithDomain = "7777@test.dk";
 		String uriWithoutDomain = "7777";
-		Long meetingUserId = new Long(101);
+		Long meetingUserId = 101L;
 		
 		ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
 		String provisionStatusDescription = "All okay untill now";
 		String provisionVMRId = "PVMRID";
 	    Calendar calendar = new GregorianCalendar(2018,10,01,13,15,00);
 		
-		Long meetingId = new Long(4);
-		Long schedulingTemplateId = new Long(1);
+		Long meetingId = 4L;
+		Long schedulingTemplateId = 1L;
 		
 		String portalLink = "https://portal-test.vconf.dk/?url=7777@test.dk&pin=2010&start_dato=2018-12-02T15:00:00";
 		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
@@ -154,7 +154,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindSchedulingInfoWithExistingId() {
 		// Given
-		Long id = new Long(201);
+		Long id = 201L;
 		
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
@@ -173,7 +173,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	@Test
 	public void testFindSchedulingInfoWithNonExistingId() {
 		// Given
-		Long id = new Long(1999);
+		Long id = 1999L;
 		
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
@@ -186,8 +186,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testGetMeetingOnExistingSchedulingInfo() {
 		
 		// Given
-		Long schedulingInfoId = new Long(201);
-		Long meetingId = new Long(1);
+		Long schedulingInfoId = 201L;
+		Long meetingId = 1L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
@@ -203,8 +203,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testSetMeetingOnExistingSchedulingInfo() {
 
 		// Given
-		Long schedulingInfoId = new Long(202);
-		Long meetingId = new Long(2);
+		Long schedulingInfoId = 202L;
+		Long meetingId = 2L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
@@ -335,8 +335,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testGetMeetingUserOnExistingSchedulingInfo() {
 		
 		// Given
-		Long schedulingInfoId = new Long(202);
-		Long meetingUserId = new Long(102);
+		Long schedulingInfoId = 202L;
+		Long meetingUserId = 102L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
@@ -351,8 +351,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testSetMeetingUserOnExistingMeeting() {
 		
 		// Given
-		Long schedulingInfoId = new Long(203);
-		Long meetingUserId = new Long(102);
+		Long schedulingInfoId = 203L;
+		Long meetingUserId = 102L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
@@ -369,8 +369,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testGetUpdatedByUserOnExistingSchedulingInfo() {
 		
 		// Given
-		Long schedulingInfoId = new Long(202);
-		Long meetingUserId = new Long(102);
+		Long schedulingInfoId = 202L;
+		Long meetingUserId = 102L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
@@ -385,8 +385,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 	public void testSetUpdatedByUserOnExistingMeeting() {
 		
 		// Given
-		Long schedulingInfoId = new Long(203);
-		Long meetingUserId = new Long(102);
+		Long schedulingInfoId = 203L;
+		Long meetingUserId = 102L;
 			
 		// When
 		SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
