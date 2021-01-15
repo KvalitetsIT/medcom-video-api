@@ -202,6 +202,7 @@ public class MeetingService {
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());
 		meeting.setProjectCode(createMeetingDto.getProjectCode());
+		meeting.setGuestPinRequired(createMeetingDto.getGuestPinRequired());
 
 		createMeetingDto.getLabels().forEach(x -> {
 			MeetingLabel meetingLabel = new MeetingLabel();

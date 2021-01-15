@@ -51,6 +51,8 @@ public class CreateMeetingDto {
 
 	private GuestMicrophone guestMicrophone;
 
+	private boolean guestPinRequired;
+
 	public List<String> getLabels() {
 		return labels;
 	}
@@ -171,5 +173,13 @@ public class CreateMeetingDto {
 
 	public void setSchedulingInfoReservationId(UUID schedulingInfoReservationId) {
 		this.schedulingInfoReservationId = schedulingInfoReservationId;
+	}
+
+	public boolean getGuestPinRequired() {
+		return guestPinRequired;
+	}
+
+	public void setGuestPinRequired(boolean guestPinRequired) {
+		this.guestPinRequired = guestPinRequired;
 	}
 }

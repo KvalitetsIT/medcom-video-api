@@ -189,6 +189,38 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testCanCreateWithGuestPinRequiredNotSet() throws ApiException {
+		var createMeeting = createMeeting("another_external_id4");
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
+		assertFalse(meeting.isGuestPinRequired());
+	}
+
+	@Test
+	public void testCanCreateWithGuestPinRequiredSetFalse() throws ApiException {
+		var createMeeting = createMeeting("another_external_id5");
+		createMeeting.setGuestPinRequired(false);
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
+		assertFalse(meeting.isGuestPinRequired());
+	}
+
+	@Test
+	public void testCanCreateWithGuestPinRequiredSetTrue() throws ApiException {
+		var createMeeting = createMeeting("another_external_id6");
+		createMeeting.setGuestPinRequired(true);
+
+		var meeting = videoMeetings.meetingsPost(createMeeting);
+		assertNotNull(meeting);
+		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
+		assertTrue(meeting.isGuestPinRequired());
+	}
+
+	@Test
 	public void testUniqueOrganisationExternalId() throws ApiException {
 		var createMeeting = createMeeting("external_id");
 

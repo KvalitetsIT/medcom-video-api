@@ -53,6 +53,8 @@ public class Meeting {
 	@Enumerated(EnumType.STRING)
 	private GuestMicrophone guestMicrophone;
 
+	private boolean guestPinRequired;
+
 	public Long getId() {
 		return id;
 	}
@@ -183,5 +185,13 @@ public class Meeting {
 
 	public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
 		this.guestMicrophone = guestMicrophone;
+	}
+
+	public boolean getGuestPinRequired() {
+		return guestPinRequired;
+	}
+
+	public void setGuestPinRequired(boolean guestPinRequired) {
+		this.guestPinRequired = guestPinRequired;
 	}
 }
