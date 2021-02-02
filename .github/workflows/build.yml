@@ -37,7 +37,7 @@ jobs:
       id: jacoco
       uses: cicirello/jacoco-badge-generator@v1.0.0
       with:
-        jacoco-csv-file: email-service-qa/target/site/jacoco-aggregate/jacoco.csv
+        jacoco-csv-file: medcom-video-api-qa/target/site/jacoco-aggregate/jacoco.csv
 
     - name: Log coverage percentage
       run: |
@@ -50,7 +50,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
-        path: email-service-qa/target/site/jacoco-aggregate/
+        path: medcom-video-api-qa/target/site/jacoco-aggregate/
 
     - name: Tag service dev docker image
       run: ./build/docker-tag.sh kvalitetsit/medcom-video-api:latest kvalitetsit/medcom-video-api:dev
