@@ -1,3 +1,5 @@
+![Build Status](https://github.com/KvalitetsIT/medcom-email-service/workflows/Java%20CI%20with%20Maven/badge.svg) ![Test Coverage](.github/badges/jacoco.svg)
+
 # medcom-video-api
 ## Databasemodel 
 Video api'ets database er struktureret som følger
