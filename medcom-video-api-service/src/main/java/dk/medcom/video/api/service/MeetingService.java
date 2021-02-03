@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -412,4 +413,56 @@ public class MeetingService {
 
 		return meeting;
 	}
+
+	@Transactional
+    public Meeting patchMeeting(UUID uuid, PatchMeetingDto patchMeetingDto) throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException, NotAcceptableException {
+		var meeting = meetingRepository.findOneByUuid(uuid.toString());
+
+		var updateMeetingDto = new UpdateMeetingDto();
+		updateMeetingDto.setOrganizedByEmail(meeting.getOrganizedByUser().getEmail());
+		updateMeetingDto.setDescription(meeting.getDescription());
+		updateMeetingDto.setSubject(meeting.getSubject());
+		updateMeetingDto.setProjectCode(meeting.getProjectCode());
+		updateMeetingDto.setEndTime(meeting.getEndTime());
+		updateMeetingDto.setStartTime(meeting.getStartTime());
+		updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(x->x.getLabel()).collect(Collectors.toList()));
+
+		if(patchMeetingDto.isProjectIsSet()) {
+			updateMeetingDto.setProjectCode(patchMeetingDto.getProjectCode());
+		}
+		if(patchMeetingDto.isOrganizedByEmailIsSet()) {
+			updateMeetingDto.setOrganizedByEmail(patchMeetingDto.getOrganizedByEmail());
+		}
+		if(patchMeetingDto.getDescriptionIsSet()) {
+			updateMeetingDto.setDescription(patchMeetingDto.getDescription());
+		}
+		if(patchMeetingDto.isSubjectIsSet()) {
+			if(patchMeetingDto.getSubject() == null) {
+				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "Subject");
+			}
+			updateMeetingDto.setSubject(patchMeetingDto.getSubject());
+		}
+		if(patchMeetingDto.isEndTimeIsSet()) {
+			if(patchMeetingDto.getEndTime() == null) {
+				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "EndTime");
+			}
+			updateMeetingDto.setEndTime(patchMeetingDto.getEndTime());
+		}
+		if(patchMeetingDto.isStartTimeIsSet()) {
+			if(patchMeetingDto.getStartTime() == null) {
+				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "StartTime");
+			}
+			updateMeetingDto.setStartTime(patchMeetingDto.getStartTime());
+		}
+		if(patchMeetingDto.isLabelsIsSet()) {
+			if(patchMeetingDto.getLabels() == null) {
+				updateMeetingDto.setLabels(Collections.emptyList());
+			}
+			else {
+				updateMeetingDto.setLabels(patchMeetingDto.getLabels());
+			}
+		}
+
+		return updateMeeting(uuid.toString(), updateMeetingDto);
+    }
 }

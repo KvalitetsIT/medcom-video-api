@@ -12,7 +12,9 @@ public enum NotValidDataErrors {
     SCHEDULING_TEMPLATE_NOT_FOUND(40, "Scheduling template %s not found."),
     SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION(41, "Scheduling template %s does not belong to organisation %s."),
     BOTH_FROM_AND_TO_START_TIME_MUST_BE_PROVIDED_OR_NONE(50, "Either both from-start-time and to-start-time must be provided or none of them must be provided."),
-    INVALID_RESERVATION_ID(60, "ReservationId not owned by organisation or not found.");
+    INVALID_RESERVATION_ID(60, "ReservationId not owned by organisation or not found."),
+    NULL_VALUE(70, "Field can not be set to null")
+    ;
 
     private final int errorCode;
     private final String errorText;

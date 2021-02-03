@@ -9,6 +9,7 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.model.CreateMeeting;
 import io.swagger.client.model.Meeting;
+import io.swagger.client.model.PatchMeeting;
 import io.swagger.client.model.UpdateMeeting;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -36,10 +37,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -304,6 +302,41 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(searchResponse);
 		assertEquals(response.getUuid(), searchResponse.getUuid());
 //		assertEquals("https://video.link/" + searchResponse.getShortId(), searchResponse.getShortLink());
+	}
+
+	@Test
+	public void testPatchUpdate() throws ApiException {
+		// Given
+		var createMeeting = new CreateMeetingDto();
+		createMeeting.setDescription("This is a description");
+		var now = Calendar.getInstance();
+		var inOneHour = createDate(now, 1);
+		var inTwoHours = createDate(now, 2);
+
+		createMeeting.setStartTime(inOneHour);
+		createMeeting.setEndTime(inTwoHours);
+		createMeeting.setSubject("This is a subject!");
+
+		var createResponse = getClient()
+				.path("meetings")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.post(Entity.entity(createMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+
+		assertNotNull(createResponse.getUuid());
+
+		// When
+		var request = new PatchMeeting();
+		request.setDescription("SOME DESCRIPTION");
+		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
+
+		// Then
+		assertNotNull(response);
+
+		var getResponse = videoMeetings.meetingsUuidGet(UUID.fromString(createResponse.getUuid()));
+
+		assertNotNull(getResponse);
+		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
+		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
 	}
 
 	@Test

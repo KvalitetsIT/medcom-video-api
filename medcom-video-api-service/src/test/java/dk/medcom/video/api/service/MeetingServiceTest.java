@@ -9,10 +9,7 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.*;
-import dk.medcom.video.api.dto.CreateMeetingDto;
-import dk.medcom.video.api.dto.MeetingType;
-import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.UpdateMeetingDto;
+import dk.medcom.video.api.dto.*;
 import dk.medcom.video.api.repository.MeetingLabelRepository;
 import dk.medcom.video.api.repository.MeetingRepository;
 import org.hibernate.exception.ConstraintViolationException;
@@ -27,8 +24,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
 public class MeetingServiceTest {
@@ -82,6 +78,10 @@ public class MeetingServiceTest {
 		meeting.setEndTime(calendarEnd.getTime());
 		meeting.setDescription("Meeting Description long text");
 		meeting.setProjectCode("P001");
+
+		var label = new MeetingLabel();
+		label.setLabel("SOME_LABEL");
+		meeting.addMeetingLabel(label);
 
 		return meeting;
 	}
@@ -218,6 +218,38 @@ public class MeetingServiceTest {
 		assertTrue(secondLabel.isPresent());
 		assertEquals("second label", secondLabel.get().getLabel());
 	}
+
+	@Test
+	public void testPatchMeeting() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		// Given
+		UUID uuid = UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fce");
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.AWAITS_PROVISION);
+
+		// When
+		var patchMeetingDto = new PatchMeetingDto();
+		patchMeetingDto.setDescription("NEW DESCRIPTION");
+		patchMeetingDto.setLabels(null);
+		var result = meetingService.patchMeeting(uuid, patchMeetingDto);
+
+		// Then
+		assertNotNull(result);
+		assertEquals(patchMeetingDto.getDescription(), result.getDescription());
+		assertEquals("test@test.dk", result.getOrganizedByUser().getEmail());
+		assertEquals("P001", result.getProjectCode());
+		assertEquals("Test møde", result.getSubject());
+		assertEquals(calendarEnd.getTime(), result.getEndTime());
+		assertEquals(calendarStart.getTime(), result.getStartTime());
+
+		var meetingArgumentCaptor = ArgumentCaptor.forClass(Meeting.class);
+		Mockito.verify(meetingRepository, times(1)).save(meetingArgumentCaptor.capture());
+
+		assertNotNull(meetingArgumentCaptor.getValue());
+		var savedMeeting = meetingArgumentCaptor.getValue();
+		assertEquals(patchMeetingDto.getDescription(), savedMeeting.getDescription());
+	}
+
 
 	@Test
 	public void deleteMeetingDeletesLabels() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {

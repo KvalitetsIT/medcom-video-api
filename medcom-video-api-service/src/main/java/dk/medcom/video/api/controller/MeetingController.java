@@ -221,18 +221,7 @@ public class MeetingController {
 		return resource;
 	}
 	
-	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
-	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.PUT)
-	public EntityModel <MeetingDto> updateMeeting(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateMeetingDto updateMeetingDto ) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
-		LOGGER.debug("Entry of /meetings.put uuid: " + uuid);
-		
-		Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
-		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
-		EntityModel <MeetingDto> resource = new EntityModel<>(meetingDto);
-		
-		LOGGER.debug("Exit of /meetings.put resource: " + resource);
-		return resource;
-	}
+
 	
 	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings/{uuid}", method = RequestMethod.DELETE)
