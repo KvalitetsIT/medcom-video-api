@@ -43,15 +43,6 @@ public class DatabaseConfiguration {
 	private String jdbcPass;
 
 	@Bean
-	@ConditionalOnProperty(value="baseline.flyway", havingValue = "true")
-	public FlywayMigrationStrategy cleanMigrateStrategy() {
-		return flyway -> {
-			flyway.baseline();
-			throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
-		};
-	}
-
-	@Bean
 	public DataSource dataSource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(jdbcDriverClassName);

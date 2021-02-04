@@ -38,5 +38,4 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 |organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information.| Ikke krævet. Default false. |
 |organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services         | Ikke krævet. Skal være sat hvis organisation.service.enabled er sat til true. |
 |short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/ | Krævet
-|baseline.flyway           | Set to true to create new new flyway baseline starting from version 40. Needed to Flyway 3 to 6 migration. | Ikke krævet. 
 |overflow.pool.organisation.id | Organisation id to use for pool overflow. | Krævet
