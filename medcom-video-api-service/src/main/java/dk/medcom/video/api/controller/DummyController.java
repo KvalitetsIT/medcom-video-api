@@ -3,7 +3,7 @@ package dk.medcom.video.api.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dk.medcom.video.api.dto.DummyDto;
+import dk.medcom.video.api.api.DummyDto;
 
 @RestController
 public class DummyController {

@@ -15,14 +15,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import dk.medcom.video.api.repository.MeetingRepository;
-import dk.medcom.video.api.repository.MeetingUserRepository;
-import dk.medcom.video.api.repository.OrganisationRepository;
-import dk.medcom.video.api.repository.SchedulingInfoRepository;
-import dk.medcom.video.api.repository.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 
 @Configuration
-@ComponentScan("dk.medcom.video.api.repository.impl")
+@ComponentScan("dk.medcom.video.api.dao.impl")
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
 @EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})

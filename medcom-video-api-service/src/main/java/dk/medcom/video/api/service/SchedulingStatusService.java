@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.SchedulingInfo;
-import dk.medcom.video.api.dao.SchedulingStatus;
-import dk.medcom.video.api.repository.SchedulingStatusRepository;
+import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingStatus;
+import dk.medcom.video.api.dao.SchedulingStatusRepository;
 
 
 @Component

@@ -12,7 +12,6 @@ public class NotAcceptableException extends Exception {
         errorText = error.getErrorText();
     }
 
-
     public int getErrorCode() {
         return errorCode;
     }

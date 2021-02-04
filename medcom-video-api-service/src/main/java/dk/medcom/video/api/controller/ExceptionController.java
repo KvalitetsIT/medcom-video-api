@@ -2,7 +2,7 @@ package dk.medcom.video.api.controller;
 
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.dto.ApiError;
+import dk.medcom.video.api.api.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -1,7 +1,9 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.dao.SchedulingTemplate;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -12,7 +12,7 @@ public enum NotAcceptableErrors {
     private final int errorCode;
     private final String errorText;
 
-    private NotAcceptableErrors(int code, String text) {
+    NotAcceptableErrors(int code, String text) {
         this.errorCode = code;
         this.errorText = text;
     }

@@ -9,10 +9,8 @@ import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
 import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
-import dk.medcom.video.api.repository.SchedulingInfoRepository;
-import dk.medcom.video.api.repository.SchedulingTemplateRepository;
-import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.service.PoolInfoService;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -32,7 +30,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableAspectJAutoProxy
 @ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect"})
 public class ServiceConfiguration implements WebMvcConfigurer {
-	private static Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
 	@Autowired
 	private OrganisationStrategy organisationStrategy;

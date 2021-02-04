@@ -10,6 +10,5 @@ import dk.medcom.video.api.context.UserRole;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface APISecurityAnnotation {
-	public UserRole[] value() default UserRole.UNDEFINED;
-
+	UserRole[] value() default UserRole.UNDEFINED;
 }

@@ -1,6 +1,6 @@
 package dk.medcom.video.api.test;
 
-import dk.medcom.video.api.dto.SchedulingInfoDto;
+import dk.medcom.video.api.api.SchedulingInfoDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;

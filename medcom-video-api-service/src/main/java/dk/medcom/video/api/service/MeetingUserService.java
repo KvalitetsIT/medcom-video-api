@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.repository.MeetingUserRepository;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.MeetingUserRepository;
 
 @Component
 public class MeetingUserService {

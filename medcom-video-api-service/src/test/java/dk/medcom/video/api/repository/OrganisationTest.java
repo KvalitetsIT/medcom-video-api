@@ -8,10 +8,11 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import dk.medcom.video.api.dao.OrganisationRepository;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dao.Organisation;
+import dk.medcom.video.api.dao.entity.Organisation;
 
 public class OrganisationTest extends RepositoryTest {
 

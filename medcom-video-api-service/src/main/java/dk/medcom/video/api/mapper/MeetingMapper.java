@@ -3,11 +3,11 @@ package dk.medcom.video.api.mapper;
 import dk.medcom.video.api.controller.MeetingController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingLabel;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dto.MeetingDto;
-import dk.medcom.video.api.dto.MeetingUserDto;
+import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.MeetingLabel;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.api.MeetingDto;
+import dk.medcom.video.api.api.MeetingUserDto;
 import org.springframework.hateoas.Link;
 
 import java.util.stream.Collectors;
@@ -57,5 +57,4 @@ public class MeetingMapper {
 
         return meetingDto;
     }
-
 }

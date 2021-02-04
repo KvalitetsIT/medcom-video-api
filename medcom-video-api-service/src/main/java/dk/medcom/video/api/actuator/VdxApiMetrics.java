@@ -17,8 +17,8 @@ public class VdxApiMetrics extends PrometheusScrapeEndpoint {
 
 	private static final String ORG_ID_KEY = "ORGANISATION_CODE";
 	
-	private Gauge wantedPoolSize;
-	private Gauge availablePoolSize;
+	private final Gauge wantedPoolSize;
+	private final Gauge availablePoolSize;
 
 	PoolInfoService poolInfoService;
 
@@ -30,7 +30,6 @@ public class VdxApiMetrics extends PrometheusScrapeEndpoint {
 		this.availablePoolSize = Gauge.build().name("available_poolsize").help("Size of the available pool").labelNames(ORG_ID_KEY).register(collectorRegistry);
 	}
 
-	
 	@Override
 	@ReadOperation(produces = TextFormat.CONTENT_TYPE_004)
 	public String scrape() {

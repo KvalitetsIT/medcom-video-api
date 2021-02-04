@@ -24,16 +24,16 @@ import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.CreateSchedulingTemplateDto;
-import dk.medcom.video.api.dto.SchedulingTemplateDto;
-import dk.medcom.video.api.dto.UpdateSchedulingTemplateDto;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
+import dk.medcom.video.api.api.SchedulingTemplateDto;
+import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
 import dk.medcom.video.api.service.SchedulingTemplateService;
 
 @RestController
 public class SchedulingTemplateController {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingTemplateController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingTemplateController.class);
 
 	@Autowired
 	SchedulingTemplateService schedulingTemplateService;
@@ -43,7 +43,7 @@ public class SchedulingTemplateController {
 		LOGGER.debug("Entry of /scheduling-templates.get");
 		
 		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateService.getSchedulingTemplates();
-		List<SchedulingTemplateDto> schedulingTemplateDtos = new LinkedList<SchedulingTemplateDto>();
+		List<SchedulingTemplateDto> schedulingTemplateDtos = new LinkedList<>();
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
 			SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 			schedulingTemplateDtos.add(schedulingTemplateDto);
@@ -64,7 +64,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(id); 
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.get resource: " + resource);
 		return resource;
@@ -78,7 +78,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
 		return resource;
@@ -92,7 +92,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(id, updateSchedulingTemplateDto);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel <SchedulingTemplateDto>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.put resource: " + resource);
 		return resource;

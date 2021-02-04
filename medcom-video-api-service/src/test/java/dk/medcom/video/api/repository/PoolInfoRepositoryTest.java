@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import dk.medcom.video.api.dao.PoolInfoRepository;
 import org.junit.Assert;
 import org.junit.Test;
 

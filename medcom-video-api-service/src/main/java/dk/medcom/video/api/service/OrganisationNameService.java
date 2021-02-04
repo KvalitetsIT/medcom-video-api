@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;

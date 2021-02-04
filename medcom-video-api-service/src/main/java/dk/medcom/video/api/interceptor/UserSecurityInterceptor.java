@@ -12,8 +12,8 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.UnauthorizedException;
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.OrganisationRepository;
 
 public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
 	

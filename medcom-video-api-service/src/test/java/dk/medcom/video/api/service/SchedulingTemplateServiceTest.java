@@ -14,12 +14,12 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.CreateSchedulingTemplateDto;
-import dk.medcom.video.api.dto.UpdateSchedulingTemplateDto;
-import dk.medcom.video.api.repository.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
+import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 
 public class SchedulingTemplateServiceTest {
 	

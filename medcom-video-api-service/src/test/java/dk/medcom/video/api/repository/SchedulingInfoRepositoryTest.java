@@ -2,7 +2,8 @@ package dk.medcom.video.api.repository;
 
 
 import dk.medcom.video.api.dao.*;
-import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.api.ProvisionStatus;
 import org.junit.Assert;
 import org.junit.Test;
 

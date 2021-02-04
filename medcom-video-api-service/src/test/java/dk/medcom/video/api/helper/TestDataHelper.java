@@ -1,10 +1,10 @@
 package dk.medcom.video.api.helper;
 
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
-import dk.medcom.video.api.dao.SchedulingInfo;
-import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.api.ProvisionStatus;
 
 import java.util.Date;
 import java.util.UUID;
