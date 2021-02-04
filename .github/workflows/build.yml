@@ -33,6 +33,8 @@ jobs:
     - name: Version
       run: lsb_release -a
 
+    - name: docker version
+      run: docker -v
 
     - name: Build and test
       run: ./build/build.sh
