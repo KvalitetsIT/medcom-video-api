@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ master ]
+    branches: [ docker ]
     tags:
       - 'v*.*.*'
 
@@ -30,8 +30,16 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+    - name: Version
+      run: lsb_release -a
+
+
     - name: Build and test
       run: ./build/build.sh
+
+    - name: docker images
+      if: ${{ always() }}
+      run: docker image ls
 
     - name: Generate Jacoco Badge
       id: jacoco
