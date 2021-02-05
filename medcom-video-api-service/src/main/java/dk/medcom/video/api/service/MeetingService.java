@@ -261,6 +261,9 @@ public class MeetingService {
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		meeting.setGuestMicrophone(GuestMicrophone.valueOf(updateMeetingDto.getGuestMicrophone().name()));
+		meeting.setGuestPinRequired(updateMeetingDto.isGuestPinRequired());
+
 		meeting = meetingRepository.save(meeting);
 
 		meetingLabelRepository.deleteByMeeting(meeting);
