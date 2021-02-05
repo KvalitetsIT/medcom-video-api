@@ -42,6 +42,14 @@ public class PatchMeetingDto {
     @JsonIgnore
     private boolean labelsIsSet;
 
+    private GuestMicrophone guestMicrophone;
+    @JsonIgnore
+    private boolean guestMicrophoneSet;
+
+    private boolean guestPinRequired;
+    @JsonIgnore
+    private boolean guestPinRequiredSet;
+
     public String getSubject() {
         return subject;
     }
@@ -131,5 +139,31 @@ public class PatchMeetingDto {
 
     public boolean isEndTimeIsSet() {
         return endTimeIsSet;
+    }
+
+    public GuestMicrophone getGuestMicrophone() {
+        return guestMicrophone;
+    }
+
+    public void setGuestMicrophone(GuestMicrophone guestMicrophone) {
+        this.guestMicrophone = guestMicrophone;
+        this.guestMicrophoneSet = true;
+    }
+
+    public boolean isGuestMicrophoneSet() {
+        return guestMicrophoneSet;
+    }
+
+    public boolean isGuestPinRequired() {
+        return guestPinRequired;
+    }
+
+    public boolean isGuestPinRequiredSet() {
+        return guestPinRequiredSet;
+    }
+
+    public void setGuestPinRequired(boolean guestPinRequired) {
+        this.guestPinRequired = guestPinRequired;
+        this.guestPinRequiredSet = true;
     }
 }

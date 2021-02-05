@@ -1053,6 +1053,21 @@ components:
           items:
             type: string
             description: Array of labels to attach to meeting.
+        guestMicrophone:
+          example: muted
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - off
+            - on
+            - muted
+            - null
+        guestPinRequired:
+          type: boolean
+          example: false
+          description: When true shortlink will ask for pin
+
     scheduling-info:
       type: object
       required:

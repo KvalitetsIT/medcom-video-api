@@ -1,15 +1,16 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
+import dk.medcom.video.api.dao.MeetingLabelRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.api.*;
-import dk.medcom.video.api.dao.MeetingLabelRepository;
-import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.service.domain.UpdateMeeting;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Component
 public class MeetingService {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingService.class);
 	private final IdGenerator idGenerator;
 
@@ -226,7 +225,11 @@ public class MeetingService {
 	@Transactional(rollbackFor = Throwable.class)
 	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		Meeting meeting = getMeetingByUuid(uuid);
-				
+
+		return updateMeeting(uuid, new DomainMapperService().mapToUpdateMeeting(updateMeetingDto, meeting), meeting);
+	}
+
+	private Meeting updateMeeting(String uuid, UpdateMeeting updateMeetingDto, Meeting meeting) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		if (schedulingInfo.getProvisionStatus() != ProvisionStatus.AWAITS_PROVISION && schedulingInfo.getProvisionStatus() != ProvisionStatus.PROVISIONED_OK) {
 			LOGGER.debug("Meeting does not have the correct Status for updating. Meeting status is: " + schedulingInfo.getProvisionStatus().getValue());
@@ -416,53 +419,8 @@ public class MeetingService {
 
 	@Transactional
     public Meeting patchMeeting(UUID uuid, PatchMeetingDto patchMeetingDto) throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException, NotAcceptableException {
-		var meeting = meetingRepository.findOneByUuid(uuid.toString());
+		var	 meeting = getMeetingByUuid(uuid.toString());
 
-		var updateMeetingDto = new UpdateMeetingDto();
-		updateMeetingDto.setOrganizedByEmail(meeting.getOrganizedByUser().getEmail());
-		updateMeetingDto.setDescription(meeting.getDescription());
-		updateMeetingDto.setSubject(meeting.getSubject());
-		updateMeetingDto.setProjectCode(meeting.getProjectCode());
-		updateMeetingDto.setEndTime(meeting.getEndTime());
-		updateMeetingDto.setStartTime(meeting.getStartTime());
-		updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(x->x.getLabel()).collect(Collectors.toList()));
-
-		if(patchMeetingDto.isProjectIsSet()) {
-			updateMeetingDto.setProjectCode(patchMeetingDto.getProjectCode());
-		}
-		if(patchMeetingDto.isOrganizedByEmailIsSet()) {
-			updateMeetingDto.setOrganizedByEmail(patchMeetingDto.getOrganizedByEmail());
-		}
-		if(patchMeetingDto.getDescriptionIsSet()) {
-			updateMeetingDto.setDescription(patchMeetingDto.getDescription());
-		}
-		if(patchMeetingDto.isSubjectIsSet()) {
-			if(patchMeetingDto.getSubject() == null) {
-				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "Subject");
-			}
-			updateMeetingDto.setSubject(patchMeetingDto.getSubject());
-		}
-		if(patchMeetingDto.isEndTimeIsSet()) {
-			if(patchMeetingDto.getEndTime() == null) {
-				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "EndTime");
-			}
-			updateMeetingDto.setEndTime(patchMeetingDto.getEndTime());
-		}
-		if(patchMeetingDto.isStartTimeIsSet()) {
-			if(patchMeetingDto.getStartTime() == null) {
-				throw new NotValidDataException(NotValidDataErrors.NULL_VALUE, "StartTime");
-			}
-			updateMeetingDto.setStartTime(patchMeetingDto.getStartTime());
-		}
-		if(patchMeetingDto.isLabelsIsSet()) {
-			if(patchMeetingDto.getLabels() == null) {
-				updateMeetingDto.setLabels(Collections.emptyList());
-			}
-			else {
-				updateMeetingDto.setLabels(patchMeetingDto.getLabels());
-			}
-		}
-
-		return updateMeeting(uuid.toString(), updateMeetingDto);
+		return updateMeeting(uuid.toString(), new DomainMapperService().mapToUpdateMeeting(patchMeetingDto, meeting), meeting);
     }
 }

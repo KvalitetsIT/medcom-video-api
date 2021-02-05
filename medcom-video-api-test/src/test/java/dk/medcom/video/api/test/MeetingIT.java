@@ -316,6 +316,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setStartTime(inOneHour);
 		createMeeting.setEndTime(inTwoHours);
 		createMeeting.setSubject("This is a subject!");
+		createMeeting.setGuestMicrophone(GuestMicrophone.muted);
 
 		var createResponse = getClient()
 				.path("meetings")
@@ -327,6 +328,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		// When
 		var request = new PatchMeeting();
 		request.setDescription("SOME DESCRIPTION");
+		request.setGuestPinRequired(true);
 		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
 
 		// Then
@@ -337,6 +339,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
+		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
+		assertEquals(true, getResponse.isGuestPinRequired());
 	}
 
 	@Test

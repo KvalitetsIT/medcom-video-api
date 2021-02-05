@@ -78,6 +78,7 @@ public class MeetingServiceTest {
 		meeting.setEndTime(calendarEnd.getTime());
 		meeting.setDescription("Meeting Description long text");
 		meeting.setProjectCode("P001");
+		meeting.setGuestMicrophone(GuestMicrophone.muted);
 
 		var label = new MeetingLabel();
 		label.setLabel("SOME_LABEL");
@@ -231,6 +232,7 @@ public class MeetingServiceTest {
 		var patchMeetingDto = new PatchMeetingDto();
 		patchMeetingDto.setDescription("NEW DESCRIPTION");
 		patchMeetingDto.setLabels(null);
+		patchMeetingDto.setGuestMicrophone(GuestMicrophone.muted);
 		var result = meetingService.patchMeeting(uuid, patchMeetingDto);
 
 		// Then
@@ -248,6 +250,7 @@ public class MeetingServiceTest {
 		assertNotNull(meetingArgumentCaptor.getValue());
 		var savedMeeting = meetingArgumentCaptor.getValue();
 		assertEquals(patchMeetingDto.getDescription(), savedMeeting.getDescription());
+		assertEquals(patchMeetingDto.getGuestMicrophone().name(), savedMeeting.getGuestMicrophone().name());
 	}
 
 
