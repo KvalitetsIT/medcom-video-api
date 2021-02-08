@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DomainMapperServiceTest {
     @Test public void testMapFromUpdateMeetingDto2UpdateMeeting() {
@@ -82,5 +83,28 @@ public class DomainMapperServiceTest {
         assertEquals(input.getLabels(), result.getLabels());
         assertEquals(input.getGuestMicrophone().name(), result.getGuestMicrophone().toString());
         assertEquals(input.isGuestPinRequired(), result.isGuestPinRequired());
+    }
+
+    @Test
+    public void testGuestMicrophoneAndPinNotSet() throws NotValidDataException {
+        // GIVEN
+        var meetingUser = new MeetingUser();
+        meetingUser.setEmail("EMAIL");
+
+        var meeting = new Meeting();
+        meeting.setGuestMicrophone(GuestMicrophone.muted);
+        meeting.setGuestPinRequired(true);
+        meeting.setOrganizedByUser(meetingUser);
+
+        var input = new PatchMeetingDto();
+        input.setDescription("DESCRIPTION");
+
+        // WHEN
+        var service = new DomainMapperService();
+        var result = service.mapToUpdateMeeting(input, meeting);
+
+        // THEN
+        assertEquals(dk.medcom.video.api.service.domain.GuestMicrophone.muted, result.getGuestMicrophone());
+        assertTrue(result.isGuestPinRequired());
     }
 }

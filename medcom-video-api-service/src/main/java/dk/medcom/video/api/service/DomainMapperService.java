@@ -31,6 +31,7 @@ public class DomainMapperService {
     }
 
     public UpdateMeeting mapToUpdateMeeting(PatchMeetingDto patchMeetingDto, Meeting meeting) throws NotValidDataException {
+        // Map data from database entity to domain model.
         var updateMeetingDto = new UpdateMeeting();
         updateMeetingDto.setOrganizedByEmail(meeting.getOrganizedByUser().getEmail());
         updateMeetingDto.setDescription(meeting.getDescription());
@@ -39,11 +40,13 @@ public class DomainMapperService {
         updateMeetingDto.setEndTime(meeting.getEndTime());
         updateMeetingDto.setStartTime(meeting.getStartTime());
         updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList()));
+        updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
+        updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
         if(meeting.getGuestMicrophone() != null) {
             updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         }
-        updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
 
+        // Overwrite data in domain model with input data.
         if(patchMeetingDto.isProjectIsSet()) {
             updateMeetingDto.setProjectCode(patchMeetingDto.getProjectCode());
         }
@@ -79,7 +82,6 @@ public class DomainMapperService {
                 updateMeetingDto.setLabels(patchMeetingDto.getLabels());
             }
         }
-
 		if(patchMeetingDto.isGuestMicrophoneSet()) {
             updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(patchMeetingDto.getGuestMicrophone().name()));
 		}
