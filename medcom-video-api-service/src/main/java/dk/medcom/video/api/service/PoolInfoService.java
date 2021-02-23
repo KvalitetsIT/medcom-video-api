@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class PoolInfoService {
-    private OrganisationStrategy organisationStrategy;
-    private SchedulingInfoRepository schedulingInfoRepository;
-    private SchedulingTemplateRepository schedulingTemplateRepository;
-    private OrganisationRepository organisationRepository;
-    private PoolInfoRepository poolInfoRepository;
+    private final OrganisationStrategy organisationStrategy;
+    private final SchedulingInfoRepository schedulingInfoRepository;
+    private final SchedulingTemplateRepository schedulingTemplateRepository;
+    private final OrganisationRepository organisationRepository;
+    private final PoolInfoRepository poolInfoRepository;
 
     PoolInfoService(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
         this.organisationStrategy = organisationStrategy;
@@ -39,9 +39,8 @@ public class PoolInfoService {
     }
     
     public List<PoolInfoDto> getPoolInfo() {
-    	
         List<Organisation> organizations = organisationStrategy.findByPoolSizeNotNull();
-        List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
+        List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
         return mapPoolInfo(organizations, schedulingInfos);
     }

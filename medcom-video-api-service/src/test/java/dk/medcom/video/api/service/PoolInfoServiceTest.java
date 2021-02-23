@@ -41,7 +41,7 @@ public class PoolInfoServiceTest {
     @Test
     public void testGetPoolInfo() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
@@ -81,7 +81,7 @@ public class PoolInfoServiceTest {
     @Test
     public void testGetPoolInfoNoDefaultTemplate() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
         OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);

@@ -449,9 +449,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
 	@Test
 	public void testGetSchedulingInfoByMeetingsIdNull() {
-		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
+		List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
 		assertNotNull(schedulingInfos);
-		assertEquals(3, schedulingInfos.size());
+		assertEquals(2, schedulingInfos.size());
 	}
 }
