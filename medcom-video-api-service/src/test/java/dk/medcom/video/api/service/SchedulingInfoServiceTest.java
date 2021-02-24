@@ -323,6 +323,9 @@ public class SchedulingInfoServiceTest {
 
     @Test
     public void testAttachMeetingToSchedulingInfoOverflowPool() {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -336,8 +339,12 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
         meeting.getOrganisation().setOrganisationId("some_other_id");
 
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
+
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
@@ -366,6 +373,35 @@ public class SchedulingInfoServiceTest {
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testAttachMeetingToSchedulingInfoNoPoolOrganisation() {
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(startTime);
+        meeting.setId(1L);
+        meeting.setUuid(UUID.randomUUID().toString());
+        meeting.setOrganisation(createOrganisation());
+        meeting.getOrganisation().setPoolSize(null);
+
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
 
         assertNull(result);
     }

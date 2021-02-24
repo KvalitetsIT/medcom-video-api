@@ -429,7 +429,7 @@ public class SchedulingInfoService {
 		SchedulingInfo schedulingInfo = null;
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
 
-		if(unusedId == null) {
+		if(unusedId == null && meeting.getOrganisation().getPoolSize() != null) {
 			unusedId = getSchedulingInfoFromOverflowPool();
 		}
 
