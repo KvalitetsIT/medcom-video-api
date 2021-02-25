@@ -1,17 +1,16 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.vdx.organisation.controller;
 
+import dk.medcom.vdx.organisation.service.OrganisationNameService;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.api.OrganisationDto;
-import dk.medcom.video.api.service.OrganisationNameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import dk.medcom.vdx.organisation.api.OrganisationDto;
 
 @RestController
 public class OrganisationController {
@@ -21,7 +20,7 @@ public class OrganisationController {
 	private OrganisationNameService organisationService;
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
-	@RequestMapping(value = "/services/organisation/{code}", method = RequestMethod.GET)
+	@GetMapping(value = "/services/organisation/{code}")
 	public OrganisationDto getOrganisation(@PathVariable("code") String code) throws RessourceNotFoundException {
 		LOGGER.debug("Entry of /services/organisation.get code: " + code);
 

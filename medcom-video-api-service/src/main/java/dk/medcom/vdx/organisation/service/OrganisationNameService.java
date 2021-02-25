@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.vdx.organisation.service;
 
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.OrganisationRepository;
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Component
 public class OrganisationNameService {
-    private OrganisationRepository organisationRepository;
+    private final OrganisationRepository organisationRepository;
 
     public OrganisationNameService(OrganisationRepository organisationRepository) {
         this.organisationRepository = organisationRepository;

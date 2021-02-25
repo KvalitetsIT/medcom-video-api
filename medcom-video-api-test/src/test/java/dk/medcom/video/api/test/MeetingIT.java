@@ -1,9 +1,9 @@
 package dk.medcom.video.api.test;
 
+import dk.medcom.vdx.organisation.api.OrganisationDto;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
-import dk.medcom.video.api.api.OrganisationDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
@@ -37,7 +37,10 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package dk.medcom.video.api.api;
+package dk.medcom.vdx.organisation.api;
 
 public class OrganisationDto {
     private String code;
