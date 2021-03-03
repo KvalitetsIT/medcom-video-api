@@ -6,6 +6,7 @@ import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
+import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.model.CreateMeeting;
 import io.swagger.client.model.Meeting;
@@ -46,6 +47,7 @@ import static org.junit.Assert.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	private VideoMeetingsApi videoMeetings;
+	private OrganisationApi organisationApi;
 
 	@Before
 	public void setupApiClient() {
@@ -54,6 +56,11 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		videoMeetings = new VideoMeetingsApi(apiClient);
+
+		var organisationApiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+		organisationApi = new OrganisationApi(apiClient);
 	}
 
 	@Test
@@ -356,6 +363,36 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(response);
 		assertEquals("test-org", response.getCode());
 		assertEquals("company name test-org", response.getName());
+	}
+
+	@Test
+	public void testReadOrganisationTree() throws ApiException {
+		var response = organisationApi.servicesOrganisationtreeCodeGet("child");
+
+		assertNotNull(response);
+		assertEquals("super_parent", response.getName());
+		assertEquals(0, response.getPoolSize().intValue());
+		assertNull(response.getCode());
+		assertEquals(1, response.getChildren().size());
+
+		var child = response.getChildren().get(0);
+		assertEquals("parent", child.getCode());
+		assertEquals(20, child.getPoolSize().intValue());
+		assertEquals("parent org", child.getName());
+		assertEquals(1, child.getChildren().size());
+
+		child = child.getChildren().get(0);
+		assertEquals("child_one", child.getName());
+		assertEquals(0, child.getPoolSize().intValue());
+		assertNull(child.getCode());
+		assertEquals(1, child.getChildren().size());
+
+		child = child.getChildren().get(0);
+		assertEquals("child", child.getCode());
+		assertEquals(0, child.getPoolSize().intValue());
+		assertEquals("child org", child.getName());
+		assertEquals(0, child.getChildren().size());
+
 	}
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {

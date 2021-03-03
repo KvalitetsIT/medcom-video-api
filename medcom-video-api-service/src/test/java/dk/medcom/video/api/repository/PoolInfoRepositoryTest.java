@@ -29,7 +29,7 @@ public class PoolInfoRepositoryTest extends RepositoryTest {
 		
 		// Then
 		Assert.assertNotNull(poolInfos);
-		Assert.assertEquals(3, poolInfos.size());
+		Assert.assertEquals(4, poolInfos.size());
 		
 		Map<String, PoolInfoEntity> resultMap = new HashMap<>();
 		for (PoolInfoEntity poolInfo : poolInfos) {

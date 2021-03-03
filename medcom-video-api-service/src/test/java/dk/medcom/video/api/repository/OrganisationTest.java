@@ -30,6 +30,7 @@ public class OrganisationTest extends RepositoryTest {
 		organisation.setOrganisationId(organisationId);
 		organisation.setPoolSize(10);
 		organisation.setName(name);
+		organisation.setGroupId(1);
 
 		// When
 		organisation = subject.save(organisation);
@@ -41,6 +42,7 @@ public class OrganisationTest extends RepositoryTest {
 		assertEquals(name,  organisation.getName());
 		assertEquals(name,  organisation.toString());
 		assertEquals(10, organisation.getPoolSize().longValue());
+		assertEquals(1L, organisation.getGroupId());
 	}
 	
 	@Test
@@ -57,7 +59,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		assertEquals(9, numberOfOrganisations);
+		assertEquals(11, numberOfOrganisations);
 	}
 	
 	@Test
@@ -132,7 +134,7 @@ public class OrganisationTest extends RepositoryTest {
 		List<Organisation> organizations = subject.findByPoolSizeNotNull();
 
 		assertNotNull(organizations);
-		assertEquals(3, organizations.size());
+		assertEquals(4, organizations.size());
 
 		var optionalOorganization = organizations.stream().filter(x -> x.getName().equals("company name another-test-org")).findFirst();
 

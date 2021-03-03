@@ -1,12 +1,28 @@
+-- groups
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (1, 'company 1', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (2, 'company 2', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (3, 'company 3', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (4, 'kvak', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (5, 'test-org', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (6, 'another-test-org', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (7, 'pool-test-org', 2, null);
+INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (9, 'overflow', 2, null);
+insert into groups(group_id, group_name, group_type, parent_id) values(10, 'super_parent', 2, null);
+insert into groups(group_id, group_name, group_type, parent_id) values(11, 'parent', 2, 10);
+insert into groups(group_id, group_name, group_type, parent_id) values(12, 'child_one', 2, 11);
+insert into groups(group_id, group_name, group_type, parent_id) values(13, 'child', 2, 12);
+
 -- * organisation *
-INSERT INTO organisation (id, organisation_id, name) VALUES (1, 'company 1', 'company name 1'); 
-INSERT INTO organisation (id, organisation_id, name) VALUES (2, 'company 2', 'company name 2');
-INSERT INTO organisation (id, organisation_id, name) VALUES (3, 'company 3', 'company name 3');
-INSERT INTO organisation (id, organisation_id, name) VALUES (4, 'kvak', 'company name kvak');
-INSERT INTO organisation (id, organisation_id, name) VALUES (5, 'test-org', 'company name test-org');
-INSERT INTO organisation (id, organisation_id, name) VALUES (6, 'another-test-org', 'company name another-test-org');
-INSERT INTO organisation (id, organisation_id, name, pool_size) VALUES (7, 'pool-test-org', 'company name another-test-org', 10);
-INSERT INTO organisation (id, organisation_id, name, pool_size) VALUES (8, 'overflow', 'overflow pool org', 10);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (1, 'company 1', 'company name 1', 1);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (2, 'company 2', 'company name 2', 2);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'company 3', 'company name 3', 3);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (4, 'kvak', 'company name kvak', 4);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (5, 'test-org', 'company name test-org', 5);
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (6, 'another-test-org', 'company name another-test-org', 6);
+INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (7, 'pool-test-org', 'company name another-test-org', 10, 7);
+INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (8, 'overflow', 'overflow pool org', 10, 8);
+insert into organisation(id, organisation_id, name, pool_size, group_id) values(10, 'parent', 'parent org', 20, 11);
+insert into organisation(id, organisation_id, name, group_id) values(11, 'child', 'child org', 13);
 
 -- * meeting_users *
 INSERT INTO meeting_users (id, organisation_id, email) VALUES (101,  5, 'me@me101.dk');

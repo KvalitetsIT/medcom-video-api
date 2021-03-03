@@ -15,10 +15,9 @@ public class Organisation {
 	private Long id;
 
 	private String organisationId;
-	
 	private String name;
-
 	private Integer poolSize;
+	private long groupId;
 
 	public Long getId() {
 		return id;
@@ -55,5 +54,13 @@ public class Organisation {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(long groupId) {
+		this.groupId = groupId;
 	}
 }

@@ -120,6 +120,7 @@
                 <version>3.0.23</version>
                 <executions>
                     <execution>
+                        <id>video-api</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -130,7 +131,24 @@
                             <generateApiTests>false</generateApiTests>
 
                             <configOptions>
-                                <sourceFolder>src/generated-sources/java/main</sourceFolder>
+                                <dateLibrary>java8</dateLibrary>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>organisation-service</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/organisationservice.yaml</inputSpec>
+<!--                            <output>${project.build.directory}/generated-sources/organisationservice</output>-->
+                            <language>java</language>
+                            <generateModelTests>false</generateModelTests>
+                            <generateApiTests>false</generateApiTests>
+
+                            <configOptions>
                                 <dateLibrary>java8</dateLibrary>
                             </configOptions>
                         </configuration>

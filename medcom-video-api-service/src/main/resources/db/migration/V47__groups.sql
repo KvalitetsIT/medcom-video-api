@@ -93,3 +93,24 @@ CREATE TABLE IF NOT EXISTS `groups_types` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1
 ;
+
+delimiter //
+CREATE PROCEDURE org_modify()
+begin
+    IF NOT EXISTS( SELECT NULL
+                FROM INFORMATION_SCHEMA.COLUMNS
+               WHERE table_name = 'organisation'
+                 AND column_name = 'group_id')  THEN
+
+      alter table `organisation` ADD `group_id` bigint(20) NOT NULL after id;
+      alter table organisation add `deleted_time` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' after name;
+
+    END IF;
+end//
+
+delimiter ;
+
+call org_modify;
+
+drop PROCEDURE org_modify;
+
