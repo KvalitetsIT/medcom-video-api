@@ -116,6 +116,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
+				.withEnv("organisationtree.service.endpoint", "http://localhost:8080/api")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)

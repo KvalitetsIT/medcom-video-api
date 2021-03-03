@@ -6,9 +6,7 @@ import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
-import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.service.PoolInfoService;
 import io.micrometer.core.instrument.Clock;
@@ -64,6 +62,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
 		LOGGER.info("Starting up with service organisation strategy.");
 		return new OrganisationServiceStrategy(endpoint);
+	}
+
+	@Bean
+	public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
+		return new OrganisationTreeServiceClientImpl(endpoint);
 	}
 
 	@Bean

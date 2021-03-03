@@ -372,7 +372,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(response);
 		assertEquals("super_parent", response.getName());
 		assertEquals(0, response.getPoolSize().intValue());
-		assertNull(response.getCode());
+		assertEquals("10", response.getCode());
 		assertEquals(1, response.getChildren().size());
 
 		var child = response.getChildren().get(0);
@@ -384,7 +384,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		child = child.getChildren().get(0);
 		assertEquals("child_one", child.getName());
 		assertEquals(0, child.getPoolSize().intValue());
-		assertNull(child.getCode());
+		assertEquals("12", child.getCode());
 		assertEquals(1, child.getChildren().size());
 
 		child = child.getChildren().get(0);

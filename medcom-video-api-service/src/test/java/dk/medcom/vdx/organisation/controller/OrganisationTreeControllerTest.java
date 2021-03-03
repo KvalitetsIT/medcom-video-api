@@ -28,10 +28,10 @@ public class OrganisationTreeControllerTest {
     public void testGetOrganisationTree() {
         var input = "child";
 
-        var child = createOrganisation("child", 13, 12, null);
-        var childOne = createOrganisation("childOne", 12, 11, null);
-        var parent = createOrganisation("parent", 11, 10, 20);
-        var superParent = createOrganisation("superParent", 10, null, null);
+        var child = createOrganisation("child", 13, 12, null, "child_code");
+        var childOne = createOrganisation("childOne", 12, 11, null, null);
+        var parent = createOrganisation("parent", 11, 10, 20, "parent_code");
+        var superParent = createOrganisation("superParent", 10, null, null, null);
 
         Mockito.when(organisationTreeService.findOrganisations(input)).thenReturn(Optional.of(Arrays.asList(child, childOne, parent, superParent)));
 
@@ -40,7 +40,7 @@ public class OrganisationTreeControllerTest {
 
         assertEquals(0, result.getPoolSize());
         assertEquals(superParent.getOrganisationName(), result.getName());
-        assertEquals(superParent.getOrganisationId(), result.getCode());
+        assertEquals(superParent.getGroupId().toString(), result.getCode());
         assertEquals(0, result.getPoolSize());
         assertEquals(1, result.getChildren().size());
 
@@ -52,7 +52,7 @@ public class OrganisationTreeControllerTest {
 
         treeChild = treeChild.getChildren().get(0);
         assertEquals(childOne.getOrganisationName(), treeChild.getName());
-        assertEquals(childOne.getOrganisationId(), treeChild.getCode());
+        assertEquals(childOne.getGroupId().toString(), treeChild.getCode());
         assertEquals(0, treeChild.getPoolSize());
         assertEquals(1, treeChild.getChildren().size());
 
@@ -70,7 +70,7 @@ public class OrganisationTreeControllerTest {
         organisationTreeController.getOrganisationTree(input);
     }
 
-    private Organisation createOrganisation(String name, int groupId, Integer parentId, Integer poolSize) {
+    private Organisation createOrganisation(String name, int groupId, Integer parentId, Integer poolSize, String organisationId) {
         var organisation = new Organisation();
         organisation.setGroupId((long) groupId);
         if(parentId != null) {
@@ -80,6 +80,7 @@ public class OrganisationTreeControllerTest {
             organisation.setPoolSize(poolSize);
         }
         organisation.setOrganisationName(name);
+        organisation.setOrganisationId(organisationId);
 
         return organisation;
     }

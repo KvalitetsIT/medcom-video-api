@@ -1,6 +1,7 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ public class OrganisationService {
 	@Autowired
 	private OrganisationStrategy organisationStrategy;
 
+
 	public Integer getPoolSizeForUserOrganisation() {
 		return organisationStrategy.getPoolSizeForOrganisation(userService.getUserContext().getUserOrganisation());
 	}
@@ -41,4 +43,5 @@ public class OrganisationService {
 	public Integer getPoolSizeForOrganisation(String organisationId) {
 		return organisationStrategy.getPoolSizeForOrganisation(organisationId);
 	}
+
 }

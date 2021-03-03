@@ -170,7 +170,7 @@ public class MeetingService {
 				throw new NotValidDataException(NotValidDataErrors.INVALID_RESERVATION_ID, createMeetingDto.getSchedulingInfoReservationId().toString());
 			}
 
-			schedulingInfoService.attachMeetingToSchedulingInfo(meeting, schedulingInfo);
+			schedulingInfoService.attachMeetingToSchedulingInfo(meeting, schedulingInfo, false);
 		}
 		catch(RessourceNotFoundException e) {
 			LOGGER.info("ReservationId {} not found.", createMeetingDto.getSchedulingInfoReservationId());

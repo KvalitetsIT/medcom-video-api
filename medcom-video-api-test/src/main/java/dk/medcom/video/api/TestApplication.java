@@ -23,7 +23,7 @@ import java.util.function.Consumer;
 
 @EnableAutoConfiguration
 @Configuration
-@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration"})
+@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration","dk.medcom.vdx.organisation"})
 public class TestApplication extends SpringBootServletInitializer {
     private static GenericContainer testOrganisationFrontend;
     private DataSource dataSource;
@@ -40,10 +40,11 @@ public class TestApplication extends SpringBootServletInitializer {
 
         mysql.start();
         String jdbcUrl = mysql.getJdbcUrl();
-        System.setProperty("jdbc.url", jdbcUrl);
+        System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
         System.setProperty("short.link.base.url", "http://shortlink");
         System.setProperty("overflow.pool.organisation.id", "overflow");
+        System.setProperty("organisationtree.service.endpoint", "http://localhost:8081");
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;

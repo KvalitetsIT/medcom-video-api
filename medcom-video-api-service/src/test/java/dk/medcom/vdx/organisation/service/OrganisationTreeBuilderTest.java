@@ -20,17 +20,17 @@ public class OrganisationTreeBuilderTest {
 
     @Test
     public void testBuildTree() {
-        var child = createOrganisation("child", 13, 12, null);
-        var childOne = createOrganisation("childOne", 12, 11, null);
-        var parent = createOrganisation("parent", 11, 10, 20);
-        var superParent = createOrganisation("superParent", 10, null, null);
+        var child = createOrganisation("child", 13, 12, null, "child_code");
+        var childOne = createOrganisation("childOne", 12, 11, null, null);
+        var parent = createOrganisation("parent", 11, 10, 20, "parent_code");
+        var superParent = createOrganisation("superParent", 10, null, null, null);
 
         var result = organisationTreeBuilder.buildOrganisationTree(Arrays.asList(childOne, child, superParent, parent));
         assertNotNull(result);
 
         assertEquals(0, result.getPoolSize());
         assertEquals(superParent.getOrganisationName(), result.getName());
-        assertEquals(superParent.getOrganisationId(), result.getCode());
+        assertEquals(superParent.getGroupId().toString(), result.getCode());
         assertEquals(0, result.getPoolSize());
         assertEquals(1, result.getChildren().size());
 
@@ -42,7 +42,7 @@ public class OrganisationTreeBuilderTest {
 
         treeChild = treeChild.getChildren().get(0);
         assertEquals(childOne.getOrganisationName(), treeChild.getName());
-        assertEquals(childOne.getOrganisationId(), treeChild.getCode());
+        assertEquals(childOne.getGroupId().toString(), treeChild.getCode());
         assertEquals(0, treeChild.getPoolSize());
         assertEquals(1, treeChild.getChildren().size());
 
@@ -66,7 +66,7 @@ public class OrganisationTreeBuilderTest {
     }
 
 
-    private Organisation createOrganisation(String name, int groupId, Integer parentId, Integer poolSize) {
+    private Organisation createOrganisation(String name, int groupId, Integer parentId, Integer poolSize, String organisationId) {
         var organisation = new Organisation();
         organisation.setGroupId((long) groupId);
         if(parentId != null) {
@@ -76,6 +76,7 @@ public class OrganisationTreeBuilderTest {
             organisation.setPoolSize(poolSize);
         }
         organisation.setOrganisationName(name);
+        organisation.setOrganisationId(organisationId);
 
         return organisation;
     }

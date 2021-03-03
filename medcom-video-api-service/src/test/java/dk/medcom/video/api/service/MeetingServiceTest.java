@@ -403,7 +403,7 @@ public class MeetingServiceTest {
 		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
 		assertEquals(input.getStartTime(), result.getStartTime());
 
-		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result, schedulingInfo);
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result, schedulingInfo, false);
 	}
 
 	@Test(expected = NotValidDataException.class)

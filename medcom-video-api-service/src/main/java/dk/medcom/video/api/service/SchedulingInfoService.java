@@ -11,6 +11,8 @@ import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +38,7 @@ public class SchedulingInfoService {
 	private final OrganisationStrategy organisationStrategy;
 	private final UserContextService userContextService;
 	private final String overflowPoolOrganisationId;
+	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;		
@@ -48,7 +51,8 @@ public class SchedulingInfoService {
 								 OrganisationRepository organisationRepository,
 								 OrganisationStrategy organisationStrategy,
 								 UserContextService userContextService,
-								@Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId) {
+								@Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+								 OrganisationTreeServiceClient organisationTreeServiceClient) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -57,6 +61,7 @@ public class SchedulingInfoService {
 		this.organisationRepository = organisationRepository;
 		this.organisationStrategy = organisationStrategy;
 		this.userContextService = userContextService;
+		this.organisationTreeServiceClient = organisationTreeServiceClient;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -404,7 +409,7 @@ public class SchedulingInfoService {
 		return schedulingInfos.get(0).longValue();
 	}
 
-	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo) {
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
@@ -418,19 +423,26 @@ public class SchedulingInfoService {
 
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		if(!meeting.getOrganisation().getOrganisationId().equals(schedulingInfo.getOrganisation().getOrganisationId())) {
-			schedulingInfo.setPoolOverflow(true);
 			schedulingInfo.setOrganisation(meeting.getOrganisation());
+		}
+		if(fromOverflow) {
+			schedulingInfo.setPoolOverflow(true);
 		}
 
 		return schedulingInfoRepository.save(schedulingInfo);
 	}
 
 	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
-		SchedulingInfo schedulingInfo = null;
-		Long unusedId = getUnusedSchedulingInfoForOrganisation(meeting.getOrganisation());
+		boolean fromOverflow = false;
+		long organisationId = findPoolOrganisation(meeting.getOrganisation());
+		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
-		if(unusedId == null && meeting.getOrganisation().getPoolSize() != null) {
+		SchedulingInfo schedulingInfo = null;
+		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation);
+
+		if(unusedId == null && organisation.getPoolSize() != null) {
 			unusedId = getSchedulingInfoFromOverflowPool();
+			fromOverflow = true;
 		}
 
 		if (unusedId != null) {
@@ -441,7 +453,18 @@ public class SchedulingInfoService {
 			return null;
 		}
 
-		return attachMeetingToSchedulingInfo(meeting, schedulingInfo);
+		return attachMeetingToSchedulingInfo(meeting, schedulingInfo, fromOverflow);
+	}
+
+	private Long findPoolOrganisation(Organisation organisation) {
+		if(organisation.getPoolSize() != null && organisation.getPoolSize() > 0) {
+			return organisation.getId();
+		}
+
+		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId());
+
+		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisation.getOrganisationId(), organisationTree);
+		return organisationRepository.findByOrganisationId(poolOrganisation.getCode()).getId();
 	}
 
 	private Long getSchedulingInfoFromOverflowPool() {
