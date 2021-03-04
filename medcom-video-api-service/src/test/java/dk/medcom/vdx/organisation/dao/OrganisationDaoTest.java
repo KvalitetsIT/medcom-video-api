@@ -79,6 +79,12 @@ public class OrganisationDaoTest extends RepositoryTest {
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
+    public void testQueryDeletedGroup() {
+        organisationDao.findOrganisationByGroupId(14L);
+    }
+
+
+    @Test(expected = EmptyResultDataAccessException.class)
     public void testOrganisationByGroupIdNotFound() {
         long notFound = 47382;
         organisationDao.findOrganisationByGroupId(notFound);

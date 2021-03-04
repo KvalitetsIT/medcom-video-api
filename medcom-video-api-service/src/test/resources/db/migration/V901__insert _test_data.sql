@@ -11,6 +11,7 @@ INSERT INTO groups(group_id, group_name, group_type, parent_id) VALUES (9, 'over
 insert into groups(group_id, group_name, group_type, parent_id) values(10, 'super_parent', 2, null);
 insert into groups(group_id, group_name, group_type, parent_id) values(11, 'parent', 2, 10);
 insert into groups(group_id, group_name, group_type, parent_id) values(12, 'child_one', 2, 11);
+insert into groups(group_id, group_name, group_type, parent_id, deleted_time, deleted_by) values(14, 'child_one-deleted', 2, 11, now(), 'some-user');
 insert into groups(group_id, group_name, group_type, parent_id) values(13, 'child', 2, 12);
 
 -- * organisation *
