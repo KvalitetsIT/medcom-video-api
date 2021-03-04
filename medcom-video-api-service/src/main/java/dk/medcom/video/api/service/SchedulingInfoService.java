@@ -110,7 +110,7 @@ public class SchedulingInfoService {
 		}
 		if (schedulingTemplate == null) {
 			LOGGER.debug("Searching for schedulingTemplate");
-			schedulingTemplate = schedulingTemplateService.getDefaultSchedulingTemplate();
+			schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
 		}
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		

@@ -11,13 +11,13 @@ public class OrganisationFinder {
             return organisation;
         }
 
-        var parent = findParent(code, organistionTree);
+        var parent = findParentOrganisation(code, organistionTree);
         while(parent.isPresent()) {
             if(parent.get().getPoolSize() != 0) {
                 return parent.get();
             }
             else {
-                parent = findParent(parent.get().getCode(), organistionTree);
+                parent = findParentOrganisation(parent.get().getCode(), organistionTree);
             }
         }
 
@@ -38,7 +38,7 @@ public class OrganisationFinder {
         return result;
     }
 
-    private Optional<OrganisationTree> findParent(String code, OrganisationTree organisationTree) {
+    public Optional<OrganisationTree> findParentOrganisation(String code, OrganisationTree organisationTree) {
         if(organisationTree.getChildren().stream().anyMatch(x -> code.equals(x.getCode()))) {
             return Optional.of(organisationTree);
         }
@@ -46,9 +46,10 @@ public class OrganisationFinder {
         var children = organisationTree.getChildren();
         Optional<OrganisationTree> result = Optional.empty();
         for(OrganisationTree child : children) {
-            result = findParent(code, child);
+            result = findParentOrganisation(code, child);
         }
 
         return result;
     }
+
 }

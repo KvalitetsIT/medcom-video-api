@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,21 +68,25 @@ public class SchedulingTemplateService {
 	private Long uriNumberRangeHigh;		
 	@Value("${scheduling.template.default.ivr.theme}")
 	private String ivrTheme;
-	
+
+	private final OrganisationFinder organisationFinder = new OrganisationFinder();
+
+	@Autowired
+	private OrganisationTreeServiceClient organisationTreeServiceClient;
+
 	public SchedulingTemplateService() {
 		
 	}
 	
-	public SchedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService, MeetingUserService meetingUserService) {
+	public SchedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService, MeetingUserService meetingUserService, OrganisationTreeServiceClient organisationTreeServiceClient) {
 	 	this.schedulingTemplateRepository = schedulingTemplateRepository;
 	 	this.userService = userService;
 	 	this.organisationService = organisationService;
 	 	this.meetingUserService = meetingUserService;
+		this.organisationTreeServiceClient = organisationTreeServiceClient;
 	}
 
-	
-	public SchedulingTemplate getDefaultSchedulingTemplate() throws PermissionDeniedException{
-		
+	public SchedulingTemplate getSchedulingTemplateInOrganisationTree() throws PermissionDeniedException {
 		Organisation organisation = organisationService.getUserOrganisation();
 		List<SchedulingTemplate> schedulingTemplates = null;
 		if (organisation != null) {
@@ -91,27 +96,39 @@ public class SchedulingTemplateService {
 				LOGGER.debug("Template found using default organization template: " + schedulingTemplates.get(0).toString());
 				return schedulingTemplates.get(0);
 			}
-			
+
+			// Find in tree
+			var organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId());
+			var parent = organisationFinder.findParentOrganisation(organisation.getOrganisationId(), organisationTree);
+			while(parent.isPresent()) {
+				var schedulingTemplateFromTree = schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull(parent.get().getCode());
+				if(schedulingTemplateFromTree != null && !schedulingTemplateFromTree.isEmpty()) {
+					LOGGER.debug("Scheduling template found in organisation tree. Using scheduling template from organisation: {}", parent.get().getCode());
+					return schedulingTemplateFromTree.get(0);
+				}
+				parent = organisationFinder.findParentOrganisation(parent.get().getCode(), organisationTree);
+			}
+
 			//second try: find shared default template, where organization is null
 			schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull();
 			if (schedulingTemplates.size() > 0) {
 				LOGGER.debug("Template found using shared default template: " + schedulingTemplates.get(0).toString());
 				return schedulingTemplates.get(0);
 			}
-	
+
 			//if none of above is found - create the shared default template
 			CreateSchedulingTemplateDto createSchedulingTemplateDto = getSchedulingTemplateDto();
 			SchedulingTemplate schedulingTemplate = createSchedulingTemplate(createSchedulingTemplateDto, false);
 			LOGGER.debug("Creating default schedulingTemplate: " + schedulingTemplate.toString());
 			return schedulingTemplateRepository.save(schedulingTemplate);
 
-		} else {
+		}
+		else {
 			LOGGER.debug("organization is null");
 			throw new PermissionDeniedException();
 		}
-		
 	}
-	
+
 	public SchedulingTemplate getSchedulingTemplateFromOrganisationAndId(Long schedulingTemplateId) throws PermissionDeniedException, RessourceNotFoundException {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(organisationService.getUserOrganisation(), schedulingTemplateId);
 		

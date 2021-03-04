@@ -10,6 +10,8 @@ import org.junit.Test;
 import javax.annotation.Resource;
 import java.util.List;
 
+import static org.junit.Assert.assertNotNull;
+
 public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 	@Resource
@@ -63,8 +65,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate = subject.save(schedulingTemplate);
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
-		Assert.assertNotNull(schedulingTemplate.getId());
+		assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate.getId());
 		Assert.assertEquals(organisation, schedulingTemplate.getOrganisation());
 		Assert.assertEquals(conferencingSysId, schedulingTemplate.getConferencingSysId());
 		Assert.assertEquals(uriPrefix, schedulingTemplate.getUriPrefix());
@@ -92,10 +94,10 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Iterable<SchedulingTemplate> schedulingTemplates = subject.findAll();
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplates);
+		assertNotNull(schedulingTemplates);
 		int numberOfSchedulingTemplates = 0;
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
-			Assert.assertNotNull(schedulingTemplate);
+			assertNotNull(schedulingTemplate);
 			numberOfSchedulingTemplates++;
 		}
 		Assert.assertEquals(6, numberOfSchedulingTemplates);
@@ -110,7 +112,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate);
 		Assert.assertEquals(1L, schedulingTemplate.getOrganisation().getId().longValue());
 		Assert.assertEquals(id, schedulingTemplate.getId());
 		Assert.assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
@@ -150,7 +152,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndDeletedTimeIsNull(organisation); 
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplates);
+		assertNotNull(schedulingTemplates);
 		Assert.assertEquals(1, schedulingTemplates.size());
 	}
 	
@@ -204,10 +206,10 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			subject.save(schedulingTemplate);
 			schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
 			
-			Assert.assertNotNull(schedulingTemplates);
+			assertNotNull(schedulingTemplates);
 			numberOfSchedulingTemplates = 0;
 			for (SchedulingTemplate schedulingTemplate2 : schedulingTemplates) {
-				Assert.assertNotNull(schedulingTemplate2);
+				assertNotNull(schedulingTemplate2);
 				Assert.assertNull(schedulingTemplate2.getOrganisation());
 				numberOfSchedulingTemplates++;
 			}
@@ -225,7 +227,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true); 
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplates);
+		assertNotNull(schedulingTemplates);
 		Assert.assertEquals(1, schedulingTemplates.size());
 	}
 	
@@ -239,7 +241,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate);
 		Assert.assertEquals(id, schedulingTemplate.getId());
 	
 	}
@@ -257,5 +259,12 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertNull(schedulingTemplate);
 	
 	}
-	
+
+	@Test
+	public void testFindByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull() {
+		var result = subject.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull("pool-test-org");
+
+		assertNotNull(result);
+		Assert.assertEquals(1, result.size());
+	}
 }
