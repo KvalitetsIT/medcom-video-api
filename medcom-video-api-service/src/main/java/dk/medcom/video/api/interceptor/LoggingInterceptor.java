@@ -10,7 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class LoggingInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LoggingInterceptor.class);
@@ -23,6 +27,7 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
 		String correlationId = request.getHeader(correlationIdHeaderName);
 		LOGGER.debug("Extracted header: "+correlationIdHeaderName+" with value:"+correlationId);
 		if(correlationId == null) {
@@ -35,6 +40,13 @@ public class LoggingInterceptor extends HandlerInterceptorAdapter {
 		if (requestUrl != null) {
 			MDC.put(MDC_REQUEST_URL, requestUrl);
 		}
+
+		if(LOGGER.isDebugEnabled()) {
+			LOGGER.debug("HTTP headers: " + StreamSupport.stream(Spliterators.spliteratorUnknownSize(request.getHeaderNames().asIterator(), Spliterator.ORDERED), false)
+					.map(x -> String.format("%s=%s", x, request.getHeader(x)))
+					.collect(Collectors.joining(",")));
+		}
+
 		return true;
 	}
 
