@@ -180,7 +180,7 @@ public class MeetingService {
 
 	private boolean isFutureMeeting(CreateMeetingDto createMeetingDto) {
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.HOUR, 24); // TODO 2020-11-04 Temporary set to 24 hours to work around issue with different times zones between servers. 
+		now.add(Calendar.MINUTE, 2);
 
 		return createMeetingDto.getStartTime().after(now.getTime());
 	}

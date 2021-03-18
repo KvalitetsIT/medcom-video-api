@@ -454,7 +454,7 @@ public class MeetingServiceTest {
 		input.setDescription("This is a description");
 		input.setOrganizedByEmail("some@email.com");
 		Calendar now = Calendar.getInstance();
-		now.add(Calendar.MINUTE, (24*60)+1);
+		now.add(Calendar.MINUTE, 3);
 		input.setStartTime(now.getTime());
 		input.setUuid(uuid);
 		input.setMeetingType(MeetingType.POOL);
