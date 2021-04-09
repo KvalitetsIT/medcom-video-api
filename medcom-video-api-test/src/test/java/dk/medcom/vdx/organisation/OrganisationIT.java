@@ -4,7 +4,7 @@ import dk.medcom.video.api.test.IntegrationWithOrganisationServiceTest;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.OrganisationApi;
-import io.swagger.client.model.Organisation;
+import io.swagger.client.model.OrganisationGroup;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,11 +28,12 @@ public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
     @Test
     public void testOrganisationByUri_StatusPROVISIONED_OK() throws ApiException {
 
-        Organisation organisation = organisationApi.servicesOrganisationUriUriGet("1239@test.dk");
+        OrganisationGroup organisation = organisationApi.servicesOrganisationUriUriGet("1239@test.dk");
 
         Assert.assertNotNull(organisation);
-        Assert.assertNotNull(organisation.getCode());
-        Assert.assertNotNull(organisation.getName());
+        Assert.assertEquals("pool-test-org", organisation.getCode());
+        Assert.assertEquals("company name another-test-org", organisation.getName());
+        Assert.assertEquals(Long.valueOf(7), organisation.getGroupId());
     }
 
     @Test

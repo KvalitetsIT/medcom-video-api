@@ -211,7 +211,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/organisation'
+                $ref: '#/components/schemas/organisation-group'
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -293,6 +293,34 @@ components:
           type: integer
           format: int32
           example: 200
+    organisation-group:
+      type: object
+      properties:
+        parentCode:
+          description: The code that uniquely identifies the parent organisation
+          type: string
+          maxLength: 100
+          example: level_one_org
+        code:
+          description: The code that uniquely identifies an organisation
+          type: string
+          maxLength: 100
+          example: organisation_a
+        name:
+          description: The name of the organisation
+          type: string
+          maxLength: 100
+          example: Organisation with the full name A
+        poolSize:
+          description: The meeting room pool size for the organisation
+          type: integer
+          format: int32
+          example: 200
+        groupId:
+          description: The ID of the group this organisation is part of
+          type: integer
+          format: int64
+          example: 23
     organisationtree:
       type: object
       required:

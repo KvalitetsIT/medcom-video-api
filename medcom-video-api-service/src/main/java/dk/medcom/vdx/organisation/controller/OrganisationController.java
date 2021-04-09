@@ -1,6 +1,7 @@
 package dk.medcom.vdx.organisation.controller;
 
 import dk.medcom.vdx.organisation.api.OrganisationDto;
+import dk.medcom.vdx.organisation.api.OrganisationGroupDto;
 import dk.medcom.vdx.organisation.service.OrganisationNameService;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
@@ -38,7 +39,7 @@ public class OrganisationController {
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
 	@GetMapping(value = "/services/organisation/uri/{uri}")
-	public OrganisationDto getOrganisationByUri(@PathVariable("uri") String uri) throws RessourceNotFoundException {
+	public OrganisationGroupDto getOrganisationByUri(@PathVariable("uri") String uri) throws RessourceNotFoundException {
 		LOGGER.debug("Entry of /services/organisation/uri.get code: " + uri);
 
 		var organisation = organisationService.getOrganisationByUriWithDomain(uri);
@@ -46,9 +47,10 @@ public class OrganisationController {
 			throw new RessourceNotFoundException("Organisation with meeting on URI", uri);
 		}
 
-		var response = new OrganisationDto();
+		var response = new OrganisationGroupDto();
 		response.setName(organisation.getName());
 		response.setCode(organisation.getOrganisationId());
+		response.setGroupId(organisation.getGroupId());
 		int poolSize = organisation.getPoolSize() == null ? 0 : organisation.getPoolSize();
 		response.setPoolSize(poolSize);
 
