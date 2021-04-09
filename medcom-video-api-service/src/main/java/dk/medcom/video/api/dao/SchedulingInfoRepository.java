@@ -1,7 +1,7 @@
 package dk.medcom.video.api.dao;
 
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -32,4 +32,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 
 	@Query(value = "SELECT * FROM scheduling_info s WHERE s.reservation_id = ?1 and meetings_id is null for update", nativeQuery=true)
     SchedulingInfo findOneByReservationId(String reservationId);
+
+	@Query("SELECT s FROM SchedulingInfo s WHERE s.uriWithDomain = ?1 AND s.provisionStatus = ?2")
+	SchedulingInfo findOneByUriWithDomainAndProvisionStatusOk(String uri, ProvisionStatus provisionStatus);
 }

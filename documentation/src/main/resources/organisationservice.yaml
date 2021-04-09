@@ -192,6 +192,32 @@ paths:
           $ref: '#/components/responses/403'      
         '404':
           $ref: '#/components/responses/404'
+  /services/organisation/uri/{uri}:
+    get:
+      tags:
+        - Organisation
+      summary: Get a specific organisation
+      description: Get a specific organisation identified by a meeting uri with domain
+      parameters:
+        - name: uri
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '1234@rooms.vconf.dk'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organisation'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
   /services/organisationtree:
     get:
       tags:
