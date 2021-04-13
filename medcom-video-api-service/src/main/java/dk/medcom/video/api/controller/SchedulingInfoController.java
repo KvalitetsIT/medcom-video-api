@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -87,13 +88,13 @@ public class SchedulingInfoController {
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER}) //full user context is required in order to update, because of updatedbyuser
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.PUT)
 	public EntityModel <SchedulingInfoDto> updateSchedulingInfo(@PathVariable("uuid") String uuid, @Valid @RequestBody UpdateSchedulingInfoDto updateSchedulingInfoDto ) throws RessourceNotFoundException, PermissionDeniedException {
-		LOGGER.debug("Entry of /scheduling-info.put uuid: " + uuid);
-				
+		LOGGER.info("Entry of /scheduling-info.put uuid: {}, vmr id: {}, status: {}, status description: {}", uuid, updateSchedulingInfoDto.getProvisionVmrId(), updateSchedulingInfoDto.getProvisionStatus(), updateSchedulingInfoDto.getProvisionStatusDescription());
+
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 		
-		LOGGER.debug("Exit of /scheduling-info.put resource: " + resource.toString());
+		LOGGER.info("Exit of /scheduling-info.put resource: {}, status: {}", resource.getContent().getUuid(), resource.getContent().getProvisionStatus());
 		return resource;
 	}
 
@@ -113,6 +114,7 @@ public class SchedulingInfoController {
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsProvision()).withSelfRel();
 		resources.add(selfRelLink);
 
+		LOGGER.info("/scheduling-info-provision.get returns: {}", resources.getContent().stream().map(x -> String.format("uuid: %s, status: %s", x.getUuid(), x.getProvisionStatus())).collect(Collectors.joining(", ")));
 		LOGGER.debug("Exit of /scheduling-info-provision.get resources: " + resources.toString());
 		return resources;
 	}
@@ -133,6 +135,7 @@ public class SchedulingInfoController {
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsDeProvision()).withSelfRel();
 		resources.add(selfRelLink);
 
+		LOGGER.info("/scheduling-info-deprovision.get returns: {}", resources.getContent().stream().map(x -> String.format("uuid: %s, status: %s", x.getUuid(), x.getProvisionStatus())).collect(Collectors.joining(", ")));
 		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources.toString());
 		return resources;
 	}
