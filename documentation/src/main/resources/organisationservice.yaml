@@ -166,6 +166,30 @@ paths:
           $ref: '#/components/responses/403'      
         '404':
           $ref: '#/components/responses/404'
+  /services/organisation/uri:
+    post:
+      tags:
+        - Organisation
+      summary: Get a specific organisations
+      description: Get organisations identified by a meeting uri with domain
+      requestBody:
+        description: List of URI to find matching organisation for
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organisation-uri-request'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organisation-uri'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
   /services/organisationtree/{code}:
     get:
       tags:
@@ -190,32 +214,6 @@ paths:
           $ref: '#/components/responses/401'
         '403':
           $ref: '#/components/responses/403'      
-        '404':
-          $ref: '#/components/responses/404'
-  /services/organisation/uri/{uri}:
-    get:
-      tags:
-        - Organisation
-      summary: Get a specific organisation
-      description: Get a specific organisation identified by a meeting uri with domain
-      parameters:
-        - name: uri
-          in: path
-          required: true
-          schema:
-            type: string
-          example: '1234@rooms.vconf.dk'
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/organisation-group'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
   /services/organisationtree:
@@ -293,34 +291,35 @@ components:
           type: integer
           format: int32
           example: 200
-    organisation-group:
-      type: object
-      properties:
-        parentCode:
-          description: The code that uniquely identifies the parent organisation
-          type: string
-          maxLength: 100
-          example: level_one_org
-        code:
-          description: The code that uniquely identifies an organisation
-          type: string
-          maxLength: 100
-          example: organisation_a
-        name:
-          description: The name of the organisation
-          type: string
-          maxLength: 100
-          example: Organisation with the full name A
-        poolSize:
-          description: The meeting room pool size for the organisation
-          type: integer
-          format: int32
-          example: 200
-        groupId:
-          description: The ID of the group this organisation is part of
-          type: integer
-          format: int64
-          example: 23
+    organisation-uri-request:
+      type: array
+      items:
+        type: string
+        example: '1234@rooms.vconf.dk'
+    organisation-uri:
+      type: array
+      items:
+        type: object
+        properties:
+          code:
+            description: The code that uniquely identifies an organisation
+            type: string
+            maxLength: 100
+            example: organisation_a
+          name:
+            description: The name of the organisation
+            type: string
+            maxLength: 100
+            example: Organisation with the full name A
+          groupId:
+            description: The ID of the group this organisation is part of
+            type: integer
+            format: int64
+            example: 23
+          uri:
+            description: URI for whits result
+            type: string
+            example: '1234@rooms.vconf.dk'
     organisationtree:
       type: object
       required:

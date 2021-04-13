@@ -1,10 +1,20 @@
 package dk.medcom.vdx.organisation.api;
 
-public class OrganisationGroupDto {
+public class OrganisationUriDto {
+    public OrganisationUriDto(){
+    }
+
+    public OrganisationUriDto(String code, String name, long groupId, String uri){
+        this.code = code;
+        this.name = name;
+        this.groupId = groupId;
+        this.uri = uri;
+    }
+
     private String code;
     private String name;
-    private int poolSize;
     private long groupId;
+    private String uri;
 
     public String getName() {
         return name;
@@ -22,19 +32,19 @@ public class OrganisationGroupDto {
         this.code = code;
     }
 
-    public int getPoolSize() {
-        return poolSize;
-    }
-
-    public void setPoolSize(int poolSize) {
-        this.poolSize = poolSize;
-    }
-
     public long getGroupId() {
         return groupId;
     }
 
     public void setGroupId(long groupId) {
         this.groupId = groupId;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

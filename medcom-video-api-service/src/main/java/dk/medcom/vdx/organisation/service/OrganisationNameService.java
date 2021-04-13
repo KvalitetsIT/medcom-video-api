@@ -7,7 +7,10 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class OrganisationNameService {
@@ -23,12 +26,8 @@ public class OrganisationNameService {
         return Optional.ofNullable(organisationRepository.findByOrganisationId(organisationId));
     }
 
-    public Organisation getOrganisationByUriWithDomain(String uri) {
-        SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUriWithDomainAndProvisionStatusOk(uri, ProvisionStatus.PROVISIONED_OK);
-
-        if (schedulingInfo == null){
-            return null;
-        }
-        return schedulingInfo.getOrganisation();
+    public Map<String, Organisation> getOrganisationByUriWithDomain(List<String> uri) {
+        List<SchedulingInfo> dbResult = schedulingInfoRepository.findAllByUriWithDomainAndProvisionStatusOk(uri, ProvisionStatus.PROVISIONED_OK);
+        return dbResult.stream().collect(Collectors.toMap(SchedulingInfo::getUriWithDomain, SchedulingInfo::getOrganisation));
     }
 }

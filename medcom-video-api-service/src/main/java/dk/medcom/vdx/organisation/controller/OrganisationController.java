@@ -1,17 +1,21 @@
 package dk.medcom.vdx.organisation.controller;
 
 import dk.medcom.vdx.organisation.api.OrganisationDto;
-import dk.medcom.vdx.organisation.api.OrganisationGroupDto;
+import dk.medcom.vdx.organisation.api.OrganisationUriDto;
 import dk.medcom.vdx.organisation.service.OrganisationNameService;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.entity.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class OrganisationController {
@@ -38,22 +42,19 @@ public class OrganisationController {
 	}
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
-	@GetMapping(value = "/services/organisation/uri/{uri}")
-	public OrganisationGroupDto getOrganisationByUri(@PathVariable("uri") String uri) throws RessourceNotFoundException {
-		LOGGER.debug("Entry of /services/organisation/uri.get code: " + uri);
+	@PostMapping(value = "/services/organisation/uri")
+	public List<OrganisationUriDto> getOrganisationsByUris(@Valid @RequestBody List<String> uris) {
+		LOGGER.debug("Entry of /services/organisation/uri.post count: " + uris.size());
 
-		var organisation = organisationService.getOrganisationByUriWithDomain(uri);
-		if (organisation == null){
-			throw new RessourceNotFoundException("Organisation with meeting on URI", uri);
+		var organisations = organisationService.getOrganisationByUriWithDomain(uris);
+
+		List<OrganisationUriDto> resource = new ArrayList<>();
+		for (Map.Entry<String, Organisation> entry : organisations.entrySet()) {
+			Organisation organisation = entry.getValue();
+			resource.add(new OrganisationUriDto(organisation.getOrganisationId(), organisation.getName(), organisation.getGroupId(), entry.getKey()));
 		}
 
-		var response = new OrganisationGroupDto();
-		response.setName(organisation.getName());
-		response.setCode(organisation.getOrganisationId());
-		response.setGroupId(organisation.getGroupId());
-		int poolSize = organisation.getPoolSize() == null ? 0 : organisation.getPoolSize();
-		response.setPoolSize(poolSize);
-
-		return response;
+		LOGGER.debug("Exit of /services/organisation/uri.post return count: " + resource.size());
+		return resource;
 	}
 }

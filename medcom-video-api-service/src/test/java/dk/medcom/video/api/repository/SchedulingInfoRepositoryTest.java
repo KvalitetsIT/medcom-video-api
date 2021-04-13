@@ -9,10 +9,7 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.*;
@@ -468,28 +465,31 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
     @Test
     public void testFindOneByUriWithDomain_PROVISIONED_OK() {
         //Given
-        String uri = "1238@test.dk";
+        List<String> uris = new ArrayList<>();
+        uris.add("1238@test.dk");
 
         //When
-        SchedulingInfo result = subject.findOneByUriWithDomainAndProvisionStatusOk(uri, ProvisionStatus.PROVISIONED_OK);
+        List<SchedulingInfo> result = subject.findAllByUriWithDomainAndProvisionStatusOk(uris, ProvisionStatus.PROVISIONED_OK);
 
         //Then
-        Assert.assertNotNull(result);
-        Assert.assertEquals(uri, result.getUriWithDomain());
-        Assert.assertNotNull(result.getOrganisation());
-        Assert.assertNotNull(result.getOrganisation().getId());
-        Assert.assertNotNull(result.getOrganisation().getName());
+        Assert.assertFalse(result.isEmpty());
+        SchedulingInfo schedulingInfo = result.get(0);
+        Assert.assertEquals(uris.get(0), schedulingInfo.getUriWithDomain());
+        Assert.assertNotNull(schedulingInfo.getOrganisation());
+        Assert.assertNotNull(schedulingInfo.getOrganisation().getId());
+        Assert.assertNotNull(schedulingInfo.getOrganisation().getName());
     }
 
     @Test
     public void testFindOneByUriWithDomain_NotPROVISIONED_OK() {
         //Given
-        String uri = "1230@test.dk";
+        List<String> uris = new ArrayList<>();
+        uris.add("1230@test.dk");
 
         //When
-        SchedulingInfo result = subject.findOneByUriWithDomainAndProvisionStatusOk(uri, ProvisionStatus.PROVISIONED_OK);
+        List<SchedulingInfo> result = subject.findAllByUriWithDomainAndProvisionStatusOk(uris, ProvisionStatus.PROVISIONED_OK);
 
         //Then
-        Assert.assertNull(result);
+        Assert.assertTrue(result.isEmpty());
     }
 }

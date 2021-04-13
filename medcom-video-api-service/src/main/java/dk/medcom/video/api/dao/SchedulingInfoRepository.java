@@ -33,6 +33,6 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query(value = "SELECT * FROM scheduling_info s WHERE s.reservation_id = ?1 and meetings_id is null for update", nativeQuery=true)
     SchedulingInfo findOneByReservationId(String reservationId);
 
-	@Query("SELECT s FROM SchedulingInfo s WHERE s.uriWithDomain = ?1 AND s.provisionStatus = ?2")
-	SchedulingInfo findOneByUriWithDomainAndProvisionStatusOk(String uri, ProvisionStatus provisionStatus);
+	@Query("SELECT s FROM SchedulingInfo s WHERE s.provisionStatus = ?2 AND s.uriWithDomain IN (?1)")
+	List<SchedulingInfo> findAllByUriWithDomainAndProvisionStatusOk(List<String> uri, ProvisionStatus provisionStatus);
 }
