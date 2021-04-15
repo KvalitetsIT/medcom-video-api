@@ -1,6 +1,7 @@
 package dk.medcom.vdx.organisation.dao;
 
 
+import dk.medcom.vdx.organisation.dao.impl.OrganisationDaoImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -114,6 +114,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("LOG_LEVEL", "debug")
 				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
+				.withClasspathResourceMapping("db/migration/V902__create_view.sql", "/app/sql/V902__create_view.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
 				.withEnv("organisationtree.service.endpoint", "http://localhost:8080/api")

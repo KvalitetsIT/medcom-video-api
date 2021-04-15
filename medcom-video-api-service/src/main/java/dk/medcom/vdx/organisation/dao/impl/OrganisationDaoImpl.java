@@ -1,5 +1,6 @@
-package dk.medcom.vdx.organisation.dao;
+package dk.medcom.vdx.organisation.dao.impl;
 
+import dk.medcom.vdx.organisation.dao.OrganisationDao;
 import dk.medcom.vdx.organisation.dao.entity.Organisation;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

@@ -1,7 +1,9 @@
 package dk.medcom.vdx.organisation.configuration;
 
 import dk.medcom.vdx.organisation.dao.OrganisationDao;
-import dk.medcom.vdx.organisation.dao.OrganisationDaoImpl;
+import dk.medcom.vdx.organisation.dao.OrganisationViews;
+import dk.medcom.vdx.organisation.dao.impl.OrganisationDaoImpl;
+import dk.medcom.vdx.organisation.dao.impl.OrganisationViewsImpl;
 import dk.medcom.vdx.organisation.service.OrganisationTreeBuilder;
 import dk.medcom.vdx.organisation.service.OrganisationTreeService;
 import dk.medcom.vdx.organisation.service.impl.OrganisationTreeBuilderImpl;
@@ -27,4 +29,7 @@ public class OrganisationConfiguration {
     public OrganisationDao organisationDao(DataSource dataSource) {
         return new OrganisationDaoImpl(dataSource);
     }
+
+    @Bean
+    public OrganisationViews organisationViews(DataSource dataSource) { return new OrganisationViewsImpl(dataSource); }
 }

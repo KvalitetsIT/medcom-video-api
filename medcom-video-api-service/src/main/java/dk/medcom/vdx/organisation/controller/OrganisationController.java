@@ -2,11 +2,11 @@ package dk.medcom.vdx.organisation.controller;
 
 import dk.medcom.vdx.organisation.api.OrganisationDto;
 import dk.medcom.vdx.organisation.api.OrganisationUriDto;
+import dk.medcom.vdx.organisation.service.OrganisationByUriService;
 import dk.medcom.vdx.organisation.service.OrganisationNameService;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.entity.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class OrganisationController {
@@ -23,6 +22,8 @@ public class OrganisationController {
 
 	@Autowired
 	private OrganisationNameService organisationService;
+	@Autowired
+	private OrganisationByUriService organisationByUriService;
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
 	@GetMapping(value = "/services/organisation/{code}")
@@ -46,12 +47,12 @@ public class OrganisationController {
 	public List<OrganisationUriDto> getOrganisationsByUris(@Valid @RequestBody List<String> uris) {
 		LOGGER.debug("Entry of /services/organisation/uri.post count: " + uris.size());
 
-		var organisations = organisationService.getOrganisationByUriWithDomain(uris);
+		var organisations = organisationByUriService.getOrganisationByUriWithDomain(uris);
 
 		List<OrganisationUriDto> resource = new ArrayList<>();
-		for (Map.Entry<String, Organisation> entry : organisations.entrySet()) {
-			Organisation organisation = entry.getValue();
-			resource.add(new OrganisationUriDto(organisation.getOrganisationId(), organisation.getName(), organisation.getGroupId(), entry.getKey()));
+		for (var entry : organisations.entrySet()) {
+			var organisation = entry.getValue();
+			resource.add(new OrganisationUriDto(organisation.getOrganisationId(), organisation.getOrganisationName(), organisation.getGroupId(), organisation.getGroupName(), entry.getKey()));
 		}
 
 		LOGGER.debug("Exit of /services/organisation/uri.post return count: " + resource.size());

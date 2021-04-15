@@ -4,16 +4,18 @@ public class OrganisationUriDto {
     public OrganisationUriDto(){
     }
 
-    public OrganisationUriDto(String code, String name, long groupId, String uri){
+    public OrganisationUriDto(String code, String name, long groupId, String groupName, String uri){
         this.code = code;
         this.name = name;
         this.groupId = groupId;
+        this.groupName = groupName;
         this.uri = uri;
     }
 
     private String code;
     private String name;
     private long groupId;
+    private String groupName;
     private String uri;
 
     public String getName() {
@@ -46,5 +48,13 @@ public class OrganisationUriDto {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }
