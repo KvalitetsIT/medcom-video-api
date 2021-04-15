@@ -1,5 +1,6 @@
 package dk.medcom.vdx.organisation.service;
 
+import dk.medcom.vdx.organisation.api.OrganisationUriDto;
 import dk.medcom.vdx.organisation.dao.OrganisationViews;
 import dk.medcom.vdx.organisation.dao.entity.Organisation;
 import dk.medcom.video.api.api.ProvisionStatus;
@@ -7,11 +8,7 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 public class OrganisationByUriService {
@@ -24,36 +21,38 @@ public class OrganisationByUriService {
         this.organisationViews = organisationViews;
     }
 
-    public Map<String, Organisation> getOrganisationByUriWithDomain(List<String> uri) {
+    public Set<OrganisationUriDto> getOrganisationByUriWithDomain(List<String> uris) {
+        Set<OrganisationUriDto> result = new HashSet<>();
+
         // Schedulerede møderum
-        Map<String, Organisation> result = getOrganisationFromSchedulingInfo(uri);
-        List<String> uriWithNoMatch = uri.stream().filter(x -> !result.containsKey(x)).collect(Collectors.toList());
+        addToResult(uris, result, getOrganisationFromSchedulingInfo(uris), true);
 
-        if (!uriWithNoMatch.isEmpty()){
+        if (!uris.isEmpty()){
             // Faste møderum
-            result.putAll(getOrganisationFromLongLivedMeetingRooms(uriWithNoMatch));
-            uriWithNoMatch = uri.stream().filter(x -> !result.containsKey(x)).collect(Collectors.toList());
+            addToResult(uris, result, getOrganisationFromLongLivedMeetingRooms(uris), false);
 
-            if (!uriWithNoMatch.isEmpty()){
+            if (!uris.isEmpty()){
                 // Registrerede klienter
-                result.putAll(getOrganisationFromRegisteredClients(uriWithNoMatch));
-                uriWithNoMatch = uri.stream().filter(x -> !result.containsKey(x)).collect(Collectors.toList());
+                addToResult(uris, result, getOrganisationFromRegisteredClients(uris), false);
 
-                if (!uriWithNoMatch.isEmpty()){
+                if (!uris.isEmpty()){
                     // Domæner
-                    result.putAll(getOrganisationFromDomain(uriWithNoMatch));
+                    addToResult(uris, result, getOrganisationFromDomain(uris), false);
                 }
             }
         }
-
-        addGroupName(result);
         return result;
     }
 
-    private void addGroupName(Map<String, Organisation> result) {
-        for (Map.Entry<String, Organisation> org : result.entrySet()) {
-            Optional<String> groupName = organisationViews.getGroupName(org.getValue().getGroupId());
-            groupName.ifPresent(name -> org.getValue().setGroupName(name));
+    private void addToResult(List<String> uris, Set<OrganisationUriDto> result, Map<String, Organisation> resultFromDb, boolean booked) {
+        for (Map.Entry<String, Organisation> entry : resultFromDb.entrySet()) {
+            Organisation value = entry.getValue();
+            // Add group name
+            Optional<String> groupName = organisationViews.getGroupName(value.getGroupId());
+            groupName.ifPresent(value::setGroupName);
+
+            result.add(new OrganisationUriDto(value.getOrganisationId(), value.getOrganisationName(), value.getGroupId(), value.getGroupName(), entry.getKey(), booked));
+            uris.remove(entry.getKey());
         }
     }
 
@@ -66,7 +65,6 @@ public class OrganisationByUriService {
             org.setGroupId(schedulingInfo.getOrganisation().getGroupId());
             org.setOrganisationId(schedulingInfo.getOrganisation().getOrganisationId());
             org.setOrganisationName(schedulingInfo.getOrganisation().getName());
-
             result.put(schedulingInfo.getUriWithDomain(), org);
         }
         return result;

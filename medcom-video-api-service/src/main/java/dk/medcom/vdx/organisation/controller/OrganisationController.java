@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class OrganisationController {
@@ -44,17 +44,10 @@ public class OrganisationController {
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
 	@PostMapping(value = "/services/organisation/uri")
-	public List<OrganisationUriDto> getOrganisationsByUris(@Valid @RequestBody List<String> uris) {
+	public Set<OrganisationUriDto> getOrganisationsByUris(@Valid @RequestBody List<String> uris) {
 		LOGGER.debug("Entry of /services/organisation/uri.post count: " + uris.size());
 
-		var organisations = organisationByUriService.getOrganisationByUriWithDomain(uris);
-
-		List<OrganisationUriDto> resource = new ArrayList<>();
-		for (var entry : organisations.entrySet()) {
-			var organisation = entry.getValue();
-			resource.add(new OrganisationUriDto(organisation.getOrganisationId(), organisation.getOrganisationName(), organisation.getGroupId(), organisation.getGroupName(), entry.getKey()));
-		}
-
+		Set<OrganisationUriDto> resource = organisationByUriService.getOrganisationByUriWithDomain(uris);
 		LOGGER.debug("Exit of /services/organisation/uri.post return count: " + resource.size());
 		return resource;
 	}

@@ -320,6 +320,10 @@ components:
             description: URI for whits result
             type: string
             example: '1234@rooms.vconf.dk'
+          booked:
+            description: Is this meeting booked
+            type: boolean
+            example: true
     organisationtree:
       type: object
       required:

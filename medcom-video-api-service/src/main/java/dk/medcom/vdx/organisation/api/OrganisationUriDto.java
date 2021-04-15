@@ -1,15 +1,22 @@
 package dk.medcom.vdx.organisation.api;
 
 public class OrganisationUriDto {
-    public OrganisationUriDto(){
-    }
-
     public OrganisationUriDto(String code, String name, long groupId, String groupName, String uri){
         this.code = code;
         this.name = name;
         this.groupId = groupId;
         this.groupName = groupName;
         this.uri = uri;
+        this.booked = false;
+    }
+
+    public OrganisationUriDto(String code, String name, long groupId, String groupName, String uri, boolean booked){
+        this.code = code;
+        this.name = name;
+        this.groupId = groupId;
+        this.groupName = groupName;
+        this.uri = uri;
+        this.booked = booked;
     }
 
     private String code;
@@ -17,6 +24,7 @@ public class OrganisationUriDto {
     private long groupId;
     private String groupName;
     private String uri;
+    private boolean booked;
 
     public String getName() {
         return name;
@@ -56,5 +64,13 @@ public class OrganisationUriDto {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public boolean isBooked() {
+        return booked;
+    }
+
+    public void setBooked(boolean booked) {
+        this.booked = booked;
     }
 }
