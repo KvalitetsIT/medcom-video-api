@@ -6,10 +6,10 @@ import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.MeetingLabelRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.MeetingLabel;
-import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-
 
 @Component
 public class MeetingService {
@@ -33,6 +32,8 @@ public class MeetingService {
 	private final OrganisationService organisationService;
 	private final UserContextService userService;
 	private final MeetingLabelRepository meetingLabelRepository;
+	private final OrganisationRepository organisationRepository;
+	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
 	MeetingService(MeetingRepository meetingRepository,
 				   MeetingUserService meetingUserService,
@@ -40,7 +41,9 @@ public class MeetingService {
 				   SchedulingStatusService schedulingStatusService,
 				   OrganisationService organisationService,
 				   UserContextService userService,
-				   MeetingLabelRepository meetingLabelRepository) {
+				   MeetingLabelRepository meetingLabelRepository,
+				   OrganisationRepository organisationRepository,
+				   OrganisationTreeServiceClient organisationTreeServiceClient) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -48,6 +51,8 @@ public class MeetingService {
 	 	this.organisationService = organisationService;
 	 	this.userService = userService;
 		this.meetingLabelRepository = meetingLabelRepository;
+		this.organisationRepository = organisationRepository;
+		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.idGenerator = new IdGeneratorImpl();
 	}
 	
@@ -100,9 +105,11 @@ public class MeetingService {
 //		meeting.setUpdatedTime(calendarNow.getTime());
 //		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
-		Integer poolSize = organisationService.getPoolSizeForUserOrganisation();
-		if(poolSize == null && createMeetingDto.getMeetingType() == MeetingType.POOL) {
-			throw new NotValidDataException(NotValidDataErrors.NON_AD_HOC_ORGANIZATION, meeting.getOrganisation().getOrganisationId());
+		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
+			boolean isPoolOrganisation = isPoolOrganisation(userService.getUserContext().getUserOrganisation());
+			if(!isPoolOrganisation) {
+				throw new NotValidDataException(NotValidDataErrors.NON_AD_HOC_ORGANIZATION, meeting.getOrganisation().getOrganisationId());
+			}
 		}
 
 		meeting = saveMeetingWithShortLink(meeting, 0);
@@ -111,6 +118,14 @@ public class MeetingService {
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
 
 		return meeting;
+	}
+
+	private boolean isPoolOrganisation(String organisationCode) {
+		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisationCode);
+
+		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisationCode, organisationTree);
+		Organisation o = organisationRepository.findByOrganisationId(poolOrganisation.getCode());
+		return o.getPoolSize() != null && o.getPoolSize() > 0;
 	}
 
 	private Meeting saveMeetingWithShortLink(Meeting meeting, int count) throws NotValidDataException {

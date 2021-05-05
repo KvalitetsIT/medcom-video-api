@@ -3,7 +3,7 @@ package dk.medcom.video.api.controller.exceptions;
 public enum NotValidDataErrors {
 
     NON_AD_HOC_ORGANIZATION(10, "Can not create ad hoc meeting on non ad hoc organization: %s"),
-    SCHEDULING_INFO_NOT_FOUND_ORGANISATION(11, "Unused scheduling information not found for organisation %s"),
+    SCHEDULING_INFO_NOT_FOUND_ORGANISATION(11, "Unused scheduling information not found for organisation tree for %s"),
     EXTERNAL_ID_NOT_UNIQUE(12, "ExternalId not unique within organisation."),
     ORGANISATION_ID_NOT_FOUND(13, "OrganisationId %s in request not found."),
     SCHEDULING_INFO_CAN_NOT_BE_CREATED(14, "Scheduling information can not be created on organisation %s that is not pool enabled."),

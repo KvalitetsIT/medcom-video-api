@@ -8,10 +8,13 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.dao.MeetingLabelRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,8 +45,10 @@ public class MeetingServiceTest {
 
 	private SchedulingInfoService schedulingInfoService;
 	private MeetingRepository meetingRepository;
-	private UUID reservationId = UUID.randomUUID();
+	private final UUID reservationId = UUID.randomUUID();
 	private SchedulingInfo schedulingInfo;
+	private OrganisationTreeServiceClient organisationTreeServiceClient;
+	private OrganisationRepository organisationRepository;
 
 	@Before
 	public void prepareTest() {
@@ -127,8 +132,33 @@ public class MeetingServiceTest {
 		SchedulingStatusService schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
+		organisationRepository = Mockito.mock(OrganisationRepository.class);
+		organisationTreeServiceClient = Mockito.mock(OrganisationTreeServiceClient.class);
 
-		MeetingService meetingService = new MeetingService(meetingRepository, meetingUserService, schedulingInfoService, schedulingStatusService, organisationService, userContextService, meetingLabelRepository);
+		OrganisationTree organisationTree = new OrganisationTree();
+		if(userOrganistionPoolSize != null) {
+			organisationTree.setPoolSize(userOrganistionPoolSize);
+		}
+		organisationTree.setCode(userContext.getUserOrganisation());
+		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(organisationTree);
+
+		Organisation o = new Organisation();
+		o.setOrganisationId(userContext.getUserOrganisation());
+		if(userOrganistionPoolSize != null) {
+			o.setPoolSize(userOrganistionPoolSize);
+		}
+		Mockito.when(organisationRepository.findByOrganisationId(userContext.getUserOrganisation())).thenReturn(o);
+
+		MeetingService meetingService = new MeetingService(meetingRepository,
+				meetingUserService,
+				schedulingInfoService,
+				schedulingStatusService,
+				organisationService,
+				userContextService,
+				meetingLabelRepository,
+				organisationRepository,
+				organisationTreeServiceClient);
+
 		Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
 		MeetingUser meetingUserOrganizer = new MeetingUser();
@@ -627,6 +657,97 @@ public class MeetingServiceTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		meetingService.createMeeting(input);
+	}
+
+	@Test(expected = NotValidDataException.class)
+	public void testCanNotCreateAdhocMeetingOnNonAdhocOrganisationInTree() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setPoolSize(null);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setMeetingType(MeetingType.POOL);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+
+		// Mock organisation tree
+		var child = createOrganisation("child name", "child", null, 10);
+		var childOne = createOrganisation("childOne name", userContext.getUserOrganisation(), Collections.singletonList(child), 0);
+		var parent = createOrganisation("parent name", "parent", Collections.singletonList(childOne), 0);
+		var superParent = createOrganisation("superParent name", "superParent", Collections.singletonList(parent), 0);
+
+		Mockito.reset(organisationTreeServiceClient);
+		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(superParent);
+
+		Mockito.reset(organisationRepository);
+		var o = new Organisation();
+		o.setOrganisationId("superParent");
+		Mockito.when(organisationRepository.findByOrganisationId("superParent")).thenReturn(o);
+
+		meetingService.createMeeting(input);
+	}
+
+	@Test
+	public void testCreatePooledMeetingFromPoolInOrganisationTree() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setMeetingType(MeetingType.POOL);
+
+		// Stuff
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
+
+		// Mock organisation tree
+		var child = createOrganisation("child name", "child", null, 10);
+		var childOne = createOrganisation("childOne name", userContext.getUserOrganisation(), Collections.singletonList(child), 0);
+		var parent = createOrganisation("parent name", "parent", Collections.singletonList(childOne), 10);
+		var superParent = createOrganisation("superParent name", "superParent", Collections.singletonList(parent), 0);
+
+		Mockito.reset(organisationTreeServiceClient);
+		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(superParent);
+
+		Mockito.reset(organisationRepository);
+		var o = new Organisation();
+		o.setOrganisationId("parent");
+		o.setPoolSize(10);
+		Mockito.when(organisationRepository.findByOrganisationId("parent")).thenReturn(o);
+
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result);
+	}
+
+	private OrganisationTree createOrganisation(String name, String code, List<OrganisationTree> children, int poolSize) {
+		var organisation = new OrganisationTree();
+		organisation.setPoolSize(poolSize);
+		organisation.setCode(code);
+		organisation.setName(name);
+		if(children != null) {
+			organisation.getChildren().addAll(children);
+		}
+
+		return organisation;
 	}
 
 	@Test
