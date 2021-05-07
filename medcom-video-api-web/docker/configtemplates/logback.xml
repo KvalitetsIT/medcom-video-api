@@ -21,8 +21,11 @@
 		</encoder>
 	</appender>
 
-	<root level="${LOG_LEVEL}">
+	<logger name="dk.medcom" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="${LOG_LEVEL_FRAMEWORK}">
 		<appender-ref ref="STDOUT" />
 	</root>
-		
 </configuration>

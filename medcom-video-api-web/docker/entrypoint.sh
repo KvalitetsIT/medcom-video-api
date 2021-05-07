@@ -34,6 +34,11 @@ if [[ -z $LOG_LEVEL ]]; then
   export LOG_LEVEL=INFO
 fi
 
+if [[ -z $LOG_LEVEL_FRAMEWORK ]]; then
+  echo "Default LOG_LEVEL_FRAMEWORK = INFO"
+  export LOG_LEVEL_FRAMEWORK=INFO
+fi
+
 if [[ -z $CORRELATION_ID ]]; then
   echo "Default CORRELATION_ID = correlation-id"
   export CORRELATION_ID=correlation-id
