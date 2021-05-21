@@ -12,6 +12,7 @@ import java.util.List;
 public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo, Long> {
 	List<SchedulingInfo> findAll();
 
+	@Query(value = "select * from scheduling_info where uuid = ?1 for update", nativeQuery = true)
 	SchedulingInfo findOneByUuid(String uuid);
 
 	SchedulingInfo findOneByUriWithoutDomain(String UriWithoutDomain);
