@@ -1,6 +1,7 @@
 package dk.medcom.vdx.organisation.dao.impl;
 
 import dk.medcom.vdx.organisation.dao.OrganisationViews;
+import dk.medcom.vdx.organisation.dao.entity.ViewGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,17 +43,17 @@ public class OrganisationViewsImpl implements OrganisationViews {
     }
 
     @Override
-    public Optional<String> getOrganisationName(Long groupId) {
+    public Optional<ViewGroups> getOrganisationFromViewGroup(Long groupId) {
         logger.debug("Enter getOrganisationName");
         var template = new NamedParameterJdbcTemplate(dataSource);
 
         var parameters = new HashMap<String, Object>();
         parameters.put("group_id", groupId);
 
-        String sql = "SELECT group_name FROM view_groups WHERE group_id = :group_id";
+        String sql = "SELECT group_name, organisation_id, organisation_id_name FROM view_groups WHERE group_id = :group_id";
 
         try {
-            String result = template.queryForObject(sql, parameters, String.class);
+            ViewGroups result = template.queryForObject(sql, parameters, ViewGroups.class);
 
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException e) {

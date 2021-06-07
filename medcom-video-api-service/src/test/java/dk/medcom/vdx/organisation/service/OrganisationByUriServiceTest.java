@@ -2,6 +2,7 @@ package dk.medcom.vdx.organisation.service;
 
 import dk.medcom.vdx.organisation.api.OrganisationUriDto;
 import dk.medcom.vdx.organisation.dao.OrganisationViews;
+import dk.medcom.vdx.organisation.dao.entity.ViewGroups;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
@@ -71,7 +72,9 @@ public class OrganisationByUriServiceTest {
         Mockito.when(organisationViewsMock.getGroupName(groupId1)).thenReturn(Optional.of(groupName1));
         Mockito.when(organisationViewsMock.getGroupName(groupId2)).thenReturn(Optional.of(groupName2));
         Mockito.when(organisationViewsMock.getGroupIdFromDomain("rooms.vconf.dk")).thenReturn(Optional.of(groupId2));
-        Mockito.when(organisationViewsMock.getOrganisationName(groupId2)).thenReturn(Optional.of(groupName2));
+        ViewGroups viewGroups = new ViewGroups();
+        viewGroups.setOrganisation_id_name(groupName2);
+        Mockito.when(organisationViewsMock.getOrganisationFromViewGroup(groupId2)).thenReturn(Optional.of(viewGroups));
 
         //When
         List<String> uris = new ArrayList<>();

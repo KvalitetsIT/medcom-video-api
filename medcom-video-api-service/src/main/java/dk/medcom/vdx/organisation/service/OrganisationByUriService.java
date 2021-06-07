@@ -3,6 +3,7 @@ package dk.medcom.vdx.organisation.service;
 import dk.medcom.vdx.organisation.api.OrganisationUriDto;
 import dk.medcom.vdx.organisation.dao.OrganisationViews;
 import dk.medcom.vdx.organisation.dao.entity.Organisation;
+import dk.medcom.vdx.organisation.dao.entity.ViewGroups;
 import dk.medcom.video.api.api.ProvisionStatus;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
@@ -79,8 +80,7 @@ public class OrganisationByUriService {
                 Organisation organisation = new Organisation();
                 organisation.setGroupId(groupId.get());
 
-                Optional<String> organisationName = organisationViews.getOrganisationName(groupId.get());
-                organisationName.ifPresent(organisation::setOrganisationName);
+                getOrganisationFromViewGroup(groupId.get(), organisation);
 
                 result.put(uri, organisation);
             }
@@ -97,8 +97,7 @@ public class OrganisationByUriService {
                 Organisation organisation = new Organisation();
                 organisation.setGroupId(groupId.get());
 
-                Optional<String> organisationName = organisationViews.getOrganisationName(groupId.get());
-                organisationName.ifPresent(organisation::setOrganisationName);
+                getOrganisationFromViewGroup(groupId.get(), organisation);
 
                 result.put(uri, organisation);
             }
@@ -117,8 +116,7 @@ public class OrganisationByUriService {
                 Organisation organisation = new Organisation();
                 organisation.setGroupId(groupId.get());
 
-                Optional<String> organisationName = organisationViews.getOrganisationName(groupId.get());
-                organisationName.ifPresent(organisation::setOrganisationName);
+                getOrganisationFromViewGroup(groupId.get(), organisation);
 
                 result.put(uri, organisation);
             }else {
@@ -128,13 +126,22 @@ public class OrganisationByUriService {
                     Organisation organisation = new Organisation();
                     organisation.setGroupId(groupId.get());
 
-                    Optional<String> organisationName = organisationViews.getOrganisationName(groupId.get());
-                    organisationName.ifPresent(organisation::setOrganisationName);
+                    getOrganisationFromViewGroup(groupId.get(), organisation);
 
                     result.put(uri, organisation);
                 }
             }
         }
         return result;
+    }
+
+    private void getOrganisationFromViewGroup(Long groupId, Organisation organisation) {
+        Optional<ViewGroups> viewGroup = organisationViews.getOrganisationFromViewGroup(groupId);
+        if (viewGroup.isPresent()){
+            ViewGroups info = viewGroup.get();
+            organisation.setGroupName(info.getGroup_name());
+            organisation.setOrganisationId(String.valueOf(info.getOrganisation_id()));
+            organisation.setOrganisationName(info.getOrganisation_id_name());
+        }
     }
 }

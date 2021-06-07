@@ -1,11 +1,13 @@
 package dk.medcom.vdx.organisation.dao;
 
+import dk.medcom.vdx.organisation.dao.entity.ViewGroups;
+
 import java.util.Optional;
 
 public interface OrganisationViews {
     Optional<Long> getGroupIdFromLongLivedMeetingRooms(String uri);
 
-    Optional<String> getOrganisationName(Long groupId);
+    Optional<ViewGroups> getOrganisationFromViewGroup(Long groupId);
 
     Optional<Long> getGroupIdFromRegisteredClients(String uri);
 
