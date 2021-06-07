@@ -3,13 +3,13 @@ package dk.medcom.vdx.organisation.dao.entity;
 import java.time.LocalDateTime;
 
 public class ViewGroups {
-    private long group_id;
-    private long parent_id;
+    private Long group_id;
+    private Long parent_id;
     private String group_name;
-    private int group_type;
+    private Integer group_type;
     private String group_type_name;
     private boolean Deleted;
-    private long organisation_id;
+    private Long organisation_id;
     private String organisation_id_name;
     private LocalDateTime created_time;
     private String created_by;
@@ -18,11 +18,11 @@ public class ViewGroups {
     private LocalDateTime deleted_time;
     private String deleted_by;
 
-    public long getGroup_id() {
+    public Long getGroup_id() {
         return group_id;
     }
 
-    public void setGroup_id(long group_id) {
+    public void setGroup_id(Long group_id) {
         this.group_id = group_id;
     }
 
@@ -30,7 +30,7 @@ public class ViewGroups {
         return parent_id;
     }
 
-    public void setParent_id(long parent_id) {
+    public void setParent_id(Long parent_id) {
         this.parent_id = parent_id;
     }
 
@@ -42,11 +42,11 @@ public class ViewGroups {
         this.group_name = group_name;
     }
 
-    public int getGroup_type() {
+    public Integer getGroup_type() {
         return group_type;
     }
 
-    public void setGroup_type(int group_type) {
+    public void setGroup_type(Integer group_type) {
         this.group_type = group_type;
     }
 
@@ -66,11 +66,11 @@ public class ViewGroups {
         Deleted = deleted;
     }
 
-    public long getOrganisation_id() {
+    public Long getOrganisation_id() {
         return organisation_id;
     }
 
-    public void setOrganisation_id(long organisation_id) {
+    public void setOrganisation_id(Long organisation_id) {
         this.organisation_id = organisation_id;
     }
 
