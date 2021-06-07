@@ -5,6 +5,7 @@ import dk.medcom.vdx.organisation.dao.entity.ViewGroups;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
@@ -53,7 +54,7 @@ public class OrganisationViewsImpl implements OrganisationViews {
         String sql = "SELECT group_name, organisation_id, organisation_id_name FROM view_groups WHERE group_id = :group_id";
 
         try {
-            ViewGroups result = template.queryForObject(sql, parameters, ViewGroups.class);
+            ViewGroups result = template.queryForObject(sql, parameters, BeanPropertyRowMapper.newInstance(ViewGroups.class));
 
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException e) {
