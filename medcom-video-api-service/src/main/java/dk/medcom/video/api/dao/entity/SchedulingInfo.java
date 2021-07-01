@@ -1,19 +1,9 @@
 package dk.medcom.video.api.dao.entity;
 
-import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
 import dk.medcom.video.api.api.ProvisionStatus;
+
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "scheduling_info")
@@ -36,6 +26,7 @@ public class SchedulingInfo {
 	private String uriWithoutDomain;	//uri before the @
 
 	private boolean poolOverflow;
+	private boolean pool;
 	
 	@ManyToOne
 	@JoinColumn(name="scheduling_template_id")
@@ -223,5 +214,13 @@ public class SchedulingInfo {
 
 	public boolean getPoolOverflow() {
 		return poolOverflow;
+	}
+
+	public boolean isPool() {
+		return pool;
+	}
+
+	public void setPool(boolean pool) {
+		this.pool = pool;
 	}
 }

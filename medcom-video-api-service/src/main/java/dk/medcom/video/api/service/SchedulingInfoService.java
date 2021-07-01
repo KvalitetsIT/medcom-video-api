@@ -1,16 +1,16 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.*;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.slf4j.Logger;
@@ -41,7 +41,10 @@ public class SchedulingInfoService {
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
 	@Value("${scheduling.info.citizen.portal}")
-	private String citizenPortal;		
+	private String citizenPortal;
+
+	@Value("${pool.meeting.minimumAgeSec:60}")
+	private int meetingMinimumAgeSec;
 	
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
 								 SchedulingTemplateRepository schedulingTemplateRepository,
@@ -379,6 +382,8 @@ public class SchedulingInfoService {
 		schedulingInfo.setOrganisation(ensureOrganisationCreated(createSchedulingInfoDto.getOrganizationId()));
 		schedulingInfo.setUuid(UUID.randomUUID().toString());
 
+		schedulingInfo.setPool(true);
+
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		LOGGER.debug("Exit createSchedulingInfo");
@@ -400,7 +405,11 @@ public class SchedulingInfoService {
 
 	@Transactional(rollbackFor = Throwable.class)
 	Long getUnusedSchedulingInfoForOrganisation(Organisation organisation) { // TODO Refactor so this can be private
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
+
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			return null;
@@ -471,7 +480,10 @@ public class SchedulingInfoService {
 		LOGGER.info("Organisation {} is using scheduling info from overflow pool organisation {}.", userContextService.getUserContext().getUserOrganisation(), overflowPoolOrganisationId);
 		var organisation = organisationRepository.findByOrganisationId(overflowPoolOrganisationId);
 		LOGGER.debug("Organisation found: {}", organisation != null);
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name());
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			return null;

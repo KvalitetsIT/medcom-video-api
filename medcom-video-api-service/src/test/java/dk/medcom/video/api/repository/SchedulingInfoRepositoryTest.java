@@ -434,11 +434,73 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
     public void testFindUnusedSchedulingInfoForOrganization() {
         Organisation organisation = new Organisation();
         organisation.setId(7L);
+        var optionalSchedulingInfo = subject.findById(207L);
+        assertTrue(optionalSchedulingInfo.isPresent());
+        SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
 
-        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name());
+        Calendar cal = Calendar.getInstance();
+
+        cal.setTime(new Date());
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 61);
+        schedulingInfo.setProvisionTimestamp(cal.getTime());
+        subject.save(schedulingInfo);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(new Date());
+        cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
+
+        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime());
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
         assertEquals(207, schedulingInfos.get(0).intValue());
+    }
+
+    @Test
+    public void testFindUnusedSchedulingInfoForOrganizationProvisionTimestamp() {
+        Organisation organisation = new Organisation();
+        organisation.setId(7L);
+        var optionalSchedulingInfo = subject.findById(207L);
+        assertTrue(optionalSchedulingInfo.isPresent());
+        SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
+
+        Calendar cal = Calendar.getInstance();
+
+        cal.setTime(new Date());
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 59);
+        schedulingInfo.setProvisionTimestamp(cal.getTime());
+        subject.save(schedulingInfo);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(new Date());
+        cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
+
+        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime());
+        assertNotNull(schedulingInfos);
+        assertEquals(0, schedulingInfos.size());
+
+        cal.setTime(new Date());
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 61);
+        schedulingInfo.setProvisionTimestamp(cal.getTime());
+        subject.save(schedulingInfo);
+
+        schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime());
+        assertNotNull(schedulingInfos);
+        assertEquals(1, schedulingInfos.size());
+        assertEquals(207, schedulingInfos.get(0).intValue());
+    }
+
+    @Test
+    public void testFindUnusedSchedulingInfoForOrganizationNoProvisionTimestampReady() {
+        Organisation organisation = new Organisation();
+        organisation.setId(7L);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(new Date());
+        cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
+
+        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime());
+        assertNotNull(schedulingInfos);
+        assertEquals(0, schedulingInfos.size());
     }
 
     @Test

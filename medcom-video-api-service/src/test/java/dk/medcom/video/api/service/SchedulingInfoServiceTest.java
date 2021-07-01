@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
@@ -8,16 +9,15 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.junit.Before;
@@ -73,7 +73,7 @@ public class SchedulingInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findOneByReservationId(reservationId.toString())).thenReturn(schedulingInfo);
         BigInteger id = new BigInteger("123");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Long.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()))).thenReturn(Collections.singletonList(id));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Long.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.singletonList(id));
         Mockito.when(schedulingInfoRepository.findById(Mockito.eq(123L))).thenReturn(Optional.of(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
@@ -345,12 +345,12 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
         meeting.getOrganisation().setOrganisationId("some_other_id");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
@@ -375,12 +375,12 @@ public class SchedulingInfoServiceTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
 
         assertNull(result);
     }
@@ -407,13 +407,13 @@ public class SchedulingInfoServiceTest {
         organisationTree.setCode(NON_POOL_ORG);
         organisationTree.setName("nonPoolOrg name");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
         Mockito.when(organisationTreeServiceClient.getOrganisationTree(NON_POOL_ORG)).thenReturn(organisationTree);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
         Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree(NON_POOL_ORG);
 
         assertNull(result);
@@ -451,7 +451,7 @@ public class SchedulingInfoServiceTest {
         organisation.setPoolSize(10);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name())).thenReturn(Collections.singletonList(BigInteger.ONE));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(organisation.getId()), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.singletonList(BigInteger.ONE));
 
         Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
         assertNotNull(schedulingInfo);
@@ -466,7 +466,7 @@ public class SchedulingInfoServiceTest {
         organisation.setPoolSize(10);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name())).thenReturn(Collections.emptyList());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(organisation.getId()), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.emptyList());
 
         Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
         assertNull(schedulingInfo);
@@ -529,7 +529,7 @@ public class SchedulingInfoServiceTest {
         assertNotNull(result);
 
         Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(1L, "PROVISIONED_OK");
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(1L), Mockito.eq("PROVISIONED_OK"), Mockito.any());
         var schedulingInfoCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoCaptor.capture());
         assertNotNull(schedulingInfoCaptor.getValue());
@@ -543,7 +543,7 @@ public class SchedulingInfoServiceTest {
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Mockito.reset(schedulingInfoRepository);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.anyLong(), Mockito.anyString(), Mockito.any())).thenReturn(null);
         var schedulingInfoService = createSchedulingInfoService();
 
         schedulingInfoService.reserveSchedulingInfo();
