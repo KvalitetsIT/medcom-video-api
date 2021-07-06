@@ -1,8 +1,9 @@
 package dk.medcom.video.api.api;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.springframework.hateoas.RepresentationModel;
 
 public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	
@@ -50,6 +51,16 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String ivrTheme;
 	
 	private boolean isDefaultTemplate;
+
+	private VmrType vmrType;
+	private ViewType hostView;
+	private ViewType guestView;
+	private VmrQuality vmrQuality;
+	private Boolean enableOverlayText;
+	private Boolean guestsCanPresent;
+	private Boolean forcePresenterIntoMain;
+	private Boolean forceEncryption;
+	private Boolean muteAllGuests;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -177,5 +188,77 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
+	}
+
+	public VmrType getVmrType() {
+		return vmrType;
+	}
+
+	public void setVmrType(VmrType vmrType) {
+		this.vmrType = vmrType;
+	}
+
+	public ViewType getHostView() {
+		return hostView;
+	}
+
+	public void setHostView(ViewType hostView) {
+		this.hostView = hostView;
+	}
+
+	public ViewType getGuestView() {
+		return guestView;
+	}
+
+	public void setGuestView(ViewType guestView) {
+		this.guestView = guestView;
+	}
+
+	public VmrQuality getVmrQuality() {
+		return vmrQuality;
+	}
+
+	public void setVmrQuality(VmrQuality vmrQuality) {
+		this.vmrQuality = vmrQuality;
+	}
+
+	public Boolean getEnableOverlayText() {
+		return enableOverlayText;
+	}
+
+	public void setEnableOverlayText(Boolean enableOverlayText) {
+		this.enableOverlayText = enableOverlayText;
+	}
+
+	public Boolean getGuestsCanPresent() {
+		return guestsCanPresent;
+	}
+
+	public void setGuestsCanPresent(Boolean guestsCanPresent) {
+		this.guestsCanPresent = guestsCanPresent;
+	}
+
+	public Boolean getForcePresenterIntoMain() {
+		return forcePresenterIntoMain;
+	}
+
+	public void setForcePresenterIntoMain(Boolean forcePresenterIntoMain) {
+		this.forcePresenterIntoMain = forcePresenterIntoMain;
+	}
+
+	public Boolean getForceEncryption() {
+		return forceEncryption;
+	}
+
+	public void setForceEncryption(Boolean forceEncryption) {
+		this.forceEncryption = forceEncryption;
+	}
+
+	public Boolean getMuteAllGuests() {
+		return muteAllGuests;
+	}
+
+	public void setMuteAllGuests(Boolean muteAllGuests) {
+		this.muteAllGuests = muteAllGuests;
 	}
 }

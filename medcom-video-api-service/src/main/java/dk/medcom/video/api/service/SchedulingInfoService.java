@@ -152,7 +152,64 @@ public class SchedulingInfoService {
 		} else {
 			schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());	
 		}
-		
+
+		LOGGER.error("TEST");
+		LOGGER.error("getVmrType. {}",createMeetingDto.getVmrType());
+		if (createMeetingDto.getVmrType() != null){
+			schedulingInfo.setVmrType(createMeetingDto.getVmrType());
+			LOGGER.debug("VmrType is taken from input: " + createMeetingDto.getVmrType().toString());
+		}else {
+			schedulingInfo.setVmrType(schedulingTemplate.getVmrType());
+		}
+		if (createMeetingDto.getHostView() != null){
+			schedulingInfo.setHostView(createMeetingDto.getHostView());
+			LOGGER.debug("HostView is taken from input: " + createMeetingDto.getHostView().toString());
+		}else {
+			schedulingInfo.setHostView(schedulingTemplate.getHostView());
+		}
+		if (createMeetingDto.getGuestView() != null){
+			schedulingInfo.setGuestView(createMeetingDto.getGuestView());
+			LOGGER.debug("GuestView is taken from input: " + createMeetingDto.getGuestView().toString());
+		}else {
+			schedulingInfo.setGuestView(schedulingTemplate.getGuestView());
+		}
+		if (createMeetingDto.getVmrQuality() != null){
+			schedulingInfo.setVmrQuality(createMeetingDto.getVmrQuality());
+			LOGGER.debug("VmrQuality is taken from input: " + createMeetingDto.getVmrQuality().toString());
+		}else {
+			schedulingInfo.setVmrQuality(schedulingTemplate.getVmrQuality());
+		}
+		if (createMeetingDto.getEnableOverlayText() != null){
+			schedulingInfo.setEnableOverlayText(createMeetingDto.getEnableOverlayText());
+			LOGGER.debug("EnableOverlayText is taken from input: " + createMeetingDto.getEnableOverlayText().toString());
+		}else {
+			schedulingInfo.setEnableOverlayText(schedulingTemplate.getEnableOverlayText());
+		}
+		if (createMeetingDto.getGuestsCanPresent() != null){
+			schedulingInfo.setGuestsCanPresent(createMeetingDto.getGuestsCanPresent());
+			LOGGER.debug("GuestsCanPresent is taken from input: " + createMeetingDto.getGuestsCanPresent().toString());
+		}else {
+			schedulingInfo.setGuestsCanPresent(schedulingTemplate.getGuestsCanPresent());
+		}
+		if (createMeetingDto.getForcePresenterIntoMain() != null){
+			schedulingInfo.setForcePresenterIntoMain(createMeetingDto.getForcePresenterIntoMain());
+			LOGGER.debug("ForcePresenterIntoMain is taken from input: " + createMeetingDto.getForcePresenterIntoMain().toString());
+		}else {
+			schedulingInfo.setForcePresenterIntoMain(schedulingTemplate.getForcePresenterIntoMain());
+		}
+		if (createMeetingDto.getForceEncryption() != null){
+			schedulingInfo.setForceEncryption(createMeetingDto.getForceEncryption());
+			LOGGER.debug("ForceEncryption is taken from input: " + createMeetingDto.getForceEncryption().toString());
+		}else {
+			schedulingInfo.setForceEncryption(schedulingTemplate.getForceEncryption());
+		}
+		if (createMeetingDto.getMuteAllGuests() != null){
+			schedulingInfo.setMuteAllGuests(createMeetingDto.getMuteAllGuests());
+			LOGGER.debug("MuteAllGuests is taken from input: " + createMeetingDto.getMuteAllGuests().toString());
+		}else {
+			schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
+		}
+
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
 		

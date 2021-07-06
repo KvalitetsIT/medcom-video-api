@@ -1,5 +1,8 @@
 package dk.medcom.video.api.test;
 
+import dk.medcom.video.api.api.CreateMeetingDto;
+import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
@@ -8,8 +11,11 @@ import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.CreateMeeting;
 import org.junit.Test;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
 import static org.junit.Assert.*;
 
@@ -40,6 +46,40 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(result);
 		assertTrue(result.contains("AWAITS_PROVISION"));
 		assertFalse(result.contains("PROVISIONED_OK"));
+	}
+
+	@Test
+	public void testGetSchedulingInfoProvisionDefaultValues() {
+		// Given
+		var createMeeting = new CreateMeetingDto();
+		createMeeting.setDescription("This is a description");
+		var now = Calendar.getInstance();
+		Calendar start = (Calendar) now.clone();
+		start.add(Calendar.MINUTE, 3);
+		Calendar end = (Calendar) now.clone();
+		end.add(Calendar.HOUR, 1);
+
+		createMeeting.setStartTime(start.getTime());
+		createMeeting.setEndTime(end.getTime());
+		createMeeting.setSubject("This is a subject!");
+		createMeeting.setGuestMicrophone(GuestMicrophone.muted);
+
+		var createResponse = getClient()
+				.path("meetings")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.post(Entity.entity(createMeeting, MediaType.APPLICATION_JSON_TYPE), MeetingDto.class);
+
+		assertNotNull(createResponse.getUuid());
+
+		//When
+		var result = getClient()
+				.path("scheduling-info-provision")
+				.request()
+				.get(String.class);
+
+		//Then
+		assertNotNull(result);
+		assertTrue(result.contains("\"vmrType\":\"CONFERENCE\",\"hostView\":\"ONE_MAIN_SEVEN_PIPS\",\"guestView\":\"ONE_MAIN_SEVEN_PIPS\",\"vmrQuality\":\"SD\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false"));
 	}
 
 	@Test

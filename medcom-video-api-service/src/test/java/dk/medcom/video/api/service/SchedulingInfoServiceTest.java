@@ -279,6 +279,15 @@ public class SchedulingInfoServiceTest {
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 
         assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(VmrType.CONFERENCE, capturedSchedulingInfo.getVmrType());
+        assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, capturedSchedulingInfo.getHostView());
+        assertEquals(ViewType.TWO_MAINS_TWENTYONE_PIPS, capturedSchedulingInfo.getGuestView());
+        assertEquals(VmrQuality.FULL_HD, capturedSchedulingInfo.getVmrQuality());
+        assertTrue(capturedSchedulingInfo.getEnableOverlayText());
+        assertTrue(capturedSchedulingInfo.getGuestsCanPresent());
+        assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
+        assertFalse(capturedSchedulingInfo.getForceEncryption());
+        assertFalse(capturedSchedulingInfo.getMuteAllGuests());
     }
 
     @Test(expected = NotValidDataException.class)
@@ -591,6 +600,15 @@ public class SchedulingInfoServiceTest {
         schedulingTemplate.setEndMeetingOnEndTime(true);
         schedulingTemplate.setConferencingSysId(1111L);
         schedulingTemplate.setIsDefaultTemplate(false);
+        schedulingTemplate.setVmrType(VmrType.CONFERENCE);
+        schedulingTemplate.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
+        schedulingTemplate.setGuestView(ViewType.TWO_MAINS_TWENTYONE_PIPS);
+        schedulingTemplate.setVmrQuality(VmrQuality.FULL_HD);
+        schedulingTemplate.setEnableOverlayText(true);
+        schedulingTemplate.setGuestsCanPresent(true);
+        schedulingTemplate.setForcePresenterIntoMain(true);
+        schedulingTemplate.setForceEncryption(false);
+        schedulingTemplate.setMuteAllGuests(false);
 
         return schedulingTemplate;
     }

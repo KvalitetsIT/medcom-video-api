@@ -1,6 +1,9 @@
 package dk.medcom.video.api.dao.entity;
 
 import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.api.ViewType;
+import dk.medcom.video.api.api.VmrQuality;
+import dk.medcom.video.api.api.VmrType;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -27,6 +30,20 @@ public class SchedulingInfo {
 
 	private boolean poolOverflow;
 	private boolean pool;
+
+	@Enumerated(EnumType.STRING)
+	private VmrType vmrType;				//type of the virtual meeting room.
+	@Enumerated(EnumType.STRING)
+	private ViewType hostView;				//the layout seen by Hosts.
+	@Enumerated(EnumType.STRING)
+	private ViewType guestView;				//the layout seen by Guests
+	@Enumerated(EnumType.STRING)
+	private VmrQuality vmrQuality;			//controls the maximum call quality for participants connecting to this service.
+	private boolean enableOverlayText;		//if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+	private boolean guestsCanPresent;		//controls whether the Guests in the conference are allowed to present content
+	private boolean forcePresenterIntoMain;	//controls whether the Host who is presenting is locked into the main video position
+	private boolean forceEncryption;
+	private boolean muteAllGuests;			//controls whether to mute guests when they first join the conference
 	
 	@ManyToOne
 	@JoinColumn(name="scheduling_template_id")
@@ -222,5 +239,77 @@ public class SchedulingInfo {
 
 	public void setPool(boolean pool) {
 		this.pool = pool;
+	}
+
+	public VmrType getVmrType() {
+		return vmrType;
+	}
+
+	public void setVmrType(VmrType vmrType) {
+		this.vmrType = vmrType;
+	}
+
+	public ViewType getHostView() {
+		return hostView;
+	}
+
+	public void setHostView(ViewType hostView) {
+		this.hostView = hostView;
+	}
+
+	public ViewType getGuestView() {
+		return guestView;
+	}
+
+	public void setGuestView(ViewType guestView) {
+		this.guestView = guestView;
+	}
+
+	public VmrQuality getVmrQuality() {
+		return vmrQuality;
+	}
+
+	public void setVmrQuality(VmrQuality vmrQuality) {
+		this.vmrQuality = vmrQuality;
+	}
+
+	public boolean getEnableOverlayText() {
+		return enableOverlayText;
+	}
+
+	public void setEnableOverlayText(boolean enableOverlayText) {
+		this.enableOverlayText = enableOverlayText;
+	}
+
+	public boolean getGuestsCanPresent() {
+		return guestsCanPresent;
+	}
+
+	public void setGuestsCanPresent(boolean guestsCanPresent) {
+		this.guestsCanPresent = guestsCanPresent;
+	}
+
+	public boolean getForcePresenterIntoMain() {
+		return forcePresenterIntoMain;
+	}
+
+	public void setForcePresenterIntoMain(boolean forcePresenterIntoMain) {
+		this.forcePresenterIntoMain = forcePresenterIntoMain;
+	}
+
+	public boolean getForceEncryption() {
+		return forceEncryption;
+	}
+
+	public void setForceEncryption(boolean forceEncryption) {
+		this.forceEncryption = forceEncryption;
+	}
+
+	public boolean getMuteAllGuests() {
+		return muteAllGuests;
+	}
+
+	public void setMuteAllGuests(boolean muteAllGuests) {
+		this.muteAllGuests = muteAllGuests;
 	}
 }

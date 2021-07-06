@@ -1,9 +1,12 @@
 package dk.medcom.video.api.service;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
+import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
+import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,14 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
-import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 @Component
 public class SchedulingTemplateService {
@@ -145,6 +143,7 @@ public class SchedulingTemplateService {
 
 	public SchedulingTemplate createSchedulingTemplate(CreateSchedulingTemplateDto createSchedulingTemplateDto, boolean includeOrganisation) throws PermissionDeniedException  {
 		LOGGER.debug("Entry createSchedulingTemplate");
+
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 		
 		//first find any other default template and make it non-default 
@@ -179,11 +178,20 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setUriNumberRangeHigh(createSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(createSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(createSchedulingTemplateDto.getIsDefaultTemplate());
-		
+
+		schedulingTemplate.setVmrType(createSchedulingTemplateDto.getVmrType() != null ? createSchedulingTemplateDto.getVmrType() : VmrType.CONFERENCE);
+		schedulingTemplate.setHostView(createSchedulingTemplateDto.getHostView() != null ? createSchedulingTemplateDto.getHostView() : ViewType.ONE_MAIN_SEVEN_PIPS);
+		schedulingTemplate.setGuestView(createSchedulingTemplateDto.getGuestView() != null ? createSchedulingTemplateDto.getGuestView() : ViewType.ONE_MAIN_SEVEN_PIPS);
+		schedulingTemplate.setVmrQuality(createSchedulingTemplateDto.getVmrQuality() != null ? createSchedulingTemplateDto.getVmrQuality() : VmrQuality.HD);
+		schedulingTemplate.setEnableOverlayText(createSchedulingTemplateDto.getEnableOverlayText() != null ? createSchedulingTemplateDto.getEnableOverlayText() : true);
+		schedulingTemplate.setGuestsCanPresent(createSchedulingTemplateDto.getGuestsCanPresent() != null ? createSchedulingTemplateDto.getGuestsCanPresent() : true);
+		schedulingTemplate.setForcePresenterIntoMain(createSchedulingTemplateDto.getForcePresenterIntoMain() != null ? createSchedulingTemplateDto.getForcePresenterIntoMain() : true);
+		schedulingTemplate.setForceEncryption(createSchedulingTemplateDto.getForceEncryption() != null ? createSchedulingTemplateDto.getForceEncryption() : false);
+		schedulingTemplate.setMuteAllGuests(createSchedulingTemplateDto.getMuteAllGuests() != null ? createSchedulingTemplateDto.getMuteAllGuests() : false);
+
 		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingTemplate.setCreatedTime(calendarNow.getTime());
-				
 		schedulingTemplate = schedulingTemplateRepository.save(schedulingTemplate);
 		
 		LOGGER.debug("Exit createSchedulingTemplate");
@@ -220,6 +228,16 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setUriNumberRangeHigh(updateSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(updateSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(updateSchedulingTemplateDto.getIsDefaultTemplate());
+
+		schedulingTemplate.setVmrType(updateSchedulingTemplateDto.getVmrType() != null ? updateSchedulingTemplateDto.getVmrType() : VmrType.CONFERENCE);
+		schedulingTemplate.setHostView(updateSchedulingTemplateDto.getHostView() != null ? updateSchedulingTemplateDto.getHostView() : ViewType.ONE_MAIN_SEVEN_PIPS);
+		schedulingTemplate.setGuestView(updateSchedulingTemplateDto.getGuestView() != null ? updateSchedulingTemplateDto.getGuestView() : ViewType.ONE_MAIN_SEVEN_PIPS);
+		schedulingTemplate.setVmrQuality(updateSchedulingTemplateDto.getVmrQuality() != null ? updateSchedulingTemplateDto.getVmrQuality() : VmrQuality.HD);
+		schedulingTemplate.setEnableOverlayText(updateSchedulingTemplateDto.getEnableOverlayText() != null ? updateSchedulingTemplateDto.getEnableOverlayText() : true);
+		schedulingTemplate.setGuestsCanPresent(updateSchedulingTemplateDto.getGuestsCanPresent() != null ? updateSchedulingTemplateDto.getGuestsCanPresent() : true);
+		schedulingTemplate.setForcePresenterIntoMain(updateSchedulingTemplateDto.getForcePresenterIntoMain() != null ? updateSchedulingTemplateDto.getForcePresenterIntoMain() : true);
+		schedulingTemplate.setForceEncryption(updateSchedulingTemplateDto.getForceEncryption() != null ? updateSchedulingTemplateDto.getForceEncryption() : false);
+		schedulingTemplate.setMuteAllGuests(updateSchedulingTemplateDto.getMuteAllGuests() != null ? updateSchedulingTemplateDto.getMuteAllGuests() : false);
 		
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();

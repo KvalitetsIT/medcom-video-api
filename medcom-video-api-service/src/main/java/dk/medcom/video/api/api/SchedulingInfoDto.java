@@ -30,6 +30,16 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private String provisionStatusDescription;
 	private String portalLink;
 	private String ivrTheme;
+
+	private VmrType vmrType;
+	private ViewType hostView;
+	private ViewType guestView;
+	private VmrQuality vmrQuality;
+	private boolean enableOverlayText;
+	private boolean guestsCanPresent;
+	private boolean forcePresenterIntoMain;
+	private boolean forceEncryption;
+	private boolean muteAllGuests;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
@@ -68,6 +78,16 @@ public class SchedulingInfoDto extends RepresentationModel {
 		if(schedulingInfo.getReservationId() != null) {
 			reservationId = UUID.fromString(schedulingInfo.getReservationId());
 		}
+
+		vmrType = schedulingInfo.getVmrType();
+		hostView = schedulingInfo.getHostView();
+		guestView = schedulingInfo.getGuestView();
+		vmrQuality = schedulingInfo.getVmrQuality();
+		enableOverlayText = schedulingInfo.getEnableOverlayText();
+		guestsCanPresent = schedulingInfo.getGuestsCanPresent();
+		forcePresenterIntoMain = schedulingInfo.getForcePresenterIntoMain();
+		forceEncryption = schedulingInfo.getForceEncryption();
+		muteAllGuests = schedulingInfo.getMuteAllGuests();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
@@ -223,5 +243,77 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setReservationId(UUID reservationId) {
 		this.reservationId = reservationId;
+	}
+
+	public VmrType getVmrType() {
+		return vmrType;
+	}
+
+	public void setVmrType(VmrType vmrType) {
+		this.vmrType = vmrType;
+	}
+
+	public ViewType getHostView() {
+		return hostView;
+	}
+
+	public void setHostView(ViewType hostView) {
+		this.hostView = hostView;
+	}
+
+	public ViewType getGuestView() {
+		return guestView;
+	}
+
+	public void setGuestView(ViewType guestView) {
+		this.guestView = guestView;
+	}
+
+	public VmrQuality getVmrQuality() {
+		return vmrQuality;
+	}
+
+	public void setVmrQuality(VmrQuality vmrQuality) {
+		this.vmrQuality = vmrQuality;
+	}
+
+	public boolean getEnableOverlayText() {
+		return enableOverlayText;
+	}
+
+	public void setEnableOverlayText(boolean enableOverlayText) {
+		this.enableOverlayText = enableOverlayText;
+	}
+
+	public boolean getGuestsCanPresent() {
+		return guestsCanPresent;
+	}
+
+	public void setGuestsCanPresent(boolean guestsCanPresent) {
+		this.guestsCanPresent = guestsCanPresent;
+	}
+
+	public boolean getForcePresenterIntoMain() {
+		return forcePresenterIntoMain;
+	}
+
+	public void setForcePresenterIntoMain(boolean forcePresenterIntoMain) {
+		this.forcePresenterIntoMain = forcePresenterIntoMain;
+	}
+
+	public boolean getForceEncryption() {
+		return forceEncryption;
+	}
+
+	public void setForceEncryption(boolean forceEncryption) {
+		this.forceEncryption = forceEncryption;
+	}
+
+	public boolean getMuteAllGuests() {
+		return muteAllGuests;
+	}
+
+	public void setMuteAllGuests(boolean muteAllGuests) {
+		this.muteAllGuests = muteAllGuests;
 	}
 }

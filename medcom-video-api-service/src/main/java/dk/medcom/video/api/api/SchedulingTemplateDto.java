@@ -1,21 +1,19 @@
 package dk.medcom.video.api.api;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import java.util.Date;
-
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import dk.medcom.video.api.controller.SchedulingTemplateController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.RepresentationModel;
+
+import java.util.Date;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class SchedulingTemplateDto extends RepresentationModel {
 	@JsonProperty("id")
@@ -37,7 +35,16 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private Long uriNumberRangeHigh;		
 	private String ivrTheme;
 	private boolean isDefaultTemplate;
-	
+	private VmrType vmrType;
+	private ViewType hostView;
+	private ViewType guestView;
+	private VmrQuality vmrQuality;
+	private boolean enableOverlayText;
+	private boolean guestsCanPresent;
+	private boolean forcePresenterIntoMain;
+	private boolean forceEncryption;
+	private boolean muteAllGuests;
+
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
@@ -71,7 +78,16 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		uriNumberRangeHigh = schedulingTemplate.getUriNumberRangeHigh();
 		ivrTheme = schedulingTemplate.getIvrTheme();
 		isDefaultTemplate = schedulingTemplate.getIsDefaultTemplate();
-		
+		vmrType = schedulingTemplate.getVmrType();
+		hostView =  schedulingTemplate.getHostView();
+		guestView = schedulingTemplate.getGuestView();
+		vmrQuality = schedulingTemplate.getVmrQuality();
+		enableOverlayText = schedulingTemplate.getEnableOverlayText();
+		guestsCanPresent = schedulingTemplate.getGuestsCanPresent();
+		forcePresenterIntoMain = schedulingTemplate.getForcePresenterIntoMain();
+		forceEncryption = schedulingTemplate.getForceEncryption();
+		muteAllGuests = schedulingTemplate.getMuteAllGuests();
+
 		createdTime = schedulingTemplate.getCreatedTime();
 		updatedTime = schedulingTemplate.getUpdatedTime();
 		
@@ -268,5 +284,76 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		this.updatedTime = updatedTime;
 	}
 
-	
+
+	public VmrType getVmrType() {
+		return vmrType;
+	}
+
+	public void setVmrType(VmrType vmrType) {
+		this.vmrType = vmrType;
+	}
+
+	public ViewType getHostView() {
+		return hostView;
+	}
+
+	public void setHostView(ViewType hostView) {
+		this.hostView = hostView;
+	}
+
+	public ViewType getGuestView() {
+		return guestView;
+	}
+
+	public void setGuestView(ViewType guestView) {
+		this.guestView = guestView;
+	}
+
+	public VmrQuality getVmrQuality() {
+		return vmrQuality;
+	}
+
+	public void setVmrQuality(VmrQuality vmrQuality) {
+		this.vmrQuality = vmrQuality;
+	}
+
+	public boolean isEnableOverlayText() {
+		return enableOverlayText;
+	}
+
+	public void setEnableOverlayText(boolean enableOverlayText) {
+		this.enableOverlayText = enableOverlayText;
+	}
+
+	public boolean isGuestsCanPresent() {
+		return guestsCanPresent;
+	}
+
+	public void setGuestsCanPresent(boolean guestsCanPresent) {
+		this.guestsCanPresent = guestsCanPresent;
+	}
+
+	public boolean isForcePresenterIntoMain() {
+		return forcePresenterIntoMain;
+	}
+
+	public void setForcePresenterIntoMain(boolean forcePresenterIntoMain) {
+		this.forcePresenterIntoMain = forcePresenterIntoMain;
+	}
+
+	public boolean isForceEncryption() {
+		return forceEncryption;
+	}
+
+	public void setForceEncryption(boolean forceEncryption) {
+		this.forceEncryption = forceEncryption;
+	}
+
+	public boolean isMuteAllGuests() {
+		return muteAllGuests;
+	}
+
+	public void setMuteAllGuests(boolean muteAllGuests) {
+		this.muteAllGuests = muteAllGuests;
+	}
 }
