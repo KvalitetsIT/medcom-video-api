@@ -7,7 +7,15 @@
     </appender>
 
 
-    <logger name="dk.medcom.url.handler" level="debug" additivity="false">
+    <logger name="dk.medcom.video" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <logger name="dk.medcom.vdx" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <logger name="dk.medcom.audit" level="info" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

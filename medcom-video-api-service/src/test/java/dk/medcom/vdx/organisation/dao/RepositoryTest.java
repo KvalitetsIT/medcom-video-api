@@ -1,5 +1,6 @@
 package dk.medcom.vdx.organisation.dao;
 
+import dk.medcom.video.api.configuration.TestConfiguration;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -10,7 +11,7 @@ import org.testcontainers.containers.MySQLContainer;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {dk.medcom.video.api.configuration.DatabaseConfiguration.class}, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {dk.medcom.video.api.configuration.DatabaseConfiguration.class, TestConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 @Transactional
 public abstract class RepositoryTest{
     private static boolean initialized;

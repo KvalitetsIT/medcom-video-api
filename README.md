@@ -1,4 +1,6 @@
+
 ![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) ![Test Coverage](.github/badges/jacoco.svg)
+
 
 # medcom-video-api
 ## Databasemodel 
@@ -40,3 +42,4 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 |short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/ | Krævet
 |overflow.pool.organisation.id | Organisation id to use for pool overflow. | Krævet
 |organisationtree.service.endpoint| Endpoint URL på organisation tree servicen. F.eks. http://organisationfrontend:80/services         | Krævet
+|audit.disable | Disable audit logging to nats. |
