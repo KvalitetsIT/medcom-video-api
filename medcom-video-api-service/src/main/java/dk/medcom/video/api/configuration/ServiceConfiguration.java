@@ -12,7 +12,6 @@ import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
-import dk.medcom.video.api.service.impl.AuditServiceNullOperation;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
