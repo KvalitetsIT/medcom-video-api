@@ -309,6 +309,7 @@ public class MeetingService {
 		return meeting;
 	}
 
+	@Transactional
 	public void deleteMeeting(String uuid) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
 		Meeting meeting = getMeetingByUuid(uuid);
 		

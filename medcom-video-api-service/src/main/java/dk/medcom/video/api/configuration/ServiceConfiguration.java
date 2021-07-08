@@ -49,15 +49,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	} 	
 
 	@Bean
-	@ConditionalOnProperty(name="AUDIT_DISABLE", havingValue = "false", matchIfMissing = true)
 	public AuditService auditService(AuditClient auditClient) {
 		return new AuditServiceImpl(auditClient);
-	}
-
-	@Bean
-	@ConditionalOnProperty(name="AUDIT_DISABLE", havingValue = "true")
-	public AuditService nullAuditService() {
-		return new AuditServiceNullOperation();
 	}
 
 	@Bean
