@@ -5,7 +5,6 @@ import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.interceptor.LoggingInterceptor;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
@@ -42,7 +41,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
-		registry.addInterceptor(loggingInterceptor());
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
 	} 	
@@ -76,12 +74,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		return new OrganisationTreeServiceClientImpl(endpoint);
 	}
 
-	@Bean
-	public LoggingInterceptor loggingInterceptor() {
-		LOGGER.debug("Creating loggingInterceptor");
-		return new LoggingInterceptor();
-	}
-	
 	@Bean
 	public UserSecurityInterceptor userSecurityInterceptor() {
 		LOGGER.debug("Creating userSecurityInterceptor");

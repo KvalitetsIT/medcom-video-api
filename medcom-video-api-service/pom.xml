@@ -15,20 +15,9 @@
 			<version>${project.version}</version>
 		</dependency>
 
-
-		<!-- Actuator so it possible to get metrics -->
-		<dependency>
-			<groupId>dk.medcom.video.api</groupId>
-			<artifactId>app-info</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>dk.kvalitetsit</groupId>
 			<artifactId>spring-prometheus-app-info</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 
 		<!-- Spring for web -->
