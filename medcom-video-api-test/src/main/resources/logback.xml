@@ -11,6 +11,10 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
+    <logger name="dk.medcom.audit" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

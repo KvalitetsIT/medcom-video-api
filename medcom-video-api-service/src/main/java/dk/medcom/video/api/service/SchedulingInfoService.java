@@ -39,6 +39,7 @@ public class SchedulingInfoService {
 	private final UserContextService userContextService;
 	private final String overflowPoolOrganisationId;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
+	private final AuditService auditService;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
@@ -55,7 +56,8 @@ public class SchedulingInfoService {
 								 OrganisationStrategy organisationStrategy,
 								 UserContextService userContextService,
 								@Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
-								 OrganisationTreeServiceClient organisationTreeServiceClient) {
+								 OrganisationTreeServiceClient organisationTreeServiceClient,
+								 AuditService auditService) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -65,6 +67,7 @@ public class SchedulingInfoService {
 		this.organisationStrategy = organisationStrategy;
 		this.userContextService = userContextService;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
+		this.auditService = auditService;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -215,6 +218,7 @@ public class SchedulingInfoService {
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
@@ -301,7 +305,8 @@ public class SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingStatusService.createSchedulingStatus(schedulingInfo);
-		
+		auditService.auditSchedulingInformation(schedulingInfo, "update");
+
 		LOGGER.debug("Exit updateSchedulingInfo");
 		return schedulingInfo;
 	}
@@ -325,6 +330,7 @@ public class SchedulingInfoService {
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
 		LOGGER.debug("Entry updateSchedulingInfo");
 		return schedulingInfo;
@@ -440,6 +446,8 @@ public class SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
+		auditService.auditSchedulingInformation(schedulingInfo, "create");
+
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}
@@ -492,7 +500,10 @@ public class SchedulingInfoService {
 			schedulingInfo.setPoolOverflow(true);
 		}
 
-		return schedulingInfoRepository.save(schedulingInfo);
+		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
+
+		return resultingSchedulingInfo;
 	}
 
 	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
@@ -558,7 +569,11 @@ public class SchedulingInfoService {
 
 		var schedulingInfo = schedulingInfoRepository.findById(id).get();
 		schedulingInfo.setReservationId(UUID.randomUUID().toString());
-		return schedulingInfoRepository.save(schedulingInfo);
+
+		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
+
+		return resultingSchedulingInfo;
 	}
 
 	public SchedulingInfo getSchedulingInfoByReservation(UUID schedulingInfoReservationId) throws RessourceNotFoundException {

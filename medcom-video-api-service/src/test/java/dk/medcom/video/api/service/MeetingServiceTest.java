@@ -49,6 +49,7 @@ public class MeetingServiceTest {
 	private SchedulingInfo schedulingInfo;
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
 	private OrganisationRepository organisationRepository;
+	private AuditService auditService;
 
 	@Before
 	public void prepareTest() {
@@ -134,6 +135,7 @@ public class MeetingServiceTest {
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
 		organisationRepository = Mockito.mock(OrganisationRepository.class);
 		organisationTreeServiceClient = Mockito.mock(OrganisationTreeServiceClient.class);
+		auditService = Mockito.mock(AuditService.class);
 
 		OrganisationTree organisationTree = new OrganisationTree();
 		if(userOrganistionPoolSize != null) {
@@ -157,7 +159,8 @@ public class MeetingServiceTest {
 				userContextService,
 				meetingLabelRepository,
 				organisationRepository,
-				organisationTreeServiceClient);
+				organisationTreeServiceClient,
+				auditService);
 
 		Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 

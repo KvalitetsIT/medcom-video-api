@@ -3,6 +3,10 @@ package dk.medcom.video.api.test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
@@ -15,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.*;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
@@ -23,12 +28,16 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.UriBuilder;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
+	protected static final Logger natsLogger = LoggerFactory.getLogger("nats");
+
+	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
 	private static boolean commandLine;
 
@@ -38,6 +47,8 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
 	protected static GenericContainer testOrganisationFrontend;
+	private static GenericContainer natsService;
+	private static String natsPath;
 
 	@BeforeClass
 	public static void setup() {
@@ -77,6 +88,8 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(userService, mockServerLogger);
 		MockServerClient mockServerClient = new MockServerClient(userService.getContainerIpAddress(), userService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
+
+		setupNats();
 
 		// VideoAPI
 		videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api:latest")
@@ -120,6 +133,12 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("organisationtree.service.endpoint", "http://localhost:8080/api")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
+
+				.withEnv("audit.nats.url", "nats://nats:4222")
+				.withEnv("audit.nats.subject", "natsSubject")
+				.withEnv("audit.nats.cluster.id", "test-cluster")
+				.withEnv("audit.nats.client.id", "natsClientId")
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
@@ -130,8 +149,30 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(videoApi, videoApiLogger);
 	}
 
+	public static void setupNats() {
+		var natsContainerName = "nats-streaming";
+		var natsContainerVersion = "0.19.0";
+
+		natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
+				.withNetwork(dockerNetwork)
+				.withNetworkAliases("nats")
+				.withExposedPorts(4222)
+				.withExposedPorts(8222)
+				.waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"))
+				;
+
+		natsService.start();
+		attachLogger(natsService, natsLogger);
+
+		natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
+		var natsHttpPath = "http://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(8222);
+		logger.info("NATS path: " + natsPath);
+		logger.info("NATS http path: " + natsHttpPath);
+	}
+
 	protected static void attachLogger(GenericContainer container, Logger logger) {
 		logger.info("Attaching logger to container: " + container.getContainerInfo().getName());
+
 		Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(logger);
 		container.followOutput(logConsumer);
 	}

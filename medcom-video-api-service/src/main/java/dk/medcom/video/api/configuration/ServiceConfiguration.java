@@ -1,14 +1,17 @@
 package dk.medcom.video.api.configuration;
 
+import dk.medcom.audit.client.AuditClient;
 import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.interceptor.LoggingInterceptor;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
-import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -36,7 +39,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private OrganisationRepository organisationRepository;
 
-	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
@@ -44,7 +46,12 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
 	} 	
-	
+
+	@Bean
+	public AuditService auditService(AuditClient auditClient) {
+		return new AuditServiceImpl(auditClient);
+	}
+
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
 		return new OrganisationInterceptor(organisationStrategy, organisationRepository);

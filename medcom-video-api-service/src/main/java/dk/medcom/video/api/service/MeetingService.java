@@ -34,6 +34,7 @@ public class MeetingService {
 	private final MeetingLabelRepository meetingLabelRepository;
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
+	private AuditService auditService;
 
 	MeetingService(MeetingRepository meetingRepository,
 				   MeetingUserService meetingUserService,
@@ -43,7 +44,8 @@ public class MeetingService {
 				   UserContextService userService,
 				   MeetingLabelRepository meetingLabelRepository,
 				   OrganisationRepository organisationRepository,
-				   OrganisationTreeServiceClient organisationTreeServiceClient) {
+				   OrganisationTreeServiceClient organisationTreeServiceClient,
+				   AuditService auditClient) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -53,6 +55,8 @@ public class MeetingService {
 		this.meetingLabelRepository = meetingLabelRepository;
 		this.organisationRepository = organisationRepository;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
+		this.auditService = auditClient;
+
 		this.idGenerator = new IdGeneratorImpl();
 	}
 	
@@ -117,6 +121,7 @@ public class MeetingService {
 
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
 
+		auditService.auditMeeting(meeting, "create");
 		return meeting;
 	}
 
@@ -299,9 +304,12 @@ public class MeetingService {
 			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");
 			schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
 		}
+
+		auditService.auditMeeting(meeting, "update");
 		return meeting;
 	}
-	
+
+	@Transactional
 	public void deleteMeeting(String uuid) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
 		Meeting meeting = getMeetingByUuid(uuid);
 		
@@ -311,6 +319,7 @@ public class MeetingService {
 			throw new NotAcceptableException(NotAcceptableErrors.MUST_HAVE_STATUS_AWAITS_PROVISION);
 		}
 
+		auditService.auditMeeting(meeting, "delete");
 		schedulingInfoService.deleteSchedulingInfo(uuid);
 		schedulingStatusService.deleteSchedulingStatus(meeting);
 		meetingLabelRepository.deleteByMeeting(meeting);

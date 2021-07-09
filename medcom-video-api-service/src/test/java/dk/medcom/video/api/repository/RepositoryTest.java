@@ -21,13 +21,6 @@ import dk.medcom.video.api.configuration.TestConfiguration;
   loader = AnnotationConfigContextLoader.class)
 @Transactional
 abstract public class RepositoryTest {
-
-//	@Autowired
-//	private DataSource dataSource;
-//	
-//	private static boolean testDataInitialised = false;
-
-
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7").withDatabaseName("videodb").withUsername("videouser").withPassword("secret1234");
