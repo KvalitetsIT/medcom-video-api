@@ -20,6 +20,11 @@
 			<artifactId>spring-prometheus-app-info</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>dk.kvalitetsit</groupId>
+			<artifactId>spring-request-id-logger</artifactId>
+		</dependency>
+
 		<!-- Spring for web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
