@@ -155,9 +155,6 @@ public class SchedulingInfoService {
 		} else {
 			schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());	
 		}
-
-		LOGGER.error("TEST");
-		LOGGER.error("getVmrType. {}",createMeetingDto.getVmrType());
 		if (createMeetingDto.getVmrType() != null){
 			schedulingInfo.setVmrType(createMeetingDto.getVmrType());
 			LOGGER.debug("VmrType is taken from input: " + createMeetingDto.getVmrType().toString());
