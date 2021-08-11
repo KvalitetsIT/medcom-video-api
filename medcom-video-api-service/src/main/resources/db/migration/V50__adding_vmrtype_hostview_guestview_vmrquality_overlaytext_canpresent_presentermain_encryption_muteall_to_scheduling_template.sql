@@ -22,34 +22,34 @@ ADD COLUMN mute_all_guests bit(1) not NULL default 0;
 
 -- set defaults scheduling_template
 update scheduling_template
-set  vmr_type = 'CONFERENCE'
+set  vmr_type = 'conference'
 where vmr_type IS NULL;
 
 update scheduling_template
-set  host_view = 'ONE_MAIN_SEVEN_PIPS'
+set  host_view = 'one_main_seven_pips'
 where host_view IS NULL;
 
 update scheduling_template
-set  guest_view = 'ONE_MAIN_SEVEN_PIPS'
+set  guest_view = 'one_main_seven_pips'
 where guest_view IS NULL;
 
 update scheduling_template
-set  vmr_quality = 'HD'
+set  vmr_quality = 'hd'
 where vmr_quality IS NULL;
 
 -- set defaults scheduling_info
 update scheduling_info
-set  vmr_type = 'CONFERENCE'
+set  vmr_type = 'conference'
 where vmr_type IS NULL;
 
 update scheduling_info
-set  host_view = 'ONE_MAIN_SEVEN_PIPS'
+set  host_view = 'one_main_seven_pips'
 where host_view IS NULL;
 
 update scheduling_info
-set  guest_view = 'ONE_MAIN_SEVEN_PIPS'
+set  guest_view = 'one_main_seven_pips'
 where guest_view IS NULL;
 
 update scheduling_info
-set  vmr_quality = 'HD'
+set  vmr_quality = 'hd'
 where vmr_quality IS NULL;

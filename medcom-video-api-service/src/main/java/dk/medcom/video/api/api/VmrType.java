@@ -1,8 +1,8 @@
 package dk.medcom.video.api.api;
 
 public enum VmrType {
-    CONFERENCE(0),
-    LECTURE(1);
+    conference(0),
+    lecture(1);
 
     private final int value;
 

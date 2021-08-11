@@ -1,11 +1,11 @@
 package dk.medcom.video.api.api;
 
 public enum ViewType {
-    ONE_MAIN_ZERO_PIPS(0),
-    ONE_MAIN_SEVEN_PIPS(1),
-    ONE_MAIN_TWENTYONE_PIPS(2),
-    TWO_MAINS_TWENTYONE_PIPS(3),
-    FOUR_MAINS_ZERO_PIPS(4);
+    one_main_zero_pips(0),
+    one_main_seven_pips(1),
+    one_main_twentyone_pips(2),
+    two_mains_twentyone_pips(3),
+    four_mains_zero_pips(4);
 
     private final int value;
 
@@ -15,4 +15,5 @@ public enum ViewType {
     public int getValue() {
         return value;
     }
+
 }

@@ -1,15 +1,13 @@
 package dk.medcom.video.api.dao.impl;
 
-import java.util.List;
-
-import javax.sql.DataSource;
-
+import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
+import dk.medcom.video.api.entity.PoolInfoEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import dk.medcom.video.api.entity.PoolInfoEntity;
-import dk.medcom.video.api.dao.PoolInfoRepository;
-import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
+import javax.sql.DataSource;
+import java.util.List;
 
 @Component
 public class PoolInfoRepositoryImpl implements PoolInfoRepository {
@@ -26,7 +24,7 @@ public class PoolInfoRepositoryImpl implements PoolInfoRepository {
 	@Override
 	public List<PoolInfoEntity> getPoolInfos() {
 //		var sql = "select o.organisation_id as organisationCode, o.pool_size wanted, count(s.id) as available  "
-		var sql = "select o.organisation_id as organisationCode, o.pool_size wanted, count(s.id) as available  "
+		var sql = "select o.organisation_id as organisationCode, name, o.pool_size wanted, count(s.id) as available  "
 				+ "from   organisation as o "
 				+ "  left join scheduling_info as s on s.organisation_id = o.id "
 				+ "        and s.meetings_id is null "

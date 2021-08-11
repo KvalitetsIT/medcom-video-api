@@ -1,13 +1,4 @@
 package dk.medcom.video.api.service;
-import dk.medcom.video.api.api.VmrType;
-import java.util.Date;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.api.ProvisionStatus;
-import dk.medcom.video.api.api.ViewType;
-import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.api.VmrQuality;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 
 import dk.medcom.audit.client.AuditClient;
 import dk.medcom.audit.client.api.v1.AuditEvent;
@@ -19,7 +10,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -164,10 +156,10 @@ public class AuditServiceImplTest {
         schedulingInfo.setReservationId("reservation_id");
         schedulingInfo.setPoolOverflow(true);
         schedulingInfo.setPool(true);
-        schedulingInfo.setVmrType(VmrType.CONFERENCE);
-        schedulingInfo.setHostView(ViewType.ONE_MAIN_ZERO_PIPS);
-        schedulingInfo.setGuestView(ViewType.ONE_MAIN_ZERO_PIPS);
-        schedulingInfo.setVmrQuality(VmrQuality.SD);
+        schedulingInfo.setVmrType(VmrType.conference);
+        schedulingInfo.setHostView(ViewType.one_main_zero_pips);
+        schedulingInfo.setGuestView(ViewType.one_main_zero_pips);
+        schedulingInfo.setVmrQuality(VmrQuality.sd);
         schedulingInfo.setEnableOverlayText(true);
         schedulingInfo.setGuestsCanPresent(true);
         schedulingInfo.setForcePresenterIntoMain(true);

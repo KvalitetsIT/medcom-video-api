@@ -179,10 +179,10 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setIvrTheme(createSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(createSchedulingTemplateDto.getIsDefaultTemplate());
 
-		schedulingTemplate.setVmrType(createSchedulingTemplateDto.getVmrType() != null ? createSchedulingTemplateDto.getVmrType() : VmrType.CONFERENCE);
-		schedulingTemplate.setHostView(createSchedulingTemplateDto.getHostView() != null ? createSchedulingTemplateDto.getHostView() : ViewType.ONE_MAIN_SEVEN_PIPS);
-		schedulingTemplate.setGuestView(createSchedulingTemplateDto.getGuestView() != null ? createSchedulingTemplateDto.getGuestView() : ViewType.ONE_MAIN_SEVEN_PIPS);
-		schedulingTemplate.setVmrQuality(createSchedulingTemplateDto.getVmrQuality() != null ? createSchedulingTemplateDto.getVmrQuality() : VmrQuality.HD);
+		schedulingTemplate.setVmrType(createSchedulingTemplateDto.getVmrType() != null ? createSchedulingTemplateDto.getVmrType() : VmrType.conference);
+		schedulingTemplate.setHostView(createSchedulingTemplateDto.getHostView() != null ? createSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
+		schedulingTemplate.setGuestView(createSchedulingTemplateDto.getGuestView() != null ? createSchedulingTemplateDto.getGuestView() : ViewType.one_main_seven_pips);
+		schedulingTemplate.setVmrQuality(createSchedulingTemplateDto.getVmrQuality() != null ? createSchedulingTemplateDto.getVmrQuality() : VmrQuality.hd);
 		schedulingTemplate.setEnableOverlayText(createSchedulingTemplateDto.getEnableOverlayText() != null ? createSchedulingTemplateDto.getEnableOverlayText() : true);
 		schedulingTemplate.setGuestsCanPresent(createSchedulingTemplateDto.getGuestsCanPresent() != null ? createSchedulingTemplateDto.getGuestsCanPresent() : true);
 		schedulingTemplate.setForcePresenterIntoMain(createSchedulingTemplateDto.getForcePresenterIntoMain() != null ? createSchedulingTemplateDto.getForcePresenterIntoMain() : true);
@@ -229,10 +229,10 @@ public class SchedulingTemplateService {
 		schedulingTemplate.setIvrTheme(updateSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(updateSchedulingTemplateDto.getIsDefaultTemplate());
 
-		schedulingTemplate.setVmrType(updateSchedulingTemplateDto.getVmrType() != null ? updateSchedulingTemplateDto.getVmrType() : VmrType.CONFERENCE);
-		schedulingTemplate.setHostView(updateSchedulingTemplateDto.getHostView() != null ? updateSchedulingTemplateDto.getHostView() : ViewType.ONE_MAIN_SEVEN_PIPS);
-		schedulingTemplate.setGuestView(updateSchedulingTemplateDto.getGuestView() != null ? updateSchedulingTemplateDto.getGuestView() : ViewType.ONE_MAIN_SEVEN_PIPS);
-		schedulingTemplate.setVmrQuality(updateSchedulingTemplateDto.getVmrQuality() != null ? updateSchedulingTemplateDto.getVmrQuality() : VmrQuality.HD);
+		schedulingTemplate.setVmrType(updateSchedulingTemplateDto.getVmrType() != null ? updateSchedulingTemplateDto.getVmrType() : VmrType.conference);
+		schedulingTemplate.setHostView(updateSchedulingTemplateDto.getHostView() != null ? updateSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
+		schedulingTemplate.setGuestView(updateSchedulingTemplateDto.getGuestView() != null ? updateSchedulingTemplateDto.getGuestView() : ViewType.one_main_seven_pips);
+		schedulingTemplate.setVmrQuality(updateSchedulingTemplateDto.getVmrQuality() != null ? updateSchedulingTemplateDto.getVmrQuality() : VmrQuality.hd);
 		schedulingTemplate.setEnableOverlayText(updateSchedulingTemplateDto.getEnableOverlayText() != null ? updateSchedulingTemplateDto.getEnableOverlayText() : true);
 		schedulingTemplate.setGuestsCanPresent(updateSchedulingTemplateDto.getGuestsCanPresent() != null ? updateSchedulingTemplateDto.getGuestsCanPresent() : true);
 		schedulingTemplate.setForcePresenterIntoMain(updateSchedulingTemplateDto.getForcePresenterIntoMain() != null ? updateSchedulingTemplateDto.getForcePresenterIntoMain() : true);

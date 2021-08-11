@@ -286,10 +286,10 @@ public class SchedulingInfoServiceTest {
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 
         assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
-        assertEquals(VmrType.CONFERENCE, capturedSchedulingInfo.getVmrType());
-        assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, capturedSchedulingInfo.getHostView());
-        assertEquals(ViewType.TWO_MAINS_TWENTYONE_PIPS, capturedSchedulingInfo.getGuestView());
-        assertEquals(VmrQuality.FULL_HD, capturedSchedulingInfo.getVmrQuality());
+        assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
+        assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
+        assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
+        assertEquals(VmrQuality.full_hd, capturedSchedulingInfo.getVmrQuality());
         assertTrue(capturedSchedulingInfo.getEnableOverlayText());
         assertTrue(capturedSchedulingInfo.getGuestsCanPresent());
         assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
@@ -608,10 +608,10 @@ public class SchedulingInfoServiceTest {
         schedulingTemplate.setEndMeetingOnEndTime(true);
         schedulingTemplate.setConferencingSysId(1111L);
         schedulingTemplate.setIsDefaultTemplate(false);
-        schedulingTemplate.setVmrType(VmrType.CONFERENCE);
-        schedulingTemplate.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
-        schedulingTemplate.setGuestView(ViewType.TWO_MAINS_TWENTYONE_PIPS);
-        schedulingTemplate.setVmrQuality(VmrQuality.FULL_HD);
+        schedulingTemplate.setVmrType(VmrType.conference);
+        schedulingTemplate.setHostView(ViewType.one_main_seven_pips);
+        schedulingTemplate.setGuestView(ViewType.two_mains_twentyone_pips);
+        schedulingTemplate.setVmrQuality(VmrQuality.full_hd);
         schedulingTemplate.setEnableOverlayText(true);
         schedulingTemplate.setGuestsCanPresent(true);
         schedulingTemplate.setForcePresenterIntoMain(true);

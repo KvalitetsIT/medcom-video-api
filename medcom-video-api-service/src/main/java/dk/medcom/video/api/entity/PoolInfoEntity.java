@@ -3,7 +3,9 @@ package dk.medcom.video.api.entity;
 public class PoolInfoEntity {
 
     private String organisationCode;
-    
+
+    private String name;
+
     private int availablePoolSize;
 
     private int wantedPoolSize;

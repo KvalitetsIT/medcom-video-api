@@ -991,44 +991,44 @@ components:
             type: string
             description: Array of labels to attach to meeting.
         vmrType:
-          example: CONFERENCE
+          example: conference
           description: type of the virtual meetingroom.
           type: string
-          default: CONFERENCE
+          default: conference
           enum:
-            - CONFERENCE
-            - LECTURE
+            - conference
+            - lecture
         hostView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Hosts.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         guestView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Guests.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         vmrQuality:
-          example: HD
+          example: hd
           description: controls the maximum call quality for participants connecting to this service.
           type: string
-          default: HD
+          default: hd
           enum:
-            - SD
-            - HD
-            - FULL_HD
+            - sd
+            - hd
+            - full_hd
         enableOverlayText:
           type: boolean
           example: true
@@ -1199,6 +1199,69 @@ components:
         provisionVmrId:
           type: string
           maxLength: 50
+        vmrType:
+          example: conference
+          description: type of the virtual meetingroom.
+          type: string
+          default: conference
+          enum:
+            - conference
+            - lecture
+        hostView:
+          example: one_main_seven_pips
+          description: the layout seen by Hosts.
+          type: string
+          default: one_main_seven_pips
+          enum:
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
+        guestView:
+          example: one_main_seven_pips
+          description: the layout seen by Guests.
+          type: string
+          default: one_main_seven_pips
+          enum:
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
+        vmrQuality:
+          example: hd
+          description: controls the maximum call quality for participants connecting to this service.
+          type: string
+          default: hd
+          enum:
+            - sd
+            - hd
+            - full_hd
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
         createdBy:
           $ref: '#/components/schemas/meetingUser'
         updatedBy:
@@ -1374,44 +1437,44 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: CONFERENCE
+          example: conference
           description: type of the virtual meetingroom.
           type: string
-          default: CONFERENCE
+          default: conference
           enum:
-            - CONFERENCE
-            - LECTURE
+            - conference
+            - lecture
         hostView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Hosts.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         guestView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Guests.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         vmrQuality:
-          example: HD
+          example: hd
           description: controls the maximum call quality for participants connecting to this service.
           type: string
-          default: HD
+          default: hd
           enum:
-            - SD
-            - HD
-            - FULL_HD
+            - sd
+            - hd
+            - full_hd
         enableOverlayText:
           type: boolean
           example: true
@@ -1536,44 +1599,44 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: CONFERENCE
+          example: conference
           description: type of the virtual meetingroom.
           type: string
-          default: CONFERENCE
+          default: conference
           enum:
-            - CONFERENCE
-            - LECTURE
+            - conference
+            - lecture
         hostView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Hosts.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         guestView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Guests.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         vmrQuality:
-          example: HD
+          example: hd
           description: controls the maximum call quality for participants connecting to this service.
           type: string
-          default: HD
+          default: hd
           enum:
-            - SD
-            - HD
-            - FULL_HD
+            - sd
+            - hd
+            - full_hd
         enableOverlayText:
           type: boolean
           example: true
@@ -1677,44 +1740,44 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: CONFERENCE
+          example: conference
           description: type of the virtual meeting room.
           type: string
-          default: CONFERENCE
+          default: conference
           enum:
-            - CONFERENCE
-            - LECTURE
+            - conference
+            - lecture
         hostView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Hosts.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         guestView:
-          example: ONE_MAIN_SEVEN_PIPS
+          example: one_main_seven_pips
           description: the layout seen by Guests.
           type: string
-          default: ONE_MAIN_SEVEN_PIPS
+          default: one_main_seven_pips
           enum:
-            - ONE_MAIN_ZERO_PIPS
-            - ONE_MAIN_SEVEN_PIPS
-            - ONE_MAIN_TWENTYONE_PIPS
-            - TWO_MAINS_TWENTYONE_PIPS
-            - FOUR_MAINS_ZERO_PIPS
+            - one_main_zero_pips
+            - one_main_seven_pips
+            - one_main_twentyone_pips
+            - two_mains_twentyone_pips
+            - four_mains_zero_pips
         vmrQuality:
-          example: HD
+          example: hd
           description: controls the maximum call quality for participants connecting to this service.
           type: string
-          default: HD
+          default: hd
           enum:
-            - SD
-            - HD
-            - FULL_HD
+            - sd
+            - hd
+            - full_hd
         enableOverlayText:
           type: boolean
           example: true
