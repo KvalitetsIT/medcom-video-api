@@ -11,7 +11,7 @@ function updateFile {
 }
 
 echo "Add Dev version to list of versions"
-GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.branch"')
+GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.tags"')
 echo "[]" > /kit/env
 
 if (echo "$GIT_BRANCH" | grep -Eq ^v[0-9]*\\.[0-9]*\\.[0-9]*); then

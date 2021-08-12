@@ -88,7 +88,7 @@
                                         <files>
                                             <file>
                                                 <source>${project.basedir}/src/main/resources/video-api.yaml</source>
-                                                <destName>${git.branch}.yaml</destName>
+                                                <destName>${git.tags}.yaml</destName>
                                             </file>
                                             <file>
                                                 <source>${project.build.outputDirectory}/git.properties</source>
@@ -189,9 +189,6 @@
                 <configuration>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-                    <includeOnlyProperties>
-                        <includeOnlyProperty>git.branch</includeOnlyProperty>
-                    </includeOnlyProperties>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                     <format>json</format>
                 </configuration>
