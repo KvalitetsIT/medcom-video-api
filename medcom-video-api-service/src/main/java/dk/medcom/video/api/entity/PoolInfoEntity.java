@@ -4,7 +4,7 @@ public class PoolInfoEntity {
 
     private String organisationCode;
 
-    private String name;
+    private String organisationName;
 
     private int availablePoolSize;
 
@@ -32,5 +32,13 @@ public class PoolInfoEntity {
 
 	public void setWantedPoolSize(int wantedPoolSize) {
 		this.wantedPoolSize = wantedPoolSize;
+	}
+
+	public String getOrganisationName() {
+		return organisationName;
+	}
+
+	public void setOrganisationName(String organisationName) {
+		this.organisationName = organisationName;
 	}
 }

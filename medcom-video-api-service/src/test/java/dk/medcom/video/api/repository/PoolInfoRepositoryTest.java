@@ -1,17 +1,15 @@
 package dk.medcom.video.api.repository;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
 import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.entity.PoolInfoEntity;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PoolInfoRepositoryTest extends RepositoryTest {
 
@@ -45,5 +43,7 @@ public class PoolInfoRepositoryTest extends RepositoryTest {
 		Assert.assertEquals(1, resultMap.get(POOL_TEST_ORG).getAvailablePoolSize());
 		Assert.assertEquals(0, resultMap.get(POOL_TEST_ORG2).getAvailablePoolSize());
 
+		Assert.assertNotNull(resultMap.get(POOL_TEST_ORG).getOrganisationName());
+		Assert.assertNotNull(resultMap.get(POOL_TEST_ORG2).getOrganisationName());
 	}
 }

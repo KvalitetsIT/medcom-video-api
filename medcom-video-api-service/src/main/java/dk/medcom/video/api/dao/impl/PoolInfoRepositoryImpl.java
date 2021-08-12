@@ -24,7 +24,7 @@ public class PoolInfoRepositoryImpl implements PoolInfoRepository {
 	@Override
 	public List<PoolInfoEntity> getPoolInfos() {
 //		var sql = "select o.organisation_id as organisationCode, o.pool_size wanted, count(s.id) as available  "
-		var sql = "select o.organisation_id as organisationCode, name, o.pool_size wanted, count(s.id) as available  "
+		var sql = "select o.organisation_id as organisationCode, o.name as organisationName, o.pool_size wanted, count(s.id) as available  "
 				+ "from   organisation as o "
 				+ "  left join scheduling_info as s on s.organisation_id = o.id "
 				+ "        and s.meetings_id is null "
