@@ -354,7 +354,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void test123() throws ApiException {
+	public void testNotAcceptableException() throws ApiException {
 
 		try {
 			videoMeetings.meetingsUuidDelete(UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5"));
