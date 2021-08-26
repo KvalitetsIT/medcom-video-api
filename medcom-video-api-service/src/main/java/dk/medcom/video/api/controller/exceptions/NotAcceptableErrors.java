@@ -21,8 +21,8 @@ public enum NotAcceptableErrors {
         return this.errorCode;
     }
 
-    public String getErrorText() {
-        return this.errorText;
+    public String getErrorText(String[] values) {
+        return String.format(this.errorText, values);
     }
 
 }

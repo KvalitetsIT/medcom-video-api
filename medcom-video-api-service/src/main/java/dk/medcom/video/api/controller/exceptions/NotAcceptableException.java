@@ -6,10 +6,10 @@ public class NotAcceptableException extends Exception {
     private final int errorCode;
     private final String errorText;
 
-    public NotAcceptableException(NotAcceptableErrors error) {
-        super(error.getErrorText());
+    public NotAcceptableException(NotAcceptableErrors error, String... values) {
+        super(error.getErrorText(values));
         errorCode = error.getErrorCode();
-        errorText = error.getErrorText();
+        errorText = error.getErrorText(values);
     }
 
     public int getErrorCode() {

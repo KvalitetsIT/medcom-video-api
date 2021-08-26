@@ -1,20 +1,19 @@
 package dk.medcom.video.api.controller;
 
+import dk.medcom.video.api.api.ApiError;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.api.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
 
 @RestControllerAdvice
 public class ExceptionController {
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(NotAcceptableException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
     public ApiError notAcceptableException(NotAcceptableException ex, HttpServletRequest req) {
         String path = req.getRequestURI();

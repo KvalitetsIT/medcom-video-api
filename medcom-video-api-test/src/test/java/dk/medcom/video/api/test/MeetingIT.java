@@ -354,6 +354,22 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void test123() throws ApiException {
+
+		try {
+			videoMeetings.meetingsUuidDelete(UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5"));
+			fail();
+		}
+		catch(ApiException e) {
+			assertEquals(406, e.getCode());
+			assertTrue(e.getResponseBody().contains("\"errorCode\":11"));
+			assertTrue(e.getResponseBody().contains("\"errorText\":\"Meeting must have status AWAITS_PROVISION (0) in order to be deleted\""));
+		}
+
+
+	}
+
+	@Test
 	public void testReadOrganisation() {
 		var response = getClient()
 				.path("services").path("organisation").path("test-org")
