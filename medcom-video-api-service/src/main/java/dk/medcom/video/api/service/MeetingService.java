@@ -167,7 +167,7 @@ public class MeetingService {
 			return;
 		}
 
-		SchedulingInfo schedulingInfo = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+		SchedulingInfo schedulingInfo = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, createMeetingDto);
 
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			if(schedulingInfo == null) {

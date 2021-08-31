@@ -40,7 +40,7 @@ public class PoolInfoRepositoryTest extends RepositoryTest {
 		Assert.assertEquals(10, resultMap.get(POOL_TEST_ORG).getWantedPoolSize());
 		Assert.assertEquals(30, resultMap.get(POOL_TEST_ORG2).getWantedPoolSize());
 		
-		Assert.assertEquals(1, resultMap.get(POOL_TEST_ORG).getAvailablePoolSize());
+		Assert.assertEquals(2, resultMap.get(POOL_TEST_ORG).getAvailablePoolSize());
 		Assert.assertEquals(0, resultMap.get(POOL_TEST_ORG2).getAvailablePoolSize());
 
 		Assert.assertNotNull(resultMap.get(POOL_TEST_ORG).getOrganisationName());

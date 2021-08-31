@@ -76,7 +76,19 @@ public class SchedulingInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findOneByReservationId(reservationId.toString())).thenReturn(schedulingInfo);
         BigInteger id = new BigInteger("123");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(Long.class), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.singletonList(id));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(Long.class),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(), Mockito.any(String.class),
+                Mockito.any(String.class),
+                Mockito.any(String.class),
+                Mockito.any(String.class),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.singletonList(id));
+
         Mockito.when(schedulingInfoRepository.findById(Mockito.eq(123L))).thenReturn(Optional.of(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
@@ -334,7 +346,7 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
@@ -361,12 +373,36 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
         meeting.getOrganisation().setOrganisationId("some_other_id");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
@@ -391,12 +427,36 @@ public class SchedulingInfoServiceTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(null);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         assertNull(result);
     }
@@ -423,13 +483,37 @@ public class SchedulingInfoServiceTest {
         organisationTree.setCode(NON_POOL_ORG);
         organisationTree.setName("nonPoolOrg name");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(null);
         Mockito.when(organisationTreeServiceClient.getOrganisationTree(NON_POOL_ORG)).thenReturn(organisationTree);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
         Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree(NON_POOL_ORG);
 
         assertNull(result);
@@ -468,9 +552,21 @@ public class SchedulingInfoServiceTest {
         organisation.setPoolSize(10);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(organisation.getId()), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.singletonList(BigInteger.ONE));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(organisation.getId()),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.singletonList(BigInteger.ONE));
 
-        Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
+        Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation, null);
         assertNotNull(schedulingInfo);
     }
 
@@ -483,9 +579,21 @@ public class SchedulingInfoServiceTest {
         organisation.setPoolSize(10);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(organisation.getId()), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any())).thenReturn(Collections.emptyList());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(organisation.getId()),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.emptyList());
 
-        Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation);
+        Long schedulingInfo = schedulingInfoService.getUnusedSchedulingInfoForOrganisation(organisation, null);
         assertNull(schedulingInfo);
     }
 
@@ -505,7 +613,7 @@ public class SchedulingInfoServiceTest {
         meeting.setGuestMicrophone(GuestMicrophone.off);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=off", result.getPortalLink());
@@ -528,7 +636,7 @@ public class SchedulingInfoServiceTest {
         meeting.setGuestMicrophone(GuestMicrophone.muted);
 
         SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
-        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting);
+        SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=muted", result.getPortalLink());
@@ -542,11 +650,32 @@ public class SchedulingInfoServiceTest {
 
         var schedulingInfoService = createSchedulingInfoService();
 
-        var result = schedulingInfoService.reserveSchedulingInfo();
+        var result = schedulingInfoService.reserveSchedulingInfo(
+                VmrType.lecture,
+                ViewType.one_main_zero_pips,
+                ViewType.four_mains_zero_pips,
+                VmrQuality.full_hd,
+                true,
+                true,
+                true,
+                false,
+                false);
         assertNotNull(result);
 
         Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(1L), Mockito.eq("PROVISIONED_OK"), Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(1L),
+                Mockito.eq("PROVISIONED_OK"),
+                Mockito.any(),
+                Mockito.eq(VmrType.lecture.name()),
+                Mockito.eq(ViewType.one_main_zero_pips.name()),
+                Mockito.eq(ViewType.four_mains_zero_pips.name()),
+                Mockito.eq(VmrQuality.full_hd.name()),
+                Mockito.eq(true),
+                Mockito.eq(true),
+                Mockito.eq(true),
+                Mockito.eq(false),
+                Mockito.eq(false));
         var schedulingInfoCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoCaptor.capture());
         assertNotNull(schedulingInfoCaptor.getValue());
@@ -560,10 +689,30 @@ public class SchedulingInfoServiceTest {
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Mockito.reset(schedulingInfoRepository);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.anyLong(), Mockito.anyString(), Mockito.any())).thenReturn(null);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.anyLong(),
+                Mockito.anyString(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(null);
         var schedulingInfoService = createSchedulingInfoService();
 
-        schedulingInfoService.reserveSchedulingInfo();
+        schedulingInfoService.reserveSchedulingInfo(VmrType.lecture,
+                ViewType.one_main_zero_pips,
+                ViewType.four_mains_zero_pips,
+                VmrQuality.full_hd,
+                true,
+                true,
+                true,
+                false,
+                false);
     }
 
     @Test

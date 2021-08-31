@@ -60,7 +60,7 @@ info:
     <Li> Implement HTTP PATCH for updates </UL>
     </Ul>
     <Li> 1.5.0 <Ul>
-    <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info and meetings </UL>
+    <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info, meetings and scheduling-info-reserve </UL>
     </Ul>
   version: "1.2.0"
   contact:
@@ -555,6 +555,70 @@ paths:
         - Video Scheduling Information
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
       description: Reserve a single scheduling info from the organisations pool.".
+      parameters:
+        - name: vmrType
+          in: query
+          description: Type of the virtual meetingroom
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrType'
+          example: 'lecture'
+        - name: hostView
+          in: query
+          description: The layout seen by Hosts
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+          example: 'one_main_zero_pips'
+        - name: guestView
+          in: query
+          description: The layout seen by Guests
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+          example: 'one_main_zero_pips'
+        - name: vmrQuality
+          in: query
+          description: Controls the maximum call quality for participants connecting to this service
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrQuality'
+          example: 'full_hd'
+        - name: enableOverlayText
+          in: query
+          description: 'If participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: guestsCanPresent
+          in: query
+          description: 'Controls whether the Guests in the conference are allowed to present content. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: forcePresenterIntoMain
+          in: query
+          description: 'Controls whether the Host who is presenting is locked into the main video position. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: forceEncryption
+          in: query
+          description: 'Default value: false'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: muteAllGuests
+          in: query
+          description: 'Controls whether to mute guests when they first join the conference. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
       responses:
         '200':
           description: Ok
@@ -991,44 +1055,13 @@ components:
             type: string
             description: Array of labels to attach to meeting.
         vmrType:
-          example: conference
-          description: type of the virtual meetingroom.
-          type: string
-          default: conference
-          enum:
-            - conference
-            - lecture
+          $ref: '#/components/schemas/vmrType'
         hostView:
-          example: one_main_seven_pips
-          description: the layout seen by Hosts.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         guestView:
-          example: one_main_seven_pips
-          description: the layout seen by Guests.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         vmrQuality:
-          example: hd
-          description: controls the maximum call quality for participants connecting to this service.
-          type: string
-          default: hd
-          enum:
-            - sd
-            - hd
-            - full_hd
+          $ref: '#/components/schemas/vmrQuality'
         enableOverlayText:
           type: boolean
           example: true
@@ -1200,44 +1233,13 @@ components:
           type: string
           maxLength: 50
         vmrType:
-          example: conference
-          description: type of the virtual meetingroom.
-          type: string
-          default: conference
-          enum:
-            - conference
-            - lecture
+          $ref: '#/components/schemas/vmrType'
         hostView:
-          example: one_main_seven_pips
-          description: the layout seen by Hosts.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         guestView:
-          example: one_main_seven_pips
-          description: the layout seen by Guests.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         vmrQuality:
-          example: hd
-          description: controls the maximum call quality for participants connecting to this service.
-          type: string
-          default: hd
-          enum:
-            - sd
-            - hd
-            - full_hd
+          $ref: '#/components/schemas/vmrQuality'
         enableOverlayText:
           type: boolean
           example: true
@@ -1349,6 +1351,34 @@ components:
         - STARTING_TO_DEPROVISION
         - DEPROVISION_PROBLEMS
         - DEPROVISION_OK
+    vmrType:
+      example: conference
+      description: Corresponds to numeric status 0 and 1.
+      type: string
+      default: conference
+      enum:
+        - conference
+        - lecture
+    viewType:
+      example: one_main_seven_pips
+      description: Corresponds to numeric status 0, 1, 2, 3 and 4.
+      type: string
+      default: one_main_seven_pips
+      enum:
+        - one_main_zero_pips
+        - one_main_seven_pips
+        - one_main_twentyone_pips
+        - two_mains_twentyone_pips
+        - four_mains_zero_pips
+    vmrQuality:
+      example: hd
+      description: Corresponds to numeric status 0, 1 and 2.
+      type: string
+      default: hd
+      enum:
+        - sd
+        - hd
+        - full_hd
 
     scheduling-template:
       type: object
@@ -1437,44 +1467,13 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: conference
-          description: type of the virtual meetingroom.
-          type: string
-          default: conference
-          enum:
-            - conference
-            - lecture
+          $ref: '#/components/schemas/vmrType'
         hostView:
-          example: one_main_seven_pips
-          description: the layout seen by Hosts.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         guestView:
-          example: one_main_seven_pips
-          description: the layout seen by Guests.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         vmrQuality:
-          example: hd
-          description: controls the maximum call quality for participants connecting to this service.
-          type: string
-          default: hd
-          enum:
-            - sd
-            - hd
-            - full_hd
+          $ref: '#/components/schemas/vmrQuality'
         enableOverlayText:
           type: boolean
           example: true
@@ -1599,44 +1598,13 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: conference
-          description: type of the virtual meetingroom.
-          type: string
-          default: conference
-          enum:
-            - conference
-            - lecture
+          $ref: '#/components/schemas/vmrType'
         hostView:
-          example: one_main_seven_pips
-          description: the layout seen by Hosts.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         guestView:
-          example: one_main_seven_pips
-          description: the layout seen by Guests.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         vmrQuality:
-          example: hd
-          description: controls the maximum call quality for participants connecting to this service.
-          type: string
-          default: hd
-          enum:
-            - sd
-            - hd
-            - full_hd
+          $ref: '#/components/schemas/vmrQuality'
         enableOverlayText:
           type: boolean
           example: true
@@ -1740,44 +1708,13 @@ components:
           example: true
           description: only one default template per organization. Setting it will unset other default template
         vmrType:
-          example: conference
-          description: type of the virtual meeting room.
-          type: string
-          default: conference
-          enum:
-            - conference
-            - lecture
+          $ref: '#/components/schemas/vmrType'
         hostView:
-          example: one_main_seven_pips
-          description: the layout seen by Hosts.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         guestView:
-          example: one_main_seven_pips
-          description: the layout seen by Guests.
-          type: string
-          default: one_main_seven_pips
-          enum:
-            - one_main_zero_pips
-            - one_main_seven_pips
-            - one_main_twentyone_pips
-            - two_mains_twentyone_pips
-            - four_mains_zero_pips
+          $ref: '#/components/schemas/viewType'
         vmrQuality:
-          example: hd
-          description: controls the maximum call quality for participants connecting to this service.
-          type: string
-          default: hd
-          enum:
-            - sd
-            - hd
-            - full_hd
+          $ref: '#/components/schemas/vmrQuality'
         enableOverlayText:
           type: boolean
           example: true

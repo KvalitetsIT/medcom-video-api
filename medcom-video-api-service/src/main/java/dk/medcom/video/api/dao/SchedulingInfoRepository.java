@@ -26,8 +26,8 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE m.endTime < ?1 AND s.provisionStatus = ?2")
 	List<SchedulingInfo> findAllWithinEndTimeLessThenAndStatus(Date toEndTime, ProvisionStatus provisionStatus);
 
-	@Query(value = "SELECT s.id FROM scheduling_info s WHERE (s.organisation_id = ?1 AND s.provision_status = ?2 AND s.meetings_id IS NULL) and reservation_id is null and provision_timestamp < ?3 LIMIT 1 FOR UPDATE", nativeQuery=true)
-	List<BigInteger> findByMeetingIsNullAndOrganisationAndProvisionStatus(Long organisationId, String provisionStatus, Date provisionTimestampOlderThen);
+	@Query(value = "SELECT s.id FROM scheduling_info s WHERE (s.organisation_id = ?1 AND s.provision_status = ?2 AND s.meetings_id IS NULL AND s.vmr_type = ?4 AND s.host_view = ?5 AND s.guest_view = ?6 AND s.vmr_quality = ?7 AND s.enable_overlay_text = ?8 AND s.guests_can_present = ?9 AND s.force_presenter_into_main = ?10 AND s.force_encryption = ?11 AND s.mute_all_guests = ?12) and reservation_id is null and provision_timestamp < ?3 LIMIT 1 FOR UPDATE", nativeQuery=true)
+	List<BigInteger> findByMeetingIsNullAndOrganisationAndProvisionStatus(Long organisationId, String provisionStatus, Date provisionTimestampOlderThen, String vmrType, String hostView, String guestView, String vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests);
 
     List<SchedulingInfo> findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus provisionStatus);
 

@@ -23,21 +23,21 @@ public class CreateMeetingDto {
 	@NotNull
 	@JsonDeserialize(using = CustomDateDeserializer.class)
 	public Date endTime;
-	
+
 	@Size(max=500, message="description should have a maximum of 500 characters")
 	public String description;
-	
+
 	@Size(max=100, message="Project Code should have a maximum of 100 characters")
 	public String projectCode;
 
 	private UUID schedulingInfoReservationId;
 
 	private String organizedByEmail;
-	
+
 	public int maxParticipants;
-	
+
 	public Boolean endMeetingOnEndTime;
-	
+
 	private Long schedulingTemplateId;
 
 	private MeetingType meetingType = MeetingType.NORMAL;
@@ -62,6 +62,36 @@ public class CreateMeetingDto {
 	private Boolean forcePresenterIntoMain;
 	private Boolean forceEncryption;
 	private Boolean muteAllGuests;
+
+	public void setDefaults(){
+        if (this.vmrType == null){
+            this.vmrType = VmrType.conference;
+        }
+		if (this.hostView == null){
+            this.hostView = ViewType.one_main_seven_pips;
+        }
+        if (this.guestView == null ){
+            this.guestView = ViewType.one_main_seven_pips;
+        }
+        if (this.vmrQuality == null){
+            this.vmrQuality = VmrQuality.hd;
+        }
+        if (this.enableOverlayText == null){
+            this.enableOverlayText = true;
+        }
+        if (this.guestsCanPresent == null){
+            this.guestsCanPresent = true;
+        }
+		if (this.forcePresenterIntoMain == null){
+            this.forcePresenterIntoMain = true;
+        }
+        if (this.forceEncryption == null ){
+            this.forceEncryption = false;
+        }
+        if (this.muteAllGuests ==null){
+            this.muteAllGuests = false;
+        }
+	}
 
 	public List<String> getLabels() {
 		return labels;
@@ -103,7 +133,7 @@ public class CreateMeetingDto {
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
@@ -122,11 +152,11 @@ public class CreateMeetingDto {
 	public Date getEndTime() {
 		return endTime;
 	}
-	
+
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
-	
+
 	public String getProjectCode() {
 		return projectCode;
 	}
@@ -134,7 +164,7 @@ public class CreateMeetingDto {
 	public void setProjectCode(String projectCode) {
 		this.projectCode = projectCode;
 	}
-	
+
 	public String getOrganizedByEmail() {
 		return organizedByEmail;
 	}

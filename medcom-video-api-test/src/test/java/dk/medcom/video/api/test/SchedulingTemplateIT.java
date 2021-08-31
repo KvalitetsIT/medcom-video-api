@@ -3,9 +3,7 @@ package dk.medcom.video.api.test;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.SchedulingTemplateAdministrationApi;
-import io.swagger.client.model.CreateSchedulingTemplate;
-import io.swagger.client.model.SchedulingTemplate;
-import io.swagger.client.model.UpdateSchedulingTemplate;
+import io.swagger.client.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,8 +62,8 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setGuestPinRequired(true);
         create.setUriNumberRangeLow(1);
         create.setUriNumberRangeHigh(100);
-        create.setVmrType(CreateSchedulingTemplate.VmrTypeEnum.LECTURE);
-        create.setHostView(CreateSchedulingTemplate.HostViewEnum.ONE_MAIN_SEVEN_PIPS);
+        create.setVmrType(VmrType.LECTURE);
+        create.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
         create.setEnableOverlayText(false);
 
         //When
@@ -99,8 +97,8 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setGuestPinRequired(create.isGuestPinRequired());
         updateSchedulingTemplate.setUriNumberRangeLow(create.getUriNumberRangeLow());
         updateSchedulingTemplate.setUriNumberRangeHigh(create.getUriNumberRangeHigh());
-        updateSchedulingTemplate.setVmrType(UpdateSchedulingTemplate.VmrTypeEnum.LECTURE);
-        updateSchedulingTemplate.setHostView(UpdateSchedulingTemplate.HostViewEnum.TWO_MAINS_TWENTYONE_PIPS);
+        updateSchedulingTemplate.setVmrType(VmrType.LECTURE);
+        updateSchedulingTemplate.setHostView(ViewType.TWO_MAINS_TWENTYONE_PIPS);
         updateSchedulingTemplate.setEnableOverlayText(false);
 
         //When

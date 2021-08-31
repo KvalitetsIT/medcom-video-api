@@ -9,6 +9,8 @@ import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.CreateMeeting;
+import io.swagger.client.model.VmrQuality;
+import io.swagger.client.model.VmrType;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
@@ -95,6 +97,25 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testReserveSchedulingInformation_DefaultValues() throws ApiException {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+
+		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
+
+		var result = schedulingInfo.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
+		assertNotNull(result);
+		assertNotNull(result.getReservationId());
+
+		var reservationId = result.getReservationId();
+
+		result = schedulingInfo.schedulingInfoReserveUuidGet(result.getReservationId());
+		assertNotNull(result);
+		assertEquals(reservationId, result.getReservationId());
+	}
+
+	@Test
 	public void testReserveSchedulingInformation() throws ApiException {
 		var apiClient = new ApiClient()
 				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
@@ -102,7 +123,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
 
-		var result = schedulingInfo.schedulingInfoReserveGet();
+		var result = schedulingInfo.schedulingInfoReserveGet(VmrType.LECTURE,null,null, VmrQuality.FULL_HD,null,null,null,null,null);
 		assertNotNull(result);
 		assertNotNull(result.getReservationId());
 
@@ -122,7 +143,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		var videoMeetingApi = new VideoMeetingsApi(apiClient);
 		var schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
 
-		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet();
+		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
 		assertNotNull(schedulingInfo);
 		var reservationId = schedulingInfo.getReservationId();
 

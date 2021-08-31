@@ -466,12 +466,28 @@ public class SchedulingInfoService {
 	}
 
 	@Transactional(rollbackFor = Throwable.class)
-	Long getUnusedSchedulingInfoForOrganisation(Organisation organisation) { // TODO Refactor so this can be private
+	Long getUnusedSchedulingInfoForOrganisation(Organisation organisation, CreateMeetingDto createMeetingDto) { // TODO Refactor so this can be private
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
 
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime());
+		if (createMeetingDto == null){
+			createMeetingDto = new CreateMeetingDto();
+		}
+		createMeetingDto.setDefaults();
+
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+				ProvisionStatus.PROVISIONED_OK.name(),
+				cal.getTime(),
+				createMeetingDto.getVmrType().name(),
+				createMeetingDto.getHostView().name(),
+				createMeetingDto.getGuestView().name(),
+				createMeetingDto.getVmrQuality().name(),
+				createMeetingDto.getEnableOverlayText(),
+				createMeetingDto.getGuestsCanPresent(),
+				createMeetingDto.getForcePresenterIntoMain(),
+				createMeetingDto.getForceEncryption(),
+				createMeetingDto.getMuteAllGuests());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			return null;
@@ -506,16 +522,16 @@ public class SchedulingInfoService {
 		return resultingSchedulingInfo;
 	}
 
-	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting) {
+	SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
 		SchedulingInfo schedulingInfo = null;
-		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation);
+		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto);
 
 		if(unusedId == null && organisation.getPoolSize() != null) {
-			unusedId = getSchedulingInfoFromOverflowPool();
+			unusedId = getSchedulingInfoFromOverflowPool(createMeetingDto);
 			fromOverflow = true;
 		}
 
@@ -541,14 +557,20 @@ public class SchedulingInfoService {
 		return organisationRepository.findByOrganisationId(poolOrganisation.getCode()).getId();
 	}
 
-	private Long getSchedulingInfoFromOverflowPool() {
+	private Long getSchedulingInfoFromOverflowPool(CreateMeetingDto createMeetingDto) {
 		LOGGER.info("Organisation {} is using scheduling info from overflow pool organisation {}.", userContextService.getUserContext().getUserOrganisation(), overflowPoolOrganisationId);
 		var organisation = organisationRepository.findByOrganisationId(overflowPoolOrganisationId);
 		LOGGER.debug("Organisation found: {}", organisation != null);
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime());
+
+		if (createMeetingDto == null) {
+			createMeetingDto = new CreateMeetingDto();
+		}
+		createMeetingDto.setDefaults();
+
+		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
 			return null;
@@ -557,10 +579,29 @@ public class SchedulingInfoService {
 		return schedulingInfos.get(0).longValue();
 	}
 
-	public SchedulingInfo reserveSchedulingInfo() throws RessourceNotFoundException {
+	public SchedulingInfo reserveSchedulingInfo(VmrType vmrType,
+												ViewType hostView,
+												ViewType guestView,
+												VmrQuality vmrQuality,
+												Boolean enableOverlayText,
+												Boolean guestsCanPresent,
+												Boolean forcePresenterIntoMain,
+												Boolean forceEncryption,
+												Boolean muteAllGuests) throws RessourceNotFoundException {
 		var organisation = organisationRepository.findByOrganisationId(userContextService.getUserContext().getUserOrganisation());
 
-		var id = getUnusedSchedulingInfoForOrganisation(organisation);
+		var createMeetingDto = new CreateMeetingDto();
+		createMeetingDto.setVmrType(vmrType);
+		createMeetingDto.setHostView(hostView);
+		createMeetingDto.setGuestView(guestView);
+		createMeetingDto.setVmrQuality(vmrQuality);
+		createMeetingDto.setEnableOverlayText(enableOverlayText);
+		createMeetingDto.setGuestsCanPresent(guestsCanPresent);
+		createMeetingDto.setForcePresenterIntoMain(forcePresenterIntoMain);
+		createMeetingDto.setForceEncryption(forceEncryption);
+		createMeetingDto.setMuteAllGuests(muteAllGuests);
+
+		var id = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto);
 
 		if(id == null) {
 			LOGGER.info("Unused scheduling info not found for organisation {}.", userContextService.getUserContext().getUserOrganisation());
