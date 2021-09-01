@@ -476,6 +476,19 @@ public class SchedulingInfoService {
 		}
 		createMeetingDto.setDefaults();
 
+		LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus - Org: '{}' Time: '{}' VMR Type: '{}' HostView: '{}' GuestView: '{}' VmrQuality: '{}' EnableOverlayText: '{}' GuestsCanPresent: '{}' ForcePresenterIntoMain: '{}' ForceEncryption: '{}' MuteAllGuests: '{}'",
+				organisation.getId(),
+				cal.getTime(),
+				createMeetingDto.getVmrType().name(),
+				createMeetingDto.getHostView().name(),
+				createMeetingDto.getGuestView().name(),
+				createMeetingDto.getVmrQuality().name(),
+				createMeetingDto.getEnableOverlayText(),
+				createMeetingDto.getGuestsCanPresent(),
+				createMeetingDto.getForcePresenterIntoMain(),
+				createMeetingDto.getForceEncryption(),
+				createMeetingDto.getMuteAllGuests());
+
 		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
 				ProvisionStatus.PROVISIONED_OK.name(),
 				cal.getTime(),
@@ -490,9 +503,16 @@ public class SchedulingInfoService {
 				createMeetingDto.getMuteAllGuests());
 
 		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
+			LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus Result NULL- Org: '{}' Time: '{}'",
+					organisation.getId(),
+					cal.getTime());
 			return null;
 		}
 
+		LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}' Time: '{}'",
+				schedulingInfos.get(0).longValue(),
+				organisation.getId(),
+				cal.getTime());
 		return schedulingInfos.get(0).longValue();
 	}
 
