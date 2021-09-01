@@ -37,6 +37,15 @@ update scheduling_template
 set  vmr_quality = 'hd'
 where vmr_quality IS NULL;
 
+update scheduling_template
+set enable_overlay_text = true;
+
+update scheduling_template
+set guests_can_present = true;
+
+update scheduling_template
+set force_presenter_into_main = true;
+
 -- set defaults scheduling_info
 update scheduling_info
 set  vmr_type = 'conference'
@@ -53,3 +62,12 @@ where guest_view IS NULL;
 update scheduling_info
 set  vmr_quality = 'hd'
 where vmr_quality IS NULL;
+
+update scheduling_info
+set enable_overlay_text = true;
+
+update scheduling_info
+set guests_can_present = true;
+
+update scheduling_info
+set force_presenter_into_main = true;
