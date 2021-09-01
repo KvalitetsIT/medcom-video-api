@@ -444,6 +444,16 @@ public class SchedulingInfoService {
 
 		schedulingInfo.setPool(true);
 
+		schedulingInfo.setVmrType(schedulingTemplate.getVmrType());
+		schedulingInfo.setHostView(schedulingTemplate.getHostView());
+		schedulingInfo.setGuestView(schedulingTemplate.getGuestView());
+		schedulingInfo.setVmrQuality(schedulingTemplate.getVmrQuality());
+		schedulingInfo.setEnableOverlayText(schedulingTemplate.getEnableOverlayText());
+		schedulingInfo.setGuestsCanPresent(schedulingTemplate.getGuestsCanPresent());
+		schedulingInfo.setForcePresenterIntoMain(schedulingTemplate.getForcePresenterIntoMain());
+		schedulingInfo.setForceEncryption(schedulingTemplate.getForceEncryption());
+		schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
+
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
