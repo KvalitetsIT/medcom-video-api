@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+# Set docker image names.
+    - name: Setup env variables
+      run: |
+        echo "DOCKER_SERVICE=kvalitetsit/medcom-video-api" >> $GITHUB_ENV
+        echo "DOCKER_DOCUMENTATION=kvalitetsit/medcom-video-api-documentation" >> $GITHUB_ENV
+
 # Checkout source code
     - uses: actions/checkout@v2
 
@@ -36,6 +42,7 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+# Build and test
     - name: Build and test
       run: ./build/build.sh
 
@@ -59,50 +66,51 @@ jobs:
         name: jacoco-report
         path: medcom-video-api-qa/target/site/jacoco-aggregate/
 
+# Tag and push docker images
     - name: Tag service dev docker image
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api:latest kvalitetsit/medcom-video-api:dev
+      run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:dev
 
     - name: Push service dev docker image
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api:dev
+      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:dev
 
     - name: Tag service git id docker image
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api:latest kvalitetsit/medcom-video-api:${{ github.sha }}
+      run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:${{ github.sha }}
 
     - name: Push service git id docker image.
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api:${{ github.sha }}
+      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:${{ github.sha }}
 
     - name: Tag documentation dev docker image
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api-documentation:latest kvalitetsit/medcom-video-api-documentation:dev
+      run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:dev
 
     - name: Push documentation dev docker image
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api-documentation:dev
+      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:dev
 
     - name: Tag documentation git id docker image
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api-documentation:latest kvalitetsit/medcom-video-api-documentation:${{ github.sha }}
+      run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:${{ github.sha }}
 
     - name: Push documentation git id docker image.
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api-documentation:${{ github.sha }}
+      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:${{ github.sha }}
 
     - name: Push latest service docker image
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api:latest
+      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:latest
 
     - name: Tag version service docker image
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api:latest kvalitetsit/medcom-video-api:${{ steps.tag.outputs.VERSION }}
+      run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:${{ steps.tag.outputs.VERSION }}
 
     - name: Push version service docker image.
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api:${{ steps.tag.outputs.VERSION }}
+      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:${{ steps.tag.outputs.VERSION }}
 
     - name: Push latest documentation docker image
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api-documentation:latest
+      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:latest
 
     - name: Tag version documentation docker image
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-tag.sh kvalitetsit/medcom-video-api-documentation:latest kvalitetsit/medcom-video-api-documentation:${{ steps.tag.outputs.VERSION }}
+      run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:${{ steps.tag.outputs.VERSION }}
 
     - name: Push version documentation docker image.
       if: ${{ steps.tag.conclusion != 'skipped' }}
-      run: ./build/docker-push.sh kvalitetsit/medcom-video-api-documentation:${{ steps.tag.outputs.VERSION }}
+      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:${{ steps.tag.outputs.VERSION }}
