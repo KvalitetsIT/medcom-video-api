@@ -17,7 +17,7 @@ INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (1, 'compa
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (2, 'company 2', 'company name 2', 2);
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'company 3', 'company name 3', 3);
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (4, 'kvak', 'company name kvak', 4);
-INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (5, 'test-org', 'company name test-org', 5);
+INSERT INTO organisation (id, organisation_id, name, group_id, sms_sender_name) VALUES (5, 'test-org', 'company name test-org', 5, 'MinAfsender');
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (6, 'another-test-org', 'company name another-test-org', 6);
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (7, 'pool-test-org', 'company name another-test-org', 10, 7);
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (8, 'overflow', 'overflow pool org', 10, 8);

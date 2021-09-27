@@ -15,7 +15,7 @@ insert into groups(group_id, group_name, group_type, parent_id, deleted_time, de
 insert into groups(group_id, group_name, group_type, parent_id) values(13, 'child', 2, 12);
 
 -- * organisation *
-INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (1, 'company 1', 'company name 1', 1);
+INSERT INTO organisation (id, organisation_id, name, group_id, sms_sender_name) VALUES (1, 'company 1', 'company name 1', 1, 'SomeSender');
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (2, 'company 2', 'company name 2', 2);
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'company 3', 'company name 3', 3);
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (4, 'kvak', 'company name kvak', 4);

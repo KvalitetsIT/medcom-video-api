@@ -18,6 +18,7 @@ public class Organisation {
 	private String name;
 	private Integer poolSize;
 	private long groupId;
+	private String smsSenderName;
 
 	public Long getId() {
 		return id;
@@ -62,5 +63,13 @@ public class Organisation {
 
 	public void setGroupId(long groupId) {
 		this.groupId = groupId;
+	}
+
+	public String getSmsSenderName() {
+		return smsSenderName;
+	}
+
+	public void setSmsSenderName(String smsSenderName) {
+		this.smsSenderName = smsSenderName;
 	}
 }

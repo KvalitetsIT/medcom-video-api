@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
     private OrganisationApi sut;
 
@@ -52,5 +54,25 @@ public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
 
         // Then
         Assert.assertTrue(organisations.isEmpty());
+    }
+
+    @Test
+    public void testReadOrganisation() throws ApiException {
+        var response = sut.servicesOrganisationCodeGet("test-org");
+
+        assertNotNull(response);
+        assertEquals("test-org", response.getCode());
+        assertEquals("company name test-org", response.getName());
+        assertEquals("MinAfsender", response.getSmsSenderName());
+    }
+
+    @Test
+    public void testReadOrganisationNoSmsSenderName() throws ApiException {
+        var response = sut.servicesOrganisationCodeGet("kvak");
+
+        assertNotNull(response);
+        assertEquals("kvak", response.getCode());
+        assertEquals("company name kvak", response.getName());
+        assertNull(response.getSmsSenderName());
     }
 }

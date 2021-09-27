@@ -291,6 +291,10 @@ components:
           type: integer
           format: int32
           example: 200
+        smsSenderName:
+          type: string
+          maxLength: 11
+          example: Min Organisation
     organisation-uri-request:
       type: array
       items:

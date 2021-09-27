@@ -75,6 +75,7 @@ public class OrganisationTest extends RepositoryTest {
 		assertEquals(id, organisation.getId());
 		assertEquals("company 1", organisation.getOrganisationId());
 		assertEquals("company name 1", organisation.getName());
+		assertEquals("SomeSender", organisation.getSmsSenderName());
 		Assert.assertNull(organisation.getPoolSize());
 	}
 

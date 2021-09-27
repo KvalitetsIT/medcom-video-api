@@ -4,6 +4,7 @@ public class OrganisationDto {
     private String code;
     private String name;
     private int poolSize;
+    private String smsSenderName;
 
     public String getName() {
         return name;
@@ -27,5 +28,22 @@ public class OrganisationDto {
 
     public void setPoolSize(int poolSize) {
         this.poolSize = poolSize;
+    }
+
+    public String getSmsSenderName() {
+        return smsSenderName;
+    }
+
+    public void setSmsSenderName(String smsSenderName) {
+        this.smsSenderName = smsSenderName;
+    }
+
+    public String toString() {
+        return "OrganisationDto{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", poolSize=" + poolSize +
+                ", smsSenderName='" + smsSenderName + '\'' +
+                '}';
     }
 }
