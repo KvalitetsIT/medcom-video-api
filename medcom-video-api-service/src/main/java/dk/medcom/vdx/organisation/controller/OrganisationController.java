@@ -36,6 +36,7 @@ public class OrganisationController {
 		var response = new OrganisationDto();
 		response.setName(organisation.getName());
 		response.setCode(organisation.getOrganisationId());
+		response.setSmsSenderName(organisation.getSmsSenderName());
 		int poolSize = organisation.getPoolSize() == null ? 0 : organisation.getPoolSize();
 		response.setPoolSize(poolSize);
 
