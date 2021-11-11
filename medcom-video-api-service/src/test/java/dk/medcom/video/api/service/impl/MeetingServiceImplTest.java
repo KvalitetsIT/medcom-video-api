@@ -387,7 +387,6 @@ public class MeetingServiceImplTest {
 		Assert.assertNotNull(meeting);
 		assertEquals(createMeetingDto.getSubject(), meeting.getSubject());
 		Assert.assertNotNull(meeting.getUuid());
-//		Assert.assertEquals(meetingUser, meeting.getOrganizedByUser()); //TODO: 0 -fix test
 		assertEquals(calendarStart.getTime(), meeting.getStartTime());
 		assertEquals(calendarEnd.getTime(), meeting.getEndTime());
 		assertEquals(createMeetingDto.getDescription(), meeting.getDescription());
