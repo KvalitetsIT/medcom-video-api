@@ -1,5 +1,6 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
+import dk.medcom.video.api.service.IdGenerator;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.UUID;

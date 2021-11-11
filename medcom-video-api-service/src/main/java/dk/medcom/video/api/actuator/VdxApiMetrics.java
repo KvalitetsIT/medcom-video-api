@@ -20,7 +20,7 @@ public class VdxApiMetrics extends PrometheusScrapeEndpoint {
 	private final Gauge wantedPoolSize;
 	private final Gauge availablePoolSize;
 
-	PoolInfoService poolInfoService;
+	private final PoolInfoService poolInfoService;
 
 	public VdxApiMetrics(CollectorRegistry collectorRegistry, PoolInfoService poolInfoService) {
 		super(collectorRegistry);

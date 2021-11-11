@@ -30,11 +30,6 @@ public class MeetingUpdateControllerTest {
 
     @Test
     public void testPatchMeeting() throws NotAcceptableException, PermissionDeniedException, RessourceNotFoundException, NotValidDataException {
-        var now = Calendar.getInstance();
-        var startTime = now.getTime();
-        now.add(Calendar.HOUR, 2);
-        var endTime = now.getTime();
-
         UUID uuid = UUID.randomUUID();
         var input = new PatchMeetingDto();
         input.setDescription("DESCRIPTION");

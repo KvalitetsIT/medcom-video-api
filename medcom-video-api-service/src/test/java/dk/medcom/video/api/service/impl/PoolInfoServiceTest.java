@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
@@ -57,7 +57,7 @@ public class PoolInfoServiceTest {
 
         
         
-		PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
+		PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -93,7 +93,7 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
 
-        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
+        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -129,7 +129,7 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
 
-        PoolInfoService poolInfoService = new PoolInfoService(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
+        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 

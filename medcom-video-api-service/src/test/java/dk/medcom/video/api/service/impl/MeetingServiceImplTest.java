@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContext;
@@ -15,6 +15,9 @@ import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.service.AuditService;
+import dk.medcom.video.api.service.MeetingService;
+import dk.medcom.video.api.service.OrganisationService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +34,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 
-public class MeetingServiceTest {
+public class MeetingServiceImplTest {
 	private final Calendar calendarDate = new GregorianCalendar(2018, Calendar.OCTOBER, 1, 13, 15, 0);
 	private final Calendar calendarStart = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 15, 0);
 	private final Calendar calendarStartUpdated = new GregorianCalendar(2018, Calendar.NOVEMBER, 1, 13, 45, 0);
@@ -44,7 +47,7 @@ public class MeetingServiceTest {
 
 	private MeetingLabelRepository meetingLabelRepository;
 
-	private SchedulingInfoService schedulingInfoService;
+	private SchedulingInfoServiceImpl schedulingInfoService;
 	private MeetingRepository meetingRepository;
 	private final UUID reservationId = UUID.randomUUID();
 	private SchedulingInfo schedulingInfo;
@@ -131,9 +134,9 @@ public class MeetingServiceTest {
 	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, MeetingLabelRepository meetingLabelRepository, Integer userOrganistionPoolSize) throws PermissionDeniedException, RessourceNotFoundException {
 
 		meetingRepository = Mockito.mock(MeetingRepository.class);
-		MeetingUserService meetingUserService = Mockito.mock(MeetingUserService.class);
-		schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
-		SchedulingStatusService schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
+		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
+		schedulingInfoService = Mockito.mock(SchedulingInfoServiceImpl.class);
+		SchedulingStatusServiceImpl schedulingStatusService = Mockito.mock(SchedulingStatusServiceImpl.class);
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
 		organisationRepository = Mockito.mock(OrganisationRepository.class);
@@ -154,7 +157,7 @@ public class MeetingServiceTest {
 		}
 		Mockito.when(organisationRepository.findByOrganisationId(userContext.getUserOrganisation())).thenReturn(o);
 
-		MeetingService meetingService = new MeetingService(meetingRepository,
+		MeetingService meetingService = new MeetingServiceImpl(meetingRepository,
 				meetingUserService,
 				schedulingInfoService,
 				schedulingStatusService,

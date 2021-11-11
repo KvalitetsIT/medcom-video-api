@@ -1,5 +1,9 @@
 package dk.medcom.video.api.controller;
 
+import dk.medcom.video.api.api.CreateSchedulingInfoDto;
+import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.api.SchedulingInfoDto;
+import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
@@ -7,10 +11,6 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.api.CreateSchedulingInfoDto;
-import dk.medcom.video.api.api.ProvisionStatus;
-import dk.medcom.video.api.api.SchedulingInfoDto;
-import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.service.SchedulingInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

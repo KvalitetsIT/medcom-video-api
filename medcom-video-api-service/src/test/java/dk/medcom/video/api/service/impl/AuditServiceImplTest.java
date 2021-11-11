@@ -1,10 +1,9 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.audit.client.AuditClient;
 import dk.medcom.audit.client.api.v1.AuditEvent;
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.dao.entity.*;
-import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

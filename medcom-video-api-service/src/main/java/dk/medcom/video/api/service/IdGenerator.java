@@ -2,6 +2,6 @@ package dk.medcom.video.api.service;
 
 import java.util.UUID;
 
-interface IdGenerator {
+public interface IdGenerator {
     String generateId(UUID uuid);
 }

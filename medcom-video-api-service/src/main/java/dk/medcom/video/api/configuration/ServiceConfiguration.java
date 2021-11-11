@@ -10,8 +10,8 @@ import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.CustomUriValidator;
-import dk.medcom.video.api.service.CustomUriValidatorImpl;
 import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
@@ -90,21 +90,20 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
 	public UserContextService userContextService() {
-		UserContextServiceImpl ucs = new UserContextServiceImpl();
-		return ucs;
+		return new UserContextServiceImpl();
 	}
 
 	@Autowired
-	PrometheusConfig prometheusConfig;
+	private PrometheusConfig prometheusConfig;
 
 	@Autowired
-	Clock clock;
+	private Clock clock;
 
 	@Autowired
-	CollectorRegistry collectorRegistry;
+	private CollectorRegistry collectorRegistry;
 
 	@Autowired
-	PoolInfoService poolInfoService;
+    private PoolInfoService poolInfoService;
 
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {

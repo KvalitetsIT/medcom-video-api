@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.service.OrganisationService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,9 +112,9 @@ public class SchedulingTemplateServiceTest {
 		return schedulingTemplate;
 	}
 	
-	private SchedulingTemplateService SchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, boolean isCreate) throws PermissionDeniedException, RessourceNotFoundException {
+	private SchedulingTemplateServiceImpl SchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, boolean isCreate) throws PermissionDeniedException, RessourceNotFoundException {
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 	
 		SchedulingTemplate schedulingTemplateInService = getSchedulingTemplateWithDefaultValues(organisation,  1L);
 
@@ -133,13 +134,13 @@ public class SchedulingTemplateServiceTest {
 		return schedulingTemplateService;
 	}
 	
-	private SchedulingTemplateService simpleSchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, SchedulingTemplateRepository schedulingTemplateRepository) throws PermissionDeniedException, RessourceNotFoundException {
+	private SchedulingTemplateServiceImpl simpleSchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, SchedulingTemplateRepository schedulingTemplateRepository) throws PermissionDeniedException, RessourceNotFoundException {
 	
 		UserContextService userService = Mockito.mock(UserContextService.class);
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
-		MeetingUserService meetingUserService = Mockito.mock(MeetingUserService.class);
+		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
 
-		SchedulingTemplateService schedulingTemplateService = new SchedulingTemplateService(schedulingTemplateRepository, userService, organisationService, meetingUserService, organisationTreeServiceClient);
+		SchedulingTemplateServiceImpl schedulingTemplateService = new SchedulingTemplateServiceImpl(schedulingTemplateRepository, userService, organisationService, meetingUserService, organisationTreeServiceClient);
 
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
@@ -153,7 +154,7 @@ public class SchedulingTemplateServiceTest {
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateService schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, true);
+		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, true);
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
@@ -169,7 +170,7 @@ public class SchedulingTemplateServiceTest {
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateService schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
+		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
 		
 		// When
@@ -187,7 +188,7 @@ public class SchedulingTemplateServiceTest {
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateService schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
+		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
 		
 		// When
@@ -205,7 +206,7 @@ public class SchedulingTemplateServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 		
 		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList();
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(organisation,  1L));
@@ -230,7 +231,7 @@ public class SchedulingTemplateServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 
 		var inputSchedulingTemplate = getSchedulingTemplateWithDefaultValues(organisation,  1L);
 		inputSchedulingTemplate.setIsDefaultTemplate(true);
@@ -260,7 +261,7 @@ public class SchedulingTemplateServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 		
 		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList();
 		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList();
@@ -299,7 +300,7 @@ public class SchedulingTemplateServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 		
 		SchedulingTemplate schedulingTemplateInService = getSchedulingTemplateWithDefaultValues(organisation,  1L);
 		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
@@ -319,7 +320,7 @@ public class SchedulingTemplateServiceTest {
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateService schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 				
 		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList();
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(organisation,  1L));

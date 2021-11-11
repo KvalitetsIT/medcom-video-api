@@ -6,7 +6,7 @@ import dk.medcom.video.api.api.UpdateMeetingDto;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.service.DomainMapperService;
+import dk.medcom.video.api.service.impl.DomainMapper;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -15,7 +15,7 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class DomainMapperServiceTest {
+public class DomainMapperTest {
     @Test public void testMapFromUpdateMeetingDto2UpdateMeeting() {
         // GIVEN
         var meeting = new Meeting();
@@ -32,7 +32,7 @@ public class DomainMapperServiceTest {
         input.getLabels().add("LABEL");
 
         // WHEN
-        var service = new DomainMapperService();
+        var service = new DomainMapper();
         var result = service.mapToUpdateMeeting(input, meeting);
 
         // THEN
@@ -70,7 +70,7 @@ public class DomainMapperServiceTest {
         input.setGuestPinRequired(true);
 
         // WHEN
-        var service = new DomainMapperService();
+        var service = new DomainMapper();
         var result = service.mapToUpdateMeeting(input, meeting);
 
         // THEN
@@ -100,7 +100,7 @@ public class DomainMapperServiceTest {
         input.setDescription("DESCRIPTION");
 
         // WHEN
-        var service = new DomainMapperService();
+        var service = new DomainMapper();
         var result = service.mapToUpdateMeeting(input, meeting);
 
         // THEN

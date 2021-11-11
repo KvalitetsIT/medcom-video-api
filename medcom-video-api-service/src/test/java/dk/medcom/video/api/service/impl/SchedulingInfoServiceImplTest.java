@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContext;
@@ -17,6 +17,9 @@ import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.service.AuditService;
+import dk.medcom.video.api.service.CustomUriValidator;
+import dk.medcom.video.api.service.MeetingUserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,7 +32,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
 
-public class SchedulingInfoServiceTest {
+public class SchedulingInfoServiceImplTest {
     private static final String OVERFLOW_POOL = "overflow";
     private SchedulingInfoRepository schedulingInfoRepository;
     private OrganisationRepository organizationRepository;
@@ -40,7 +43,7 @@ public class SchedulingInfoServiceTest {
     private UUID reservationId;
 
     private MeetingUserService meetingUserService;
-    private SchedulingTemplateService schedulingTemplateService;
+    private SchedulingTemplateServiceImpl schedulingTemplateService;
 
     private static final String NON_POOL_ORG = "nonPoolOrg";
     private static final String POOL_ORG = "poolOrg";
@@ -49,7 +52,7 @@ public class SchedulingInfoServiceTest {
     private static final long SCHEDULING_TEMPLATE_ID_OTHER_ORG = 2L;
 
     private SchedulingTemplate schedulingTemplateIdOne;
-    private SchedulingStatusService schedulingStatusService;
+    private SchedulingStatusServiceImpl schedulingStatusService;
     private OrganisationStrategy organisationStrategy;
     private UserContextService userContextService;
     private OrganisationTreeServiceClient organisationTreeServiceClient;
@@ -96,14 +99,14 @@ public class SchedulingInfoServiceTest {
         Mockito.when(organizationRepository.findById(createOrganisation().getId())).thenReturn(Optional.of(createOrganisation()));
         Mockito.when(organizationRepository.findByOrganisationId(OVERFLOW_POOL)).thenReturn(createOverflowPool());
 
-        schedulingTemplateService = Mockito.mock(SchedulingTemplateService.class);
+        schedulingTemplateService = Mockito.mock(SchedulingTemplateServiceImpl.class);
         Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
 
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findById(SCHEDULING_TEMPLATE_ID)).thenReturn(Optional.of(schedulingTemplateIdOne));
         Mockito.when(schedulingTemplateRepository.findById(SCHEDULING_TEMPLATE_ID_OTHER_ORG)).thenReturn(Optional.of(createSchedulingTemplateOtherOrg()));
 
-        schedulingStatusService = Mockito.mock(SchedulingStatusService.class);
+        schedulingStatusService = Mockito.mock(SchedulingStatusServiceImpl.class);
 
         organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findOrganisationByCode(NON_POOL_ORG)).thenReturn(createNonPoolStrategyOrganisation());
@@ -116,7 +119,7 @@ public class SchedulingInfoServiceTest {
 
     @Test(expected = RessourceNotFoundException.class)
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date());
     }
@@ -134,7 +137,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
 
@@ -163,7 +166,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -195,7 +198,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -228,7 +231,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
 
         CreateSchedulingInfoDto input = new CreateSchedulingInfoDto();
         input.setOrganizationId(POOL_ORG);
@@ -274,7 +277,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
@@ -320,7 +323,7 @@ public class SchedulingInfoServiceTest {
 
         var customUriValidator = Mockito.mock(CustomUriValidator.class);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService(customUriValidator);
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
@@ -370,7 +373,7 @@ public class SchedulingInfoServiceTest {
 
         var customUriValidator = Mockito.mock(CustomUriValidator.class);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService(customUriValidator);
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
@@ -409,7 +412,7 @@ public class SchedulingInfoServiceTest {
 
         var customUriValidator = Mockito.mock(CustomUriValidator.class);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService(customUriValidator);
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
@@ -439,7 +442,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(POOL_ORG);
         input.setSchedulingTemplateId(10L);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -450,7 +453,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(POOL_ORG);
         input.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -469,7 +472,7 @@ public class SchedulingInfoServiceTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
@@ -511,7 +514,7 @@ public class SchedulingInfoServiceTest {
                 Mockito.any(),
                 Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
@@ -565,7 +568,7 @@ public class SchedulingInfoServiceTest {
                 Mockito.any(),
                 Mockito.any())).thenReturn(null);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
@@ -622,7 +625,7 @@ public class SchedulingInfoServiceTest {
                 Mockito.any())).thenReturn(null);
         Mockito.when(organisationTreeServiceClient.getOrganisationTree(NON_POOL_ORG)).thenReturn(organisationTree);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
@@ -650,7 +653,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -661,7 +664,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.createSchedulingInfo(input);
         Mockito.verifyNoMoreInteractions(auditService);
@@ -675,7 +678,7 @@ public class SchedulingInfoServiceTest {
         organisation.setOrganisationId("RH");
         organisation.setPoolSize(10);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 Mockito.eq(organisation.getId()),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
@@ -702,7 +705,7 @@ public class SchedulingInfoServiceTest {
         organisation.setOrganisationId("RH");
         organisation.setPoolSize(10);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 Mockito.eq(organisation.getId()),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
@@ -736,7 +739,7 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.off);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
@@ -759,7 +762,7 @@ public class SchedulingInfoServiceTest {
         meeting.setOrganisation(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.muted);
 
-        SchedulingInfoService schedulingInfoService = createSchedulingInfoService();
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
@@ -913,12 +916,12 @@ public class SchedulingInfoServiceTest {
         return schedulingInfo;
     }
 
-    private SchedulingInfoService createSchedulingInfoService() {
+    private SchedulingInfoServiceImpl createSchedulingInfoService() {
         return createSchedulingInfoService(new CustomUriValidatorImpl());
     }
 
-    private SchedulingInfoService createSchedulingInfoService(CustomUriValidator customUriValidator) {
-        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, customUriValidator);
+    private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator) {
+        return new SchedulingInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, customUriValidator);
     }
 
     private Organisation createNonPoolOrganisation()  {

@@ -8,7 +8,7 @@ import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import dk.medcom.video.api.helper.TestDataHelper;
-import dk.medcom.video.api.service.SchedulingInfoService;
+import dk.medcom.video.api.service.impl.SchedulingInfoServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -35,7 +35,7 @@ public class SchedulingInfoControllerTest {
         input.setSchedulingTemplateId(1L);
         input.setOrganizationId("pool-org");
 
-        SchedulingInfoService schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
+        SchedulingInfoServiceImpl schedulingInfoService = Mockito.mock(SchedulingInfoServiceImpl.class);
         Organisation organisation = TestDataHelper.createOrganisation(true, "pool-org", 1L);
         SchedulingInfo expectedSchedulingInfoResult = TestDataHelper.createSchedulingInfo(organisation);
         expectedSchedulingInfoResult.setProvisionVMRId(null);

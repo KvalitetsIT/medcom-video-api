@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
@@ -12,7 +12,7 @@ import dk.medcom.video.api.service.domain.UpdateMeeting;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-public class DomainMapperService {
+public class DomainMapper {
     public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting) {
         var updateMeeting = new UpdateMeeting();
         updateMeeting.setLabels(updateMeetingDto.getLabels());

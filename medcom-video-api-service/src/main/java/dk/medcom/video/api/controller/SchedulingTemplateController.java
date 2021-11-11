@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import dk.medcom.video.api.service.SchedulingTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
 import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
-import dk.medcom.video.api.service.SchedulingTemplateService;
 
 @RestController
 public class SchedulingTemplateController {
@@ -36,7 +36,7 @@ public class SchedulingTemplateController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingTemplateController.class);
 
 	@Autowired
-	SchedulingTemplateService schedulingTemplateService;
+	private SchedulingTemplateService schedulingTemplateService;
 	
 	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.GET)
 	public CollectionModel <SchedulingTemplateDto> getSchedulingTemplates() throws PermissionDeniedException  {
