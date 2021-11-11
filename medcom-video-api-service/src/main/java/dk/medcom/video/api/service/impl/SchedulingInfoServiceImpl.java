@@ -503,8 +503,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	}
 
-	@Transactional(rollbackFor = Throwable.class)
-	Long getUnusedSchedulingInfoForOrganisation(Organisation organisation, CreateMeetingDto createMeetingDto) { // TODO Refactor so this can be private
+	private Long getUnusedSchedulingInfoForOrganisation(Organisation organisation, CreateMeetingDto createMeetingDto) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
 		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
@@ -582,6 +581,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
@@ -640,6 +640,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo reserveSchedulingInfo(VmrType vmrType,
 												ViewType hostView,
 												ViewType guestView,

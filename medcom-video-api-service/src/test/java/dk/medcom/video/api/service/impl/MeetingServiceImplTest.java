@@ -190,7 +190,6 @@ public class MeetingServiceImplTest {
 		schedulingInfo.setOrganisation(organisation);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(new SchedulingInfo());
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
-		Mockito.when(schedulingInfoService.getUnusedSchedulingInfoForOrganisation(Mockito.eq(meetingUser.getOrganisation()), Mockito.any(CreateMeetingDto.class))).thenReturn(schedulingInfo.getId());
 		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(reservationId)).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
 		Mockito.when(meetingRepository.save((Meeting) argThat(x -> ((Meeting) x).getUuid().equals(meetingUuid)))).thenAnswer(i -> {
