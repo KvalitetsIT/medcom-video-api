@@ -434,7 +434,7 @@ public class SchedulingInfoService {
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION, createSchedulingInfoDto.getSchedulingTemplateId().toString(), createSchedulingInfoDto.getOrganizationId());
 		}
 
-		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
+		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate);
 
 		schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
 		schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
@@ -655,7 +655,7 @@ public class SchedulingInfoService {
 			throw new RessourceNotFoundException("SchedulingInfo", "SchedulingInfo");
 		}
 
-		var schedulingInfo = schedulingInfoRepository.findById(id).get();
+		var schedulingInfo = schedulingInfoRepository.findById(id).orElseThrow(() -> new RuntimeException("Please try again"));
 		schedulingInfo.setReservationId(UUID.randomUUID().toString());
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);

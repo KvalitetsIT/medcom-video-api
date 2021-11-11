@@ -12,7 +12,7 @@ import dk.medcom.video.api.dao.MeetingUserRepository;
 
 @Component
 public class MeetingUserService {
-	private static Logger LOGGER = LoggerFactory.getLogger(MeetingUserService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingUserService.class);
 
 	@Autowired
 	MeetingUserRepository meetingUserRepository;

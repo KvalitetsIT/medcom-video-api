@@ -51,7 +51,7 @@ public class SchedulingInfoController {
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
 
-		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource.toString());
+		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource);
 		return resource;
 	}
 
@@ -73,7 +73,7 @@ public class SchedulingInfoController {
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfo(fromStartTime, toEndTime, provisionStatus)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("Exit of /scheduling-info.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /scheduling-info.get resources: " + resources);
 		return resources;
 	}
 	
@@ -115,7 +115,7 @@ public class SchedulingInfoController {
 		resources.add(selfRelLink);
 
 		LOGGER.info("/scheduling-info-provision.get returns: {}", resources.getContent().stream().map(x -> String.format("uuid: %s, status: %s", x.getUuid(), x.getProvisionStatus())).collect(Collectors.joining(", ")));
-		LOGGER.debug("Exit of /scheduling-info-provision.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /scheduling-info-provision.get resources: " + resources);
 		return resources;
 	}
 
@@ -136,7 +136,7 @@ public class SchedulingInfoController {
 		resources.add(selfRelLink);
 
 		LOGGER.info("/scheduling-info-deprovision.get returns: {}", resources.getContent().stream().map(x -> String.format("uuid: %s, status: %s", x.getUuid(), x.getProvisionStatus())).collect(Collectors.joining(", ")));
-		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /scheduling-info-deprovision.get resources: " + resources);
 		return resources;
 	}
 }

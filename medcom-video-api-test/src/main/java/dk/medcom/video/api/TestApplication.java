@@ -28,11 +28,11 @@ import java.util.function.Consumer;
 @Configuration
 @ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration","dk.medcom.vdx.organisation"})
 public class TestApplication extends SpringBootServletInitializer {
-    private static Logger logger = LoggerFactory.getLogger(TestApplication.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
     private static GenericContainer testOrganisationFrontend;
     private static GenericContainer natsService;
     private static String natsPath;
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
 	public static void main(String[] args) {
         Network n = Network.newNetwork();

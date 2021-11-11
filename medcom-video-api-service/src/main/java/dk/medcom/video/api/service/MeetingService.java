@@ -34,7 +34,7 @@ public class MeetingService {
 	private final MeetingLabelRepository meetingLabelRepository;
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
-	private AuditService auditService;
+	private final AuditService auditService;
 
 	MeetingService(MeetingRepository meetingRepository,
 				   MeetingUserService meetingUserService,

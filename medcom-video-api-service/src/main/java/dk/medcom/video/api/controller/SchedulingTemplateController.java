@@ -53,7 +53,7 @@ public class SchedulingTemplateController {
 		Link selfRelLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplates()).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("Exit of /scheduling-templates.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /scheduling-templates.get resources: " + resources);
 		return resources;
 
 	}

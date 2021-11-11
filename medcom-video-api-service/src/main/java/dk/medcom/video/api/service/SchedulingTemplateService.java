@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class SchedulingTemplateService {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoService.class);
 
 	@Autowired
 	SchedulingTemplateRepository schedulingTemplateRepository;
@@ -258,7 +258,7 @@ public class SchedulingTemplateService {
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingTemplate.setDeletedTime(calendarNow.getTime());
 		
-		schedulingTemplate = schedulingTemplateRepository.save(schedulingTemplate);
+		schedulingTemplateRepository.save(schedulingTemplate);
 		LOGGER.debug("Exit deleteSchedulingTemplate");
 	}
 

@@ -12,32 +12,27 @@ import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingStatus;
 import dk.medcom.video.api.dao.SchedulingStatusRepository;
 
-
 @Component
 public class SchedulingStatusService {
-	
-	private static Logger LOGGER = LoggerFactory.getLogger(SchedulingStatusService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingStatusService.class);
 	
 	@Autowired
 	private SchedulingStatusRepository schedulingStatusRepository;
 
-	public SchedulingStatus createSchedulingStatus(SchedulingInfo schedulingInfo) {
+	public void createSchedulingStatus(SchedulingInfo schedulingInfo) {
 		SchedulingStatus schedulingStatus = new SchedulingStatus();
 		schedulingStatus.setMeeting(schedulingInfo.getMeeting());
 		schedulingStatus.setProvisionStatus(schedulingInfo.getProvisionStatus());
 		schedulingStatus.setProvisionStatusDescription(schedulingInfo.getProvisionStatusDescription());
 		schedulingStatus.setTimeStamp(schedulingInfo.getProvisionTimestamp());
-		schedulingStatus = schedulingStatusRepository.save(schedulingStatus);
-		
-		return schedulingStatus;
+		schedulingStatusRepository.save(schedulingStatus);
 	}
 
-	public void deleteSchedulingStatus(Meeting meeting) throws RessourceNotFoundException, PermissionDeniedException {
+	public void deleteSchedulingStatus(Meeting meeting) {
 		LOGGER.debug("Entry deleteShedulingStatus. meetingid=" + meeting.getId());
 
 		schedulingStatusRepository.deleteByMeetingId(meeting.getId());
 		
 		LOGGER.debug("Exit deleteeSchedulingStatus");
 	}
-
 }

@@ -28,10 +28,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class MeetingController {
-	private static Logger LOGGER = LoggerFactory.getLogger(MeetingController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingController.class);
 
 	@Autowired
-	MeetingService meetingService;
+	private MeetingService meetingService;
 
 	@Value("${short.link.base.url}")
 	private String shortLinkBaseUrl;
@@ -56,7 +56,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetings(fromStartTime, toStartTime)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("Exit of /meetings.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /meetings.get resources: " + resources);
 		return resources;
 	}
 
@@ -75,7 +75,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingByShortId(shortId)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("Exit of /meetings.get resources: " + resources.toString());
+		LOGGER.debug("Exit of /meetings.get resources: " + resources);
 		return resources;
 	}
 
@@ -97,7 +97,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetings(subject)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("end og get meeting by subject: " + resources.toString());
+		LOGGER.debug("end og get meeting by subject: " + resources);
 		return resources;
 	}
 
@@ -119,7 +119,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsOrganizedBy(organizedBy)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("end og get meeting by organized by: " + resources.toString());
+		LOGGER.debug("end og get meeting by organized by: " + resources);
 		return resources;
 	}
 
@@ -141,7 +141,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsUriWithDomain(uriWithDomain)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("end og get meeting by uri with domain: " + resources.toString());
+		LOGGER.debug("end og get meeting by uri with domain: " + resources);
 		return resources;
 	}
 
@@ -169,7 +169,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).genericSearchMeetings(search, fromStartTime, toStartTime)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("End generic search meetings: " + resources.toString());
+		LOGGER.debug("End generic search meetings: " + resources);
 		return resources;
 	}
 
@@ -191,7 +191,7 @@ public class MeetingController {
 		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsByLabel(label)).withSelfRel();
 		resources.add(selfRelLink);
 
-		LOGGER.debug("end og get meeting by label with label: " + resources.toString());
+		LOGGER.debug("end og get meeting by label with label: " + resources);
 		return resources;
 	}
 

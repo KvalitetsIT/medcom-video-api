@@ -1,21 +1,20 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.OrganisationRepository;
 
 
 @Component
 public class OrganisationService {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(OrganisationService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationService.class);
 	
 	@Autowired
 	UserContextService userService;
