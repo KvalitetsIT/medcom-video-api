@@ -19,7 +19,7 @@ INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'compa
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (4, 'kvak', 'company name kvak', 4);
 INSERT INTO organisation (id, organisation_id, name, group_id, sms_sender_name) VALUES (5, 'test-org', 'company name test-org', 5, 'MinAfsender');
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (6, 'another-test-org', 'company name another-test-org', 6);
-INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (7, 'pool-test-org', 'company name another-test-org', 10, 7);
+INSERT INTO organisation (id, organisation_id, name, pool_size, group_id, allow_custom_uri_without_domain) VALUES (7, 'pool-test-org', 'company name another-test-org', 10, 7, 1);
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (8, 'overflow', 'overflow pool org', 10, 8);
 insert into organisation(id, organisation_id, name, pool_size, group_id) values(10, 'parent', 'parent org', 20, 11);
 insert into organisation(id, organisation_id, name, group_id) values(11, 'child', 'child org', 13);

@@ -63,6 +63,9 @@ public class CreateMeetingDto {
 	private Boolean forceEncryption;
 	private Boolean muteAllGuests;
 
+	@Size(max = 100, message = "uriWithoutDomain should have a maximum length of 100 characters.")
+	private String uriWithoutDomain;
+
 	public void setDefaults(){
         if (this.vmrType == null){
             this.vmrType = VmrType.conference;
@@ -293,5 +296,13 @@ public class CreateMeetingDto {
 
 	public void setMuteAllGuests(Boolean muteAllGuests) {
 		this.muteAllGuests = muteAllGuests;
+	}
+
+	public String getUriWithoutDomain() {
+		return uriWithoutDomain;
+	}
+
+	public void setUriWithoutDomain(String uriWithoutDomain) {
+		this.uriWithoutDomain = uriWithoutDomain;
 	}
 }

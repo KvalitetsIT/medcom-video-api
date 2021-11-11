@@ -40,13 +40,14 @@ public class SchedulingInfoService {
 	private final String overflowPoolOrganisationId;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
+	private final CustomUriValidator customUriValidator;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
 
 	@Value("${pool.meeting.minimumAgeSec:60}")
 	private int meetingMinimumAgeSec;
-	
+
 	public SchedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
 								 SchedulingTemplateRepository schedulingTemplateRepository,
 								 SchedulingTemplateService schedulingTemplateService,
@@ -57,7 +58,8 @@ public class SchedulingInfoService {
 								 UserContextService userContextService,
 								@Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
 								 OrganisationTreeServiceClient organisationTreeServiceClient,
-								 AuditService auditService) {
+								 AuditService auditService,
+								 CustomUriValidator customUriValidator) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -68,6 +70,7 @@ public class SchedulingInfoService {
 		this.userContextService = userContextService;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditService;
+		this.customUriValidator = customUriValidator;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -99,7 +102,7 @@ public class SchedulingInfoService {
 	}
 
 	@Transactional(rollbackFor = Throwable.class)
-	public SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException {
+	public SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
 		LOGGER.debug("Entry createSchedulingInfo");
 		SchedulingTemplate schedulingTemplate = null;
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
@@ -132,16 +135,30 @@ public class SchedulingInfoService {
 		
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
 
-		String randomUri = generateUriWithoutDomain(schedulingTemplate);
-		schedulingInfo.setUriWithoutDomain(randomUri);
-		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		if(createMeetingDto.getUriWithoutDomain() != null) {
+			var uri = createMeetingDto.getUriWithoutDomain();
+
+			customUriValidator.validate(uri);
+
+			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(uri);
+			if(schedulingInfoUri != null) {
+				throw new NotValidDataException(NotValidDataErrors.URI_ALREADY_USED);
+			}
+
+			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		}
+		else {
+			var uri = generateUriWithoutDomain(schedulingTemplate);
+			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
+		}
 
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setOrganisation(meeting.getOrganisation());
 
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
-		
-		
+
 		//Overwrite template value with input parameters 
 		if (createMeetingDto.getMaxParticipants() > 0) { 
 			schedulingInfo.setMaxParticipants(createMeetingDto.getMaxParticipants());

@@ -5,10 +5,7 @@ import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
-import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
@@ -119,7 +116,7 @@ public class SchedulingInfoServiceTest {
 
     @Test(expected = RessourceNotFoundException.class)
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date());
     }
@@ -137,7 +134,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
 
@@ -166,7 +163,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -198,7 +195,7 @@ public class SchedulingInfoServiceTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -266,7 +263,7 @@ public class SchedulingInfoServiceTest {
     }
 
     @Test
-    public void testCreateSchedulingInfoMeeting() throws PermissionDeniedException, NotAcceptableException {
+    public void testCreateSchedulingInfoMeeting() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         calendar.add(Calendar.MINUTE, -10);
@@ -307,6 +304,133 @@ public class SchedulingInfoServiceTest {
         assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
         assertFalse(capturedSchedulingInfo.getForceEncryption());
         assertFalse(capturedSchedulingInfo.getMuteAllGuests());
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomain() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        var customUriValidator = Mockito.mock(CustomUriValidator.class);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setUriWithoutDomain("573489");
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+        SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+
+        assertNotNull(schedulingInfo);
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertTrue("Host pin should be greater than 0.", capturedSchedulingInfo.getHostPin() > 0);
+        assertTrue("Guest pin should be greater than 0.", capturedSchedulingInfo.getGuestPin() > 0);
+        assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+
+        assertEquals(capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
+        assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
+        assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
+        assertEquals(VmrQuality.full_hd, capturedSchedulingInfo.getVmrQuality());
+        assertTrue(capturedSchedulingInfo.getEnableOverlayText());
+        assertTrue(capturedSchedulingInfo.getGuestsCanPresent());
+        assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
+        assertFalse(capturedSchedulingInfo.getForceEncryption());
+        assertFalse(capturedSchedulingInfo.getMuteAllGuests());
+
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomainAlreadyUsed() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        var customUriValidator = Mockito.mock(CustomUriValidator.class);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setUriWithoutDomain("573489");
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+
+        Mockito.when(schedulingInfoRepository.findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain())).thenReturn(new SchedulingInfo());
+
+        try {
+            schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+            fail();
+        }
+        catch(NotValidDataException e) {
+            assertEquals(90, e.getErrorCode());
+        }
+
+        Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
+
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomainValidationError() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        var customUriValidator = Mockito.mock(CustomUriValidator.class);
+
+        SchedulingInfoService schedulingInfoService = createSchedulingInfoService(customUriValidator);
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setUriWithoutDomain("573 489");
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+
+        Mockito.doThrow(new NotValidDataException(NotValidDataErrors.URI_IS_INVALID)).when(customUriValidator).validate(createMeetingDto.getUriWithoutDomain());
+
+        try {
+            schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+            fail();
+        }
+        catch(NotValidDataException e) {
+            assertEquals(100, e.getErrorCode());
+        }
+
+        Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
+        Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
     @Test(expected = NotValidDataException.class)
@@ -526,7 +650,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -537,7 +661,7 @@ public class SchedulingInfoServiceTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        SchedulingInfoService schedulingInfoService = new SchedulingInfoService(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
         schedulingInfoService.createSchedulingInfo(input);
         Mockito.verifyNoMoreInteractions(auditService);
@@ -790,7 +914,11 @@ public class SchedulingInfoServiceTest {
     }
 
     private SchedulingInfoService createSchedulingInfoService() {
-        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService);
+        return createSchedulingInfoService(new CustomUriValidatorImpl());
+    }
+
+    private SchedulingInfoService createSchedulingInfoService(CustomUriValidator customUriValidator) {
+        return new SchedulingInfoService(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, customUriValidator);
     }
 
     private Organisation createNonPoolOrganisation()  {

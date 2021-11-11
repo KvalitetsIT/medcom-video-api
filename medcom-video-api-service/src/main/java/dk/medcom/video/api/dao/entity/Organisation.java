@@ -19,6 +19,7 @@ public class Organisation {
 	private Integer poolSize;
 	private long groupId;
 	private String smsSenderName;
+	private boolean allowCustomUriWithoutDomain;
 
 	public Long getId() {
 		return id;
@@ -72,4 +73,12 @@ public class Organisation {
 	public void setSmsSenderName(String smsSenderName) {
 		this.smsSenderName = smsSenderName;
 	}
+
+    public boolean getAllowCustomUriWithoutDomain() {
+        return allowCustomUriWithoutDomain;
+    }
+
+    public void setAllowCustomUriWithoutDomain(boolean allowCustomUriWithoutDomain) {
+        this.allowCustomUriWithoutDomain = allowCustomUriWithoutDomain;
+    }
 }

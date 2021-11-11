@@ -1086,6 +1086,11 @@ components:
           example: false
           default: false
           description: controls whether to mute guests when they first join the conference
+        uriWithoutDomain:
+          type: string
+          example: 574893
+          maxLength: 100
+          description: Uri without domain. Only allowed if organisation configured to support it.
     update-meeting:
       type: object
       required:
@@ -1795,3 +1800,13 @@ components:
           errorText: 'Scheduling template yyy does not belong to organisation xxx.'
         - errorCode: 50
           errorText: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.'
+        - errorCode: 60,
+          errorText: 'ReservationId not owned by organisation or not found.'
+        - errorCode: 70
+          errorText: 'Field can not be set to null'
+        - errorCode: 80
+          errorText: 'Organisation does not allow setting custom meeting address.'
+        - errorCode: 90
+          errorText: 'Supplied URI already used'
+        - errorCode: 100
+          errorText: 'Supplied URI contains invalid characters.'

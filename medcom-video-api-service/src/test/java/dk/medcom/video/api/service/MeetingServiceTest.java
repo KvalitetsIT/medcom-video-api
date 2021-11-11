@@ -27,8 +27,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 
@@ -589,6 +588,69 @@ public class MeetingServiceTest {
 		assertNotNull(savedMeeting);
 		assertNotNull(savedMeeting.getShortId());
 		assertEquals("This is a description", savedMeeting.getDescription());
+	}
+
+	@Test
+	public void testCreateMeetingCustomUriWithoutDomain() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+
+		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+
+		var meetingCaptor = ArgumentCaptor.forClass(Meeting.class);
+		Mockito.verify(meetingRepository).save(meetingCaptor.capture());
+		var savedMeeting = meetingCaptor.getValue();
+		assertNotNull(savedMeeting);
+		assertNotNull(savedMeeting.getShortId());
+		assertEquals("This is a description", savedMeeting.getDescription());
+	}
+
+	@Test
+	public void testCreateMeetingCustomUriWithoutDomainNotAllowed() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+		input.setUriWithoutDomain("473829");
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		try {
+			meetingService.createMeeting(input);
+			fail();
+		}
+		catch(NotValidDataException e) {
+			assertEquals(80, e.getErrorCode());
+		}
 	}
 
 	@Test

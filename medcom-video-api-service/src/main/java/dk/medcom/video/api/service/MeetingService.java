@@ -157,6 +157,17 @@ public class MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
+		// Custom URI
+		if(createMeetingDto.getUriWithoutDomain() != null) {
+			if(organisationService.getUserOrganisation().getAllowCustomUriWithoutDomain()) {
+				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+				return;
+			}
+			else {
+				throw new NotValidDataException(NotValidDataErrors.CUSTOM_MEETING_ADDRESS_NOT_ALLOWED);
+			}
+		}
+
 		if(createMeetingDto.getSchedulingInfoReservationId() != null) {
 			attachReservedSchedulingInfo(meeting, createMeetingDto);
 			return;

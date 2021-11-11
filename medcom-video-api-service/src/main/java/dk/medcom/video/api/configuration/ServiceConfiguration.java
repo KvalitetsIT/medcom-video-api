@@ -9,6 +9,8 @@ import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.AuditService;
+import dk.medcom.video.api.service.CustomUriValidator;
+import dk.medcom.video.api.service.CustomUriValidatorImpl;
 import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import io.micrometer.core.instrument.Clock;
@@ -44,6 +46,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
 	} 	
+
+	@Bean
+	public CustomUriValidator customUriValidator() {
+		return new CustomUriValidatorImpl();
+	}
 
 	@Bean
 	public AuditService auditService(AuditClient auditClient) {

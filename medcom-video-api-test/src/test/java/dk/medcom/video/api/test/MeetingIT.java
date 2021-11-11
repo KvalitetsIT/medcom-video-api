@@ -8,6 +8,7 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.api.VideoMeetingsApi;
+import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.CreateMeeting;
 import io.swagger.client.model.Meeting;
 import io.swagger.client.model.PatchMeeting;
@@ -48,6 +49,7 @@ import static org.junit.Assert.*;
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	private VideoMeetingsApi videoMeetings;
 	private OrganisationApi organisationApi;
+	private VideoSchedulingInformationApi schedulingInfoApi;
 
 	@Before
 	public void setupApiClient() {
@@ -56,6 +58,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		videoMeetings = new VideoMeetingsApi(apiClient);
+
+		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
 
 		var organisationApiClient = new ApiClient()
 				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
@@ -139,12 +143,18 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setLabels(new ArrayList<String>());
 		createMeeting.getLabels().add("Label One");
 		createMeeting.getLabels().add("Label Two");
+		createMeeting.setUriWithoutDomain("12345");
 
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(createdMeeting);
 		assertEquals(createMeeting.getExternalId(), createdMeeting.getExternalId());
 		assertEquals(2, createdMeeting.getLabels().size());
 		assertTrue(createMeeting.getLabels().containsAll(createdMeeting.getLabels()));
+
+		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
+		assertNotNull(schedulingInfo);
+		assertEquals(createMeeting.getUriWithoutDomain(), schedulingInfo.getUriWithoutDomain());
+		assertTrue(schedulingInfo.getUriWithDomain().startsWith(createMeeting.getUriWithoutDomain()));
 
 		var updateMeeting = new UpdateMeeting();
 		updateMeeting.setSubject("SUBJECT");

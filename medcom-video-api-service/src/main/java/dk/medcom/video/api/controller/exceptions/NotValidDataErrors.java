@@ -13,8 +13,10 @@ public enum NotValidDataErrors {
     SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION(41, "Scheduling template %s does not belong to organisation %s."),
     BOTH_FROM_AND_TO_START_TIME_MUST_BE_PROVIDED_OR_NONE(50, "Either both from-start-time and to-start-time must be provided or none of them must be provided."),
     INVALID_RESERVATION_ID(60, "ReservationId not owned by organisation or not found."),
-    NULL_VALUE(70, "Field can not be set to null")
-    ;
+    NULL_VALUE(70, "Field can not be set to null"),
+    CUSTOM_MEETING_ADDRESS_NOT_ALLOWED(80, "Organisation does not allow setting custom meeting address."),
+    URI_ALREADY_USED(90, "Supplied URI already used"),
+    URI_IS_INVALID(100, "Supplied URI contains invalid characters." );
 
     private final int errorCode;
     private final String errorText;
