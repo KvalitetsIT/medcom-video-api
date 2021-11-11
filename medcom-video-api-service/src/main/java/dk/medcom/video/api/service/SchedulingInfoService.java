@@ -142,6 +142,7 @@ public class SchedulingInfoService {
 
 			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(uri);
 			if(schedulingInfoUri != null) {
+				LOGGER.info("uriWithoutDomain already used. Uri: {}", uri);
 				throw new NotValidDataException(NotValidDataErrors.URI_ALREADY_USED);
 			}
 

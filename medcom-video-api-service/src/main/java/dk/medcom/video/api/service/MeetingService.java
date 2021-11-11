@@ -160,10 +160,15 @@ public class MeetingService {
 		// Custom URI
 		if(createMeetingDto.getUriWithoutDomain() != null) {
 			if(organisationService.getUserOrganisation().getAllowCustomUriWithoutDomain()) {
+				LOGGER.info("Using custom uriWithoutDomain for meeting in organisation {}", organisationService.getUserOrganisation().getOrganisationId());
 				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 				return;
 			}
 			else {
+				LOGGER.info("Organisation not configured to allow custom uri without domain. Organisation: {}, uriWithoutDomain: {}.",
+							organisationService.getUserOrganisation().getOrganisationId(),
+							createMeetingDto.getUriWithoutDomain()
+				);
 				throw new NotValidDataException(NotValidDataErrors.CUSTOM_MEETING_ADDRESS_NOT_ALLOWED);
 			}
 		}
