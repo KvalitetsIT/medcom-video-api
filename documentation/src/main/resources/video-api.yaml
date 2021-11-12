@@ -62,7 +62,10 @@ info:
     <Li> 1.5.0 <Ul>
     <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info, meetings and scheduling-info-reserve </UL>
     </Ul>
-  version: "1.2.0"
+    <Li> 1.6.0 <Ul>
+    <Li> Added uriWithoutDomain to create meeting. </UL>
+    </Ul>
+  version: "1.6.0"
   contact:
     email: development@kvalitetitsit.dk
 tags:
