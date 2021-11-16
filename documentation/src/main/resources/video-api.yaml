@@ -65,7 +65,10 @@ info:
     <Li> 1.6.0 <Ul>
     <Li> Added uriWithoutDomain to create meeting. </UL>
     </Ul>
-  version: "1.6.0"
+    <Li> 1.6.1 <Ul>
+    <Li> Updated error text for code 100. </UL>
+    </Ul>
+  version: "1.6.1"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -1812,4 +1815,4 @@ components:
         - errorCode: 90
           errorText: 'Supplied URI already used'
         - errorCode: 100
-          errorText: 'Supplied URI contains invalid characters.'
+          errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'

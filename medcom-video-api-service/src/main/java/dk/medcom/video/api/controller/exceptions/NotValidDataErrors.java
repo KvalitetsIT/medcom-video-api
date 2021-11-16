@@ -16,7 +16,7 @@ public enum NotValidDataErrors {
     NULL_VALUE(70, "Field can not be set to null"),
     CUSTOM_MEETING_ADDRESS_NOT_ALLOWED(80, "Organisation does not allow setting custom meeting address."),
     URI_ALREADY_USED(90, "Supplied URI already used"),
-    URI_IS_INVALID(100, "Supplied URI contains invalid characters." );
+    URI_IS_INVALID(100, "Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9]." );
 
     private final int errorCode;
     private final String errorText;
