@@ -411,6 +411,53 @@ public class MeetingServiceImpl implements MeetingService {
 	}
 
 	@Override
+	public Meeting getMeetingsByUriWithDomainSingle(String uriWithDomain) throws PermissionDeniedException, RessourceNotFoundException {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganizedBy");
+			var result =  meetingRepository.findOneByUriWithDomainAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), uriWithDomain);
+
+			if(result == null) {
+				throw new RessourceNotFoundException("meeting", "uriWithDomain");
+			}
+
+			return result;
+		} else {
+			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganisation");
+			var result = meetingRepository.findOneByUriWithDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithDomain);
+
+			if(result == null) {
+				throw new RessourceNotFoundException("meeting", "uriWithDomain");
+			}
+
+			return result;
+		}
+	}
+
+	@Override
+	public Meeting getMeetingsByUriWithoutDomain(String uriWithoutDomain) throws PermissionDeniedException, RessourceNotFoundException {
+		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+			LOGGER.debug("Finding meetings using findByUriWithoutDomainAndOrganizedBy");
+			var result =  meetingRepository.findOneByUriWithoutDomainAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), uriWithoutDomain);
+
+			if(result == null) {
+				throw new RessourceNotFoundException("meeting", "uriWithDomain");
+			}
+
+			return result;
+
+		} else {
+			LOGGER.debug("Finding meetings using findByUriWithoutDomainAndOrganisation");
+			var result =  meetingRepository.findOneByUriWithoutDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithoutDomain);
+
+			if(result == null) {
+				throw new RessourceNotFoundException("meeting", "uriWithDomain");
+			}
+
+			return result;
+		}
+	}
+
+	@Override
 	public List<Meeting> getMeetingsByLabel(String label) throws PermissionDeniedException {
 		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
 			LOGGER.debug("Finding meetings using findByLabelAndOrganizedBy");

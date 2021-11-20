@@ -27,6 +27,10 @@ public interface MeetingService {
 
     List<Meeting> searchMeetings(String search, Date fromStartTime, Date toStartTime) throws PermissionDeniedException;
 
+    Meeting getMeetingsByUriWithDomainSingle(String uriWithDomain) throws PermissionDeniedException, RessourceNotFoundException;
+
+    Meeting getMeetingsByUriWithoutDomain(String uriWithoutDomain) throws PermissionDeniedException, RessourceNotFoundException;
+
     List<Meeting> getMeetingsByLabel(String label) throws PermissionDeniedException;
 
     Meeting getMeetingByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException;

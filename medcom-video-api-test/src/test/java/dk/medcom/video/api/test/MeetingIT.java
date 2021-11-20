@@ -138,6 +138,29 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testUriWithDomain() throws ApiException {
+		var createMeeting = createMeeting(UUID.randomUUID().toString());
+		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
+		// 1236@test.dk 1238
+		var result = videoMeetings.meetingsFindByUriWithDomainGet(schedulingInfo.getUriWithDomain());
+
+		assertNotNull(result);
+		assertEquals(createdMeeting.getUuid(), result.getUuid());
+	}
+
+	@Test
+	public void testUriWithoutDomain() throws ApiException {
+		var createMeeting = createMeeting(UUID.randomUUID().toString());
+		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
+		var result = videoMeetings.meetingsFindByUriWithoutDomainGet(schedulingInfo.getUriWithoutDomain());
+
+		assertNotNull(result);
+		assertEquals(createdMeeting.getUuid(), result.getUuid());
+	}
+
+	@Test
 	public void testCanCreateUpdateAndReadMeeting() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
 		createMeeting.setLabels(new ArrayList<String>());

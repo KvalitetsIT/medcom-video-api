@@ -68,7 +68,10 @@ info:
     <Li> 1.6.1 <Ul>
     <Li> Updated error text for code 100. </UL>
     </Ul>
-  version: "1.6.1"
+    <Li> 1.6.2 <Ul>
+    <Li> Search by uri with domain and uri without domain.</UL>
+    </Ul>
+  version: "1.6.2"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -98,6 +101,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/info'
+
+  /meetings/findByUriWithDomain:
+    get:
+      tags:
+        - Video Meetings
+      summary: find meeting by uri with domain.
+      description: find meeting by uri with domain.
+      parameters:
+        - name: uri
+          in: query
+          description: uri with domain
+          required: true
+          schema:
+            type: string
+          example: '123456@video.domain'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+
+  /meetings/findByUriWithoutDomain:
+    get:
+      tags:
+        - Video Meetings
+      summary: find meeting by uri without domain.
+      description: find meeting by uri without domain.
+      parameters:
+        - name: uri
+          in: query
+          description: uri without domain
+          required: true
+          schema:
+            type: string
+          example: '12345'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+
   /meetings:
     get:
       tags:

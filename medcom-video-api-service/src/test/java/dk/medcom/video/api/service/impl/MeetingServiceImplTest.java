@@ -970,6 +970,61 @@ public class MeetingServiceImplTest {
 		Mockito.verify(meetingRepository).findByUriWithDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
 	}
 
+	@Test
+	public void testGetMeetingByUriWithoutDomainUser() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
+		Mockito.when(meetingRepository.findOneByUriWithoutDomainAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+
+		meetingService.getMeetingsByUriWithoutDomain("uriWithDomain");
+
+		Mockito.verify(meetingRepository).findOneByUriWithoutDomainAndOrganizedBy(Mockito.any(MeetingUser.class), Mockito.anyString());
+	}
+
+	@Test
+	public void testGetMeetingByUriWithoutDomainAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
+		Mockito.when(meetingRepository.findOneByUriWithoutDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+
+		meetingService.getMeetingsByUriWithoutDomain("uriWithDomain");
+
+		Mockito.verify(meetingRepository).findOneByUriWithoutDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
+	}
+
+	@Test
+	public void testGetMeetingByUriWithDomainUserSingle() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
+		Mockito.when(meetingRepository.findOneByUriWithDomainAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+
+		meetingService.getMeetingsByUriWithDomainSingle("uriWithDomain");
+
+		Mockito.verify(meetingRepository).findOneByUriWithDomainAndOrganizedBy(Mockito.any(MeetingUser.class), Mockito.anyString());
+	}
+
+	@Test
+	public void testGetMeetingByUriWithDomainAdminSingle() throws RessourceNotFoundException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
+		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
+		Mockito.when(meetingRepository.findOneByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+
+		meetingService.getMeetingsByUriWithDomainSingle("uriWithDomain");
+
+		Mockito.verify(meetingRepository).findOneByUriWithDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
+	}
 
 	@Test
 	public void testGetMeetingByLabelUser() throws RessourceNotFoundException, PermissionDeniedException {

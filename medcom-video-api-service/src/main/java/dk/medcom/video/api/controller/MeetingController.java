@@ -145,6 +145,44 @@ public class MeetingController {
 		return resources;
 	}
 
+	@RequestMapping(value = "/meetings/findByUriWithDomain", method = RequestMethod.GET, params = "uri")
+	public EntityModel <MeetingDto> getMeetingsFindByUriWithOutDomainUriWithDomain(@RequestParam(value = "uri") String uriWithDomain) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by uri with domain: " + uriWithDomain);
+
+		var meetings = meetingService.getMeetingsByUriWithDomainSingle(uriWithDomain);
+		MeetingDto meetingDto = new MeetingDto(meetings, shortLinkBaseUrl);
+
+		Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meetings.getUuid())).withRel("scheduling-info");
+		meetingDto.add(schedulingInfoLink);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsUriWithDomain(uriWithDomain)).withSelfRel();
+
+		var resources = new EntityModel<>(meetingDto);
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by uri with domain: " + resources);
+		return resources;
+	}
+
+	@RequestMapping(value = "/meetings/findByUriWithoutDomain", method = RequestMethod.GET, params = "uri")
+	public EntityModel<MeetingDto> getMeetingsUriWithoutDomain(@RequestParam(value = "uri") String uriWithoutDomain) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Getting meetings by uri without domain: " + uriWithoutDomain);
+
+		var meetings = meetingService.getMeetingsByUriWithoutDomain(uriWithoutDomain);
+		MeetingDto meetingDto = new MeetingDto(meetings, shortLinkBaseUrl);
+
+		Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meetings.getUuid())).withRel("scheduling-info");
+		meetingDto.add(schedulingInfoLink);
+
+		Link selfRelLink = linkTo(methodOn(MeetingController.class).getMeetingsUriWithDomain(uriWithoutDomain)).withSelfRel();
+
+		var resources = new EntityModel<>(meetingDto);
+		resources.add(selfRelLink);
+
+		LOGGER.debug("end og get meeting by uri without domain: " + resources);
+		return resources;
+	}
+
 	@RequestMapping(value = "/meetings", method = RequestMethod.GET, params="search")
 	public CollectionModel<MeetingDto> genericSearchMeetings(@RequestParam(name ="search") String search,
 													   @RequestParam(name="from-start-time", required = false) @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ") Date fromStartTime,
@@ -206,6 +244,7 @@ public class MeetingController {
 		LOGGER.debug("Exit of /meetings.get resource: " + resource);
 		return resource;
 	}
+
 	@APISecurityAnnotation({UserRole.MEETING_PLANNER, UserRole.PROVISIONER_USER, UserRole.ADMIN, UserRole.USER})
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
 	public EntityModel <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException {

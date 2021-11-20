@@ -31,6 +31,18 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organizedBy = ?1")
 	List<Meeting> findByUriWithDomainAndOrganizedBy(MeetingUser organizedBy, String uriWithDomain);
 
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organisation = ?1")
+	Meeting findOneByUriWithDomainAndOrganisation(Organisation userOrganisation, String uriWithDomain);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?2 and m.organizedBy = ?1")
+	Meeting findOneByUriWithDomainAndOrganizedBy(MeetingUser organizedBy, String uriWithDomain);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithoutDomain = ?2 and m.organisation = ?1")
+	Meeting findOneByUriWithoutDomainAndOrganisation(Organisation userOrganisation, String uriWithDomain);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithoutDomain = ?2 and m.organizedBy = ?1")
+	Meeting findOneByUriWithoutDomainAndOrganizedBy(MeetingUser organizedBy, String uriWithDomain);
+
 	@Query("select l.meeting from MeetingLabel l inner join l.meeting m where l.label = ?2 and m.organisation = ?1")
     List<Meeting> findByLabelAndOrganisation(Organisation userOrganisation, String label);
 
