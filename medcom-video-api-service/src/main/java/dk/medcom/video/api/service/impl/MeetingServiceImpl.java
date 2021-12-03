@@ -279,8 +279,10 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public Meeting updateMeeting(String uuid, UpdateMeetingDto updateMeetingDto) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		Meeting meeting = getMeetingByUuid(uuid);
+		var schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(meeting.getUuid());
 
-		return updateMeeting(uuid, new DomainMapper().mapToUpdateMeeting(updateMeetingDto, meeting), meeting);
+		var domainMapper = new DomainMapper();
+		return updateMeeting(uuid, domainMapper.mapToUpdateMeeting(updateMeetingDto, meeting, schedulingInfo), meeting);
 	}
 
 	private Meeting updateMeeting(String uuid, UpdateMeeting updateMeetingDto, Meeting meeting) throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
@@ -335,8 +337,11 @@ public class MeetingServiceImpl implements MeetingService {
 		meetingLabelRepository.saveAll(meetingLabels);
 
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
-			LOGGER.debug("Start time is allowed to be updated, because booking has status AWAITS_PROVISION");
-			schedulingInfoService.updateSchedulingInfo(uuid, meeting.getStartTime());
+			LOGGER.debug("Start time and pin codes is allowed to be updated, because booking has status AWAITS_PROVISION");
+			schedulingInfoService.updateSchedulingInfo(uuid,
+					meeting.getStartTime(),
+					updateMeetingDto.getHostPin() != null ? updateMeetingDto.getHostPin().longValue() : null,
+					updateMeetingDto.getGuestPin() != null ? updateMeetingDto.getGuestPin().longValue() : null);
 		}
 
 		auditService.auditMeeting(meeting, "update");
@@ -536,7 +541,9 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
     public Meeting patchMeeting(UUID uuid, PatchMeetingDto patchMeetingDto) throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException, NotAcceptableException {
 		var	 meeting = getMeetingByUuid(uuid.toString());
+		var schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(meeting.getUuid());
 
-		return updateMeeting(uuid.toString(), new DomainMapper().mapToUpdateMeeting(patchMeetingDto, meeting), meeting);
+		var domainMapper = new DomainMapper();
+		return updateMeeting(uuid.toString(), domainMapper.mapToUpdateMeeting(patchMeetingDto, meeting, schedulingInfo), meeting);
     }
 }

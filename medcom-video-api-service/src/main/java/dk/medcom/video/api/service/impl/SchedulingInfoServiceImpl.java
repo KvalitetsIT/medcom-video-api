@@ -351,7 +351,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	//used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
-	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime) throws RessourceNotFoundException, PermissionDeniedException{
+	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException{
 		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -367,7 +367,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
+		schedulingInfo.setHostPin(hostPin);
+		schedulingInfo.setGuestPin(guestPin);
+
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
 		LOGGER.debug("Entry updateSchedulingInfo");
@@ -396,14 +400,15 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
 			portalPin = schedulingInfo.getGuestPin().toString();
 			LOGGER.debug("Portal pin used is guest");
-		} else {
-				if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
-					portalPin = schedulingInfo.getHostPin().toString();
-					LOGGER.debug("Portal pin used is host");
-				} else {
-					portalPin = "";
-					LOGGER.debug("Portal pin used is empty");
-				}
+		}
+		else {
+			if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
+				portalPin = schedulingInfo.getHostPin().toString();
+				LOGGER.debug("Portal pin used is host");
+			} else {
+				portalPin = "";
+				LOGGER.debug("Portal pin used is empty");
+			}
 		}
 
 		String microphone = null;

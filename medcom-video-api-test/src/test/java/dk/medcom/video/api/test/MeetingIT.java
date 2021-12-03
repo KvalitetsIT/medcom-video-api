@@ -168,8 +168,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.getLabels().add("Label One");
 		createMeeting.getLabels().add("Label Two");
 		createMeeting.setUriWithoutDomain("12345");
-		createMeeting.setGuestPin(BigDecimal.valueOf(4321));
-		createMeeting.setHostPin(BigDecimal.valueOf(1234));
+		createMeeting.setGuestPin(4321);
+		createMeeting.setHostPin(1234);
 
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(createdMeeting);
@@ -373,11 +373,14 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 		assertNotNull(createResponse.getUuid());
 
+		var originalSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
+
 		// When
 		var request = new PatchMeeting();
 		request.setDescription("SOME DESCRIPTION");
 		request.setGuestPinRequired(true);
 		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
+		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
 		// Then
 		assertNotNull(response);
@@ -389,6 +392,24 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
 		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
 		assertEquals(true, getResponse.isGuestPinRequired());
+		assertEquals(originalSchedulingInfo.getHostPin(), updatedSchedulingInfo.getHostPin());
+		assertEquals(originalSchedulingInfo.getGuestPin(), updatedSchedulingInfo.getGuestPin());
+
+		// When - update pin codes part
+		request = new PatchMeeting();
+		request.setHostPin(4321);
+		request.setGuestPin(1234);
+		response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
+
+		// Then
+		assertNotNull(response);
+
+		getResponse = videoMeetings.meetingsUuidGet(UUID.fromString(createResponse.getUuid()));
+		updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
+
+		assertNotNull(getResponse);
+		assertEquals(request.getHostPin(), updatedSchedulingInfo.getHostPin());
+		assertEquals(request.getGuestPin(), updatedSchedulingInfo.getGuestPin());
 	}
 
 	@Test

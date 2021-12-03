@@ -6,14 +6,16 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataErrors;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.domain.GuestMicrophone;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class DomainMapper {
-    public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting) {
+    public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting, SchedulingInfo schedulingInfo) {
         var updateMeeting = new UpdateMeeting();
         updateMeeting.setLabels(updateMeetingDto.getLabels());
         updateMeeting.setSubject(updateMeetingDto.getSubject());
@@ -26,11 +28,17 @@ public class DomainMapper {
             updateMeeting.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         }
         updateMeeting.setGuestPinRequired(meeting.getGuestPinRequired());
+        if(schedulingInfo.getGuestPin() != null) {
+            updateMeeting.setGuestPin(new BigDecimal(schedulingInfo.getGuestPin()));
+        }
+        if(schedulingInfo.getHostPin() != null) {
+            updateMeeting.setHostPin(new BigDecimal(schedulingInfo.getHostPin()));
+        }
 
         return updateMeeting;
     }
 
-    public UpdateMeeting mapToUpdateMeeting(PatchMeetingDto patchMeetingDto, Meeting meeting) throws NotValidDataException {
+    public UpdateMeeting mapToUpdateMeeting(PatchMeetingDto patchMeetingDto, Meeting meeting, SchedulingInfo schedulingInfo) throws NotValidDataException {
         // Map data from database entity to domain model.
         var updateMeetingDto = new UpdateMeeting();
         updateMeetingDto.setOrganizedByEmail(meeting.getOrganizedByUser().getEmail());
@@ -42,6 +50,12 @@ public class DomainMapper {
         updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList()));
         updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
+        if(schedulingInfo.getHostPin() != null) {
+            updateMeetingDto.setHostPin(new BigDecimal(schedulingInfo.getHostPin()));
+        }
+        if(schedulingInfo.getGuestPin() != null) {
+            updateMeetingDto.setGuestPin(new BigDecimal(schedulingInfo.getGuestPin()));
+        }
         if(meeting.getGuestMicrophone() != null) {
             updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         }
@@ -88,7 +102,23 @@ public class DomainMapper {
 		if(patchMeetingDto.isGuestPinRequiredSet()) {
             updateMeetingDto.setGuestPinRequired(patchMeetingDto.isGuestPinRequired());
 		}
+        if(patchMeetingDto.isGuestPinSet()) {
+            if(patchMeetingDto.getGuestPin() == null) {
+                updateMeetingDto.setGuestPin(null);
+            }
+            else {
+                updateMeetingDto.setGuestPin(new BigDecimal(patchMeetingDto.getGuestPin()));
+            }
+        }
+        if(patchMeetingDto.isHostPinSet()) {
+            if(patchMeetingDto.getHostPin() == null) {
+                updateMeetingDto.setHostPin(null);
+            }
+            else {
+                updateMeetingDto.setHostPin(new BigDecimal(patchMeetingDto.getHostPin()));
+            }
+        }
 
-		return updateMeetingDto;
+        return updateMeetingDto;
     }
 }

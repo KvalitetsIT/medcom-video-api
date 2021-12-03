@@ -181,7 +181,11 @@ public class MeetingServiceImplTest {
 		Mockito.when(organisationService.getPoolSizeForUserOrganisation()).thenReturn(userOrganistionPoolSize);
 
 		Meeting meetingInService = getMeetingWithDefaultValues(meetingUser, meetingUuid);
+		SchedulingInfo schedulingInfoInService = new SchedulingInfo();
+		schedulingInfoInService.setGuestPin(4321L);
+		schedulingInfoInService.setHostPin(1234L);
 		Mockito.when(meetingRepository.findOneByUuid(Mockito.anyString())).thenReturn(meetingInService);
+		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(meetingInService.getUuid())).thenReturn(schedulingInfoInService);
 		schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setId(100L);
 		schedulingInfo.setProvisionStatus(provisionStatus);
@@ -271,6 +275,8 @@ public class MeetingServiceImplTest {
 		patchMeetingDto.setDescription("NEW DESCRIPTION");
 		patchMeetingDto.setLabels(null);
 		patchMeetingDto.setGuestMicrophone(GuestMicrophone.muted);
+		patchMeetingDto.setHostPin(9876);
+		patchMeetingDto.setGuestPin(7890);
 		var result = meetingService.patchMeeting(uuid, patchMeetingDto);
 
 		// Then

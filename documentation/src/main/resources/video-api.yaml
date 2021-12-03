@@ -71,7 +71,10 @@ info:
     <Li> 1.6.2 <Ul>
     <Li> Search by uri with domain and uri without domain.</UL>
     </Ul>
-  version: "1.6.2"
+    <Li> 1.6.3 <Ul>
+    <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.</UL>
+    </Ul>
+  version: "1.6.3"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -1158,12 +1161,12 @@ components:
           maxLength: 100
           description: Uri without domain. Only allowed if organisation configured to support it.
         guestPin:
-          type: number
+          type: integer
           format: int32
           minimum: 10000
           maximum: 999999999
         hostPin:
-          type: number
+          type: integer
           format: int32
           minimum: 10000
           maximum: 999999999
@@ -1248,6 +1251,16 @@ components:
           type: boolean
           example: false
           description: When true shortlink will ask for pin
+        guestPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+        hostPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
 
     scheduling-info:
       type: object

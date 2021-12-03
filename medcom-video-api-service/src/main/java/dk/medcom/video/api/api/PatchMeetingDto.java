@@ -50,6 +50,15 @@ public class PatchMeetingDto {
     @JsonIgnore
     private boolean guestPinRequiredSet;
 
+    private Integer hostPin;
+    @JsonIgnore
+    private boolean hostPinSet;
+
+    private Integer guestPin;
+    @JsonIgnore
+    private boolean guestPinSet;
+
+
     public String getSubject() {
         return subject;
     }
@@ -165,5 +174,31 @@ public class PatchMeetingDto {
     public void setGuestPinRequired(boolean guestPinRequired) {
         this.guestPinRequired = guestPinRequired;
         this.guestPinRequiredSet = true;
+    }
+
+    public Integer getGuestPin() {
+        return guestPin;
+    }
+
+    public void setGuestPin(Integer guestPin) {
+        this.guestPin = guestPin;
+        this.guestPinSet = true;
+    }
+
+    public Integer getHostPin() {
+        return hostPin;
+    }
+
+    public void setHostPin(Integer hostPin) {
+        this.hostPin = hostPin;
+        this.hostPinSet = true;
+    }
+
+    public boolean isHostPinSet() {
+        return hostPinSet;
+    }
+
+    public boolean isGuestPinSet() {
+        return guestPinSet;
     }
 }

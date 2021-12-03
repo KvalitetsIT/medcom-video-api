@@ -121,11 +121,46 @@ public class SchedulingInfoServiceImplTest {
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
-        schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date());
+        schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L);
     }
 
     @Test
     public void testUpdateSchedulingInfo() throws RessourceNotFoundException, PermissionDeniedException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
+        Date startTime = calendar.getTime();
+        calendar.add(Calendar.MINUTE, -10);
+        Date calculatedStartTime = calendar.getTime();
+
+        var hostPin = 1234L;
+        var guestPin = 4321L;
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
+
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
+
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
+
+        assertNotNull(schedulingInfo);
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
+        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
+        assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
+
+        Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
+    }
+
+    @Test
+    public void testUpdateSchedulingInfoNullPin() throws RessourceNotFoundException, PermissionDeniedException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         Date startTime = calendar.getTime();
@@ -139,7 +174,7 @@ public class SchedulingInfoServiceImplTest {
 
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl());
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -150,6 +185,8 @@ public class SchedulingInfoServiceImplTest {
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
         assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertNull(capturedSchedulingInfo.getHostPin());
+        assertNull(capturedSchedulingInfo.getGuestPin());
 
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
