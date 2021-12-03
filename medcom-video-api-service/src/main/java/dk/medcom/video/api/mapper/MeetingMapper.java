@@ -1,6 +1,6 @@
 package dk.medcom.video.api.mapper;
 
-import dk.medcom.video.api.controller.MeetingController;
+import dk.medcom.video.api.controller.MeetingSearchController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.Meeting;
@@ -49,7 +49,7 @@ public class MeetingMapper {
         meetingDto.setLabels(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList()));
 
         try {
-            Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(meetingDto.uuid)).withRel("self");
+            Link selfLink = linkTo(methodOn(MeetingSearchController.class).getMeetingByUUID(meetingDto.uuid)).withRel("self");
             meetingDto.add(selfLink);
         } catch (RessourceNotFoundException | PermissionDeniedException e) {
             // Empty

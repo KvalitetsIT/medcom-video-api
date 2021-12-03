@@ -1,7 +1,7 @@
 package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dk.medcom.video.api.controller.MeetingController;
+import dk.medcom.video.api.controller.MeetingSearchController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.Meeting;
@@ -83,7 +83,7 @@ public class MeetingDto extends RepresentationModel {
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
 
 		try { 
-			Link selfLink = linkTo(methodOn(MeetingController.class).getMeetingByUUID(uuid)).withRel("self");
+			Link selfLink = linkTo(methodOn(MeetingSearchController.class).getMeetingByUUID(uuid)).withRel("self");
 			add(selfLink);
 		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 			// Empty

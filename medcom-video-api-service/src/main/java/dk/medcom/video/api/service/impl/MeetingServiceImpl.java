@@ -70,7 +70,6 @@ public class MeetingServiceImpl implements MeetingService {
 			LOGGER.debug("Finding meetings using findByOrganisationAndStartTimeBetween");
 			return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);	
 		}
-		
 	}
 
 	@Override
