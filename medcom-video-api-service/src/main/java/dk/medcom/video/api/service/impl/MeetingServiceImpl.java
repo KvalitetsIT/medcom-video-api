@@ -113,6 +113,11 @@ public class MeetingServiceImpl implements MeetingService {
 //		meeting.setUpdatedTime(calendarNow.getTime());
 //		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
+		if(createMeetingDto.getSchedulingInfoReservationId() != null && (createMeetingDto.getHostPin() != null || createMeetingDto.getGuestPin() != null)) {
+			LOGGER.info("SchedulingInfoReservationId and host pin or guest pin can not be set at the same time.");
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_RESERVATION_PIN_COMBINATION);
+		}
+
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			boolean isPoolOrganisation = isPoolOrganisation(userService.getUserContext().getUserOrganisation());
 			if(!isPoolOrganisation) {
@@ -175,6 +180,13 @@ public class MeetingServiceImpl implements MeetingService {
 				);
 				throw new NotValidDataException(NotValidDataErrors.CUSTOM_MEETING_ADDRESS_NOT_ALLOWED);
 			}
+		}
+
+		// If host pin or guest pin used we can not use pool scheduling info.
+		if(createMeetingDto.getHostPin() != null || createMeetingDto.getGuestPin() != null) {
+			LOGGER.info("Using custom guest pin ({}) or host pin ({}) for meeting.", createMeetingDto.getGuestPin(), createMeetingDto.getHostPin());
+			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+			return;
 		}
 
 		if(createMeetingDto.getSchedulingInfoReservationId() != null) {

@@ -606,6 +606,7 @@ public class MeetingServiceImplTest {
 		input.setStartTime(new Date());
 		input.setUuid(uuid);
 		input.setEndTime(new Date());
+		input.setUriWithoutDomain("1234");
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
 		Meeting result = meetingService.createMeeting(input);
@@ -615,8 +616,7 @@ public class MeetingServiceImplTest {
 		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
 		assertEquals(input.getStartTime(), result.getStartTime());
 
-		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
-		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
@@ -627,6 +627,127 @@ public class MeetingServiceImplTest {
 		assertNotNull(savedMeeting);
 		assertNotNull(savedMeeting.getShortId());
 		assertEquals("This is a description", savedMeeting.getDescription());
+	}
+
+	@Test
+	public void testCreateMeetingCustomGuestPin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+		input.setGuestPin(1234);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+
+		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+
+		var meetingCaptor = ArgumentCaptor.forClass(Meeting.class);
+		Mockito.verify(meetingRepository).save(meetingCaptor.capture());
+		var savedMeeting = meetingCaptor.getValue();
+		assertNotNull(savedMeeting);
+		assertNotNull(savedMeeting.getShortId());
+		assertEquals("This is a description", savedMeeting.getDescription());
+	}
+
+	@Test
+	public void testCreateMeetingCustomHostPin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+		input.setHostPin(1234);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+		assertEquals(uuid.toString(), result.getUuid());
+		assertEquals(input.getDescription(), result.getDescription());
+		assertEquals(input.getOrganizedByEmail(), result.getOrganizedByUser().getEmail());
+		assertEquals(input.getStartTime(), result.getStartTime());
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+
+		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+
+		var meetingCaptor = ArgumentCaptor.forClass(Meeting.class);
+		Mockito.verify(meetingRepository).save(meetingCaptor.capture());
+		var savedMeeting = meetingCaptor.getValue();
+		assertNotNull(savedMeeting);
+		assertNotNull(savedMeeting.getShortId());
+		assertEquals("This is a description", savedMeeting.getDescription());
+	}
+
+	@Test
+	public void testCreateMeetingPinAndReservationCombination() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+
+		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+		input.setSchedulingInfoReservationId(UUID.randomUUID());
+
+		// Test Host pin
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		try {
+			input.setHostPin(1234);
+			meetingService.createMeeting(input);
+			fail();
+		}
+		catch(NotValidDataException e) {
+			assertEquals(110, e.getErrorCode());
+		}
+
+		// Test guest pin
+		try {
+			input.setHostPin(null);
+			input.setGuestPin(1234);
+			meetingService.createMeeting(input);
+			fail();
+		}
+		catch(NotValidDataException e) {
+			assertEquals(110, e.getErrorCode());
+		}
+
+
+		Mockito.verifyNoMoreInteractions(schedulingInfoService);
+		Mockito.verifyNoMoreInteractions(meetingLabelRepository);
+		Mockito.verifyNoMoreInteractions(meetingRepository);
 	}
 
 	@Test

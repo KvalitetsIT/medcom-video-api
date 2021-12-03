@@ -310,7 +310,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testCreateSchedulingInfoMeetingCustomUriWithDomain() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomainAndPin() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         calendar.add(Calendar.MINUTE, -10);
@@ -330,6 +330,8 @@ public class SchedulingInfoServiceImplTest {
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setUriWithoutDomain("573489");
+        createMeetingDto.setHostPin(1234);
+        createMeetingDto.setGuestPin(4321);
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
@@ -340,8 +342,8 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertTrue("Host pin should be greater than 0.", capturedSchedulingInfo.getHostPin() > 0);
-        assertTrue("Guest pin should be greater than 0.", capturedSchedulingInfo.getGuestPin() > 0);
+        assertEquals(createMeetingDto.getHostPin().longValue(), capturedSchedulingInfo.getHostPin().longValue());
+        assertEquals(createMeetingDto.getGuestPin().longValue(), capturedSchedulingInfo.getGuestPin().longValue());
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 
         assertEquals(capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());

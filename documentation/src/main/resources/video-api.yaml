@@ -1157,6 +1157,17 @@ components:
           example: 574893
           maxLength: 100
           description: Uri without domain. Only allowed if organisation configured to support it.
+        guestPin:
+          type: number
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+        hostPin:
+          type: number
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+
     update-meeting:
       type: object
       required:
@@ -1876,3 +1887,5 @@ components:
           errorText: 'Supplied URI already used'
         - errorCode: 100
           errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'
+        - errorCode: 110
+          errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.'

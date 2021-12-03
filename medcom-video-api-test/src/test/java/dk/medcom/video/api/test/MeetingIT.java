@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -167,6 +168,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.getLabels().add("Label One");
 		createMeeting.getLabels().add("Label Two");
 		createMeeting.setUriWithoutDomain("12345");
+		createMeeting.setGuestPin(BigDecimal.valueOf(4321));
+		createMeeting.setHostPin(BigDecimal.valueOf(1234));
 
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(createdMeeting);
@@ -178,6 +181,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(schedulingInfo);
 		assertEquals(createMeeting.getUriWithoutDomain(), schedulingInfo.getUriWithoutDomain());
 		assertTrue(schedulingInfo.getUriWithDomain().startsWith(createMeeting.getUriWithoutDomain()));
+		assertEquals(createMeeting.getHostPin().longValue(), schedulingInfo.getHostPin().longValue());
+		assertEquals(createMeeting.getGuestPin().longValue(), schedulingInfo.getGuestPin().longValue());
 
 		var updateMeeting = new UpdateMeeting();
 		updateMeeting.setSubject("SUBJECT");

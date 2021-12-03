@@ -16,7 +16,8 @@ public enum NotValidDataErrors {
     NULL_VALUE(70, "Field can not be set to null"),
     CUSTOM_MEETING_ADDRESS_NOT_ALLOWED(80, "Organisation does not allow setting custom meeting address."),
     URI_ALREADY_USED(90, "Supplied URI already used"),
-    URI_IS_INVALID(100, "Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9]." );
+    URI_IS_INVALID(100, "Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9]." ),
+    SCHEDULING_INFO_RESERVATION_PIN_COMBINATION(110, "Scheduling info reservation can not be used in combination with guest pin and/or host pin.");
 
     private final int errorCode;
     private final String errorText;

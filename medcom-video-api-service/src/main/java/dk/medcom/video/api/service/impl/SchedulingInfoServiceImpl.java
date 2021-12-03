@@ -130,8 +130,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		
 		schedulingInfo.setUuid(meeting.getUuid());
-		schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
-		schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
+		// Pin range is already validated at the API level.
+		if(createMeetingDto.getHostPin() != null) {
+			schedulingInfo.setHostPin(createMeetingDto.getHostPin().longValue());
+		}
+		else {
+			schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
+		}
+
+		if(createMeetingDto.getGuestPin() != null) {
+			schedulingInfo.setGuestPin(createMeetingDto.getGuestPin().longValue());
+		}
+		else {
+			schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
+		}
 
 		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
 		Calendar cal = Calendar.getInstance();
