@@ -1,5 +1,6 @@
 package dk.medcom.video.api.controller;
 
+import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingInfoDto;
@@ -79,8 +80,11 @@ public class SchedulingInfoController {
 	
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.GET)
 	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException {
+		var performanceLogger = new PerformanceLogger("get scheduling info");
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
+
+		performanceLogger.logTimeSinceCreation();
 
 		return  new EntityModel<>(schedulingInfoDto);
 	}

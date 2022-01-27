@@ -1,6 +1,7 @@
 package dk.medcom.video.api.controller;
 
 
+import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
@@ -33,12 +34,16 @@ public class MeetingCreateController {
 	@RequestMapping(value = "/meetings", method = RequestMethod.POST)
 	public EntityModel <MeetingDto> createMeeting(@Valid @RequestBody CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		LOGGER.debug("Entry of /meetings.post");
-		
+
+		var performanceLogger = new PerformanceLogger("create meeting");
+
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		LOGGER.info(meeting.getShortId());
 		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
 		EntityModel<MeetingDto> resource = new EntityModel<>(meetingDto);
-		
+
+		performanceLogger.logTimeSinceCreation();
+
 		LOGGER.debug("Exit of /meetings.post resource: " + resource);
 		return resource;
 	}

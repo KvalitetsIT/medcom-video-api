@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service.impl;
 
+import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.*;
@@ -97,7 +98,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException {
 		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
+		var performanceLogger = new PerformanceLogger("read scheduling info by uuid");
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
+		performanceLogger.logTimeSinceCreation();
 		if (schedulingInfo == null) {
 			LOGGER.debug("SchedulingInfo was null");
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
@@ -117,7 +120,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		if (createMeetingDto.getSchedulingTemplateId() != null && createMeetingDto.getSchedulingTemplateId() > 0 ) {
 			LOGGER.debug("Searching for schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
 			try {
+				var performanceLogger = new PerformanceLogger("create scheduling info get scheduling template for org");
 				schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(createMeetingDto.getSchedulingTemplateId());
+				performanceLogger.logTimeSinceCreation();
 			} catch (RessourceNotFoundException e) {
 				LOGGER.debug("The template was not found using Organization and id");
 				//Do nothing. More logic below
@@ -125,7 +130,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 		if (schedulingTemplate == null) {
 			LOGGER.debug("Searching for schedulingTemplate");
+			var performanceLogger = new PerformanceLogger("get scheduling template in org tree");
 			schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
+			performanceLogger.logTimeSinceCreation();
 		}
 		LOGGER.debug("Found schedulingTemplate: " + schedulingTemplate.toString());
 		
@@ -248,14 +255,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
-		
+
+		var meetingUserPerformance = new PerformanceLogger("Get or create current meeting user");
 		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		meetingUserPerformance.logTimeSinceCreation();
+
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
 
+		var performanceĹogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		performanceĹogger.logTimeSinceCreation();
+		performanceĹogger.reset("audit create scheduling info");
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
-
+		performanceĹogger.logTimeSinceCreation();
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}
@@ -572,6 +585,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
+		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
@@ -592,8 +606,10 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("Attach meeting to sched info audit");
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
-
+		performanceLogger.logTimeSinceCreation();
 		return resultingSchedulingInfo;
 	}
 
@@ -605,15 +621,21 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
 		SchedulingInfo schedulingInfo = null;
-		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto);
+		var performanceLogger = new PerformanceLogger("get unushed scheduling info for org");
+		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto); // Try to get scheduling info from organisation
+		performanceLogger.logTimeSinceCreation();
 
-		if(unusedId == null && organisation.getPoolSize() != null) {
+		if(unusedId == null && organisation.getPoolSize() != null) { // not scheduling info found and org is pool organization.
+			performanceLogger.reset("Get unused scheduling info from pool");
 			unusedId = getSchedulingInfoFromOverflowPool(createMeetingDto);
+			performanceLogger.logTimeSinceCreation();
 			fromOverflow = true;
 		}
 
 		if (unusedId != null) {
+			performanceLogger.reset("Find by id");
 			schedulingInfo = schedulingInfoRepository.findById(unusedId).orElse(null);
+			performanceLogger.logTimeSinceCreation();
 		}
 
 		if(schedulingInfo == null) {

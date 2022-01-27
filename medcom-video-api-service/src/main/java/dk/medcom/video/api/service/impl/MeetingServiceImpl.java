@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service.impl;
 
+import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
@@ -96,6 +97,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException  {
+		var performanceLogger = new PerformanceLogger("create meeting convert");
 		Meeting meeting = convert(createMeetingDto);
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
@@ -124,12 +126,19 @@ public class MeetingServiceImpl implements MeetingService {
 			}
 		}
 
+		performanceLogger.logTimeSinceCreation();
+
+		performanceLogger.reset("create meeting save");
 		meeting = saveMeetingWithShortLink(meeting, 0);
 		meetingLabelRepository.saveAll(meeting.getMeetingLabels());
-
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("attach or create scheduling info");
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
+		performanceLogger.logTimeSinceCreation();
 
+		performanceLogger.reset("create meeting audit");
 		auditService.auditMeeting(meeting, "create");
+		performanceLogger.logTimeSinceCreation();
 		return meeting;
 	}
 
@@ -143,8 +152,11 @@ public class MeetingServiceImpl implements MeetingService {
 
 	private Meeting saveMeetingWithShortLink(Meeting meeting, int count) throws NotValidDataException {
 		try {
+			var performanceLogger = new PerformanceLogger("save meeting with short link to database");
 			meeting.setShortId(idGenerator.generateId(UUID.randomUUID()));
-			return meetingRepository.save(meeting);
+			var savedResult = meetingRepository.save(meeting);
+			performanceLogger.logTimeSinceCreation();
+			return savedResult;
 		}
 		catch(DataIntegrityViolationException e) {
 			if(e.getCause() instanceof ConstraintViolationException) {
@@ -213,6 +225,7 @@ public class MeetingServiceImpl implements MeetingService {
 	}
 
 	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
+		var performanceLogger = new PerformanceLogger("attach reserved scheduling info");
 		try {
 			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
 
@@ -226,6 +239,9 @@ public class MeetingServiceImpl implements MeetingService {
 		catch(RessourceNotFoundException e) {
 			LOGGER.info("ReservationId {} not found.", createMeetingDto.getSchedulingInfoReservationId());
 			throw new NotValidDataException(NotValidDataErrors.INVALID_RESERVATION_ID, createMeetingDto.getSchedulingInfoReservationId().toString());
+		}
+		finally {
+			performanceLogger.logTimeSinceCreation();
 		}
 	}
 

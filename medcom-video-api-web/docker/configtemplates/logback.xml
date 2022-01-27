@@ -25,6 +25,10 @@
 		<appender-ref ref="STDOUT" />
 	</logger>
 
+	<logger name="PERFORMANCE" level="${LOG_LEVEL_PERFORMANCE}" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
 	<root level="${LOG_LEVEL_FRAMEWORK}">
 		<appender-ref ref="STDOUT" />
 	</root>
