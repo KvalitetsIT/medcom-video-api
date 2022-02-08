@@ -52,9 +52,9 @@ fi
 
 if [[ -z $logging_config ]]; then
   echo "Default logging_config=/app/logback-spring.xml"
-  export logging_config="/app/logback-spring.xml"
+  export logging_config="/home/appuser/logback-spring.xml"
 fi
 
-envsubst < /configtemplates/logback.xml > /app/logback-spring.xml
+envsubst < /home/appuser/configtemplates/logback.xml > /home/appuser/logback-spring.xml
 
 java $JVM_OPTS -jar medcom-video-api-web.jar
