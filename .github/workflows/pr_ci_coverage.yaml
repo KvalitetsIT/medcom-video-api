@@ -39,7 +39,7 @@ jobs:
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v1.0.0
         with:
-          jacoco-csv-file: testreport/target/site/jacoco-aggregate/jacoco.csv
+          jacoco-csv-file: medcom-video-api-qa/target/site/jacoco-aggregate/jacoco.csv
 
       - name: Log coverage percentage
         run: |
