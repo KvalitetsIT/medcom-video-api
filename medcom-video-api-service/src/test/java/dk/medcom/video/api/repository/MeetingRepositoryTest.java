@@ -1,14 +1,16 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingLabel;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.MeetingLabel;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
@@ -110,7 +112,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 			assertNotNull(meeting);
 			numberOfMeetings++;
 		}
-		assertEquals(7, numberOfMeetings);
+		assertEquals(8, numberOfMeetings);
 	}
 
 	@Test

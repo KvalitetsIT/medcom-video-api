@@ -1,0 +1,1 @@
+create index idx_si_org_status_meeting_id_res_id on scheduling_info(organisation_id, provision_status, meetings_id, reservation_id);

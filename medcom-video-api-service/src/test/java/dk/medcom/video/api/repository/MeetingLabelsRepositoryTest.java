@@ -1,9 +1,13 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.MeetingLabel;
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
+import dk.medcom.video.api.dao.MeetingLabelRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.MeetingLabel;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Test;
 
 import javax.annotation.Resource;

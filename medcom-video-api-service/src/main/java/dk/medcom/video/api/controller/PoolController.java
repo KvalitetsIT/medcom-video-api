@@ -1,6 +1,6 @@
 package dk.medcom.video.api.controller;
 
-import dk.medcom.video.api.dto.PoolInfoDto;
+import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.service.PoolInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +17,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class PoolController {
-	private static Logger logger = LoggerFactory.getLogger(PoolController.class);
+	private static final Logger logger = LoggerFactory.getLogger(PoolController.class);
 
-	private PoolInfoService poolInfoService;
+	private final PoolInfoService poolInfoService;
 
 	public PoolController(PoolInfoService poolInfoService) {
 		this.poolInfoService = poolInfoService;

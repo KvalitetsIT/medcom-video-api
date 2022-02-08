@@ -10,7 +10,7 @@
 						{
 						"logger": "%logger",
 						"level": "%level",
-						"correlation-id": "%mdc{${CORRELATION_ID}}",
+						"correlation-id": "%X{correlation-id}",
 						"thread": "%thread",
 						"message": "%m"
 						}
@@ -21,8 +21,15 @@
 		</encoder>
 	</appender>
 
-	<root level="${LOG_LEVEL}">
+	<logger name="dk.medcom" level="${LOG_LEVEL}" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<logger name="PERFORMANCE" level="${LOG_LEVEL_PERFORMANCE}" additivity="false">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<root level="${LOG_LEVEL_FRAMEWORK}">
 		<appender-ref ref="STDOUT" />
 	</root>
-		
 </configuration>

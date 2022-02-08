@@ -8,21 +8,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import dk.medcom.video.api.repository.MeetingRepository;
-import dk.medcom.video.api.repository.MeetingUserRepository;
-import dk.medcom.video.api.repository.SchedulingTemplateRepository;
-import dk.medcom.video.api.repository.OrganisationRepository;
-import dk.medcom.video.api.repository.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 
 @Configuration
+@ComponentScan("dk.medcom.video.api.dao.impl")
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
 @EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})
@@ -41,15 +41,6 @@ public class DatabaseConfiguration {
 
 	@Value("${jdbc.pass}")
 	private String jdbcPass;
-
-	@Bean
-	@ConditionalOnProperty(value="baseline.flyway", havingValue = "true")
-	public FlywayMigrationStrategy cleanMigrateStrategy() {
-		return flyway -> {
-			flyway.baseline();
-			throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
-		};
-	}
 
 	@Bean
 	public DataSource dataSource() {

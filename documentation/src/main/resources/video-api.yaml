@@ -42,9 +42,39 @@ info:
     <Li> 0.6.0 <Ul>
     <Li> added post scheduling-info
     <Li> added get pool-info
-    <Li> added meetingType and uuid to create-meeting
+    <Li> added meetingType and uuid to create-meeting </Ul>
+    <Li> 1.0.5 <Ul>
+    <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request </Ul>
     </Ul>
-  version: "0.6.0"
+    <Li> 1.1.0 <Ul>
+    <Li> added get scheduling-info-provision
+    <Li> added get scheduling-info-deprovision
+    <Li> added guestMicrophone to create-meeting </Ul>
+    <Li> 1.2.0 <Ul>
+    <Li> added scheduling-info-reserve
+    <Li> Extended create meeting with optional field schedulingInfoReservationId
+    <Li> Document labels.</Ul>
+    <Li> 1.3.0 <Ul>
+    <Li> added guestPingRequired to create-meeting </UL>
+    <Li> 1.4.0 <Ul>
+    <Li> Implement HTTP PATCH for updates </UL>
+    </Ul>
+    <Li> 1.5.0 <Ul>
+    <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info, meetings and scheduling-info-reserve </UL>
+    </Ul>
+    <Li> 1.6.0 <Ul>
+    <Li> Added uriWithoutDomain to create meeting. </UL>
+    </Ul>
+    <Li> 1.6.1 <Ul>
+    <Li> Updated error text for code 100. </UL>
+    </Ul>
+    <Li> 1.6.2 <Ul>
+    <Li> Search by uri with domain and uri without domain.</UL>
+    </Ul>
+    <Li> 1.6.3 <Ul>
+    <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.</UL>
+    </Ul>
+  version: "1.6.3"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -74,6 +104,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/info'
+
+  /meetings/findByUriWithDomain:
+    get:
+      tags:
+        - Video Meetings
+      summary: find meeting by uri with domain.
+      description: find meeting by uri with domain.
+      parameters:
+        - name: uri
+          in: query
+          description: uri with domain
+          required: true
+          schema:
+            type: string
+          example: '123456@video.domain'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+
+  /meetings/findByUriWithoutDomain:
+    get:
+      tags:
+        - Video Meetings
+      summary: find meeting by uri without domain.
+      description: find meeting by uri without domain.
+      parameters:
+        - name: uri
+          in: query
+          description: uri without domain
+          required: true
+          schema:
+            type: string
+          example: '12345'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+
   /meetings:
     get:
       tags:
@@ -181,6 +268,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/update-meeting'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+    patch:
+      tags:
+        - Video Meetings
+      summary: Updates an existing meeting through HTTP patch
+      description: Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). In the later case only endTime can be updated.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        description: Meeting details to update with. If field is NOT present in the json structure it will not be updated. If field is set to null it will be deleted in the meeting.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patch-meeting'
       responses:
         '200':
           description: Ok
@@ -434,7 +552,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/scheduling-template'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -461,6 +579,151 @@ paths:
           $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+  /scheduling-info-provision:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a list of scheduling informations on meetings waiting to be provisioned
+      description: Gets a a list of scheduling informations to provision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to provision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-provision/".
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+  /scheduling-info-deprovision:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
+      description: Gets a a list of scheduling informations to deprovision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to deprovision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-deprovision/".
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+
+  /scheduling-info-reserve:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
+      description: Reserve a single scheduling info from the organisations pool.".
+      parameters:
+        - name: vmrType
+          in: query
+          description: Type of the virtual meetingroom
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrType'
+          example: 'lecture'
+        - name: hostView
+          in: query
+          description: The layout seen by Hosts
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+          example: 'one_main_zero_pips'
+        - name: guestView
+          in: query
+          description: The layout seen by Guests
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+          example: 'one_main_zero_pips'
+        - name: vmrQuality
+          in: query
+          description: Controls the maximum call quality for participants connecting to this service
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrQuality'
+          example: 'full_hd'
+        - name: enableOverlayText
+          in: query
+          description: 'If participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: guestsCanPresent
+          in: query
+          description: 'Controls whether the Guests in the conference are allowed to present content. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: forcePresenterIntoMain
+          in: query
+          description: 'Controls whether the Host who is presenting is locked into the main video position. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: forceEncryption
+          in: query
+          description: 'Default value: false'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+        - name: muteAllGuests
+          in: query
+          description: 'Controls whether to mute guests when they first join the conference. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+          example: 'false'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+
+  /scheduling-info-reserve/{uuid}:
+    get:
+      tags:
+        - Video Scheduling Information
+      summary: Get scheduling info by reservation id.
+      description: Read a single scheduling info by id.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+
   /pool:
     get:
       tags:
@@ -505,6 +768,101 @@ components:
   responses:
     '400':
       description: "Bad Request. This could be because: <br> * invalid date format in date format parameters/properties <br> * a uuid parameter does not have the correct format <br>  * one of the required parameters/properties are missing or is empty <br> * length of input is exeeding maximum length <br> * referenced entities like organisation, templates etc has some problems <br> (See a possible detailed error message in the in the response.)"
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/bad-request'
+          examples:
+            10:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 10
+                errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
+            11:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 11
+                errorText: 'Unused scheduling information not found for organisation xxx'
+            12:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 12
+                errorText: 'ExternalId not unique within organisation.'
+            13:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 13
+                errorText: 'OrganisationId xxx in request not found.'
+            14:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 14
+                errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.'
+            20:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 20
+                errorText: 'Unable to generate unique shortId. Try again.'
+            30:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 30
+                errorText: 'Date format is wrong, year must only have 4 digits'
+            40:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 40
+                errorText: 'Scheduling template xxx not found.'
+            41:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 41
+                errorText: 'Scheduling template xxx not found.'
+            50:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 50
+                errorText: 'Scheduling template xxx not found.'
     '401':
       description: "Unauthorized. This could be because: <br> * the role of the user may not use the request (only PROVISIONER can use the scheduling-info post request and only ADMIN can use the scheduling-template post and put request) <br> * the role mapping between 'user context' and the video API does not match <br> * the user is not correct configured. It could be missing email or organisation"
     '403':
@@ -513,6 +871,65 @@ components:
       description: "Not Found. This could be because: <br> * the uuid being requested has been deleted <br> * the uuid being requested has never existed <br> * the id (scheduling template) being requested does not exist"
     '406':
       description: "Not Acceptable. This could be because: <br> * Status of the meeting is not AWAITS_PROVISION or PROVISIONED_OK<br> * template configuration was inadequate <br> (See a possible detailed error message in the in the response.)"
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/not-acceptable'
+          examples:
+            10:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 10
+                errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated'
+            11:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 11
+                errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted'
+            20:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 20
+                errorText: 'The Uri assignment failed due to invalid setup on the template used'
+            21:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 21
+                errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template'
+            30:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 30
+                errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
+            31:
+              value:
+                timestamp: '2020-11-23T10:55:51.765906351Z'
+                status: 400
+                error: Bad Request
+                message: Unable to generate unique shortId. Try again.
+                path: /meetings
+                errorCode: 31
+                errorText: 'The host pincode assignment failed due to invalid setup on the template used'
   schemas:
     info:
       type: object
@@ -592,6 +1009,25 @@ components:
           type: string
           maxLength: 200
           example: 87527808-147f-4c54-88be-aec56c7194a3
+        guestMicrophone:
+          example: muted
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - off
+            - on
+            - muted
+            - null
+        guestPinRequired:
+          type: boolean
+          example: false
+          description: When true shortlink will aske for pin
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
         _links:
           properties:
             self:
@@ -663,6 +1099,78 @@ components:
           type: string
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
+        guestMicrophone:
+          example: muted
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - off
+            - on
+            - muted
+            - null
+        guestPinRequired:
+          type: boolean
+          example: false
+          description: When true shortlink will aske for pin
+        schedulingInfoReservationId:
+          type: string
+          format: uuid
+          description: Scheduling info reservation ID to use for this meeting. The ID must belong to the same organisation and not used by other meeting.
+          example: 8103c61c-eb64-4148-984b-1236f4ff5849
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
+        vmrType:
+          $ref: '#/components/schemas/vmrType'
+        hostView:
+          $ref: '#/components/schemas/viewType'
+        guestView:
+          $ref: '#/components/schemas/viewType'
+        vmrQuality:
+          $ref: '#/components/schemas/vmrQuality'
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
+        uriWithoutDomain:
+          type: string
+          example: 574893
+          maxLength: 100
+          description: Uri without domain. Only allowed if organisation configured to support it.
+        guestPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+        hostPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+
     update-meeting:
       type: object
       required:
@@ -693,6 +1201,67 @@ components:
         organizedByEmail:
           type: string
           example: mail@mail.dk
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
+    patch-meeting:
+      type: object
+      properties:
+        subject:
+          type: string
+          maxLength: 100
+          example: Short talk about hiring new people
+        startTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:00:00 +0000
+        endTime:
+          type: string
+          format: date-time
+          example: 2018-11-01T10:30:00 +0000
+        description:
+          type: string
+          maxLength: 500
+          example: We need to agree on the process should be. And what deadlines we have during the next 14 days.
+        projectCode:
+          type: string
+          maxLength: 100
+          example: PROJECT001.
+        organizedByEmail:
+          type: string
+          example: mail@mail.dk
+        labels:
+          type: array
+          items:
+            type: string
+            description: Array of labels to attach to meeting.
+        guestMicrophone:
+          example: muted
+          description: Corresponds to numeric status 0, 1 and 2.
+          type: string
+          nullable: true
+          enum:
+            - off
+            - on
+            - muted
+            - null
+        guestPinRequired:
+          type: boolean
+          example: false
+          description: When true shortlink will ask for pin
+        guestPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+        hostPin:
+          type: integer
+          format: int32
+          minimum: 10000
+          maximum: 999999999
+
     scheduling-info:
       type: object
       required:
@@ -758,6 +1327,38 @@ components:
         provisionVmrId:
           type: string
           maxLength: 50
+        vmrType:
+          $ref: '#/components/schemas/vmrType'
+        hostView:
+          $ref: '#/components/schemas/viewType'
+        guestView:
+          $ref: '#/components/schemas/viewType'
+        vmrQuality:
+          $ref: '#/components/schemas/vmrQuality'
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
         createdBy:
           $ref: '#/components/schemas/meetingUser'
         updatedBy:
@@ -770,6 +1371,10 @@ components:
           type: string
           format: date-time
           example: 2018-10-01T11:00:00 +0000
+        reservationId:
+          type: string
+          format: uuid
+          example: 569ce82e-385b-4ccc-9648-e86129a72fce
         meetingDetails:
           $ref: '#/components/schemas/meeting'
         _links:
@@ -841,6 +1446,34 @@ components:
         - STARTING_TO_DEPROVISION
         - DEPROVISION_PROBLEMS
         - DEPROVISION_OK
+    vmrType:
+      example: conference
+      description: Corresponds to numeric status 0 and 1.
+      type: string
+      default: conference
+      enum:
+        - conference
+        - lecture
+    viewType:
+      example: one_main_seven_pips
+      description: Corresponds to numeric status 0, 1, 2, 3 and 4.
+      type: string
+      default: one_main_seven_pips
+      enum:
+        - one_main_zero_pips
+        - one_main_seven_pips
+        - one_main_twentyone_pips
+        - two_mains_twentyone_pips
+        - four_mains_zero_pips
+    vmrQuality:
+      example: hd
+      description: Corresponds to numeric status 0, 1 and 2.
+      type: string
+      default: hd
+      enum:
+        - sd
+        - hd
+        - full_hd
 
     scheduling-template:
       type: object
@@ -928,6 +1561,38 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        vmrType:
+          $ref: '#/components/schemas/vmrType'
+        hostView:
+          $ref: '#/components/schemas/viewType'
+        guestView:
+          $ref: '#/components/schemas/viewType'
+        vmrQuality:
+          $ref: '#/components/schemas/vmrQuality'
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
         createdBy:
           $ref: '#/components/schemas/meetingUser'
         updatedBy:
@@ -1027,6 +1692,38 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        vmrType:
+          $ref: '#/components/schemas/vmrType'
+        hostView:
+          $ref: '#/components/schemas/viewType'
+        guestView:
+          $ref: '#/components/schemas/viewType'
+        vmrQuality:
+          $ref: '#/components/schemas/vmrQuality'
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
     update-scheduling-template:
       type: object
       required:
@@ -1105,6 +1802,38 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        vmrType:
+          $ref: '#/components/schemas/vmrType'
+        hostView:
+          $ref: '#/components/schemas/viewType'
+        guestView:
+          $ref: '#/components/schemas/viewType'
+        vmrQuality:
+          $ref: '#/components/schemas/vmrQuality'
+        enableOverlayText:
+          type: boolean
+          example: true
+          default: true
+          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
+        guestsCanPresent:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Guests in the conference are allowed to present content
+        forcePresenterIntoMain:
+          type: boolean
+          example: true
+          default: true
+          description: controls whether the Host who is presenting is locked into the main video position
+        forceEncryption:
+          type: boolean
+          example: false
+          default: false
+        muteAllGuests:
+          type: boolean
+          example: false
+          default: false
+          description: controls whether to mute guests when they first join the conference
     pool-info:
       type: object
       required:
@@ -1122,3 +1851,54 @@ components:
           format: int32
         schedulingTemplate:
           $ref: '#/components/schemas/scheduling-template'
+    not-acceptable:
+      type: integer
+      format: int32
+      enum:
+        - errorCode: 10
+          errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated'
+        - errorCode: 11
+          errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted'
+        - errorCode: 20
+          errorText: 'The Uri assignment failed due to invalid setup on the template used'
+        - errorCode: 21
+          errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template'
+        - errorCode: 30
+          errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
+        - errorCode: 31
+          errorText: 'The host pincode assignment failed due to invalid setup on the template used'
+    bad-request:
+      type: integer
+      enum:
+        - errorCode: 10
+          errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
+        - errorCode: 11
+          errorText: 'Unused scheduling information not found for organisation xxx'
+        - errorCode: 12
+          errorText: 'ExternalId not unique within organisation.'
+        - errorCode: 13
+          errorText: 'OrganisationId xxx in request not found.'
+        - errorCode: 14
+          errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.'
+        - errorCode: 20
+          errorText: 'Unable to generate unique shortId. Try again.'
+        - errorCode: 30
+          errorText: 'Date format is wrong, year must only have 4 digits'
+        - errorCode: 40
+          errorText: 'Scheduling template xxx not found.'
+        - errorCode: 41
+          errorText: 'Scheduling template yyy does not belong to organisation xxx.'
+        - errorCode: 50
+          errorText: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.'
+        - errorCode: 60,
+          errorText: 'ReservationId not owned by organisation or not found.'
+        - errorCode: 70
+          errorText: 'Field can not be set to null'
+        - errorCode: 80
+          errorText: 'Organisation does not allow setting custom meeting address.'
+        - errorCode: 90
+          errorText: 'Supplied URI already used'
+        - errorCode: 100
+          errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'
+        - errorCode: 110
+          errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.'

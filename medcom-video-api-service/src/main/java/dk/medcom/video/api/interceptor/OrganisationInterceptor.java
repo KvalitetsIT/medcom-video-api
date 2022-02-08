@@ -3,7 +3,7 @@ package dk.medcom.video.api.interceptor;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -38,10 +38,10 @@ public class OrganisationInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void ensureCreatedLocally(Organisation organisation) {
-        dk.medcom.video.api.dao.Organisation dbOrganisation = organisationRepository.findByOrganisationId(organisation.getCode());
+        dk.medcom.video.api.dao.entity.Organisation dbOrganisation = organisationRepository.findByOrganisationId(organisation.getCode());
 
         if(dbOrganisation == null) {
-            dbOrganisation = new dk.medcom.video.api.dao.Organisation();
+            dbOrganisation = new dk.medcom.video.api.dao.entity.Organisation();
             dbOrganisation.setOrganisationId(organisation.getCode());
             organisationRepository.save(dbOrganisation);
         }

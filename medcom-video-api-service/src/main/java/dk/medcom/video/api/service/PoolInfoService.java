@@ -1,74 +1,12 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.SchedulingInfo;
-import dk.medcom.video.api.dao.SchedulingTemplate;
-import dk.medcom.video.api.dto.PoolInfoDto;
-import dk.medcom.video.api.dto.ProvisionStatus;
-import dk.medcom.video.api.dto.SchedulingTemplateDto;
-import dk.medcom.video.api.organisation.Organisation;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
-import dk.medcom.video.api.repository.SchedulingInfoRepository;
-import dk.medcom.video.api.repository.SchedulingTemplateRepository;
-import org.springframework.stereotype.Component;
+import dk.medcom.video.api.api.PoolInfoDto;
+import dk.medcom.video.api.entity.PoolInfoEntity;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Component
-public class PoolInfoService {
-    private OrganisationStrategy organisationStrategy;
-    private SchedulingInfoRepository schedulingInfoRepository;
-    private SchedulingTemplateRepository schedulingTemplateRepository;
-    private OrganisationRepository organisationRepository;
+public interface PoolInfoService {
+    List<PoolInfoEntity> getAllPoolInfo();
 
-    PoolInfoService(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy) {
-        this.organisationStrategy = organisationStrategy;
-        this.schedulingInfoRepository = schedulingInfoRepository;
-        this.schedulingTemplateRepository = schedulingTemplateRepository;
-        this.organisationRepository = organisationRepository;
-    }
-
-    public List<PoolInfoDto> getPoolInfo() {
-        List<Organisation> organizations = organisationStrategy.findByPoolSizeNotNull();
-        List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
-
-        return mapPoolInfo(organizations, schedulingInfos);
-    }
-
-    private List<PoolInfoDto> mapPoolInfo(List<Organisation> organizations, List<SchedulingInfo> schedulingInfos) {
-        return organizations.stream().map( o -> {
-            PoolInfoDto poolInfo = new PoolInfoDto();
-            poolInfo.setDesiredPoolSize(o.getPoolSize());
-            poolInfo.setOrganizationId(o.getCode());
-
-            poolInfo.setAvailablePoolSize((int) schedulingInfos.stream().filter(x -> x.getOrganisation().getOrganisationId().equals(o.getCode())).count());
-
-            poolInfo.setSchedulingTemplate(getSchedulingTemplate(o));
-            
-            return poolInfo;
-        }).collect(Collectors.toList());
-    }
-
-    private SchedulingTemplateDto getSchedulingTemplate(Organisation o) {
-        dk.medcom.video.api.dao.Organisation org = organisationRepository.findByOrganisationId(o.getCode());
-        if(org != null) {
-            List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(org, true);
-
-            if(schedulingTemplates != null && schedulingTemplates.size() > 0) {
-                return mapSchedulingTemplate(schedulingTemplates.get(0));
-            }
-        }
-
-        return null;
-    }
-
-    private SchedulingTemplateDto mapSchedulingTemplate(SchedulingTemplate schedulingTemplate) {
-        try {
-            return new SchedulingTemplateDto(schedulingTemplate);
-        } catch (PermissionDeniedException e) {
-            throw new RuntimeException("Error mapping SchedulingTemplate.", e);
-        }
-    }
+    List<PoolInfoDto> getPoolInfo();
 }

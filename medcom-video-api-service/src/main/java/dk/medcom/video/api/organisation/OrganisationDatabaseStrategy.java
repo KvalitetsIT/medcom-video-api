@@ -1,6 +1,6 @@
 package dk.medcom.video.api.organisation;
 
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class OrganisationDatabaseStrategy implements OrganisationStrategy {
 
     @Override
     public Organisation findOrganisationByCode(String organisationCode) {
-        dk.medcom.video.api.dao.Organisation organisation = organisationRepository.findByOrganisationId(organisationCode);
+        dk.medcom.video.api.dao.entity.Organisation organisation = organisationRepository.findByOrganisationId(organisationCode);
 
         if(organisation != null) {
             Organisation returnOrganisation = new Organisation();
@@ -29,14 +29,14 @@ public class OrganisationDatabaseStrategy implements OrganisationStrategy {
 
     @Override
     public Integer getPoolSizeForOrganisation(String userOrganisation) {
-        dk.medcom.video.api.dao.Organisation organisation = organisationRepository.findByOrganisationId(userOrganisation);
+        dk.medcom.video.api.dao.entity.Organisation organisation = organisationRepository.findByOrganisationId(userOrganisation);
 
         return organisation != null ? organisation.getPoolSize() : null;
     }
 
     @Override
     public List<Organisation> findByPoolSizeNotNull() {
-        List<dk.medcom.video.api.dao.Organisation> organisations = organisationRepository.findByPoolSizeNotNull();
+        List<dk.medcom.video.api.dao.entity.Organisation> organisations = organisationRepository.findByPoolSizeNotNull();
 
         List<Organisation> returnOrgs = new ArrayList<>();
         organisations.forEach( x -> {

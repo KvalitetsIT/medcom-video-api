@@ -1,7 +1,9 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.MeetingUser;
-import dk.medcom.video.api.dao.Organisation;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Assert;
 import org.junit.Test;
 

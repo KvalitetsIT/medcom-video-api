@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -13,6 +14,17 @@
 			<artifactId>medcom-video-api-interface</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>dk.kvalitetsit</groupId>
+			<artifactId>spring-prometheus-app-info</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>dk.kvalitetsit</groupId>
+			<artifactId>spring-request-id-logger</artifactId>
+		</dependency>
+
 		<!-- Spring for web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -40,19 +52,19 @@
 
 		<!-- Hateoas -->
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-hateoas</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <scope>test</scope>
-        </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.jayway.jsonpath</groupId>
+			<artifactId>json-path</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
@@ -78,6 +90,12 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
+		</dependency>
+
+		<!-- Audit api -->
+		<dependency>
+			<groupId>dk.medcom</groupId>
+			<artifactId>medcom-audit-api</artifactId>
 		</dependency>
 
 		<!-- Test -->

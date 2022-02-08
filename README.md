@@ -1,3 +1,7 @@
+
+![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) 
+
+
 # medcom-video-api
 ## Databasemodel 
 Video api'ets database er struktureret som følger
@@ -5,7 +9,7 @@ Video api'ets database er struktureret som følger
 
 ## API dokumentation
 API'ets snitflade dokumentation kan findes på swaggerhub:
-https://app.swaggerhub.com/apis/Kvalitetsit/VDX-Booking-Module-API/0.4.0
+https://api-docs.vconf.dk/videoapi/v1/videoapi/
 
 ## Test
 ### Unit test
@@ -30,10 +34,17 @@ For at køre disse scripts mod udviklings versionen i f.eks. eclipse, køres kla
 ### Environment variables
 Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 
-| Environment variable       | Beskrivelse                                                                                    |           Tvunget / Default  |
-| -------------------------- |------------------------------------------------------------------------------------------------| -----------------------------|
-| sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn | Ikke tvunget/ Ingen default  |
-|organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information.| Ikke tvungen. Default false. |
-|organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services         | Ikke tvungen. Skal være sat hvis organisation.service.enabled er sat til true. |
- |short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/ | Tvunget
- |baseline.flyway           | Set to true to create new new flyway baseline starting from version 40. Needed to Flyway 3 to 6 migration. | Ikke tvunget. 
+| Environment variable       | Beskrivelse                                                                                      |           Krævet / Default  |
+| -------------------------- |--------------------------------------------------------------------------------------------------| -----------------------------|
+| sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn   | Ikke krævet / Ingen default  |
+|organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information. | Ikke krævet. Default false. |
+|organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services           | Ikke krævet. Skal være sat hvis organisation.service.enabled er sat til true. |
+|short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/                               | Krævet
+|overflow.pool.organisation.id | Organisation id to use for pool overflow.                                                        | Krævet
+|organisationtree.service.endpoint| Endpoint URL på organisation tree servicen. F.eks. http://organisationfrontend:80/services       | Krævet
+|audit.nats.disabled         | Disable audit logging to nats.                                                                   | No
+| audit.nats.cluster.id      | Nats cluster id                                                                                  | Yes |
+| audit.nats.client.id       | Nats client id                                                                                   | Yes |
+| audit.nats.curl            | Nats url to connect to                                                                           | Yes |
+| audit.nats.subject         | Nats subject to publish to                                                                       | Yes |
+| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING | 

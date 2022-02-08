@@ -1,14 +1,18 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.dao.Organisation;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import dk.medcom.video.api.dao.OrganisationRepository;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.annotation.Resource;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import dk.medcom.video.api.dao.entity.Organisation;
 
 public class OrganisationTest extends RepositoryTest {
 
@@ -26,6 +30,7 @@ public class OrganisationTest extends RepositoryTest {
 		organisation.setOrganisationId(organisationId);
 		organisation.setPoolSize(10);
 		organisation.setName(name);
+		organisation.setGroupId(1);
 
 		// When
 		organisation = subject.save(organisation);
@@ -37,6 +42,7 @@ public class OrganisationTest extends RepositoryTest {
 		assertEquals(name,  organisation.getName());
 		assertEquals(name,  organisation.toString());
 		assertEquals(10, organisation.getPoolSize().longValue());
+		assertEquals(1L, organisation.getGroupId());
 	}
 	
 	@Test
@@ -53,7 +59,7 @@ public class OrganisationTest extends RepositoryTest {
 			Assert.assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
-		assertEquals(7, numberOfOrganisations);
+		assertEquals(11, numberOfOrganisations);
 	}
 	
 	@Test
@@ -69,6 +75,7 @@ public class OrganisationTest extends RepositoryTest {
 		assertEquals(id, organisation.getId());
 		assertEquals("company 1", organisation.getOrganisationId());
 		assertEquals("company name 1", organisation.getName());
+		assertEquals("SomeSender", organisation.getSmsSenderName());
 		Assert.assertNull(organisation.getPoolSize());
 	}
 
@@ -128,10 +135,12 @@ public class OrganisationTest extends RepositoryTest {
 		List<Organisation> organizations = subject.findByPoolSizeNotNull();
 
 		assertNotNull(organizations);
-		assertEquals(1, organizations.size());
+		assertEquals(4, organizations.size());
 
-		Organisation organization = organizations.get(0);
-		assertEquals("company name another-test-org", organization.getName());
+		var optionalOorganization = organizations.stream().filter(x -> x.getName().equals("company name another-test-org")).findFirst();
+
+		assertTrue(optionalOorganization.isPresent());
+		var organization = optionalOorganization.get();
 		assertEquals("pool-test-org", organization.getOrganisationId());
 		assertEquals(10, organization.getPoolSize().intValue());
 	}

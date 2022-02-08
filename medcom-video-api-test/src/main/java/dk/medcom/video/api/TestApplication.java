@@ -4,6 +4,8 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -13,6 +15,7 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.annotation.PostConstruct;
@@ -23,14 +26,19 @@ import java.util.function.Consumer;
 
 @EnableAutoConfiguration
 @Configuration
-@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration"})
+@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration","dk.medcom.vdx.organisation"})
 public class TestApplication extends SpringBootServletInitializer {
+    private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
     private static GenericContainer testOrganisationFrontend;
-    private DataSource dataSource;
+    private static GenericContainer natsService;
+    private static String natsPath;
+    private final DataSource dataSource;
 
 	public static void main(String[] args) {
         Network n = Network.newNetwork();
 	    createOrganisationService(n);
+
+        startNats(n);
 
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
                 .withDatabaseName("videodb")
@@ -40,9 +48,17 @@ public class TestApplication extends SpringBootServletInitializer {
 
         mysql.start();
         String jdbcUrl = mysql.getJdbcUrl();
-        System.setProperty("jdbc.url", jdbcUrl);
+        System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
         System.setProperty("short.link.base.url", "http://shortlink");
+        System.setProperty("overflow.pool.organisation.id", "overflow");
+        System.setProperty("organisationtree.service.endpoint", "http://localhost:8081");
+
+        System.setProperty("audit.nats.url", natsPath);
+        System.setProperty("audit.nats.subject", "natsSubject");
+        System.setProperty("audit.nats.cluster.id", "test-cluster");
+        System.setProperty("audit.nats.client.id", "natsClientId");
+//        System.setProperty("audit.nats.disabled", "true");
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
@@ -65,6 +81,26 @@ public class TestApplication extends SpringBootServletInitializer {
 
 		SpringApplication.run(TestApplication.class, args);
 	}
+
+    private static void startNats(Network n) {
+        var natsContainerName = "nats-streaming";
+        var natsContainerVersion = "0.19.0";
+
+        natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
+                .withNetwork(n)
+                .withNetworkAliases("nats")
+                .withExposedPorts(4222)
+                .withExposedPorts(8222)
+                .waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"))
+        ;
+
+        natsService.start();
+
+        natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
+        var natsHttpPath = "http://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(8222);
+        logger.info("NATS path: " + natsPath);
+        logger.info("NATS http path: " + natsHttpPath);
+    }
 
     private static void createOrganisationService(Network n) {
         MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")

@@ -5,12 +5,14 @@ import java.util.GregorianCalendar;
 
 import javax.annotation.Resource;
 
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.SchedulingStatusRepository;
 import org.junit.Assert;
 import org.junit.Test;
 
-import dk.medcom.video.api.dao.Meeting;
-import dk.medcom.video.api.dao.SchedulingStatus;
-import dk.medcom.video.api.dto.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.SchedulingStatus;
+import dk.medcom.video.api.api.ProvisionStatus;
 
 public class SchedulingStatusRepositoryTest extends RepositoryTest{
 	@Resource

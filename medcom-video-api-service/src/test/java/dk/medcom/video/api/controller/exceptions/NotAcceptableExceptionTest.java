@@ -10,7 +10,7 @@ public class NotAcceptableExceptionTest {
 	
 	@Before
 	public void setup() {
-		subject = new NotAcceptableException("Test");
+		subject = new NotAcceptableException(NotAcceptableErrors.URI_ASSIGNMENT_FAILED_NOT_POSSIBLE_TO_CREATE_UNIQUE);
 	}
 
 	@Test
@@ -21,7 +21,7 @@ public class NotAcceptableExceptionTest {
 		
 		// Then
 		Assert.assertNotNull(subject);
-		Assert.assertEquals("Test", subject.getMessage());
+		Assert.assertEquals(21, subject.getErrorCode());
 
 	}
 

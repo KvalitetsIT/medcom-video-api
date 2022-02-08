@@ -6,7 +6,7 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -48,10 +48,10 @@ public class OrganisationInterceptorTest {
 
         organisationInterceptor.preHandle(null, null, null);
 
-        ArgumentCaptor<dk.medcom.video.api.dao.Organisation> dbOrganisationCaptor = ArgumentCaptor.forClass(dk.medcom.video.api.dao.Organisation.class);
+        ArgumentCaptor<dk.medcom.video.api.dao.entity.Organisation> dbOrganisationCaptor = ArgumentCaptor.forClass(dk.medcom.video.api.dao.entity.Organisation.class);
         Mockito.verify(organisationRepository).save(dbOrganisationCaptor.capture());
 
-        dk.medcom.video.api.dao.Organisation dbOrganisation = dbOrganisationCaptor.getValue();
+        dk.medcom.video.api.dao.entity.Organisation dbOrganisation = dbOrganisationCaptor.getValue();
         assertEquals(ORG, dbOrganisation.getOrganisationId());
     }
 
@@ -65,13 +65,13 @@ public class OrganisationInterceptorTest {
         serviceOrganisation.setPoolSize(10);
         Mockito.when(organisationStrategy.findOrganisationByCode(ORG)).thenReturn(serviceOrganisation);
 
-        dk.medcom.video.api.dao.Organisation dbOrganisation = new dk.medcom.video.api.dao.Organisation();
+        dk.medcom.video.api.dao.entity.Organisation dbOrganisation = new dk.medcom.video.api.dao.entity.Organisation();
         dbOrganisation.setOrganisationId(ORG);
         Mockito.when(organisationRepository.findByOrganisationId(ORG)).thenReturn(dbOrganisation);
 
         organisationInterceptor.preHandle(null, null, null);
 
-        Mockito.verify(organisationRepository, Mockito.never()).save(Mockito.any(dk.medcom.video.api.dao.Organisation.class));
+        Mockito.verify(organisationRepository, Mockito.never()).save(Mockito.any(dk.medcom.video.api.dao.entity.Organisation.class));
     }
 
     @Test

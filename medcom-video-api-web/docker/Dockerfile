@@ -11,4 +11,11 @@ RUN mkdir /app
 ADD /maven/medcom-video-api-web.jar /app/medcom-video-api-web.jar
 WORKDIR /app
 
+## Default ENV
+
+ENV management_server_port=8081
+ENV management_server_servlet_context-path=/manage
+ENV management_endpoints_web_exposure_include=health,info,prometheus,appmetrics
+
+
 ENTRYPOINT [ "/entrypoint.sh" ]

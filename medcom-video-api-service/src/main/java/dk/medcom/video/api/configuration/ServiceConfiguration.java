@@ -1,35 +1,38 @@
 package dk.medcom.video.api.configuration;
 
+import dk.medcom.audit.client.AuditClient;
+import dk.medcom.video.api.actuator.VdxApiMetrics;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserContextServiceImpl;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
-import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
-import dk.medcom.video.api.repository.OrganisationRepository;
+import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
+import dk.medcom.video.api.organisation.*;
+import dk.medcom.video.api.service.AuditService;
+import dk.medcom.video.api.service.CustomUriValidator;
+import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
+import dk.medcom.video.api.service.impl.AuditServiceImpl;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.prometheus.client.CollectorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.context.annotation.*;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.interceptor.LoggingInterceptor;
-import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableAspectJAutoProxy
 @ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect"})
-public class ServiceConfiguration extends WebMvcConfigurerAdapter {
-	private static Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
+public class ServiceConfiguration implements WebMvcConfigurer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
 	@Autowired
 	private OrganisationStrategy organisationStrategy;
@@ -40,10 +43,19 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
-		registry.addInterceptor(loggingInterceptor());
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
-	} 
+	} 	
+
+	@Bean
+	public CustomUriValidator customUriValidator() {
+		return new CustomUriValidatorImpl();
+	}
+
+	@Bean
+	public AuditService auditService(AuditClient auditClient) {
+		return new AuditServiceImpl(auditClient);
+	}
 
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
@@ -65,21 +77,42 @@ public class ServiceConfiguration extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public LoggingInterceptor loggingInterceptor() {
-		LOGGER.debug("Creating loggingInterceptor");
-		return new LoggingInterceptor();
+	public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
+		return new OrganisationTreeServiceClientImpl(endpoint);
 	}
-	
+
 	@Bean
 	public UserSecurityInterceptor userSecurityInterceptor() {
 		LOGGER.debug("Creating userSecurityInterceptor");
 		return new UserSecurityInterceptor();
 	}
-	
+
 	@Bean
 	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
 	public UserContextService userContextService() {
-		UserContextServiceImpl ucs = new UserContextServiceImpl();
-		return ucs;
+		return new UserContextServiceImpl();
+	}
+
+	@Autowired
+	private PrometheusConfig prometheusConfig;
+
+	@Autowired
+	private Clock clock;
+
+	@Autowired
+	private CollectorRegistry collectorRegistry;
+
+	@Autowired
+    private PoolInfoService poolInfoService;
+
+	@Bean
+	public PrometheusScrapeEndpoint prometheus() {
+		return new PrometheusScrapeEndpoint(collectorRegistry);
+	}
+
+	@Bean
+	public PrometheusScrapeEndpoint appmetricsScrapeEndpoint() {
+		PrometheusMeterRegistry registry = new PrometheusMeterRegistry(prometheusConfig, new CollectorRegistry(false), clock);
+		return new VdxApiMetrics(registry.getPrometheusRegistry(), poolInfoService);
 	}
 }
