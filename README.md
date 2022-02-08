@@ -1,5 +1,5 @@
 
-![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) ![Test Coverage](.github/badges/jacoco.svg)
+![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) 
 
 
 # medcom-video-api
