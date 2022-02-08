@@ -3,7 +3,8 @@ FROM adoptopenjdk:11-jre-openj9
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y gettext-base tzdata inetutils-telnet
 
-RUN addgroup   --system --gid 1001 appuser & adduser  --system --uid  1001   --group appuser
+RUN addgroup --system --gid 1001 appuser
+RUN adduser --system --uid 1001 --group appuser
 
 COPY   entrypoint.sh /home/appuser
 RUN chmod +x /home/appuser/entrypoint.sh
