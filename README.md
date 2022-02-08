@@ -50,4 +50,4 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING | 
 
 
-test pr
+test pr - trigger
