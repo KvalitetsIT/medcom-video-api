@@ -48,3 +48,6 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | audit.nats.curl            | Nats url to connect to                                                                           | Yes |
 | audit.nats.subject         | Nats subject to publish to                                                                       | Yes |
 | LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING | 
+
+
+test pr
