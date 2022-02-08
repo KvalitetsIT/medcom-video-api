@@ -27,7 +27,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: jacoco-report
-        path: testreport/target/site/jacoco-aggregate/
+        path: medcom-video-api-qa/target/site/jacoco-aggregate/
 
     - name: Save PR number
       run: |
@@ -39,4 +39,4 @@ jobs:
         name: pr
         path: |
           pr/
-          testreport/target/site/jacoco-aggregate/jacoco.csv
+          medcom-video-api-qa/target/site/jacoco-aggregate/jacoco.csv
