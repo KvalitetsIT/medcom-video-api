@@ -219,7 +219,7 @@ public class IntegrationWithOrganisationServiceTest {
 		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
 				.withNetwork(n)
 				.withNetworkAliases("organisationservice")
-				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb&serverTimezone=UTC")
+				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb?serverTimezone=UTC")
 				.withEnv("jdbc_user", "orguser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("usercontext_header_name", "X-Test-Auth")
