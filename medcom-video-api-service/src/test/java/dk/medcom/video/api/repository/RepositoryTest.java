@@ -24,7 +24,8 @@ import java.util.TimeZone;
 @Transactional
 abstract public class RepositoryTest {
 	static {
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC")); // Needed when upgrading from Connector/j 5 to 8 to avoid fucking up date/times.
+		// Make sure unit test is running in same timezone as the default one in the container. This is needed when using Connector/J version 8.
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
