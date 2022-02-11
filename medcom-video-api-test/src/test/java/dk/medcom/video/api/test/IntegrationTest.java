@@ -92,7 +92,7 @@ public class IntegrationTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false")
+				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
 				.withEnv("jdbc_user", "videouser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("userservice_url", "http://userservice:1080")

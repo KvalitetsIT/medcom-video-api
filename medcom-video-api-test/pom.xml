@@ -32,13 +32,6 @@
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-client-java</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.47</version>
-		</dependency>
-
-
 	</dependencies>
 	<build>
 		<plugins>
