@@ -3,10 +3,6 @@ package dk.medcom.video.api.test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.junit.BeforeClass;
@@ -96,7 +92,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false")
+				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
 				.withEnv("jdbc_user", "videouser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("userservice_url", "http://userservice:1080")
@@ -223,7 +219,7 @@ public class IntegrationWithOrganisationServiceTest {
 		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
 				.withNetwork(n)
 				.withNetworkAliases("organisationservice")
-				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
+				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb?serverTimezone=UTC")
 				.withEnv("jdbc_user", "orguser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("usercontext_header_name", "X-Test-Auth")
