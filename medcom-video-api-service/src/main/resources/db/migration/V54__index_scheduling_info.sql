@@ -1,0 +1,1 @@
+create index idx_provision_stats_vmrstart_time on scheduling_info(provision_status, vmrstart_time);
