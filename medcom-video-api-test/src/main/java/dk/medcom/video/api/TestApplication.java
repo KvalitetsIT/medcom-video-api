@@ -79,6 +79,8 @@ public class TestApplication extends SpringBootServletInitializer {
 
         System.setProperty("SERVER_SERVLET_CONTEXT_PATH", "/videoapi");
 
+        System.setProperty("ALLOWED_ORIGINS", "http://allowed");
+
 		SpringApplication.run(TestApplication.class, args);
 	}
 

@@ -11,8 +11,8 @@ import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.CustomUriValidator;
 import dk.medcom.video.api.service.PoolInfoService;
-import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
+import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -25,8 +25,11 @@ import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScra
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.*;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -40,12 +43,22 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private OrganisationRepository organisationRepository;
 
+	@Value("${ALLOWED_ORIGINS}")
+	private List<String> allowedOrigins;
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
-	} 	
+	}
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**")
+				.maxAge(1800)
+				.allowedOrigins(allowedOrigins.toArray(String[]::new));
+	}
 
 	@Bean
 	public CustomUriValidator customUriValidator() {
