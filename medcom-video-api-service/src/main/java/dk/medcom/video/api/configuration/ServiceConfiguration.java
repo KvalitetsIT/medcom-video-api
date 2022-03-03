@@ -56,7 +56,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.maxAge(1800)
 				.allowedOrigins(allowedOrigins.toArray(String[]::new));
 	}
 
