@@ -34,7 +34,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -468,6 +471,32 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("child org", child.getName());
 		assertEquals(0, child.getChildren().size());
 
+	}
+
+	@Test
+	public void testCorsAllowed() throws IOException, InterruptedException {
+		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getContainerIpAddress(), videoApiPort)))
+				.method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+				.header("Origin", "http://allowed:4100")
+				.header("Access-Control-Request-Method", "POST")
+				.build();
+
+		var client = HttpClient.newBuilder().build();
+		var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		assertEquals(200, response.statusCode());
+	}
+
+	@Test
+	public void testCorsDenied() throws IOException, InterruptedException {
+		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getContainerIpAddress(), videoApiPort)))
+				.method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+				.header("Origin", "http://denied:4200")
+				.header("Access-Control-Request-Method", "POST")
+				.build();
+
+		var client = HttpClient.newBuilder().build();
+		var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		assertEquals(403, response.statusCode());
 	}
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {

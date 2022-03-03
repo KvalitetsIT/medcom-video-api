@@ -130,6 +130,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
 
+				.withEnv("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200")
+
 				.withEnv("audit.nats.url", "nats://nats:4222")
 				.withEnv("audit.nats.subject", "natsSubject")
 				.withEnv("audit.nats.cluster.id", "test-cluster")
