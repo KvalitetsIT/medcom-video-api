@@ -26,7 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class MeetingSearchController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MeetingCreateController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeetingSearchController.class);
 
     @Autowired
     private MeetingService meetingService;
