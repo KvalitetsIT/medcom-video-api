@@ -47,8 +47,7 @@ public class IntegrationWithOrganisationServiceTest {
 	private static String natsPath;
 	static MySQLContainer mysql;
 
-	@BeforeClass
-	public static void setup() {
+	static {
 		dockerNetwork = Network.newNetwork();
 
 		createOrganisationService(dockerNetwork);
