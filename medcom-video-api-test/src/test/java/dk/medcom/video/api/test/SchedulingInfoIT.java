@@ -8,20 +8,51 @@ import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.api.VideoSchedulingInformationApi;
-import io.swagger.client.model.CreateMeeting;
-import io.swagger.client.model.VmrQuality;
-import io.swagger.client.model.VmrType;
+import io.swagger.client.model.*;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
+	private final VideoMeetingsApi videoMeetings;
+	private final VideoSchedulingInformationApi schedulingInfoApi;
+
+	public SchedulingInfoIT() {
+		var apiClient = new ApiClient()
+				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
+
+		videoMeetings = new VideoMeetingsApi(apiClient);
+		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
+	}
+
+	private void verifyRowExistsInDatabase(String sql) throws SQLException {
+//			Class.forName(myDriver);
+		Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), "videouser", "secret1234");
+
+		// our SQL SELECT query.
+		// if you only need a few columns, specify them by name instead of using "*"
+		// create the java statement
+		Statement st = conn.createStatement();
+
+		// execute the query, and get a java resultset
+		ResultSet rs = st.executeQuery(sql);
+
+		// iterate through the java resultset
+		if(!rs.next()) {
+			st.close();
+			throw new RuntimeException("No rows found: " + sql);
+		}
+		st.close();
+	}
 
 	@Test
 	public void testCanReadSchedulingInfo() {
@@ -94,6 +125,27 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(result);
 		assertFalse(result.contains("AWAITS_PROVISION"));
 		assertTrue(result.contains("PROVISIONED_OK"));
+	}
+
+	@Test
+	public void testDeprovisionSchedulingInfo() throws ApiException, SQLException {
+		// Create scheduling info.
+		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
+		createSchedulingInfo.setOrganizationId("company 3");
+		createSchedulingInfo.setSchedulingTemplateId(4);
+
+		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
+		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain = 'test.dk' and uri_without_domain is not null and uuid = '" + createdSchedulingInfo.getUuid() + "'");
+
+		// Deprovision(update) scheduling info
+		UpdateSchedulingInfo updateSchedulingInfo = new UpdateSchedulingInfo();
+		updateSchedulingInfo.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
+		updateSchedulingInfo.setProvisionStatusDescription("DET GIK GODT");
+		updateSchedulingInfo.setProvisionVmrId(UUID.randomUUID().toString());
+
+		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidPut(updateSchedulingInfo, createdSchedulingInfo.getUuid());
+
+		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain is null and uri_without_domain is null and uuid = '" + updatedSchedulingInfo.getUuid() + "'");
 	}
 
 	@Test

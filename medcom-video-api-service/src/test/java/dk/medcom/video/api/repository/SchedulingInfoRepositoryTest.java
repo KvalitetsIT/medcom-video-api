@@ -42,6 +42,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         boolean endMeetingOnEndTime = true;
         String uriWithDomain = "7777@test.dk";
         String uriWithoutDomain = "7777";
+        String uriDomain = "test.dk";
         Long meetingUserId = 101L;
 
         ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
@@ -66,6 +67,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setEndMeetingOnEndTime(endMeetingOnEndTime);
         schedulingInfo.setUriWithDomain(uriWithDomain);
         schedulingInfo.setUriWithoutDomain(uriWithoutDomain);
+        schedulingInfo.setUriDomain(uriDomain);
         schedulingInfo.setProvisionStatus(provisionStatus);
         schedulingInfo.setProvisionStatusDescription(provisionStatusDescription);
         schedulingInfo.setProvisionTimestamp(calendar.getTime());
@@ -114,6 +116,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(endMeetingOnEndTime, schedulingInfo.getEndMeetingOnEndTime());
         assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
         assertEquals(uriWithoutDomain, schedulingInfo.getUriWithoutDomain());
+        assertEquals(uriDomain, schedulingInfo.getUriDomain());
         assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
         assertEquals(provisionStatusDescription, schedulingInfo.getProvisionStatusDescription());
         assertEquals(calendar.getTime(), schedulingInfo.getProvisionTimestamp());
@@ -150,7 +153,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
             Assert.assertNotNull(schedulingInfo);
             numberOfSchedulingInfo++;
         }
-        assertEquals(10, numberOfSchedulingInfo);
+        assertEquals(11, numberOfSchedulingInfo);
     }
 
     @Test

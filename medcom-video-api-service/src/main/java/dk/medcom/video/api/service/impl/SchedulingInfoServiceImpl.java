@@ -172,11 +172,13 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			}
 
 			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 			schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 		}
 		else {
 			var uri = generateUriWithoutDomain(schedulingTemplate);
 			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 			schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 		}
 
@@ -351,6 +353,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		if(schedulingInfo.getProvisionStatus() == ProvisionStatus.DEPROVISION_OK) {
 			schedulingInfo.setUriWithoutDomain(null);
+			schedulingInfo.setUriDomain(null);
 		}
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
@@ -484,6 +487,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
+		schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());

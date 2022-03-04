@@ -45,6 +45,7 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer testOrganisationFrontend;
 	private static GenericContainer natsService;
 	private static String natsPath;
+	static MySQLContainer mysql;
 
 	@BeforeClass
 	public static void setup() {
@@ -67,7 +68,7 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+		mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
 				.withDatabaseName("videodb")
 				.withUsername("videouser")
 				.withPassword("secret1234")

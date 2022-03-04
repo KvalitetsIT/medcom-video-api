@@ -75,6 +75,7 @@ public class SchedulingInfo {
 	private MeetingUser updatedBy;
 	private Date updatedTime;
 	private String reservationId;
+	private String uriDomain;
 
 	public Long getId() {
 		return id;
@@ -311,5 +312,13 @@ public class SchedulingInfo {
 
 	public void setMuteAllGuests(boolean muteAllGuests) {
 		this.muteAllGuests = muteAllGuests;
+	}
+
+	public void setUriDomain(String uriDomain) {
+		this.uriDomain = uriDomain;
+	}
+
+	public String getUriDomain() {
+		return uriDomain;
 	}
 }
