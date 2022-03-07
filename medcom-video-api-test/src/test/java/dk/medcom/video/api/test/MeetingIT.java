@@ -187,7 +187,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		updateMeeting.setSubject("SUBJECT");
 		updateMeeting.setStartTime(OffsetDateTime.now());
 		updateMeeting.setEndTime(OffsetDateTime.now().plusHours(1));
-		updateMeeting.setLabels(Collections.emptyList());
+		updateMeeting.setLabels(new ArrayList<>());
 		updateMeeting.getLabels().add("Another Label");
 
 		var updatedMeeting = videoMeetings.meetingsUuidPut(updateMeeting, createdMeeting.getUuid());
