@@ -43,10 +43,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -120,8 +117,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test(expected = ForbiddenException.class)
 	public void testCanNotReadOtherOrganisation()  {
-		String result = getClient()
-				.path("meetings")
+		getClient().path("meetings")
 				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc1")
 				.request()
 				.get(String.class);
@@ -167,7 +163,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testCanCreateUpdateAndReadMeeting() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
-		createMeeting.setLabels(new ArrayList<String>());
+		createMeeting.setLabels(new ArrayList<>());
 		createMeeting.getLabels().add("Label One");
 		createMeeting.getLabels().add("Label Two");
 		createMeeting.setUriWithoutDomain("12345");
@@ -191,7 +187,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		updateMeeting.setSubject("SUBJECT");
 		updateMeeting.setStartTime(OffsetDateTime.now());
 		updateMeeting.setEndTime(OffsetDateTime.now().plusHours(1));
-		updateMeeting.setLabels(new ArrayList());
+		updateMeeting.setLabels(Collections.emptyList());
 		updateMeeting.getLabels().add("Another Label");
 
 		var updatedMeeting = videoMeetings.meetingsUuidPut(updateMeeting, createdMeeting.getUuid());
@@ -270,7 +266,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testUniqueOrganisationExternalId() throws ApiException {
+	public void testUniqueOrganisationExternalId() {
 		var createMeeting = createMeeting("external_id");
 
 		try {
@@ -416,7 +412,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	public void testNotAcceptableException() throws ApiException {
+	public void testNotAcceptableException() {
 
 		try {
 			videoMeetings.meetingsUuidDelete(UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5"));

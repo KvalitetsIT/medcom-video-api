@@ -265,12 +265,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
 
-		var performanceĹogger = new PerformanceLogger("Save scheduling info");
+		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		performanceĹogger.logTimeSinceCreation();
-		performanceĹogger.reset("audit create scheduling info");
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("audit create scheduling info");
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
-		performanceĹogger.logTimeSinceCreation();
+		performanceLogger.logTimeSinceCreation();
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}

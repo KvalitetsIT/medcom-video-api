@@ -111,8 +111,6 @@ public class MeetingServiceImpl implements MeetingService {
 			
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setCreatedTime(calendarNow.getTime());
-//		meeting.setUpdatedTime(calendarNow.getTime());
-//		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 
 		if(createMeetingDto.getSchedulingInfoReservationId() != null && (createMeetingDto.getHostPin() != null || createMeetingDto.getGuestPin() != null)) {
 			LOGGER.info("SchedulingInfoReservationId and host pin or guest pin can not be set at the same time.");
