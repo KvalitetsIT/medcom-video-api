@@ -1,5 +1,3 @@
-drop index uri_without_domain on scheduling_info;
-
 alter table scheduling_info add column uri_domain varchar(100) null after uri_without_domain;
 
 update scheduling_info
@@ -7,3 +5,5 @@ update scheduling_info
     where provision_status != 'DEPROVISION_OK';
 
 create unique index idx_uri_without_domain_uri_domain on scheduling_info(uri_without_domain, uri_domain);
+
+drop index uri_without_domain on scheduling_info;
