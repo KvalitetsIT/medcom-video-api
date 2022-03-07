@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import org.junit.BeforeClass;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.Header;
@@ -22,9 +21,9 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.UriBuilder;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.function.Consumer;
 
 public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
@@ -35,8 +34,6 @@ public class IntegrationWithOrganisationServiceTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
-	private static boolean commandLine;
-
 	protected static Network dockerNetwork;
 	protected static GenericContainer resourceContainer;
 	protected static GenericContainer videoApi;
@@ -45,7 +42,9 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer testOrganisationFrontend;
 	private static GenericContainer natsService;
 	private static String natsPath;
-	static MySQLContainer mysql;
+	private static MySQLContainer mysql;
+	private static final String DB_USER = "videouser";
+	private static final String DB_PASSWORD = "secret1234";
 
 	static {
 		dockerNetwork = Network.newNetwork();
@@ -69,8 +68,8 @@ public class IntegrationWithOrganisationServiceTest {
 		// SQL server for Video API.
 		mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
 				.withDatabaseName("videodb")
-				.withUsername("videouser")
-				.withPassword("secret1234")
+				.withUsername(DB_USER)
+				.withPassword(DB_PASSWORD)
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("mysql");
 		mysql.start();
@@ -93,8 +92,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
 				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
-				.withEnv("jdbc_user", "videouser")
-				.withEnv("jdbc_pass", "secret1234")
+				.withEnv("jdbc_user", DB_USER)
+				.withEnv("jdbc_pass", DB_PASSWORD)
 				.withEnv("userservice_url", "http://userservice:1080")
 				.withEnv("userservice_token_attribute_organisation", "organisation_id")
 				.withEnv("userservice_token_attribute_username", "username")
@@ -187,8 +186,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 		return target;
 	}
-	
-	
+
 	WebTarget getClient() {
 		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -205,7 +203,6 @@ public class IntegrationWithOrganisationServiceTest {
 	private static HttpResponse getResponse() {
 		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\", \"dk:medcom:role:provisioner\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
 	}
-
 
 	private static void createOrganisationService(Network n) {
 		MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
@@ -248,6 +245,19 @@ public class IntegrationWithOrganisationServiceTest {
 				.waitingFor(Wait.forLogMessage(".*", 1));
 
 		testOrganisationFrontend.start();
+	}
 
+	void verifyRowExistsInDatabase(String sql) throws SQLException {
+		Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), DB_USER, DB_PASSWORD);
+
+		Statement st = conn.createStatement();
+
+		ResultSet rs = st.executeQuery(sql);
+
+		if(!rs.next()) {
+			st.close();
+			throw new RuntimeException("No rows found: " + sql);
+		}
+		st.close();
 	}
 }

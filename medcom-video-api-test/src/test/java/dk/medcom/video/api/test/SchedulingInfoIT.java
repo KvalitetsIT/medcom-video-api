@@ -22,7 +22,6 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
-	private final VideoMeetingsApi videoMeetings;
 	private final VideoSchedulingInformationApi schedulingInfoApi;
 
 	public SchedulingInfoIT() {
@@ -30,28 +29,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
-		videoMeetings = new VideoMeetingsApi(apiClient);
 		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
-	}
-
-	private void verifyRowExistsInDatabase(String sql) throws SQLException {
-//			Class.forName(myDriver);
-		Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), "videouser", "secret1234");
-
-		// our SQL SELECT query.
-		// if you only need a few columns, specify them by name instead of using "*"
-		// create the java statement
-		Statement st = conn.createStatement();
-
-		// execute the query, and get a java resultset
-		ResultSet rs = st.executeQuery(sql);
-
-		// iterate through the java resultset
-		if(!rs.next()) {
-			st.close();
-			throw new RuntimeException("No rows found: " + sql);
-		}
-		st.close();
 	}
 
 	@Test
