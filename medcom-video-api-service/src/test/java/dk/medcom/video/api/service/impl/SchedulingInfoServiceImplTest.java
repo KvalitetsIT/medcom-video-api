@@ -398,7 +398,7 @@ public class SchedulingInfoServiceImplTest {
         assertFalse(capturedSchedulingInfo.getForceEncryption());
         assertFalse(capturedSchedulingInfo.getMuteAllGuests());
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(),schedulingTemplateIdOne.getUriDomain());
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
@@ -425,7 +425,7 @@ public class SchedulingInfoServiceImplTest {
         createMeetingDto.setUriWithoutDomain("573489");
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
 
-        Mockito.when(schedulingInfoRepository.findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain())).thenReturn(new SchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), schedulingTemplateIdOne.getUriDomain())).thenReturn(new SchedulingInfo());
 
         try {
             schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
@@ -437,7 +437,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), schedulingTemplateIdOne.getUriDomain());
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
@@ -475,7 +475,7 @@ public class SchedulingInfoServiceImplTest {
         }
 
         Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
-        Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), null);
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 

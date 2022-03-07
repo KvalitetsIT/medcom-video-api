@@ -165,7 +165,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 			customUriValidator.validate(uri);
 
-			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(uri);
+			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(uri, schedulingTemplate.getUriDomain());
 			if(schedulingInfoUri != null) {
 				LOGGER.info("uriWithoutDomain already used. Uri: {}", uri);
 				throw new NotValidDataException(NotValidDataErrors.URI_ALREADY_USED);
@@ -288,7 +288,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 		do {            //loop x number of times until a no-duplicate url is found
 			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
-			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
+			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(randomUri, schedulingTemplate.getUriDomain());
 		} while (schedulingInfoUri != null && whileCount++ < whileMax);
 		if (whileCount > whileMax) {
 			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
