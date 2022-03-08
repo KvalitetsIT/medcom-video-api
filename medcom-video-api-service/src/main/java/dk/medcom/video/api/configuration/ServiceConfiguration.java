@@ -23,9 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.*;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -53,10 +56,21 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		registry.addInterceptor(userSecurityInterceptor());
 	}
 
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-				.allowedOrigins(allowedOrigins.toArray(String[]::new));
+	@Bean
+	public FilterRegistrationBean<CorsFilter> corsFilter() {
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowCredentials(true);
+		allowedOrigins.forEach(config::addAllowedOrigin);
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", config);
+
+		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+		bean.setOrder(0);
+
+		return bean;
 	}
 
 	@Bean
