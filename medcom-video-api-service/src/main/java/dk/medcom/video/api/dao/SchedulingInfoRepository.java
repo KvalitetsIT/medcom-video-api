@@ -15,7 +15,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query(value = "select * from scheduling_info where uuid = ?1 for update", nativeQuery = true)
 	SchedulingInfo findOneByUuid(String uuid);
 
-	SchedulingInfo findOneByUriWithoutDomain(String UriWithoutDomain);
+	SchedulingInfo findOneByUriWithoutDomainAndUriDomain(String UriWithoutDomain, String uriDomain);
 	
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);

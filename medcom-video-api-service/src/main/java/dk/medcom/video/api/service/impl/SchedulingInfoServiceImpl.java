@@ -165,18 +165,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 			customUriValidator.validate(uri);
 
-			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(uri);
+			var schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(uri, schedulingTemplate.getUriDomain());
 			if(schedulingInfoUri != null) {
 				LOGGER.info("uriWithoutDomain already used. Uri: {}", uri);
 				throw new NotValidDataException(NotValidDataErrors.URI_ALREADY_USED);
 			}
 
 			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 			schedulingInfo.setUriWithDomain(schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 		}
 		else {
 			var uri = generateUriWithoutDomain(schedulingTemplate);
 			schedulingInfo.setUriWithoutDomain(uri);
+			schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 			schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 		}
 
@@ -263,12 +265,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
 
-		var performanceĹogger = new PerformanceLogger("Save scheduling info");
+		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		performanceĹogger.logTimeSinceCreation();
-		performanceĹogger.reset("audit create scheduling info");
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("audit create scheduling info");
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
-		performanceĹogger.logTimeSinceCreation();
+		performanceLogger.logTimeSinceCreation();
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
 	}
@@ -286,7 +288,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 		do {            //loop x number of times until a no-duplicate url is found
 			randomUri = String.valueOf(ThreadLocalRandom.current().nextLong(schedulingTemplate.getUriNumberRangeLow(), schedulingTemplate.getUriNumberRangeHigh()));
-			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomain(randomUri);
+			schedulingInfoUri = schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(randomUri, schedulingTemplate.getUriDomain());
 		} while (schedulingInfoUri != null && whileCount++ < whileMax);
 		if (whileCount > whileMax) {
 			LOGGER.debug("The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template ");
@@ -351,6 +353,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		if(schedulingInfo.getProvisionStatus() == ProvisionStatus.DEPROVISION_OK) {
 			schedulingInfo.setUriWithoutDomain(null);
+			schedulingInfo.setUriDomain(null);
 		}
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
@@ -484,6 +487,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
 		schedulingInfo.setUriWithoutDomain(randomUri);
+		schedulingInfo.setUriDomain(schedulingTemplate.getUriDomain());
 		schedulingInfo.setUriWithDomain(schedulingTemplate.getUriPrefix() + schedulingInfo.getUriWithoutDomain() + "@" + schedulingTemplate.getUriDomain());
 
 		schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());

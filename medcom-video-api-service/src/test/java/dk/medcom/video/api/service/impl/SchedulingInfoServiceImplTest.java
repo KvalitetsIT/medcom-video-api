@@ -220,6 +220,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertNull(capturedSchedulingInfo.getUriWithoutDomain());
+        assertNull(capturedSchedulingInfo.getUriDomain());
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
 
@@ -252,9 +253,9 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+        assertNotNull(capturedSchedulingInfo.getUriDomain());
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
-
 
     @Test
     public void testCreateSchedulingInfoPooling() throws NotValidDataException, PermissionDeniedException, NotAcceptableException {
@@ -295,6 +296,7 @@ public class SchedulingInfoServiceImplTest {
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
         assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
         assertNotNull(capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());
         assertTrue(capturedSchedulingInfo.getEndMeetingOnEndTime());
         assertEquals(10, capturedSchedulingInfo.getMaxParticipants());
         assertEquals(10, capturedSchedulingInfo.getVMRAvailableBefore());
@@ -335,6 +337,7 @@ public class SchedulingInfoServiceImplTest {
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 
         assertEquals(schedulingTemplateIdOne.getUriPrefix() + capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());
         assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
         assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
         assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
@@ -384,6 +387,7 @@ public class SchedulingInfoServiceImplTest {
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
 
         assertEquals(capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
+        assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());
         assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
         assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
         assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
@@ -394,7 +398,7 @@ public class SchedulingInfoServiceImplTest {
         assertFalse(capturedSchedulingInfo.getForceEncryption());
         assertFalse(capturedSchedulingInfo.getMuteAllGuests());
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(),schedulingTemplateIdOne.getUriDomain());
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
@@ -421,7 +425,7 @@ public class SchedulingInfoServiceImplTest {
         createMeetingDto.setUriWithoutDomain("573489");
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
 
-        Mockito.when(schedulingInfoRepository.findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain())).thenReturn(new SchedulingInfo());
+        Mockito.when(schedulingInfoRepository.findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), schedulingTemplateIdOne.getUriDomain())).thenReturn(new SchedulingInfo());
 
         try {
             schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
@@ -433,7 +437,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), schedulingTemplateIdOne.getUriDomain());
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
@@ -471,7 +475,7 @@ public class SchedulingInfoServiceImplTest {
         }
 
         Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
-        Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomain(createMeetingDto.getUriWithoutDomain());
+        Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), null);
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
     }
 
@@ -950,6 +954,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setUuid(schedulingInfoUuid.toString());
         schedulingInfo.setOrganisation(createOrganisation());
         schedulingInfo.setUriWithoutDomain("random_uri");
+        schedulingInfo.setUriDomain("some_domain");
         schedulingInfo.setMeeting(new Meeting());
 
         return schedulingInfo;
