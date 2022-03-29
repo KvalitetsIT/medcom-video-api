@@ -15,9 +15,8 @@ import java.util.UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-
 public class SchedulingInfoDto extends RepresentationModel {
-	private UUID reservationId;
+    private UUID reservationId;
 	public String uuid;
 	public Long hostPin; 		
 	public Long guestPin;
@@ -55,6 +54,8 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public MeetingDto meetingDetails;
 	private String shortlink;
+	private String customPortalGuest;
+	private String customPortalHost;
 
 	public SchedulingInfoDto() {	
 	}
@@ -88,6 +89,8 @@ public class SchedulingInfoDto extends RepresentationModel {
 		forcePresenterIntoMain = schedulingInfo.getForcePresenterIntoMain();
 		forceEncryption = schedulingInfo.getForceEncryption();
 		muteAllGuests = schedulingInfo.getMuteAllGuests();
+		customPortalGuest = schedulingInfo.getCustomPortalGuest();
+		customPortalHost = schedulingInfo.getCustomPortalHost();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
@@ -315,5 +318,21 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setMuteAllGuests(boolean muteAllGuests) {
 		this.muteAllGuests = muteAllGuests;
+	}
+
+	public String getCustomPortalGuest() {
+		return customPortalGuest;
+	}
+
+	public void setCustomPortalGuest(String customPortalGuest) {
+		this.customPortalGuest = customPortalGuest;
+	}
+
+	public String getCustomPortalHost() {
+		return customPortalHost;
+	}
+
+	public void setCustomPortalHost(String customPortalHost) {
+		this.customPortalHost = customPortalHost;
 	}
 }

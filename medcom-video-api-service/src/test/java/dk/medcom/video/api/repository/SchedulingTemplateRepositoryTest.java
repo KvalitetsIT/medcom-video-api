@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -22,7 +23,6 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	
 	@Test
 	public void testCreateSchedulingTemplate() {
-		
 		// Given
 		Long organisationId = 1L; 
 		Long conferencingSysId = 7L; 
@@ -40,6 +40,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Long uriNumberRangeLow = 1007L;
 		Long uriNumberRangeHigh = 9997L;
 		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
+		String customPortalGuest = UUID.randomUUID().toString();
+		String customPortalHost = UUID.randomUUID().toString();
 		
 		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
@@ -60,7 +62,9 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate.setUriNumberRangeLow(uriNumberRangeLow);
 		schedulingTemplate.setUriNumberRangeHigh(uriNumberRangeHigh);
 		schedulingTemplate.setIvrTheme(ivrTheme);
-		
+		schedulingTemplate.setCustomPortalGuest(customPortalGuest);
+		schedulingTemplate.setCustomPortalHost(customPortalHost);
+
 		// When
 		schedulingTemplate = subject.save(schedulingTemplate);
 		
@@ -83,7 +87,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(uriNumberRangeLow, schedulingTemplate.getUriNumberRangeLow());
 		Assert.assertEquals(uriNumberRangeHigh, schedulingTemplate.getUriNumberRangeHigh());
 		Assert.assertEquals(ivrTheme, schedulingTemplate.getIvrTheme());
-				
+		Assert.assertEquals(customPortalGuest, schedulingTemplate.getCustomPortalGuest());
+		Assert.assertEquals(customPortalHost, schedulingTemplate.getCustomPortalHost());
 	}
 
 	@Test
@@ -130,6 +135,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		Assert.assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
 		Assert.assertEquals("/api/admin/configuration/v1/ivr_theme/10/", schedulingTemplate.getIvrTheme());
+		Assert.assertEquals("some_portal_guest", schedulingTemplate.getCustomPortalGuest());
+		Assert.assertEquals("some_portal_host", schedulingTemplate.getCustomPortalHost());
 	}
 
 	@Test
@@ -157,8 +164,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	}
 	
 	@Test
-	public void testFindScheduligTemplateWithOrganisationNull() {
-		
+	public void testFindSchedulingTemplateWithOrganisationNull() {
 		// Given
 		Long conferencingSysId = 7L; 
 		String uriPrefix = "abcd";
@@ -214,10 +220,9 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 				numberOfSchedulingTemplates++;
 			}
 			Assert.assertEquals(1, numberOfSchedulingTemplates);
-			
 		}
-				
 	}
+
 	@Test
 	public void testFindScheduligTemplateWithExistingOrganisationAndIsDefault() {
 		// Given

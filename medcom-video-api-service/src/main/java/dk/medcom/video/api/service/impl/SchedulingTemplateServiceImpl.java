@@ -195,6 +195,9 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setForcePresenterIntoMain(createSchedulingTemplateDto.getForcePresenterIntoMain() != null ? createSchedulingTemplateDto.getForcePresenterIntoMain() : true);
 		schedulingTemplate.setForceEncryption(createSchedulingTemplateDto.getForceEncryption() != null ? createSchedulingTemplateDto.getForceEncryption() : false);
 		schedulingTemplate.setMuteAllGuests(createSchedulingTemplateDto.getMuteAllGuests() != null ? createSchedulingTemplateDto.getMuteAllGuests() : false);
+		schedulingTemplate.setCustomPortalGuest(createSchedulingTemplateDto.getCustomPortalGuest());
+		schedulingTemplate.setCustomPortalHost(createSchedulingTemplateDto.getCustomPortalHost());
+
 
 		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
@@ -246,7 +249,9 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setForcePresenterIntoMain(updateSchedulingTemplateDto.getForcePresenterIntoMain() != null ? updateSchedulingTemplateDto.getForcePresenterIntoMain() : true);
 		schedulingTemplate.setForceEncryption(updateSchedulingTemplateDto.getForceEncryption() != null ? updateSchedulingTemplateDto.getForceEncryption() : false);
 		schedulingTemplate.setMuteAllGuests(updateSchedulingTemplateDto.getMuteAllGuests() != null ? updateSchedulingTemplateDto.getMuteAllGuests() : false);
-		
+		schedulingTemplate.setCustomPortalGuest(updateSchedulingTemplateDto.getCustomPortalGuest());
+		schedulingTemplate.setCustomPortalHost(updateSchedulingTemplateDto.getCustomPortalHost());
+
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingTemplate.setUpdatedTime(calendarNow.getTime());
