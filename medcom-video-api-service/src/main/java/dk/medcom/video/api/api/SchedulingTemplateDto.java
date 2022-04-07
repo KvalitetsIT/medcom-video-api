@@ -46,6 +46,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private boolean muteAllGuests;
 	private String customPortalGuest;
 	private String customPortalHost;
+	private String returnUrl;
 
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;
@@ -91,6 +92,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		muteAllGuests = schedulingTemplate.getMuteAllGuests();
 		customPortalGuest = schedulingTemplate.getCustomPortalGuest();
 		customPortalHost = schedulingTemplate.getCustomPortalHost();
+		returnUrl = schedulingTemplate.getReturnUrl();
 
 		createdTime = schedulingTemplate.getCreatedTime();
 		updatedTime = schedulingTemplate.getUpdatedTime();
@@ -375,5 +377,13 @@ public class SchedulingTemplateDto extends RepresentationModel {
 
 	public void setCustomPortalHost(String customPortalHost) {
 		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

@@ -304,6 +304,7 @@ public class SchedulingInfoServiceImplTest {
         assertNotNull(capturedSchedulingInfo.getHostPin());
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
+        assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
     }
 
     @Test
@@ -351,6 +352,7 @@ public class SchedulingInfoServiceImplTest {
         assertFalse(capturedSchedulingInfo.getMuteAllGuests());
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
+        assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
     }
 
     @Test
@@ -940,8 +942,9 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setForcePresenterIntoMain(true);
         schedulingTemplate.setForceEncryption(false);
         schedulingTemplate.setMuteAllGuests(false);
-        schedulingTemplate.setCustomPortalGuest("some_portal_guest");
         schedulingTemplate.setCustomPortalHost("some_portal_host");
+        schedulingTemplate.setCustomPortalHost("some_portal_host");
+        schedulingTemplate.setReturnUrl("some_return_url");
 
         return schedulingTemplate;
     }

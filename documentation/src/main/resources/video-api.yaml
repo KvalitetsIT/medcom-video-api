@@ -1389,6 +1389,11 @@ components:
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
           maxLength: 200
           description: If the scheduling info is using a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         meetingDetails:
           $ref: '#/components/schemas/meeting'
         _links:
@@ -1585,6 +1590,11 @@ components:
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
           maxLength: 200
           description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:
@@ -1726,6 +1736,11 @@ components:
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
           maxLength: 200
           description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:
@@ -1846,6 +1861,11 @@ components:
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
           maxLength: 200
           description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:

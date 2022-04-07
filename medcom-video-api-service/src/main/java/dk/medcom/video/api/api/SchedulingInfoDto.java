@@ -56,6 +56,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private String shortlink;
 	private String customPortalGuest;
 	private String customPortalHost;
+	private String returnUrl;
 
 	public SchedulingInfoDto() {	
 	}
@@ -91,6 +92,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		muteAllGuests = schedulingInfo.getMuteAllGuests();
 		customPortalGuest = schedulingInfo.getCustomPortalGuest();
 		customPortalHost = schedulingInfo.getCustomPortalHost();
+		returnUrl = schedulingInfo.getReturnUrl();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
@@ -334,5 +336,13 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setCustomPortalHost(String customPortalHost) {
 		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

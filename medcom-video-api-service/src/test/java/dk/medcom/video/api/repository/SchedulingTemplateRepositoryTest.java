@@ -42,7 +42,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		String ivrTheme = "/api/admin/configuration/v1/ivr_theme/10/";
 		String customPortalGuest = UUID.randomUUID().toString();
 		String customPortalHost = UUID.randomUUID().toString();
-		
+		String returnUrl = UUID.randomUUID().toString();
+
 		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
@@ -64,6 +65,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate.setIvrTheme(ivrTheme);
 		schedulingTemplate.setCustomPortalGuest(customPortalGuest);
 		schedulingTemplate.setCustomPortalHost(customPortalHost);
+		schedulingTemplate.setReturnUrl(returnUrl);
 
 		// When
 		schedulingTemplate = subject.save(schedulingTemplate);
@@ -89,6 +91,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals(ivrTheme, schedulingTemplate.getIvrTheme());
 		Assert.assertEquals(customPortalGuest, schedulingTemplate.getCustomPortalGuest());
 		Assert.assertEquals(customPortalHost, schedulingTemplate.getCustomPortalHost());
+		Assert.assertEquals(returnUrl, schedulingTemplate.getReturnUrl());
 	}
 
 	@Test
@@ -137,6 +140,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Assert.assertEquals("/api/admin/configuration/v1/ivr_theme/10/", schedulingTemplate.getIvrTheme());
 		Assert.assertEquals("some_portal_guest", schedulingTemplate.getCustomPortalGuest());
 		Assert.assertEquals("some_portal_host", schedulingTemplate.getCustomPortalHost());
+		Assert.assertEquals("return_url", schedulingTemplate.getReturnUrl());
 	}
 
 	@Test

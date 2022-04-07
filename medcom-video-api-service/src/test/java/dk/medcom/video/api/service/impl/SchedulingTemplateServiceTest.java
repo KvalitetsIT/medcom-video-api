@@ -70,6 +70,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(createSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalGuest());
 		assertEquals(createSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
+		assertEquals(createSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 	}
 	
 	@Test 
@@ -81,6 +82,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
 		updateSchedulingTemplateDto.setCustomPortalGuest("some_portal_guest");
 		updateSchedulingTemplateDto.setCustomPortalHost("some_portal_host");
+		updateSchedulingTemplateDto.setReturnUrl("return_url");
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
@@ -94,6 +96,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(updateSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalGuest());
 		assertEquals(updateSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
+		assertEquals(updateSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 	}
 
 	@Test(expected = RessourceNotFoundException.class)
@@ -135,6 +138,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplate.getOrganisation());
 		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(0)).getOrganisationTree("org");
 
 	}
@@ -166,6 +170,8 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplate);
 		assertNotNull(schedulingTemplate.getOrganisation());
 		assertEquals(inputSchedulingTemplate.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(inputSchedulingTemplate.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(inputSchedulingTemplate.getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 	
@@ -194,6 +200,7 @@ public class SchedulingTemplateServiceTest {
 		Assert.assertNull(schedulingTemplate.getOrganisation());
 		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 
@@ -229,7 +236,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplate);
 		assertEquals(schedulingTemplateInService.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(schedulingTemplateInService.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
-
+		assertEquals(schedulingTemplateInService.getReturnUrl(), schedulingTemplate.getReturnUrl());
 	}
 	
 	@Test  
@@ -276,6 +283,7 @@ public class SchedulingTemplateServiceTest {
 		createSchedulingTemplateDto.setIsDefaultTemplate(false);
 		createSchedulingTemplateDto.setCustomPortalGuest(UUID.randomUUID().toString());
 		createSchedulingTemplateDto.setCustomPortalHost(UUID.randomUUID().toString());
+		createSchedulingTemplateDto.setReturnUrl(UUID.randomUUID().toString());
 
 		return createSchedulingTemplateDto;
 	}
@@ -324,6 +332,7 @@ public class SchedulingTemplateServiceTest {
 		schedulingTemplate.setIsDefaultTemplate(false);
 		schedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
 		schedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
+		schedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
 
 		return schedulingTemplate;
 	}

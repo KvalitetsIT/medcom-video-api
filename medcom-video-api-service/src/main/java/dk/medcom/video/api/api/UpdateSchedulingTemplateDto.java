@@ -63,6 +63,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private Boolean muteAllGuests;
 	private String customPortalGuest;
 	private String customPortalHost;
+	private String returnUrl;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -278,5 +279,13 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setCustomPortalHost(String customPortalHost) {
 		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

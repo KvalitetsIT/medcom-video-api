@@ -149,6 +149,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals(createdMeeting.getUuid(), result.getUuid());
 		assertNull(schedulingInfo.getCustomPortalGuest());
 		assertNull(schedulingInfo.getCustomPortalHost());
+		assertNull(schedulingInfo.getReturnUrl());
 	}
 
 	@Test

@@ -65,6 +65,7 @@ public class SchedulingTemplate {
 	private Date deletedTime;
 	private String customPortalGuest;
 	private String customPortalHost;
+	private String returnUrl;
 
 	public Long getId() {
 		return id;
@@ -311,5 +312,13 @@ public class SchedulingTemplate {
 
 	public void setCustomPortalHost(String customPortalHost) {
 		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

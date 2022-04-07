@@ -45,6 +45,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         Long meetingUserId = 101L;
         String customPortalGuest = "custom_portal_guest";
         String customPortalHost = "custom_portal_host";
+        String returnUrl = "return_url";
 
         ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
         String provisionStatusDescription = "All okay untill now";
@@ -104,6 +105,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setPoolOverflow(true);
         schedulingInfo.setCustomPortalGuest(customPortalGuest);
         schedulingInfo.setCustomPortalHost(customPortalHost);
+        schedulingInfo.setReturnUrl(returnUrl);
 
         // When
         schedulingInfo = subject.save(schedulingInfo);
@@ -142,6 +144,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertTrue(schedulingInfo.getPoolOverflow());
         assertEquals(customPortalGuest, schedulingInfo.getCustomPortalGuest());
         assertEquals(customPortalHost, schedulingInfo.getCustomPortalHost());
+        assertEquals(returnUrl, schedulingInfo.getReturnUrl());
     }
 
     @Test
@@ -180,6 +183,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());
         assertEquals("custom_portal_guest", schedulingInfo.getCustomPortalGuest());
         assertEquals("custom_portal_host", schedulingInfo.getCustomPortalHost());
+        assertEquals("return_url", schedulingInfo.getReturnUrl());
     }
 
     @Test

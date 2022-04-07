@@ -36,6 +36,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setUriNumberRangeHigh(100);
         create.setCustomPortalGuest("some_portal_guest");
         create.setCustomPortalHost("some_portal_host");
+        create.setReturnUrl("return_url");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -54,6 +55,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertFalse(result.isMuteAllGuests());
         Assert.assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
         Assert.assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
+        Assert.assertEquals(create.getReturnUrl(), result.getReturnUrl());
     }
 
     @Test
@@ -107,6 +109,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setEnableOverlayText(false);
         updateSchedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
         updateSchedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
+        updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -120,5 +123,6 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertEquals(updateSchedulingTemplate.isEnableOverlayText(), result.isEnableOverlayText());
         Assert.assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
         Assert.assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
+        Assert.assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
     }
 }

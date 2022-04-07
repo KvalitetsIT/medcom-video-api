@@ -47,6 +47,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals(result.meetingDetails.getShortLink(), result.meetingDetails.getShortlink());
 		assertEquals("custom_portal_guest", result.getCustomPortalGuest());
 		assertEquals("custom_portal_host", result.getCustomPortalHost());
+		assertEquals("return_url", result.getReturnUrl());
 	}
 
 	@Test
@@ -204,10 +205,12 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(createdSchedulingInfo);
 		assertEquals("custom_portal_guest", createdSchedulingInfo.getCustomPortalGuest());
 		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
+		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
 
 		var readSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdSchedulingInfo.getUuid());
 		assertNotNull(readSchedulingInfo);
 		assertEquals("custom_portal_guest", createdSchedulingInfo.getCustomPortalGuest());
 		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
+		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
 	}
 }
