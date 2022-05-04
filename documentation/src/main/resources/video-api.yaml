@@ -72,9 +72,13 @@ info:
     <Li> Search by uri with domain and uri without domain.</UL>
     </Ul>
     <Li> 1.6.3 <Ul>
-    <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.</UL>
+    <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.</UL>    
     </Ul>
-  version: "1.6.3"
+    <Li> 1.7.0 <Ul>
+    <Li> Added custom portal to scheduling template and scheduling info.</UL>
+    </Ul>
+
+  version: "1.7.0"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -1375,6 +1379,21 @@ components:
           type: string
           format: uuid
           example: 569ce82e-385b-4ccc-9648-e86129a72fce
+        customPortalGuest:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling info is using a custom portal for the guest portal.
+        customPortalHost:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling info is using a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         meetingDetails:
           $ref: '#/components/schemas/meeting'
         _links:
@@ -1561,6 +1580,21 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        customPortalGuest:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the guest portal.
+        customPortalHost:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:
@@ -1692,6 +1726,21 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        customPortalGuest:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the guest portal.
+        customPortalHost:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:
@@ -1802,6 +1851,21 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        customPortalGuest:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the guest portal.
+        customPortalHost:
+          type: string
+          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
+          maxLength: 200
+          description: If the scheduling template should use a custom portal for the host portal.
+        returnUrl:
+          type: string
+          example: https://some.url/xyz
+          maxLength: 200
+          description: If set this is the url that the portal should redirect the user to when the meeting ends.
         vmrType:
           $ref: '#/components/schemas/vmrType'
         hostView:

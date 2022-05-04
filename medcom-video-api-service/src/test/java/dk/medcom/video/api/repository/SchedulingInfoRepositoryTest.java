@@ -33,7 +33,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testSchedulingInfo() {
-
         // Given
         Long hostPin = 1010L;
         Long guestPin = 2010L;
@@ -44,6 +43,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         String uriWithoutDomain = "7777";
         String uriDomain = "test.dk";
         Long meetingUserId = 101L;
+        String customPortalGuest = "custom_portal_guest";
+        String customPortalHost = "custom_portal_host";
+        String returnUrl = "return_url";
 
         ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
         String provisionStatusDescription = "All okay untill now";
@@ -101,6 +103,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         Organisation organization = subjectOrganisationRepository.findByOrganisationId("test-org");
         schedulingInfo.setOrganisation(organization);
         schedulingInfo.setPoolOverflow(true);
+        schedulingInfo.setCustomPortalGuest(customPortalGuest);
+        schedulingInfo.setCustomPortalHost(customPortalHost);
+        schedulingInfo.setReturnUrl(returnUrl);
 
         // When
         schedulingInfo = subject.save(schedulingInfo);
@@ -137,6 +142,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
         assertEquals(reservationId.toString(), schedulingInfo.getReservationId());
         assertTrue(schedulingInfo.getPoolOverflow());
+        assertEquals(customPortalGuest, schedulingInfo.getCustomPortalGuest());
+        assertEquals(customPortalHost, schedulingInfo.getCustomPortalHost());
+        assertEquals(returnUrl, schedulingInfo.getReturnUrl());
     }
 
     @Test
@@ -173,6 +181,9 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(10, schedulingInfo.getMaxParticipants());
         assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
         assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());
+        assertEquals("custom_portal_guest", schedulingInfo.getCustomPortalGuest());
+        assertEquals("custom_portal_host", schedulingInfo.getCustomPortalHost());
+        assertEquals("return_url", schedulingInfo.getReturnUrl());
     }
 
     @Test

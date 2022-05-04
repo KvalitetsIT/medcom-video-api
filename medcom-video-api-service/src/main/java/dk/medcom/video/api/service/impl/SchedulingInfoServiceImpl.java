@@ -265,6 +265,10 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setCreatedTime(calendarNow.getTime());
 
+		schedulingInfo.setCustomPortalGuest(schedulingTemplate.getCustomPortalGuest());
+		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
+		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
+
 		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		performanceLogger.logTimeSinceCreation();
@@ -515,6 +519,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setForcePresenterIntoMain(schedulingTemplate.getForcePresenterIntoMain());
 		schedulingInfo.setForceEncryption(schedulingTemplate.getForceEncryption());
 		schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
+		schedulingInfo.setCustomPortalGuest(schedulingTemplate.getCustomPortalGuest());
+		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
+		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 

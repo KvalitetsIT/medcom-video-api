@@ -76,6 +76,9 @@ public class SchedulingInfo {
 	private Date updatedTime;
 	private String reservationId;
 	private String uriDomain;
+	private String customPortalGuest;
+	private String customPortalHost;
+	private String returnUrl;
 
 	public Long getId() {
 		return id;
@@ -320,5 +323,29 @@ public class SchedulingInfo {
 
 	public String getUriDomain() {
 		return uriDomain;
+	}
+
+    public String getCustomPortalGuest() {
+        return customPortalGuest;
+    }
+
+    public void setCustomPortalGuest(String customPortalGuest) {
+        this.customPortalGuest = customPortalGuest;
+    }
+
+	public String getCustomPortalHost() {
+		return customPortalHost;
+	}
+
+	public void setCustomPortalHost(String customPortalHost) {
+		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

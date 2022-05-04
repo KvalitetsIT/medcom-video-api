@@ -45,6 +45,9 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("https://video.link/" + result.meetingDetails.getShortId(), result.getShortLink());
 		assertEquals(result.getShortLink(), result.getShortlink());
 		assertEquals(result.meetingDetails.getShortLink(), result.meetingDetails.getShortlink());
+		assertEquals("custom_portal_guest", result.getCustomPortalGuest());
+		assertEquals("custom_portal_host", result.getCustomPortalHost());
+		assertEquals("return_url", result.getReturnUrl());
 	}
 
 	@Test
@@ -190,5 +193,24 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(result.getUuid());
 		assertNotNull(schedulingInfo);
 		assertEquals(reservationId, schedulingInfo.getReservationId());
+	}
+
+	@Test
+	public void createSchedulingInfo() throws ApiException {
+		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
+		createSchedulingInfo.setSchedulingTemplateId(1);
+		createSchedulingInfo.setOrganizationId("company 1");
+		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
+
+		assertNotNull(createdSchedulingInfo);
+		assertEquals("custom_portal_guest", createdSchedulingInfo.getCustomPortalGuest());
+		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
+		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
+
+		var readSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdSchedulingInfo.getUuid());
+		assertNotNull(readSchedulingInfo);
+		assertEquals("custom_portal_guest", createdSchedulingInfo.getCustomPortalGuest());
+		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
+		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
 	}
 }

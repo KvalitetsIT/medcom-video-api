@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest {
     private SchedulingTemplateAdministrationApi schedulingTemplate;
@@ -33,6 +34,9 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setGuestPinRequired(true);
         create.setUriNumberRangeLow(1);
         create.setUriNumberRangeHigh(100);
+        create.setCustomPortalGuest("some_portal_guest");
+        create.setCustomPortalHost("some_portal_host");
+        create.setReturnUrl("return_url");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -49,6 +53,9 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertTrue(result.isForcePresenterIntoMain());
         Assert.assertFalse(result.isForceEncryption());
         Assert.assertFalse(result.isMuteAllGuests());
+        Assert.assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
+        Assert.assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
+        Assert.assertEquals(create.getReturnUrl(), result.getReturnUrl());
     }
 
     @Test
@@ -100,6 +107,9 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setVmrType(VmrType.LECTURE);
         updateSchedulingTemplate.setHostView(ViewType.TWO_MAINS_TWENTYONE_PIPS);
         updateSchedulingTemplate.setEnableOverlayText(false);
+        updateSchedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
+        updateSchedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
+        updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -111,5 +121,8 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
         Assert.assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
         Assert.assertEquals(updateSchedulingTemplate.isEnableOverlayText(), result.isEnableOverlayText());
+        Assert.assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
+        Assert.assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
+        Assert.assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
     }
 }

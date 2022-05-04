@@ -44,6 +44,9 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private boolean forcePresenterIntoMain;
 	private boolean forceEncryption;
 	private boolean muteAllGuests;
+	private String customPortalGuest;
+	private String customPortalHost;
+	private String returnUrl;
 
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;
@@ -87,6 +90,9 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		forcePresenterIntoMain = schedulingTemplate.getForcePresenterIntoMain();
 		forceEncryption = schedulingTemplate.getForceEncryption();
 		muteAllGuests = schedulingTemplate.getMuteAllGuests();
+		customPortalGuest = schedulingTemplate.getCustomPortalGuest();
+		customPortalHost = schedulingTemplate.getCustomPortalHost();
+		returnUrl = schedulingTemplate.getReturnUrl();
 
 		createdTime = schedulingTemplate.getCreatedTime();
 		updatedTime = schedulingTemplate.getUpdatedTime();
@@ -355,5 +361,29 @@ public class SchedulingTemplateDto extends RepresentationModel {
 
 	public void setMuteAllGuests(boolean muteAllGuests) {
 		this.muteAllGuests = muteAllGuests;
+	}
+
+	public String getCustomPortalGuest() {
+		return customPortalGuest;
+	}
+
+	public void setCustomPortalGuest(String customPortalGuest) {
+		this.customPortalGuest = customPortalGuest;
+	}
+
+	public String getCustomPortalHost() {
+		return customPortalHost;
+	}
+
+	public void setCustomPortalHost(String customPortalHost) {
+		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

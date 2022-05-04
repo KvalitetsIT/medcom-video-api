@@ -55,7 +55,10 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	private Boolean forcePresenterIntoMain;
 	private Boolean forceEncryption;
 	private Boolean muteAllGuests;
-	
+	private String customPortalGuest;
+	private String customPortalHost;
+	private String returnUrl;
+
 	@Size(max=100, message="ivrThme should have a maximum of 100 characters")
 	private String ivrTheme;
 	
@@ -259,5 +262,29 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setMuteAllGuests(Boolean muteAllGuests) {
 		this.muteAllGuests = muteAllGuests;
+	}
+
+	public String getCustomPortalGuest() {
+		return customPortalGuest;
+	}
+
+	public void setCustomPortalGuest(String customPortalGuest) {
+		this.customPortalGuest = customPortalGuest;
+	}
+
+	public String getCustomPortalHost() {
+		return customPortalHost;
+	}
+
+	public void setCustomPortalHost(String customPortalHost) {
+		this.customPortalHost = customPortalHost;
+	}
+
+	public String getReturnUrl() {
+		return returnUrl;
+	}
+
+	public void setReturnUrl(String returnUrl) {
+		this.returnUrl = returnUrl;
 	}
 }

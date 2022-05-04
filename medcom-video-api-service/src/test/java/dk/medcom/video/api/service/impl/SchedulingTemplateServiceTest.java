@@ -3,6 +3,7 @@ package dk.medcom.video.api.service.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
@@ -10,6 +11,7 @@ import dk.medcom.video.api.service.OrganisationService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import dk.medcom.video.api.context.UserContext;
@@ -25,16 +27,17 @@ import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
 import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 
 public class SchedulingTemplateServiceTest {
-	
-	private CreateSchedulingTemplateDto createSchedulingTemplateDto;	
+	private CreateSchedulingTemplateDto createSchedulingTemplateDto;
 	private UpdateSchedulingTemplateDto updateSchedulingTemplateDto;
 	private MeetingUser meetingUser;
 	private Organisation organisation;
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
-	
+	private SchedulingTemplateRepository schedulingTemplateRepository;
 
 	@Before
 	public void prepareTest() {
@@ -46,140 +49,54 @@ public class SchedulingTemplateServiceTest {
 		organisation.setOrganisationId("org");
 		meetingUser.setOrganisation(organisation);
 	}
-	
-	public CreateSchedulingTemplateDto getCreateSchedulingTemplateDtoWithDefaultValues() {
-		CreateSchedulingTemplateDto createSchedulingTemplateDto = new CreateSchedulingTemplateDto();
-		createSchedulingTemplateDto.setConferencingSysId(1L);
-		createSchedulingTemplateDto.setUriPrefix("a");
-		createSchedulingTemplateDto.setUriDomain("b");
-		createSchedulingTemplateDto.setHostPinRequired(true);
-		createSchedulingTemplateDto.setHostPinRangeLow(10L);
-		createSchedulingTemplateDto.setHostPinRangeHigh(99L);
-		createSchedulingTemplateDto.setGuestPinRequired(true);
-		createSchedulingTemplateDto.setGuestPinRangeLow(100L);
-		createSchedulingTemplateDto.setGuestPinRangeHigh(999L);
-		createSchedulingTemplateDto.setvMRAvailableBefore(15);
-		createSchedulingTemplateDto.setMaxParticipants(10);
-		createSchedulingTemplateDto.setEndMeetingOnEndTime(true);
-		createSchedulingTemplateDto.setUriNumberRangeLow(1000L);
-		createSchedulingTemplateDto.setUriNumberRangeHigh(9999L);
-		createSchedulingTemplateDto.setIvrTheme("20");
-		createSchedulingTemplateDto.setIsDefaultTemplate(false);
-		return createSchedulingTemplateDto;
-	}
-	
-	public UpdateSchedulingTemplateDto getUpdateSchedulingTemplateDtoWithDefaultValues() {
-		UpdateSchedulingTemplateDto updateSchedulingTemplateDto = new UpdateSchedulingTemplateDto();
-		updateSchedulingTemplateDto.setConferencingSysId(1L);
-		updateSchedulingTemplateDto.setUriPrefix("a");
-		updateSchedulingTemplateDto.setUriDomain("b");
-		updateSchedulingTemplateDto.setHostPinRequired(true);
-		updateSchedulingTemplateDto.setHostPinRangeLow(10L);
-		updateSchedulingTemplateDto.setHostPinRangeHigh(99L);
-		updateSchedulingTemplateDto.setGuestPinRequired(true);
-		updateSchedulingTemplateDto.setGuestPinRangeLow(100L);
-		updateSchedulingTemplateDto.setGuestPinRangeHigh(999L);
-		updateSchedulingTemplateDto.setvMRAvailableBefore(15);
-		updateSchedulingTemplateDto.setMaxParticipants(10);
-		updateSchedulingTemplateDto.setEndMeetingOnEndTime(true);
-		updateSchedulingTemplateDto.setUriNumberRangeLow(1000L);
-		updateSchedulingTemplateDto.setUriNumberRangeHigh(9999L);
-		updateSchedulingTemplateDto.setIvrTheme("20");
-		updateSchedulingTemplateDto.setIsDefaultTemplate(false);
-		return updateSchedulingTemplateDto;
-	}
-	            
-	public SchedulingTemplate getSchedulingTemplateWithDefaultValues(Organisation organisation, Long id) {
-		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
-		schedulingTemplate.setOrganisation(organisation);
-		schedulingTemplate.setId(id);
-		schedulingTemplate.setConferencingSysId(1L);
-		schedulingTemplate.setUriPrefix("a");
-		schedulingTemplate.setUriDomain("b");
-		schedulingTemplate.setHostPinRequired(true);
-		schedulingTemplate.setHostPinRangeLow(10L);
-		schedulingTemplate.setHostPinRangeHigh(99L);
-		schedulingTemplate.setGuestPinRequired(true);
-		schedulingTemplate.setGuestPinRangeLow(100L);
-		schedulingTemplate.setGuestPinRangeHigh(999L);
-		schedulingTemplate.setVMRAvailableBefore(15);
-		schedulingTemplate.setMaxParticipants(10);
-		schedulingTemplate.setEndMeetingOnEndTime(true);
-		schedulingTemplate.setUriNumberRangeLow(1000L);
-		schedulingTemplate.setUriNumberRangeHigh(9999L);
-		schedulingTemplate.setIvrTheme("20");
-		schedulingTemplate.setIsDefaultTemplate(false);
-		return schedulingTemplate;
-	}
-	
-	private SchedulingTemplateServiceImpl SchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, boolean isCreate) throws PermissionDeniedException, RessourceNotFoundException {
-		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
-	
-		SchedulingTemplate schedulingTemplateInService = getSchedulingTemplateWithDefaultValues(organisation,  1L);
 
-		
-		if (isCreate) {
-			Mockito.when(schedulingTemplateRepository.save(Mockito.any(SchedulingTemplate.class))).thenReturn(schedulingTemplateInService);	
-		} else {
-			Mockito.when(schedulingTemplateRepository.save(schedulingTemplateInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call	
-		}
-		
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(777L))).thenReturn(null);
-		
-		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList();
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
-		
-		return schedulingTemplateService;
-	}
-	
-	private SchedulingTemplateServiceImpl simpleSchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, SchedulingTemplateRepository schedulingTemplateRepository) throws PermissionDeniedException, RessourceNotFoundException {
-	
-		UserContextService userService = Mockito.mock(UserContextService.class);
-		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
-		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
-
-		SchedulingTemplateServiceImpl schedulingTemplateService = new SchedulingTemplateServiceImpl(schedulingTemplateRepository, userService, organisationService, meetingUserService, organisationTreeServiceClient);
-
-		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
-		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
-
-		return schedulingTemplateService;
-	}
-	
 	@Test 
 	public void testCreateSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException {
-		
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, true);
+		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate);
 
+		assertEquals(createSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+
+		ArgumentCaptor<SchedulingTemplate> schedulingTemplateArgumentCaptor = ArgumentCaptor.forClass(SchedulingTemplate.class);
+		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
+		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
+		assertEquals(createSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalGuest());
+		assertEquals(createSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
+		assertEquals(createSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 	}
 	
 	@Test 
 	public void testUpdateSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException {
-		
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
+		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
+		updateSchedulingTemplateDto.setCustomPortalGuest("some_portal_guest");
+		updateSchedulingTemplateDto.setCustomPortalHost("some_portal_host");
+		updateSchedulingTemplateDto.setReturnUrl("return_url");
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
-		Assert.assertEquals(false, schedulingTemplate.getGuestPinRequired());
+		assertNotNull(schedulingTemplate);
+		Assert.assertFalse(schedulingTemplate.getGuestPinRequired());
 
+		ArgumentCaptor<SchedulingTemplate> schedulingTemplateArgumentCaptor = ArgumentCaptor.forClass(SchedulingTemplate.class);
+		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
+		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
+		assertEquals(updateSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalGuest());
+		assertEquals(updateSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
+		assertEquals(updateSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 	}
 
 	@Test(expected = RessourceNotFoundException.class)
@@ -188,7 +105,7 @@ public class SchedulingTemplateServiceTest {
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
-		SchedulingTemplateServiceImpl schedulingTemplateService = SchedulingTemplateServiceMocked(userContext, meetingUser, false);
+		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
 		
 		// When
@@ -197,7 +114,6 @@ public class SchedulingTemplateServiceTest {
 		// Then
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(777L); //cheating, to retrieve null
 	}
-
 
 	@Test 
 	public void getGetSchedulingTemplateInOrganisationTree() throws PermissionDeniedException, RessourceNotFoundException   {
@@ -218,15 +134,17 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
-		Assert.assertNotNull(schedulingTemplate.getOrganisation());
+		assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate.getOrganisation());
+		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(0)).getOrganisationTree("org");
 
 	}
 
 	@Test
 	public void getGetSchedulingTemplateInOrganisationTreeOtherOrganisation() throws PermissionDeniedException, RessourceNotFoundException   {
-
 		// Given
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -249,8 +167,11 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
 
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
-		Assert.assertNotNull(schedulingTemplate.getOrganisation());
+		assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate.getOrganisation());
+		assertEquals(inputSchedulingTemplate.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(inputSchedulingTemplate.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(inputSchedulingTemplate.getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 	
@@ -263,8 +184,8 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
 		
-		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList();
-		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList();
+		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList<>();
+		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList<>();
 
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(null,  1L));
 		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
@@ -275,8 +196,11 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
+		assertNotNull(schedulingTemplate);
 		Assert.assertNull(schedulingTemplate.getOrganisation());
+		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 
@@ -309,8 +233,10 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(1L);
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplate);
-
+		assertNotNull(schedulingTemplate);
+		assertEquals(schedulingTemplateInService.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplateInService.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplateInService.getReturnUrl(), schedulingTemplate.getReturnUrl());
 	}
 	
 	@Test  
@@ -332,9 +258,120 @@ public class SchedulingTemplateServiceTest {
 		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateService.getSchedulingTemplates();
 		
 		// Then
-		Assert.assertNotNull(schedulingTemplates);
-		Assert.assertEquals(3, schedulingTemplates.size());
+		assertNotNull(schedulingTemplates);
+		assertEquals(3, schedulingTemplates.size());
  
 	}
 
+	private CreateSchedulingTemplateDto getCreateSchedulingTemplateDtoWithDefaultValues() {
+		CreateSchedulingTemplateDto createSchedulingTemplateDto = new CreateSchedulingTemplateDto();
+		createSchedulingTemplateDto.setConferencingSysId(1L);
+		createSchedulingTemplateDto.setUriPrefix("a");
+		createSchedulingTemplateDto.setUriDomain("b");
+		createSchedulingTemplateDto.setHostPinRequired(true);
+		createSchedulingTemplateDto.setHostPinRangeLow(10L);
+		createSchedulingTemplateDto.setHostPinRangeHigh(99L);
+		createSchedulingTemplateDto.setGuestPinRequired(true);
+		createSchedulingTemplateDto.setGuestPinRangeLow(100L);
+		createSchedulingTemplateDto.setGuestPinRangeHigh(999L);
+		createSchedulingTemplateDto.setvMRAvailableBefore(15);
+		createSchedulingTemplateDto.setMaxParticipants(10);
+		createSchedulingTemplateDto.setEndMeetingOnEndTime(true);
+		createSchedulingTemplateDto.setUriNumberRangeLow(1000L);
+		createSchedulingTemplateDto.setUriNumberRangeHigh(9999L);
+		createSchedulingTemplateDto.setIvrTheme("20");
+		createSchedulingTemplateDto.setIsDefaultTemplate(false);
+		createSchedulingTemplateDto.setCustomPortalGuest(UUID.randomUUID().toString());
+		createSchedulingTemplateDto.setCustomPortalHost(UUID.randomUUID().toString());
+		createSchedulingTemplateDto.setReturnUrl(UUID.randomUUID().toString());
+
+		return createSchedulingTemplateDto;
+	}
+
+	private UpdateSchedulingTemplateDto getUpdateSchedulingTemplateDtoWithDefaultValues() {
+		UpdateSchedulingTemplateDto updateSchedulingTemplateDto = new UpdateSchedulingTemplateDto();
+		updateSchedulingTemplateDto.setConferencingSysId(1L);
+		updateSchedulingTemplateDto.setUriPrefix("a");
+		updateSchedulingTemplateDto.setUriDomain("b");
+		updateSchedulingTemplateDto.setHostPinRequired(true);
+		updateSchedulingTemplateDto.setHostPinRangeLow(10L);
+		updateSchedulingTemplateDto.setHostPinRangeHigh(99L);
+		updateSchedulingTemplateDto.setGuestPinRequired(true);
+		updateSchedulingTemplateDto.setGuestPinRangeLow(100L);
+		updateSchedulingTemplateDto.setGuestPinRangeHigh(999L);
+		updateSchedulingTemplateDto.setvMRAvailableBefore(15);
+		updateSchedulingTemplateDto.setMaxParticipants(10);
+		updateSchedulingTemplateDto.setEndMeetingOnEndTime(true);
+		updateSchedulingTemplateDto.setUriNumberRangeLow(1000L);
+		updateSchedulingTemplateDto.setUriNumberRangeHigh(9999L);
+		updateSchedulingTemplateDto.setIvrTheme("20");
+		updateSchedulingTemplateDto.setIsDefaultTemplate(false);
+
+		return updateSchedulingTemplateDto;
+	}
+
+	private SchedulingTemplate getSchedulingTemplateWithDefaultValues(Organisation organisation, Long id) {
+		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
+		schedulingTemplate.setOrganisation(organisation);
+		schedulingTemplate.setId(id);
+		schedulingTemplate.setConferencingSysId(1L);
+		schedulingTemplate.setUriPrefix("a");
+		schedulingTemplate.setUriDomain("b");
+		schedulingTemplate.setHostPinRequired(true);
+		schedulingTemplate.setHostPinRangeLow(10L);
+		schedulingTemplate.setHostPinRangeHigh(99L);
+		schedulingTemplate.setGuestPinRequired(true);
+		schedulingTemplate.setGuestPinRangeLow(100L);
+		schedulingTemplate.setGuestPinRangeHigh(999L);
+		schedulingTemplate.setVMRAvailableBefore(15);
+		schedulingTemplate.setMaxParticipants(10);
+		schedulingTemplate.setEndMeetingOnEndTime(true);
+		schedulingTemplate.setUriNumberRangeLow(1000L);
+		schedulingTemplate.setUriNumberRangeHigh(9999L);
+		schedulingTemplate.setIvrTheme("20");
+		schedulingTemplate.setIsDefaultTemplate(false);
+		schedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
+		schedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
+		schedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
+
+		return schedulingTemplate;
+	}
+
+	private SchedulingTemplateServiceImpl schedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, boolean isCreate) throws PermissionDeniedException, RessourceNotFoundException {
+		schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
+		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
+
+		SchedulingTemplate schedulingTemplateInService = getSchedulingTemplateWithDefaultValues(organisation,  1L);
+
+
+		if (isCreate) {
+			Mockito.when(schedulingTemplateRepository.save(Mockito.any(SchedulingTemplate.class))).thenReturn(schedulingTemplateInService);
+		} else {
+			Mockito.when(schedulingTemplateRepository.save(schedulingTemplateInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
+		}
+
+		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(777L))).thenReturn(null);
+
+		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList();
+		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
+
+		Mockito.when(schedulingTemplateRepository.save(Mockito.any())).thenAnswer(x -> x.getArgument(0));
+
+		return schedulingTemplateService;
+	}
+
+	private SchedulingTemplateServiceImpl simpleSchedulingTemplateServiceMocked(UserContext userContext, MeetingUser meetingUser, SchedulingTemplateRepository schedulingTemplateRepository) throws PermissionDeniedException, RessourceNotFoundException {
+
+		UserContextService userService = Mockito.mock(UserContextService.class);
+		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
+		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
+
+		SchedulingTemplateServiceImpl schedulingTemplateService = new SchedulingTemplateServiceImpl(schedulingTemplateRepository, userService, organisationService, meetingUserService, organisationTreeServiceClient);
+
+		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
+		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
+
+		return schedulingTemplateService;
+	}
 }
