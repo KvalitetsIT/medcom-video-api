@@ -295,6 +295,10 @@ components:
           type: string
           maxLength: 11
           example: Min Organisation
+        smsCallbackUrl:
+          type: string
+          maxLength: 100
+          example: http://callback.api/%reference%?status=%status%
     organisation-uri-request:
       type: array
       items:

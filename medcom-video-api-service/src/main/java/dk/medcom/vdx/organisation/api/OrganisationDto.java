@@ -5,6 +5,7 @@ public class OrganisationDto {
     private String name;
     private int poolSize;
     private String smsSenderName;
+    private String smsCallbackUrl;
 
     public String getName() {
         return name;
@@ -45,5 +46,13 @@ public class OrganisationDto {
                 ", poolSize=" + poolSize +
                 ", smsSenderName='" + smsSenderName + '\'' +
                 '}';
+    }
+
+    public String getSmsCallbackUrl() {
+        return smsCallbackUrl;
+    }
+
+    public void setSmsCallbackUrl(String smsCallbackUrl) {
+        this.smsCallbackUrl = smsCallbackUrl;
     }
 }

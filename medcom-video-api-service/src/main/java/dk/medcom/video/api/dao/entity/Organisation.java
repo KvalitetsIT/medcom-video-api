@@ -20,6 +20,7 @@ public class Organisation {
 	private long groupId;
 	private String smsSenderName;
 	private boolean allowCustomUriWithoutDomain;
+	private String smsCallbackUrl;
 
 	public Long getId() {
 		return id;
@@ -81,4 +82,12 @@ public class Organisation {
     public void setAllowCustomUriWithoutDomain(boolean allowCustomUriWithoutDomain) {
         this.allowCustomUriWithoutDomain = allowCustomUriWithoutDomain;
     }
+
+	public String getSmsCallbackUrl() {
+		return smsCallbackUrl;
+	}
+
+	public void setSmsCallbackUrl(String smsCallbackUrl) {
+		this.smsCallbackUrl = smsCallbackUrl;
+	}
 }
