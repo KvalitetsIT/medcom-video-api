@@ -64,6 +64,7 @@ public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
         assertEquals("test-org", response.getCode());
         assertEquals("company name test-org", response.getName());
         assertEquals("MinAfsender", response.getSmsSenderName());
+        assertEquals("some_url", response.getSmsCallbackUrl());
     }
 
     @Test

@@ -295,6 +295,11 @@ components:
           type: string
           maxLength: 11
           example: Min Organisation
+        smsCallbackUrl:
+          type: string
+          maxLength: 100
+          example: http://callback.api/%reference%?status=%status%
+          description: If set a callback is done to this URL when SMS status is updated. Valid variables is %reference% and %status%.
     organisation-uri-request:
       type: array
       items:

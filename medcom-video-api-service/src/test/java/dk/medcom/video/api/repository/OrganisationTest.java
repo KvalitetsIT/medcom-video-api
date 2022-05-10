@@ -31,6 +31,7 @@ public class OrganisationTest extends RepositoryTest {
 		organisation.setPoolSize(10);
 		organisation.setName(name);
 		organisation.setGroupId(1);
+		organisation.setSmsCallbackUrl("some_url");
 
 		// When
 		organisation = subject.save(organisation);
@@ -43,6 +44,7 @@ public class OrganisationTest extends RepositoryTest {
 		assertEquals(name,  organisation.toString());
 		assertEquals(10, organisation.getPoolSize().longValue());
 		assertEquals(1L, organisation.getGroupId());
+		assertEquals("some_url", organisation.getSmsCallbackUrl());
 	}
 	
 	@Test

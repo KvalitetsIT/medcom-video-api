@@ -37,6 +37,7 @@ public class OrganisationController {
 		response.setName(organisation.getName());
 		response.setCode(organisation.getOrganisationId());
 		response.setSmsSenderName(organisation.getSmsSenderName());
+		response.setSmsCallbackUrl(organisation.getSmsCallbackUrl());
 		int poolSize = organisation.getPoolSize() == null ? 0 : organisation.getPoolSize();
 		response.setPoolSize(poolSize);
 
