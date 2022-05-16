@@ -6,6 +6,7 @@ import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
+import io.swagger.client.api.InfoApi;
 import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.api.VideoSchedulingInformationApi;
@@ -51,6 +52,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	private VideoMeetingsApi videoMeetings;
 	private OrganisationApi organisationApi;
 	private VideoSchedulingInformationApi schedulingInfoApi;
+	private InfoApi infoApi;
 
 	@Before
 	public void setupApiClient() {
@@ -59,6 +61,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		videoMeetings = new VideoMeetingsApi(apiClient);
+
+		infoApi = new InfoApi(apiClient);
 
 		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
 
@@ -496,6 +500,18 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var client = HttpClient.newBuilder().build();
 		var response = client.send(request, HttpResponse.BodyHandlers.ofString());
 		assertEquals(403, response.statusCode());
+	}
+
+	@Test
+	public void testCanReadInfo() {
+		try {
+			var result = infoApi.infoGet();
+
+			assertNotNull(result);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {
