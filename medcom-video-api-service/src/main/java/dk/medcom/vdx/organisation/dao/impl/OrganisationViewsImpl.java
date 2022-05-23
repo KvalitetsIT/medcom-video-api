@@ -32,7 +32,7 @@ public class OrganisationViewsImpl implements OrganisationViews {
         var parameters = new HashMap<String, Object>();
         parameters.put("uri_with_domain", uri.toLowerCase());
 
-        String sql = "SELECT relation_id FROM view_entities_meetingrooms WHERE FIND_IN_SET(:uri_with_domain,LOWER(aliases))";
+        String sql = "SELECT group_id FROM view_entities_meetingroom WHERE FIND_IN_SET(:uri_with_domain,LOWER(aliases))";
 
         try {
             Long result = template.queryForObject(sql, parameters, Long.class);
