@@ -7,6 +7,7 @@ import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.model.OrganisationUri;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.format.DateTimeFormatter;
@@ -44,6 +45,7 @@ public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
     }
 
     @Test
+    @Ignore // missing view view_entities_meetingroom
     public void testOrganisationByUri_StatusNotPROVISIONED_OK() throws ApiException {
         // Given
         List<String> uris = new ArrayList<>();
