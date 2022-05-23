@@ -146,6 +146,10 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(videoApi, videoApiLogger);
 	}
 
+	String getJdbcUrl() {
+		return mysql.getJdbcUrl();
+	}
+
 	public static void setupNats() {
 		var natsContainerName = "nats-streaming";
 		var natsContainerVersion = "0.19.0";

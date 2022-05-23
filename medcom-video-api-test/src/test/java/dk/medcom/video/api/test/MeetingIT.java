@@ -41,6 +41,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -511,6 +513,15 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testViewIsHealthy() throws SQLException {
+		// Only test that we can select from the view and it contains data.
+		try(var connection = DriverManager.getConnection(getJdbcUrl(), "videouser", "secret1234");
+			var result = connection.createStatement().executeQuery("select * from view_pool_history")) {
+			assertTrue(result.next());
 		}
 	}
 

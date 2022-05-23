@@ -1,12 +1,11 @@
 package dk.medcom.video.api.configuration;
 
-import javax.sql.DataSource;
-
+import dk.medcom.video.api.dao.*;
+import dk.medcom.video.api.dao.impl.PoolHistoryDaoImpl;
+import dk.medcom.video.api.dao.impl.PoolInfoRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("dk.medcom.video.api.dao.impl")
@@ -41,6 +36,16 @@ public class DatabaseConfiguration {
 
 	@Value("${jdbc.pass}")
 	private String jdbcPass;
+
+	@Bean
+	public PoolHistoryDao poolHistoryDao(DataSource dataSource) {
+		return new PoolHistoryDaoImpl(dataSource);
+	}
+
+	@Bean
+	public PoolInfoRepository poolInfoRepository(DataSource dataSource) {
+		return new PoolInfoRepositoryImpl(dataSource);
+	}
 
 	@Bean
 	public DataSource dataSource() {
