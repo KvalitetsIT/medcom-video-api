@@ -20,36 +20,44 @@ CREATE TABLE entities (
   KEY idx_provisionstatus_type (provision_status,type)
 );
 
--- * view entities meetingrooms *
-CREATE OR REPLACE VIEW view_entities_meetingrooms AS
-select
-    e1.entity_id AS entity_id,
-    e1.relation_id AS relation_id,
-    json_unquote(json_extract(e1.jsondata,
-    '$.name')) AS name,
-    json_unquote(json_extract(e1.jsondata,
-    '$.description')) AS description,
-    group_concat(json_unquote(json_extract(e2.jsondata, '$.alias')) separator ',') AS aliases,
-    e1.jsondata AS jsondata,
-    e1.type AS type,
-    e1.provision_status AS provision_status,
-    e1.provision_status_description AS provision_status_description,
-    e1.provision_id AS provision_id,
-    e1.provision_timestamp AS provision_timestamp,
-    e1.created_time AS created_time,
-    e1.created_by AS created_by,
-    e1.updated_time AS updated_time,
-    e1.updated_by AS updated_by
-from
-    (entities e1 straight_join entities e2 on
-    ((e2.relation_id = e1.entity_id)))
-where
-    ((e1.type = 'meetingroom')
-        and (e2.type = 'alias')
-            and (e1.deleted_time = '0001-01-01')
-                and (e2.deleted_time = '0001-01-01'))
-group by
-    e1.entity_id;
+---- * view entities meetingrooms *
+--CREATE OR REPLACE view view_entities_meetingroom AS
+--  SELECT    t1.uuid                                 AS uuid,
+--            t1.group_id                             AS group_id,
+--            t1.name                                 AS name,
+--            t1.description                          AS description,
+--            t1.pin                                  AS pin,
+--            t1.guest_pin                            AS guest_pin,
+--            t1.allow_guests                         AS allow_guests,
+--            t1.participant_limit                    AS participant_limit,
+--            t1.enable_overlay_text                  AS enable_overlay_text,
+--            t1.guests_can_present                   AS guests_can_present,
+--            t1.enable_chat                          AS enable_chat,
+--            t1.force_presenter_into_main            AS force_presenter_into_main,
+--            t1.mute_all_guests                      AS mute_all_guests,
+--            t1.force_encryption                     AS force_encryption,
+--            t1.type                                 AS type,
+--            t1.host_layout                          AS host_layout,
+--            t1.guest_layout                         AS guest_layout,
+--            t1.quality                              AS quality,
+--            t1.theme_id                             AS theme_id,
+--            t1.last_use                             AS last_use,
+--            group_concat(t2.alias SEPARATOR ',')    AS aliases,
+--            group_concat(t2.last_use SEPARATOR ',') AS aliases_last_use,
+--            t1.provision_status                     AS provision_status,
+--            t1.provision_status_description         AS provision_status_description,
+--            t1.provision_id                         AS provision_id,
+--            t1.provision_timestamp                  AS provision_timestamp,
+--            t1.created_time                         AS created_time,
+--            t1.created_by                           AS created_by,
+--            t1.updated_time                         AS updated_time,
+--            t1.updated_by                           AS updated_by,
+--            t1.deleted_time                         AS deleted_time,
+--            t1.deleted_by                           AS deleted_by
+--  FROM      (entities_meetingroom t1
+--  LEFT JOIN entities_meetingroom_alias t2
+--  ON       ((t2.relation_uuid = t1.uuid)))
+--  GROUP BY  t1.uuid
 
 -- * view entities registeredclients *
 CREATE OR REPLACE VIEW view_entities_registeredclients AS
