@@ -111,5 +111,5 @@ INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_statu
 insert into meeting_labels(id, meeting_id, label) values(301, 7, 'first label');
 insert into meeting_labels(id, meeting_id, label) values(302, 7, 'second label');
 
-insert into pool_history(organisation_code, pool_enabled, desired_pool_size, available_pool_rooms, status_time, created_time)
-values('example_org', 1, 10, 11, now(), now());
+insert into pool_history(organisation_code, desired_pool_size, available_pool_rooms, status_time, created_time)
+values('example_org', 10, 11, now(), now());
