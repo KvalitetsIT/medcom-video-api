@@ -17,13 +17,12 @@ public class PoolHistoryDaoImpl implements PoolHistoryDao {
 
     @Override
     public void create(PoolHistory poolHistory) {
-        var sql = "insert into pool_history(organisation_code, pool_enabled, desired_pool_size, available_pool_rooms, status_time, created_time) " +
+        var sql = "insert into pool_history(organisation_code, desired_pool_size, available_pool_rooms, status_time, created_time) " +
                 "values(:organisation_code, :pool_enabled, :desired_pool_size, :available_pool_rooms, :status_time, :created_time)";
 
         var template = new NamedParameterJdbcTemplate(dataSource);
         var parameterMap = new HashMap<String, Object>();
         parameterMap.put("organisation_code", poolHistory.getOrganisationCode());
-        parameterMap.put("pool_enabled", poolHistory.isPoolEnabled());
         parameterMap.put("desired_pool_size", poolHistory.getDesiredPoolSize());
         parameterMap.put("available_pool_rooms", poolHistory.getAvailablePoolRooms());
         parameterMap.put("status_time", new Timestamp(poolHistory.getStatusTime().toEpochMilli()));

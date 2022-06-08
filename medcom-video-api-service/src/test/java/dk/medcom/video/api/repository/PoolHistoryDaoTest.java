@@ -18,7 +18,6 @@ public class PoolHistoryDaoTest extends RepositoryTest {
 		// Given
 		var poolHistory = new PoolHistory();
 		poolHistory.setOrganisationCode("" + Instant.now().toEpochMilli());
-		poolHistory.setPoolEnabled(true);
 		poolHistory.setDesiredPoolSize(10);
 		poolHistory.setAvailablePoolRooms(20);
 		poolHistory.setStatusTime(Instant.now());

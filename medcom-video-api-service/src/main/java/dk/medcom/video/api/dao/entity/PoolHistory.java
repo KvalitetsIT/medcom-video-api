@@ -5,7 +5,6 @@ import java.time.Instant;
 public class PoolHistory {
     private Long id;
     private String organisationCode;
-    private boolean poolEnabled;
     private Integer desiredPoolSize;
     private Integer availablePoolRooms;
     private Instant statusTime;
@@ -26,14 +25,6 @@ public class PoolHistory {
 
     public void setOrganisationCode(String organisationCode) {
         this.organisationCode = organisationCode;
-    }
-
-    public boolean isPoolEnabled() {
-        return poolEnabled;
-    }
-
-    public void setPoolEnabled(boolean poolEnabled) {
-        this.poolEnabled = poolEnabled;
     }
 
     public Integer getDesiredPoolSize() {

@@ -24,12 +24,11 @@ public class PoolHistoryServiceImpl implements PoolHistoryService {
     @Transactional
     public void calculateHistory() {
         var poolInfo = poolInfoRepository.getPoolInfos();
-        logger.info("Found data for {} pools.", poolInfo.size());
+        logger.info("Found data for {} pools. Updating pool history.", poolInfo.size());
         poolInfo.forEach(x -> {
             var now = Instant.now();
             var poolHistory = new PoolHistory();
             poolHistory.setOrganisationCode(x.getOrganisationCode());
-            poolHistory.setPoolEnabled(true);
             poolHistory.setDesiredPoolSize(x.getWantedPoolSize());
             poolHistory.setAvailablePoolRooms(x.getAvailablePoolSize());
             poolHistory.setStatusTime(now);
