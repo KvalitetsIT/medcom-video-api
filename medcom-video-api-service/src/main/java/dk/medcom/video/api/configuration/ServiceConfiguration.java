@@ -5,12 +5,12 @@ import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.PoolHistoryDao;
+import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
-import dk.medcom.video.api.service.AuditService;
-import dk.medcom.video.api.service.CustomUriValidator;
-import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
 import io.micrometer.core.instrument.Clock;
@@ -105,6 +105,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
 		return new OrganisationTreeServiceClientImpl(endpoint);
+	}
+
+	@Bean
+	public PoolHistoryService poolHistoryService(PoolInfoRepository poolInfoRepository, PoolHistoryDao PoolHistorydao) {
+		return new PoolHistoryServiceImpl(poolInfoRepository, PoolHistorydao);
 	}
 
 	@Bean
