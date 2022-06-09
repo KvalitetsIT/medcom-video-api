@@ -23,7 +23,7 @@ public class ScheduledTaskConfiguration {
     private PoolHistoryService poolHistoryService;
 
     @SchedulerLock(name = "cleanup")
-    @Scheduled(cron = "* */5 * * * *")
+    @Scheduled(fixedDelayString = "PT5M" )
     public void cleanupService() {
         LockAssert.assertLocked();
 
