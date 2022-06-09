@@ -8,9 +8,11 @@ CREATE TABLE pool_history (
   PRIMARY KEY (id)
 );
 
-create view view_pool_history
-as select organisation_code
-         ,desired_pool_size
-         ,available_pool_rooms
-         ,status_time
-      from pool_history;
+create or replace view view_pool_history
+as select h.organisation_code
+         ,o.name as organisation_name
+         ,h.desired_pool_size
+         ,h.available_pool_rooms
+         ,h.status_time
+      from pool_history h left outer join organisation as o on o.organisation_id = h.organisation_code
+;

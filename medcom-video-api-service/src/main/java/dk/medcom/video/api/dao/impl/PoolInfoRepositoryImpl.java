@@ -26,6 +26,7 @@ public class PoolInfoRepositoryImpl implements PoolInfoRepository {
 				+ "  left join scheduling_info as s on s.organisation_id = o.id "
 				+ "        and s.meetings_id is null "
 				+ "        and s.provision_status = 'PROVISIONED_OK' "
+				+ " 	   and s.reservation_id is null "
 				+ "where o.pool_size > 0 "
 			// Kopieret fra "job" + "  AND created_time < ADDDATE(UTC_TIMESTAMP, INTERVAL -1 MINUTE) "
 				+ " group by o.organisation_id";
