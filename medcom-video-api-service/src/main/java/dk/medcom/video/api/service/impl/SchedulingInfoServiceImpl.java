@@ -15,6 +15,8 @@ import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.domain.MessageType;
+import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +45,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
 	private final CustomUriValidator customUriValidator;
+	private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
@@ -61,7 +64,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 									 @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
 									 OrganisationTreeServiceClient organisationTreeServiceClient,
 									 AuditService auditService,
-									 CustomUriValidator customUriValidator) {
+									 CustomUriValidator customUriValidator,
+									 SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -73,6 +77,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditService;
 		this.customUriValidator = customUriValidator;
+		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -271,12 +276,52 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+
+		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(schedulingInfoEvent);
+
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 		performanceLogger.logTimeSinceCreation();
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
+	}
+
+	private SchedulingInfoEvent createSchedulingInfoEvent(SchedulingInfo schedulingInfo) {
+		var schedulingInfoEvent = new SchedulingInfoEvent();
+
+		schedulingInfoEvent.setMessageType(MessageType.CREATE);
+
+		schedulingInfoEvent.setUuid(schedulingInfo.getUuid());
+		schedulingInfoEvent.setHostPin(schedulingInfo.getHostPin());
+		schedulingInfoEvent.setGuestPin(schedulingInfo.getGuestPin());
+		schedulingInfoEvent.setVMRAvailableBefore(schedulingInfo.getVMRAvailableBefore());
+		schedulingInfoEvent.setvMRStartTime(schedulingInfo.getvMRStartTime().toInstant());
+		schedulingInfoEvent.setIvrTheme(schedulingInfo.getIvrTheme());
+		schedulingInfoEvent.setUriWithoutDomain(schedulingInfo.getUriWithoutDomain());
+		schedulingInfoEvent.setUriDomain(schedulingInfo.getUriDomain());
+		schedulingInfoEvent.setUriWithDomain(schedulingInfo.getUriWithDomain());
+		schedulingInfoEvent.setOrganisationCode(schedulingInfo.getOrganisation().getOrganisationId());
+		schedulingInfoEvent.setPortalLink(schedulingInfo.getPortalLink());
+		schedulingInfoEvent.setMaxParticipants(schedulingInfo.getMaxParticipants());
+		schedulingInfoEvent.setEndMeetingOnEndTime(schedulingInfo.getEndMeetingOnEndTime());
+		schedulingInfoEvent.setVmrType(schedulingInfo.getVmrType().toString());
+		schedulingInfoEvent.setHostView(schedulingInfo.getHostView().toString());
+		schedulingInfoEvent.setGuestView(schedulingInfo.getGuestView().toString());
+		schedulingInfoEvent.setVmrQuality(schedulingInfo.getVmrQuality().toString());
+		schedulingInfoEvent.setEnableOverlayText(schedulingInfo.getEnableOverlayText());
+		schedulingInfoEvent.setGuestsCanPresent(schedulingInfo.getGuestsCanPresent());
+		schedulingInfoEvent.setForcePresenterIntoMain(schedulingInfo.getForcePresenterIntoMain());
+		schedulingInfoEvent.setForceEncryption(schedulingInfo.getForceEncryption());
+		schedulingInfoEvent.setMuteAllGuests(schedulingInfo.getMuteAllGuests());
+		schedulingInfoEvent.setMeetingUser(schedulingInfo.getMeetingUser().getEmail());
+		schedulingInfoEvent.setCreatedTime(schedulingInfo.getCreatedTime().toInstant());
+		schedulingInfoEvent.setCustomPortalGuest(schedulingInfo.getCustomPortalGuest());
+		schedulingInfoEvent.setCustomPortalHost(schedulingInfo.getCustomPortalHost());
+		schedulingInfoEvent.setReturnUrl(schedulingInfo.getReturnUrl());
+
+		return schedulingInfoEvent;
 	}
 
 	private String generateUriWithoutDomain(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {

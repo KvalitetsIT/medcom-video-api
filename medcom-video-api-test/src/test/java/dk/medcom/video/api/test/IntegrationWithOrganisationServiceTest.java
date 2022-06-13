@@ -136,6 +136,11 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("audit.nats.cluster.id", "test-cluster")
 				.withEnv("audit.nats.client.id", "natsClientId")
 
+				.withEnv("events.nats.url", "nats://nats:4222")
+				.withEnv("events.nats.cluster.id", "test-cluster")
+				.withEnv("events.nats.client.id", "natsClientId")
+				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))

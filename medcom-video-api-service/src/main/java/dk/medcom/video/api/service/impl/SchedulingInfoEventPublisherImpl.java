@@ -1,0 +1,30 @@
+package dk.medcom.video.api.service.impl;
+
+import dk.medcom.audit.client.messaging.nats.NatsPublisher;
+import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
+import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
+public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
+    private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
+    private NatsPublisher natsPublisher;
+
+    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher) {
+        this.natsPublisher = natsPublisher;
+    }
+    @Override
+    public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
+        try {
+            natsPublisher.publishMessage(schedulingInfoEvent);
+        }
+        catch(IOException | InterruptedException | TimeoutException e) {
+            logger.warn("Error publishing nats message", e);
+
+            throw new MessagingException("Error during publish of event.", e);
+        }
+    }
+}

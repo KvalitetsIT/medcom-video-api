@@ -1,6 +1,7 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.audit.client.AuditClient;
+import dk.medcom.audit.client.messaging.nats.NatsPublisher;
 import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
@@ -13,6 +14,7 @@ import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
+import dk.medcom.video.api.service.impl.SchedulingInfoEventPublisherImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -100,6 +102,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
 		LOGGER.info("Starting up with service organisation strategy.");
 		return new OrganisationServiceStrategy(endpoint);
+	}
+
+	@Bean
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(NatsPublisher eventPublisher) {
+		return new SchedulingInfoEventPublisherImpl(eventPublisher);
 	}
 
 	@Bean
