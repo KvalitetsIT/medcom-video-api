@@ -17,13 +17,13 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "PT5M")
+@EnableSchedulerLock(defaultLockAtMostFor = "PT1M", defaultLockAtLeastFor = "PT1M")
 public class ScheduledTaskConfiguration {
     @Autowired
     private PoolHistoryService poolHistoryService;
 
     @SchedulerLock(name = "cleanup")
-    @Scheduled(fixedDelayString = "PT5M" )
+    @Scheduled(fixedDelayString = "PT1M" )
     public void cleanupService() {
         LockAssert.assertLocked();
 
