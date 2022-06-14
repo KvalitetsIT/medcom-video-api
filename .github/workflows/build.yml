@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ pool-info-1-minute ]
+    branches: [ master ]
     tags:
       - 'v*.*.*'
 
