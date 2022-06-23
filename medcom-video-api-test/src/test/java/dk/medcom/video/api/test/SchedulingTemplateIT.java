@@ -11,6 +11,8 @@ import org.junit.Test;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
+
 public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest {
     private SchedulingTemplateAdministrationApi schedulingTemplate;
 
@@ -37,6 +39,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setCustomPortalGuest("some_portal_guest");
         create.setCustomPortalHost("some_portal_host");
         create.setReturnUrl("return_url");
+        create.setGuestView(ViewType.FIVE_MAINS_SEVEN_PIPS);
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -53,9 +56,10 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertTrue(result.isForcePresenterIntoMain());
         Assert.assertFalse(result.isForceEncryption());
         Assert.assertFalse(result.isMuteAllGuests());
-        Assert.assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
-        Assert.assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
-        Assert.assertEquals(create.getReturnUrl(), result.getReturnUrl());
+        assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
+        assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
+        assertEquals(create.getReturnUrl(), result.getReturnUrl());
+        assertEquals(create.getGuestView(), result.getGuestView());
     }
 
     @Test
@@ -79,9 +83,9 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
 
         //Then
         Assert.assertNotNull(result);
-        Assert.assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
-        Assert.assertEquals(create.getHostView().toString(), result.getHostView().toString());
-        Assert.assertEquals(create.isEnableOverlayText(), result.isEnableOverlayText());
+        assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
+        assertEquals(create.getHostView().toString(), result.getHostView().toString());
+        assertEquals(create.isEnableOverlayText(), result.isEnableOverlayText());
     }
 
     @Test
@@ -118,11 +122,11 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
 
         //Then
         Assert.assertNotNull(result);
-        Assert.assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
-        Assert.assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
-        Assert.assertEquals(updateSchedulingTemplate.isEnableOverlayText(), result.isEnableOverlayText());
-        Assert.assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
-        Assert.assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
-        Assert.assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
+        assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
+        assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
+        assertEquals(updateSchedulingTemplate.isEnableOverlayText(), result.isEnableOverlayText());
+        assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
+        assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
+        assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
     }
 }
