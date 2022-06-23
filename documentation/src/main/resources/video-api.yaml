@@ -1484,6 +1484,11 @@ components:
         - one_main_twentyone_pips
         - two_mains_twentyone_pips
         - four_mains_zero_pips
+        - five_mains_seven_pips
+        - one_main_thirtythree_pips
+        - nine_mains_zero_pips
+        - sixteen_mains_zero_pips
+        - twentyfive_mains_zero_pips
     vmrQuality:
       example: hd
       description: Corresponds to numeric status 0, 1 and 2.
