@@ -34,7 +34,7 @@ public class NatsConfiguration {
     }
 
     @Bean("natsEventPublisher")
-    public NatsPublisher eventPublisher(NatsConnectionHandler natsEventPublisherConnectionHandler, @Value("${events.nats.subject.scheduling-info}") String subject) {
+    public NatsPublisher eventPublisher(@Qualifier("eventPublisher") NatsConnectionHandler natsEventPublisherConnectionHandler, @Value("${events.nats.subject.scheduling-info}") String subject) {
         return new NatsPublisher(natsEventPublisherConnectionHandler, subject);
     }
 
