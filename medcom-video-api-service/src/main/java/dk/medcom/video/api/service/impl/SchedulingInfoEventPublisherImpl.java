@@ -18,6 +18,7 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
     }
     @Override
     public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
+        logger.debug("Publishing scheduling info event to nats for uri with domain {}.", schedulingInfoEvent.getUriWithDomain());
         try {
             natsPublisher.publishMessage(schedulingInfoEvent);
         }
