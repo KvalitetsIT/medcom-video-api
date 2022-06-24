@@ -33,7 +33,7 @@ public class NatsConfiguration {
         return consumerConnectionHandler;
     }
 
-    @Bean
+    @Bean("natsEventPublisher")
     public NatsPublisher eventPublisher(NatsConnectionHandler natsEventPublisherConnectionHandler, @Value("${events.nats.subject.scheduling-info}") String subject) {
         return new NatsPublisher(natsEventPublisherConnectionHandler, subject);
     }
