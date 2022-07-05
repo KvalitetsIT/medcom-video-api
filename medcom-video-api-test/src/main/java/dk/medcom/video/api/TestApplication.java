@@ -60,7 +60,7 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("audit.nats.client.id", "natsClientId");
 //        System.setProperty("audit.nats.disabled", "true");
 
-        System.setProperty("events.nats.url", "nats://nats:4222");
+        System.setProperty("events.nats.url", natsPath);
         System.setProperty("events.nats.cluster.id", "test-cluster");
         System.setProperty("events.nats.client.id", "natsClientId");
         System.setProperty("events.nats.subject.scheduling-info", "schedulingInfo");
