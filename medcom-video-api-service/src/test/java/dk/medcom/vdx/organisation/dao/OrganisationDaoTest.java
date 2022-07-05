@@ -31,6 +31,8 @@ public class OrganisationDaoTest extends RepositoryTest {
         assertEquals("child org", result.getOrganisationName());
         assertEquals("child", result.getOrganisationId());
         assertEquals("child", result.getGroupName());
+        assertNull(result.getSmsCallbackUrl());
+        assertNull(result.getSmsSenderName());
         assertNull(result.getPoolSize());
     }
 
@@ -45,6 +47,8 @@ public class OrganisationDaoTest extends RepositoryTest {
         assertEquals("parent org", result.getOrganisationName());
         assertEquals("parent", result.getOrganisationId());
         assertEquals("parent", result.getGroupName());
+        assertEquals("sms-sender", result.getSmsSenderName());
+        assertEquals("callback", result.getSmsCallbackUrl());
     }
 
     @Test
@@ -63,6 +67,8 @@ public class OrganisationDaoTest extends RepositoryTest {
         assertEquals("child org", result.getOrganisationName());
         assertEquals("child", result.getOrganisationId());
         assertEquals("child", result.getGroupName());
+        assertNull(result.getSmsCallbackUrl());
+        assertNull(result.getSmsSenderName());
         assertNull(result.getPoolSize());
     }
 
@@ -77,6 +83,8 @@ public class OrganisationDaoTest extends RepositoryTest {
         assertEquals("parent org", result.getOrganisationName());
         assertEquals("parent", result.getOrganisationId());
         assertEquals("parent", result.getGroupName());
+        assertEquals("sms-sender", result.getSmsSenderName());
+        assertEquals("callback", result.getSmsCallbackUrl());
     }
 
     @Test(expected = EmptyResultDataAccessException.class)

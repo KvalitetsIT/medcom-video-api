@@ -78,4 +78,22 @@ public class OrganisationIT extends IntegrationWithOrganisationServiceTest {
         assertEquals("company name kvak", response.getName());
         assertNull(response.getSmsSenderName());
     }
+
+    @Test
+    public void testReadOrganisationTree() throws ApiException {
+        var response = sut.servicesOrganisationtreeCodeGet("child");
+        assertNotNull(response);
+
+        var childOrganisation = response.getChildren().get(0).getChildren().get(0).getChildren().get(0);
+        assertEquals("child", childOrganisation.getCode());
+        assertEquals("child org", childOrganisation.getName());
+        assertNull(childOrganisation.getSmsSenderName());
+        assertNull(childOrganisation.getSmsCallbackUrl());
+
+        var parentOrganisation = response.getChildren().get(0);
+        assertEquals("parent", parentOrganisation.getCode());
+        assertEquals("parent org", parentOrganisation.getName());
+        assertEquals("sms-sender", parentOrganisation.getSmsSenderName());
+        assertEquals("callback", parentOrganisation.getSmsCallbackUrl());
+    }
 }
