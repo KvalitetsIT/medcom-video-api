@@ -23,19 +23,26 @@ import java.util.TimeZone;
   loader = AnnotationConfigContextLoader.class)
 @Transactional
 abstract public class RepositoryTest {
+	private static boolean initialized = false;
+
 	static {
 		// Make sure unit test is running in same timezone as the default one in the container. This is needed when using Connector/J version 8.
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
+
 	@BeforeClass
 	public static void setupMySqlJdbcUrl() {
-		MySQLContainer mysql = new MySQLContainer("mysql:5.7")
-				.withDatabaseName("videodb")
-				.withUsername("videouser")
-				.withPassword("secret1234");
-		mysql.start();
-				
-		String jdbcUrl = mysql.getJdbcUrl() + "?useSSL=false&serverTimeZone=UTC";
-		System.setProperty("jdbc.url", jdbcUrl);
+		if(!initialized) {
+			MySQLContainer mysql = new MySQLContainer("mysql:5.7")
+					.withDatabaseName("videodb")
+					.withUsername("videouser")
+					.withPassword("secret1234");
+			mysql.start();
+
+			String jdbcUrl = mysql.getJdbcUrl() + "?useSSL=false&serverTimeZone=UTC";
+			System.setProperty("jdbc.url", jdbcUrl);
+
+			initialized = true;
+		}
 	}
 }
