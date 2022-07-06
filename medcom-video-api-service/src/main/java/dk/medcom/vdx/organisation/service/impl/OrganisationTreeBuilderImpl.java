@@ -45,6 +45,8 @@ public class OrganisationTreeBuilderImpl implements OrganisationTreeBuilder {
         organisationTreeDto.setCode(organisation.getOrganisationId() != null ? organisation.getOrganisationId() : organisation.getGroupId().toString());
         organisationTreeDto.setName(organisation.getOrganisationName() != null ? organisation.getOrganisationName() : organisation.getGroupName());
         organisationTreeDto.setPoolSize(organisation.getPoolSize() != null ? organisation.getPoolSize() : 0);
+        organisationTreeDto.setSmsCallbackUrl(organisation.getSmsCallbackUrl());
+        organisationTreeDto.setSmsSenderName(organisation.getSmsSenderName());
 
         return organisationTreeDto;
     }

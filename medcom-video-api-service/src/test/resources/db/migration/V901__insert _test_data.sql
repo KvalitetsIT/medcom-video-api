@@ -24,7 +24,7 @@ INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (6, 'anoth
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (7, 'pool-test-org', 'company name another-test-org', 10, 7);
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (8, 'pool-test-org2', 'company name another-test-org2', 30, 8);
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (9, 'overflow', 'overflow pool org', 10, 9);
-insert into organisation(id, organisation_id, name, pool_size, group_id) values(10, 'parent', 'parent org', 20, 11);
+insert into organisation(id, organisation_id, name, pool_size, group_id, sms_sender_name, sms_callback_url) values(10, 'parent', 'parent org', 20, 11, 'sms-sender', 'callback');
 insert into organisation(id, organisation_id, name, group_id) values(11, 'child', 'child org', 13);
 
 -- * meeting_users *

@@ -7,6 +7,8 @@ public class Organisation {
     private String groupName;
     private String organisationId;
     private String organisationName;
+    private String smsSenderName;
+    private String smsCallbackUrl;
 
     public Long getGroupId() {
         return groupId;
@@ -54,5 +56,21 @@ public class Organisation {
 
     public void setOrganisationName(String organisationName) {
         this.organisationName = organisationName;
+    }
+
+    public String getSmsSenderName() {
+        return smsSenderName;
+    }
+
+    public void setSmsSenderName(String smsSenderName) {
+        this.smsSenderName = smsSenderName;
+    }
+
+    public String getSmsCallbackUrl() {
+        return smsCallbackUrl;
+    }
+
+    public void setSmsCallbackUrl(String smsCallbackUrl) {
+        this.smsCallbackUrl = smsCallbackUrl;
     }
 }

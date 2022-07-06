@@ -7,6 +7,9 @@ public class OrganisationTreeDto {
     private int poolSize;
     private String code;
     private String name;
+    private String smsSenderName;
+    private String smsCallbackUrl;
+
     private List<OrganisationTreeDto> children = new ArrayList<>();
 
     public int getPoolSize() {
@@ -39,5 +42,21 @@ public class OrganisationTreeDto {
 
     public void setChildren(List<OrganisationTreeDto> children) {
         this.children = children;
+    }
+
+    public String getSmsSenderName() {
+        return smsSenderName;
+    }
+
+    public void setSmsSenderName(String smsSenderName) {
+        this.smsSenderName = smsSenderName;
+    }
+
+    public String getSmsCallbackUrl() {
+        return smsCallbackUrl;
+    }
+
+    public void setSmsCallbackUrl(String smsCallbackUrl) {
+        this.smsCallbackUrl = smsCallbackUrl;
     }
 }
