@@ -81,7 +81,7 @@
 			<dependency>
 				<groupId>dk.kvalitetsit</groupId>
 				<artifactId>spring-request-id-logger</artifactId>
-				<version>1.0.1</version>
+				<version>1.2.1</version>
 			</dependency>
 
 			<!-- Actuator and prometheus -->
