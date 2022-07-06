@@ -19,10 +19,10 @@
 			<artifactId>medcom-video-api-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
-			<version>6.3</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>

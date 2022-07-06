@@ -33,7 +33,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testcontainers.version>1.15.1</testcontainers.version>
 		<spring-prometheus-app-info-version>1.0.3</spring-prometheus-app-info-version>
-		<shed-lock-version>4.34.0</shed-lock-version>
+		<shed-lock-version>4.36.0</shed-lock-version>
 	</properties>
 	<dependencies>
 		<!-- Test -->
@@ -74,7 +74,7 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.13</version>
+				<version>1.15</version>
 			</dependency>
 
 			<!-- Actuator and prometheus -->
@@ -110,7 +110,7 @@
 			<dependency>
 				<groupId>dk.medcom</groupId>
 				<artifactId>medcom-audit-api</artifactId>
-				<version>0.9.0</version>
+				<version>1.0.0</version>
 			</dependency>
 
 			<!-- Task locking -->
@@ -124,6 +124,14 @@
 				<groupId>net.javacrumbs.shedlock</groupId>
 				<artifactId>shedlock-provider-jdbc-template</artifactId>
 				<version>${shed-lock-version}</version>
+			</dependency>
+
+			<!-- Logback -->
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>7.2</version>
+				<scope>runtime</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
