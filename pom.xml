@@ -33,7 +33,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testcontainers.version>1.15.1</testcontainers.version>
 		<spring-prometheus-app-info-version>1.0.3</spring-prometheus-app-info-version>
-		<shed-lock-version>4.36.0</shed-lock-version>
+		<shed-lock-version>4.38.0</shed-lock-version>
 	</properties>
 	<dependencies>
 		<!-- Test -->
@@ -46,13 +46,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>3.0.0</version>
-				<scope>test</scope>
-			</dependency>
-
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>mockserver</artifactId>
@@ -194,7 +187,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.2</version>
+				<version>0.8.8</version>
 				<executions>
 					<execution>
 						<goals>
