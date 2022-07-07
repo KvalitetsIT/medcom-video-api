@@ -10,10 +10,7 @@ import io.swagger.client.api.InfoApi;
 import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.api.VideoSchedulingInformationApi;
-import io.swagger.client.model.CreateMeeting;
-import io.swagger.client.model.Meeting;
-import io.swagger.client.model.PatchMeeting;
-import io.swagger.client.model.UpdateMeeting;
+import io.swagger.client.model.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -167,6 +164,15 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 		assertNotNull(result);
 		assertEquals(createdMeeting.getUuid(), result.getUuid());
+	}
+
+	@Test
+	public void testCanCreatePoolMeeting() throws ApiException {
+		var createMeeting = createMeeting(UUID.randomUUID().toString());
+		createMeeting.meetingType(MeetingType.POOL);
+		var result = videoMeetings.meetingsPost(createMeeting);
+
+		assertNotNull(result);
 	}
 
 	@Test
