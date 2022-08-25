@@ -1,0 +1,1 @@
+alter table meeting_users modify email varchar(100) not null;
