@@ -31,7 +31,7 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
             return;
         }
 
-        logger.debug("Publishing scheduling info event to nats for uri with domain {}.", schedulingInfoEvent.getUriWithDomain());
+        logger.info("Publishing scheduling info event to nats for uri with domain {}.", schedulingInfoEvent.getUriWithDomain());
 
         if(schedulingInfoEvent.getIvrTheme() != null && !schedulingInfoEvent.getIvrTheme().equals("0")) {
             var theme = entitiesIvrThemeDao.getTheme(schedulingInfoEvent.getIvrTheme());
