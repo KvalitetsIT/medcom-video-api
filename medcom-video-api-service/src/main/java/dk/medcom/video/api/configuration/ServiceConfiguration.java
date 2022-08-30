@@ -36,6 +36,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -107,9 +108,10 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, @Value("${event.organisation.filter}") List<String> filterOrganisations) {
-		LOGGER.info("Only sending events for the following organisations: {}", filterOrganisations);
-		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, x -> filterOrganisations.isEmpty() || filterOrganisations.contains(x));
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, @Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
+		List<String> finalFilterOrganisations = filterOrganisations == null ? Collections.emptyList() : filterOrganisations;;
+		LOGGER.info("Only sending events for the following organisations: {}", finalFilterOrganisations);
+		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, x -> finalFilterOrganisations.isEmpty() || finalFilterOrganisations.contains(x));
 	}
 
 	@Bean
