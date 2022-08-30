@@ -5,6 +5,7 @@ import dk.medcom.audit.client.messaging.nats.NatsPublisher;
 import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
+import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.PoolInfoRepository;
@@ -106,8 +107,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher) {
-		return new SchedulingInfoEventPublisherImpl(eventPublisher);
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
+		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao);
 	}
 
 	@Bean

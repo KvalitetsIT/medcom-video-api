@@ -1,6 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
 import dk.medcom.audit.client.messaging.nats.NatsPublisher;
+import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;
@@ -12,13 +13,22 @@ import java.util.concurrent.TimeoutException;
 public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
     private NatsPublisher natsPublisher;
+    private final EntitiesIvrThemeDao entitiesIvrThemeDao;
 
-    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher) {
+    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
         this.natsPublisher = natsPublisher;
+        this.entitiesIvrThemeDao = entitiesIvrThemeDao;
     }
     @Override
     public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
         logger.debug("Publishing scheduling info event to nats for uri with domain {}.", schedulingInfoEvent.getUriWithDomain());
+
+        if(schedulingInfoEvent.getIvrTheme() != null && !schedulingInfoEvent.getIvrTheme().equals("0")) {
+            var theme = entitiesIvrThemeDao.getTheme(schedulingInfoEvent.getIvrTheme());
+
+            theme.ifPresent(x -> schedulingInfoEvent.setIvrThemeProvisionId(x.getProvisionId()));
+        }
+
         try {
             natsPublisher.publishMessage(schedulingInfoEvent);
         }

@@ -1,6 +1,7 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.video.api.dao.*;
+import dk.medcom.video.api.dao.impl.EntitiesIvrThemeDaoImpl;
 import dk.medcom.video.api.dao.impl.PoolHistoryDaoImpl;
 import dk.medcom.video.api.dao.impl.PoolInfoRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +46,11 @@ public class DatabaseConfiguration {
 	@Bean
 	public PoolInfoRepository poolInfoRepository(DataSource dataSource) {
 		return new PoolInfoRepositoryImpl(dataSource);
+	}
+
+	@Bean
+	public EntitiesIvrThemeDao entitiesIvrThemeDao(DataSource dataSource) {
+		return new EntitiesIvrThemeDaoImpl(dataSource);
 	}
 
 	@Bean
