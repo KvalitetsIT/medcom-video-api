@@ -107,8 +107,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
-		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao);
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, @Value("event.organisation.filter") List<String> filterOrganisations) {
+		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, x -> filterOrganisations.isEmpty() || filterOrganisations.contains(x));
 	}
 
 	@Bean

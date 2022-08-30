@@ -8,19 +8,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
     private NatsPublisher natsPublisher;
     private final EntitiesIvrThemeDao entitiesIvrThemeDao;
+    private final Function<String, Boolean> organisationFilter;
 
-    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
+    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, Function<String, Boolean> organisationFilter) {
         this.natsPublisher = natsPublisher;
         this.entitiesIvrThemeDao = entitiesIvrThemeDao;
+        this.organisationFilter = organisationFilter;
     }
+
     @Override
     public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
+        if(!organisationFilter.apply(schedulingInfoEvent.getOrganisationCode())) {
+            logger.info("Not publishing event due to organisation {} not configured for events.", schedulingInfoEvent.getOrganisationCode());
+            return;
+        }
+
         logger.debug("Publishing scheduling info event to nats for uri with domain {}.", schedulingInfoEvent.getUriWithDomain());
 
         if(schedulingInfoEvent.getIvrTheme() != null && !schedulingInfoEvent.getIvrTheme().equals("0")) {

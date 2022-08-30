@@ -1,4 +1,5 @@
 
+
 ![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) 
 
 
@@ -49,3 +50,4 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | audit.nats.subject         | Nats subject to publish to                                                                       | Yes |
 | LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING |
 | ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                  | Yes |
+| event.organisation.filter | List of organisations to send events for | Yes |
