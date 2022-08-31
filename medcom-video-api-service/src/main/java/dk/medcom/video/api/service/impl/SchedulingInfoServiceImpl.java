@@ -333,7 +333,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfoEvent.setForceEncryption(schedulingInfo.getForceEncryption());
 		schedulingInfoEvent.setMuteAllGuests(schedulingInfo.getMuteAllGuests());
 		schedulingInfoEvent.setMeetingUser(schedulingInfo.getMeetingUser().getEmail());
-		schedulingInfoEvent.setCreatedTime(schedulingInfo.getCreatedTime().toInstant());
+		if(schedulingInfo.getCreatedTime() != null) {
+			schedulingInfoEvent.setCreatedTime(schedulingInfo.getCreatedTime().toInstant());
+		}
 		schedulingInfoEvent.setCustomPortalGuest(schedulingInfo.getCustomPortalGuest());
 		schedulingInfoEvent.setCustomPortalHost(schedulingInfo.getCustomPortalHost());
 		schedulingInfoEvent.setReturnUrl(schedulingInfo.getReturnUrl());
@@ -809,7 +811,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReservationId(UUID.randomUUID().toString());
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
 
 		return resultingSchedulingInfo;
