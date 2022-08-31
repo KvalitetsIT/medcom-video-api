@@ -286,7 +286,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo);
+		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
 		schedulingInfoEventPublisher.publishCreate(schedulingInfoEvent);
 
 		performanceLogger.logTimeSinceCreation();
@@ -297,10 +297,10 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	private SchedulingInfoEvent createSchedulingInfoEvent(SchedulingInfo schedulingInfo) {
+	private SchedulingInfoEvent createSchedulingInfoEvent(SchedulingInfo schedulingInfo, MessageType messageType) {
 		var schedulingInfoEvent = new SchedulingInfoEvent();
 
-		schedulingInfoEvent.setMessageType(MessageType.CREATE);
+		schedulingInfoEvent.setMessageType(messageType);
 
 		schedulingInfoEvent.setUuid(schedulingInfo.getUuid());
 		schedulingInfoEvent.setHostPin(schedulingInfo.getHostPin());
@@ -449,6 +449,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
+
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
 		LOGGER.debug("Entry updateSchedulingInfo");
@@ -462,7 +464,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE));
+
 		LOGGER.debug("Exit deleteeSchedulingInfo");
 	}
 
@@ -581,7 +584,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo));
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
@@ -675,6 +678,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
+
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
@@ -782,6 +787,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReservationId(UUID.randomUUID().toString());
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
 
 		return resultingSchedulingInfo;
