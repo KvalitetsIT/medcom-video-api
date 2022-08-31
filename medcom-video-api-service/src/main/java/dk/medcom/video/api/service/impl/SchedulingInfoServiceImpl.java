@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Component
 public class SchedulingInfoServiceImpl implements SchedulingInfoService {
@@ -45,7 +46,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
 	private final CustomUriValidator customUriValidator;
-	private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
+	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
+	private final List<String> provisionExcludeOrganisations;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
@@ -65,7 +67,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 									 OrganisationTreeServiceClient organisationTreeServiceClient,
 									 AuditService auditService,
 									 CustomUriValidator customUriValidator,
-									 SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+									 @Value("${event.organisation.filter:#{null}}") List<String> provisionExcludeOrganisations) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -78,6 +81,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.auditService = auditService;
 		this.customUriValidator = customUriValidator;
 		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
+
+		this.provisionExcludeOrganisations = Objects.requireNonNullElse(provisionExcludeOrganisations, Collections.emptyList());
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -92,12 +97,16 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
-		return schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+
+		return schedulingInfos.stream().filter(x -> provisionExcludeOrganisations.isEmpty() || !provisionExcludeOrganisations.contains(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
-		return schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
+		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
+
+		return schedulingInfos.stream().filter(x -> provisionExcludeOrganisations.isEmpty() || !provisionExcludeOrganisations.contains(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
