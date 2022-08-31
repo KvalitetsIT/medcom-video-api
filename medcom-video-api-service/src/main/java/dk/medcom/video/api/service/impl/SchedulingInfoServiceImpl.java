@@ -581,6 +581,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo));
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 

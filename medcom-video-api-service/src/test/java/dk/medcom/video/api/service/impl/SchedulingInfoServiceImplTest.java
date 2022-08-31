@@ -306,6 +306,8 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
+
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishCreate(Mockito.any()); // TODO Assert content.
     }
 
     @Test
