@@ -1031,6 +1031,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setUriWithoutDomain("random_uri");
         schedulingInfo.setUriDomain("some_domain");
         schedulingInfo.setMeeting(new Meeting());
+        schedulingInfo.getMeeting().setEndTime(new Date());
         schedulingInfo.setVmrType(VmrType.conference);
         schedulingInfo.setVmrQuality(VmrQuality.hd);
         schedulingInfo.setHostView(ViewType.one_main_zero_pips);
