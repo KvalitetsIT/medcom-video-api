@@ -329,6 +329,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfoEvent.setCustomPortalGuest(schedulingInfo.getCustomPortalGuest());
 		schedulingInfoEvent.setCustomPortalHost(schedulingInfo.getCustomPortalHost());
 		schedulingInfoEvent.setReturnUrl(schedulingInfo.getReturnUrl());
+		if(schedulingInfo.getMeeting() != null) {
+			schedulingInfoEvent.setMeetingEndTime(schedulingInfo.getMeeting().getEndTime().toInstant());
+		}
 
 		return schedulingInfoEvent;
 	}

@@ -35,6 +35,7 @@ public class SchedulingInfoEvent {
     private boolean endMeetingOnEndTime;
     private String vmrQuality;
     private String ivrThemeProvisionId;
+    private Instant meetingEndTime;
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
@@ -266,5 +267,13 @@ public class SchedulingInfoEvent {
 
     public String getIvrThemeProvisionId() {
         return ivrThemeProvisionId;
+    }
+
+    public Instant getMeetingEndTime() {
+        return meetingEndTime;
+    }
+
+    public void setMeetingEndTime(Instant meetingEndTime) {
+        this.meetingEndTime = meetingEndTime;
     }
 }
