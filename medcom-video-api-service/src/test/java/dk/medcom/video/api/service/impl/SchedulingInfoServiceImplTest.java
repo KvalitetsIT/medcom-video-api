@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import java.math.BigInteger;
 import java.util.*;
 
+import static dk.medcom.video.api.helper.TestDataHelper.createMeetingUser;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.times;
@@ -511,7 +512,9 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfo() {
+    public void testAttachMeetingToSchedulingInfo() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -523,6 +526,8 @@ public class SchedulingInfoServiceImplTest {
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
+        meeting.setMeetingUser(createMeetingUser(createOrganisation()));
+        meeting.setEndTime(new Date());
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
@@ -535,7 +540,9 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoOverflowPool() {
+    public void testAttachMeetingToSchedulingInfoOverflowPool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+
         UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
@@ -551,6 +558,8 @@ public class SchedulingInfoServiceImplTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
         meeting.getOrganisation().setOrganisationId("some_other_id");
+        meeting.setMeetingUser(createMeetingUser(createOrganisation()));
+        meeting.setEndTime(new Date());
 
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 Mockito.any(),
@@ -591,7 +600,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoNoFreePool() {
+    public void testAttachMeetingToSchedulingInfoNoFreePool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
@@ -641,7 +650,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoNoPoolOrganisation() {
+    public void testAttachMeetingToSchedulingInfoNoPoolOrganisation() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         UserContext userContext = new UserContextImpl(NON_POOL_ORG, "test@test.dk", UserRole.ADMIN);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
@@ -777,7 +786,9 @@ public class SchedulingInfoServiceImplTest {
 //    }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoMicrophoneOff() {
+    public void testAttachMeetingToSchedulingInfoMicrophoneOff() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -790,6 +801,8 @@ public class SchedulingInfoServiceImplTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.off);
+        meeting.setMeetingUser(createMeetingUser(createOrganisation()));
+        meeting.setEndTime(new Date());
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
@@ -800,7 +813,9 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testAttachMeetingToSchedulingInfoMicrophoneMuted() {
+    public void testAttachMeetingToSchedulingInfoMicrophoneMuted() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -813,6 +828,8 @@ public class SchedulingInfoServiceImplTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.muted);
+        meeting.setMeetingUser(createMeetingUser(createOrganisation()));
+        meeting.setEndTime(new Date());
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
@@ -1042,6 +1059,8 @@ public class SchedulingInfoServiceImplTest {
         meetingUser.setEmail("some_email");
         schedulingInfo.setMeetingUser(meetingUser);
         schedulingInfo.setCreatedTime(new Date());
+        schedulingInfo.setSchedulingTemplate(schedulingTemplateIdOne);
+        schedulingInfo.setvMRStartTime(new Date());
 
         return schedulingInfo;
     }

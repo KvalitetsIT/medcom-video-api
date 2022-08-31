@@ -123,15 +123,15 @@ public class MeetingServiceImplTest {
 		return createMeetingDto;
 	}
 
-	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException {
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus) throws PermissionDeniedException, RessourceNotFoundException, NotValidDataException, NotAcceptableException {
 		return createMeetingServiceMocked(userContext, meetingUser, meetingUuid, provisionStatus, meetingLabelRepository, null);
 	}
 
-	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, Integer userOrganisationPoolSize) throws PermissionDeniedException, RessourceNotFoundException {
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, Integer userOrganisationPoolSize) throws PermissionDeniedException, RessourceNotFoundException, NotValidDataException, NotAcceptableException {
 		return createMeetingServiceMocked(userContext, meetingUser, meetingUuid, provisionStatus, meetingLabelRepository, userOrganisationPoolSize);
 	}
 
-	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, MeetingLabelRepository meetingLabelRepository, Integer userOrganistionPoolSize) throws PermissionDeniedException, RessourceNotFoundException {
+	private MeetingService createMeetingServiceMocked(UserContext userContext, MeetingUser meetingUser, String meetingUuid, ProvisionStatus provisionStatus, MeetingLabelRepository meetingLabelRepository, Integer userOrganistionPoolSize) throws PermissionDeniedException, RessourceNotFoundException, NotValidDataException, NotAcceptableException {
 
 		meetingRepository = Mockito.mock(MeetingRepository.class);
 		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
@@ -299,7 +299,7 @@ public class MeetingServiceImplTest {
 
 
 	@Test
-	public void deleteMeetingDeletesLabels() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+	public void deleteMeetingDeletesLabels() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException, NotValidDataException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
@@ -378,7 +378,7 @@ public class MeetingServiceImplTest {
 
 	// *** Other tests **********************************************************************************************************
 	@Test
-	public void testConversionFromDtoToDao() throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException {
+	public void testConversionFromDtoToDao() throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException, NotAcceptableException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
@@ -757,7 +757,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testCreateMeetingCustomUriWithoutDomainNotAllowed() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
+	public void testCreateMeetingCustomUriWithoutDomainNotAllowed() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1031,7 +1031,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByOrganizedByOtherUser() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByOrganizedByOtherUser() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1045,7 +1045,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByOrganizedBySameUser() throws PermissionDeniedException, RessourceNotFoundException {
+	public void testGetMeetingByOrganizedBySameUser() throws PermissionDeniedException, RessourceNotFoundException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1059,7 +1059,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByOrganizedAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByOrganizedAdmin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1072,7 +1072,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriUser() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriUser() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1085,7 +1085,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriAdmin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1098,7 +1098,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriWithoutDomainUser() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriWithoutDomainUser() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1112,7 +1112,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriWithoutDomainAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriWithoutDomainAdmin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1126,7 +1126,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriWithDomainUserSingle() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriWithDomainUserSingle() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1140,7 +1140,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByUriWithDomainAdminSingle() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByUriWithDomainAdminSingle() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1154,7 +1154,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByLabelUser() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByLabelUser() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
 
@@ -1167,7 +1167,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGetMeetingByLabelAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGetMeetingByLabelAdmin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1328,7 +1328,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGenericSearchAdmin() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGenericSearchAdmin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 
@@ -1368,7 +1368,7 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
-	public void testGenericSearchAdminWithoutDates() throws RessourceNotFoundException, PermissionDeniedException {
+	public void testGenericSearchAdminWithoutDates() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
 

@@ -306,7 +306,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfoEvent.setHostPin(schedulingInfo.getHostPin());
 		schedulingInfoEvent.setGuestPin(schedulingInfo.getGuestPin());
 		schedulingInfoEvent.setVMRAvailableBefore(schedulingInfo.getVMRAvailableBefore());
-		schedulingInfoEvent.setvMRStartTime(schedulingInfo.getvMRStartTime().toInstant());
+
 		schedulingInfoEvent.setIvrTheme(schedulingInfo.getIvrTheme());
 		schedulingInfoEvent.setUriWithoutDomain(schedulingInfo.getUriWithoutDomain());
 		schedulingInfoEvent.setUriDomain(schedulingInfo.getUriDomain());
@@ -315,10 +315,18 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfoEvent.setPortalLink(schedulingInfo.getPortalLink());
 		schedulingInfoEvent.setMaxParticipants(schedulingInfo.getMaxParticipants());
 		schedulingInfoEvent.setEndMeetingOnEndTime(schedulingInfo.getEndMeetingOnEndTime());
-		schedulingInfoEvent.setVmrType(schedulingInfo.getVmrType().toString());
-		schedulingInfoEvent.setHostView(schedulingInfo.getHostView().toString());
-		schedulingInfoEvent.setGuestView(schedulingInfo.getGuestView().toString());
-		schedulingInfoEvent.setVmrQuality(schedulingInfo.getVmrQuality().toString());
+		if(schedulingInfo.getVmrType() != null) {
+			schedulingInfoEvent.setVmrType(schedulingInfo.getVmrType().toString());
+		}
+		if(schedulingInfo.getHostView() != null) {
+			schedulingInfoEvent.setHostView(schedulingInfo.getHostView().toString());
+		}
+		if(schedulingInfo.getGuestView() != null) {
+			schedulingInfoEvent.setGuestView(schedulingInfo.getGuestView().toString());
+		}
+		if(schedulingInfo.getVmrQuality() != null) {
+			schedulingInfoEvent.setVmrQuality(schedulingInfo.getVmrQuality().toString());
+		}
 		schedulingInfoEvent.setEnableOverlayText(schedulingInfo.getEnableOverlayText());
 		schedulingInfoEvent.setGuestsCanPresent(schedulingInfo.getGuestsCanPresent());
 		schedulingInfoEvent.setForcePresenterIntoMain(schedulingInfo.getForcePresenterIntoMain());
@@ -331,6 +339,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfoEvent.setReturnUrl(schedulingInfo.getReturnUrl());
 		if(schedulingInfo.getMeeting() != null) {
 			schedulingInfoEvent.setMeetingEndTime(schedulingInfo.getMeeting().getEndTime().toInstant());
+		}
+		if(schedulingInfo.getvMRStartTime() != null) {
+			schedulingInfoEvent.setvMRStartTime(schedulingInfo.getvMRStartTime().toInstant());
 		}
 
 		return schedulingInfoEvent;
@@ -656,8 +667,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	@Override
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
+
+		var organisationFromSchedulinInfo = schedulingInfo.getOrganisation().getOrganisationId();
+
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
@@ -680,6 +694,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
+		if(provisionExcludeOrganisations.isEmpty() || provisionExcludeOrganisations.contains(organisationFromSchedulinInfo)) {
+			LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulinInfo);
+			var createSchedulingInfoDto = new CreateSchedulingInfoDto();
+			createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
+			createSchedulingInfoDto.setOrganizationId(organisationFromSchedulinInfo);
+			createSchedulingInfo(createSchedulingInfoDto);
+		}
+
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
@@ -689,7 +711,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);

@@ -222,7 +222,7 @@ public class MeetingServiceImpl implements MeetingService {
 		}
 	}
 
-	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
+	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("attach reserved scheduling info");
 		try {
 			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
