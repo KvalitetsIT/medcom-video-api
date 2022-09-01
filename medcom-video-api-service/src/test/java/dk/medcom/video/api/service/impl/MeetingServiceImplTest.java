@@ -193,6 +193,7 @@ public class MeetingServiceImplTest {
 		schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setId(100L);
 		schedulingInfo.setProvisionStatus(provisionStatus);
+		schedulingInfo.setMeetingUser(meetingUser);
 		Organisation organisation = new Organisation();
 		organisation.setOrganisationId("org");
 		schedulingInfo.setOrganisation(organisation);
