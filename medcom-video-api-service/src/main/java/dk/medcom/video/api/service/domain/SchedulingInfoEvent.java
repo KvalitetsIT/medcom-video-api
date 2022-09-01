@@ -6,6 +6,7 @@ import java.util.Date;
 public class SchedulingInfoEvent {
 
     private MessageType messageType;
+    private Long schedulingInfoIdentifier;
 
     private String uuid;
     private Long hostPin;
@@ -275,5 +276,13 @@ public class SchedulingInfoEvent {
 
     public void setMeetingEndTime(Instant meetingEndTime) {
         this.meetingEndTime = meetingEndTime;
+    }
+
+    public Long getSchedulingInfoIdentifier() {
+        return schedulingInfoIdentifier;
+    }
+
+    public void setSchedulingInfoIdentifier(Long schedulingInfoIdentifier) {
+        this.schedulingInfoIdentifier = schedulingInfoIdentifier;
     }
 }

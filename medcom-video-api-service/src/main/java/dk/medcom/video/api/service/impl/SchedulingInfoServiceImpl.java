@@ -302,6 +302,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfoEvent.setMessageType(messageType);
 
+		schedulingInfoEvent.setSchedulingInfoIdentifier(schedulingInfo.getId());
+
 		schedulingInfoEvent.setUuid(schedulingInfo.getUuid());
 		schedulingInfoEvent.setHostPin(schedulingInfo.getHostPin());
 		schedulingInfoEvent.setGuestPin(schedulingInfo.getGuestPin());
