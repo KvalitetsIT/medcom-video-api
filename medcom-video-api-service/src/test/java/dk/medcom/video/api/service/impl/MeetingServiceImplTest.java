@@ -18,6 +18,7 @@ import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.MeetingService;
 import dk.medcom.video.api.service.OrganisationService;
+import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -157,6 +158,8 @@ public class MeetingServiceImplTest {
 		}
 		Mockito.when(organisationRepository.findByOrganisationId(userContext.getUserOrganisation())).thenReturn(o);
 
+		var schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
+
 		MeetingService meetingService = new MeetingServiceImpl(meetingRepository,
 				meetingUserService,
 				schedulingInfoService,
@@ -166,7 +169,8 @@ public class MeetingServiceImplTest {
 				meetingLabelRepository,
 				organisationRepository,
 				organisationTreeServiceClient,
-				auditService);
+				auditService,
+				schedulingInfoEventPublisher);
 
 		Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
