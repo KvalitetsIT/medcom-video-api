@@ -1,15 +1,15 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,21 +19,17 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PoolInfoServiceTest {
 
 	@Mock
     PoolInfoRepository poolInfoRepository;
-    private List<String> filterOutOrganisations = Arrays.asList("kit");
-
 
     @Before
     public void setup() {
@@ -58,7 +54,7 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
 
-		PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository, filterOutOrganisations);
+		PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -80,65 +76,6 @@ public class PoolInfoServiceTest {
     }
 
     @Test
-    public void testGetPoolInfoEmptyFilterFilterAll() {
-        SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
-
-        List<Organisation> organisations = createOrganisationList();
-        OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
-        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
-
-        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
-        SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
-
-        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
-
-        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository, new ArrayList<>());
-
-        List<PoolInfoDto> response = poolInfoService.getPoolInfo();
-        assertTrue(response.isEmpty());
-    }
-
-    @Test
-    public void testGetPoolInfoEmptyFilterFilterSome() {
-        SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
-
-        List<Organisation> organisations = createOrganisationList();
-        organisations.get(0).setOrganisationId("kit");
-
-        OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
-        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
-
-        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
-        SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
-        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
-
-        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
-        var strategyOrganisationList = createStrategyOrganisationList();
-        strategyOrganisationList.get(0).setCode("kit");
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(strategyOrganisationList);
-
-        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository, filterOutOrganisations);
-
-        List<PoolInfoDto> response = poolInfoService.getPoolInfo();
-
-        assertNotNull(response);
-        assertEquals(1, response.size());
-
-        PoolInfoDto firstPoolInfo = response.get(0);
-        assertEquals(organisations.get(1).getOrganisationId(), firstPoolInfo.getOrganizationId());
-        assertEquals(organisations.get(1).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
-        assertEquals(0, firstPoolInfo.getAvailablePoolSize());
-
-        assertNotNull(firstPoolInfo.getSchedulingTemplate());
-    }
-
-    @Test
     public void testGetPoolInfoNoDefaultTemplate() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
@@ -153,7 +90,7 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
 
-        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository, filterOutOrganisations);
+        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -189,7 +126,7 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
 
-        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository, filterOutOrganisations);
+        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 

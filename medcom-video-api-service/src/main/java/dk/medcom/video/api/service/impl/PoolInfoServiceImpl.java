@@ -1,25 +1,23 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
-import dk.medcom.video.api.entity.PoolInfoEntity;
-import dk.medcom.video.api.organisation.Organisation;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.organisation.Organisation;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.service.PoolInfoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,15 +27,13 @@ public class PoolInfoServiceImpl implements PoolInfoService {
     private final SchedulingTemplateRepository schedulingTemplateRepository;
     private final OrganisationRepository organisationRepository;
     private final PoolInfoRepository poolInfoRepository;
-    private List<String> provisionExcludeOrganisations;
 
-    PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository, @Value("${event.organisation.filter:#{null}}") List<String> provisionExcludeOrganisations) {
+    PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
         this.organisationStrategy = organisationStrategy;
         this.schedulingInfoRepository = schedulingInfoRepository;
         this.schedulingTemplateRepository = schedulingTemplateRepository;
         this.organisationRepository = organisationRepository;
         this.poolInfoRepository = poolInfoRepository;
-        this.provisionExcludeOrganisations = Objects.requireNonNullElse(provisionExcludeOrganisations, Collections.emptyList());
     }
 
     @Override
@@ -47,7 +43,7 @@ public class PoolInfoServiceImpl implements PoolInfoService {
 
     @Override
     public List<PoolInfoDto> getPoolInfo() {
-        List<Organisation> organizations = organisationStrategy.findByPoolSizeNotNull().stream().filter(x -> !provisionExcludeOrganisations.isEmpty() && !provisionExcludeOrganisations.contains(x.getCode())).collect(Collectors.toList());
+        List<Organisation> organizations = organisationStrategy.findByPoolSizeNotNull();
         List<SchedulingInfo> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK);
 
         return mapPoolInfo(organizations, schedulingInfos);
