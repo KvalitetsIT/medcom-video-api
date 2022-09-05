@@ -141,6 +141,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("events.nats.client.id", "natsClientId")
 				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
 
+				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist")
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
