@@ -40,7 +40,9 @@ public class PoolServiceImpl implements PoolService {
         var poolInfo = poolInfoService.getPoolInfo();
 
         poolInfo.forEach( x -> {
+            logger.info("Handling pool for organisation {}. Ignoring? {}.", x.getOrganizationId(), organisationFilter.apply(x.getOrganizationId()));
             if(organisationFilter.apply(x.getOrganizationId())) {
+                logger.info("Organisation wants {} pool rooms and {} is available.", x.getDesiredPoolSize(), x.getAvailablePoolSize());
                 if(x.getDesiredPoolSize() > x.getAvailablePoolSize()) {
                     logger.info("Filling pool for {}.", x.getOrganizationId());
                     fillPool(x);
