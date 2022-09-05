@@ -5,10 +5,7 @@ import dk.medcom.audit.client.messaging.nats.NatsPublisher;
 import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
@@ -76,6 +73,12 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		bean.setOrder(0);
 
 		return bean;
+	}
+
+	@Bean
+	public PoolService poolService(PoolInfoService poolInfoService, SchedulingInfoService schedulingInfoService, MeetingUserRepository meetingUserRepository, OrganisationRepository organisationRepository, @Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
+		List<String> finalFilterOrganisations = filterOrganisations == null ? Collections.emptyList() : filterOrganisations;;
+		return new PoolServiceImpl(poolInfoService, schedulingInfoService, meetingUserRepository, organisationRepository, x -> finalFilterOrganisations.isEmpty() || finalFilterOrganisations.contains(x));
 	}
 
 	@Bean

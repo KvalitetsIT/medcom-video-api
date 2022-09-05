@@ -7,10 +7,7 @@ import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
@@ -480,6 +477,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		return createSchedulingInfoWithCustomCreatedBy(createSchedulingInfoDto, meetingUserService.getOrCreateCurrentMeetingUser());
+	}
+
+	@Override
+	@Transactional
+	public SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException {
 		LOGGER.debug("Entry createSchedulingInfo");
 
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
@@ -526,7 +529,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
 		schedulingInfo.setProvisionStatusDescription("Pooled awaiting provisioning.");
 
-		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		schedulingInfo.setMeetingUser(createdBy);
 
 		schedulingInfo.setCreatedTime(new Date());
 
@@ -648,13 +651,13 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
-		if(provisionExcludeOrganisations.isEmpty() || provisionExcludeOrganisations.contains(organisationFromSchedulinInfo)) {
-			LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulinInfo);
-			var createSchedulingInfoDto = new CreateSchedulingInfoDto();
-			createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
-			createSchedulingInfoDto.setOrganizationId(organisationFromSchedulinInfo);
-			createSchedulingInfo(createSchedulingInfoDto);
-		}
+//		if(provisionExcludeOrganisations.isEmpty() || provisionExcludeOrganisations.contains(organisationFromSchedulinInfo)) { // TODO Overvej om dette skal være aktiveret?
+//			LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulinInfo);
+//			var createSchedulingInfoDto = new CreateSchedulingInfoDto();
+//			createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
+//			createSchedulingInfoDto.setOrganizationId(organisationFromSchedulinInfo);
+//			createSchedulingInfo(createSchedulingInfoDto);
+//		}
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");

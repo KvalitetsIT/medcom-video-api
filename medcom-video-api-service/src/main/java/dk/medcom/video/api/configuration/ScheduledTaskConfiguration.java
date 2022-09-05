@@ -1,6 +1,7 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.video.api.service.PoolHistoryService;
+import dk.medcom.video.api.service.PoolService;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
@@ -22,6 +23,9 @@ public class ScheduledTaskConfiguration {
     @Autowired
     private PoolHistoryService poolHistoryService;
 
+    @Autowired
+    private PoolService poolService;
+
     @SchedulerLock(name = "cleanup")
     @Scheduled(fixedDelayString = "PT1M" )
     public void cleanupService() {
@@ -38,5 +42,13 @@ public class ScheduledTaskConfiguration {
                         .usingDbTime()
                         .build()
         );
+    }
+
+    @SchedulerLock(name = "fillPools")
+    @Scheduled(fixedDelayString = "PT1M")
+    public void fillPools() { // Make it configurable if it should be enabled.
+        LockAssert.assertLocked();
+
+        poolService.fillPools();
     }
 }
