@@ -36,6 +36,7 @@ public class PoolServiceImpl implements PoolService {
     @Override
     @Transactional
     public void fillPools() {
+        logger.info("Checking if pools rooms should be created!");
         var poolInfo = poolInfoService.getPoolInfo();
 
         poolInfo.forEach( x -> {
@@ -43,6 +44,9 @@ public class PoolServiceImpl implements PoolService {
                 if(x.getDesiredPoolSize() > x.getAvailablePoolSize()) {
                     logger.info("Filling pool for {}.", x.getOrganizationId());
                     fillPool(x);
+                }
+                else {
+                    logger.info("No need for additional pool rooms for {}.", x.getOrganizationId());
                 }
             }
             else {
