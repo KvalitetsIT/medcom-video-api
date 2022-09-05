@@ -935,7 +935,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoAwaisProvisionNoFilter() {
+    public void testGetSchedulingInfoAwaitProvisionNoFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
@@ -943,13 +943,11 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), null);
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsProvision();
-        assertEquals(2, result.size());
-        assertEquals(schedulingInfo1, result.get(0));
-        assertEquals(schedulingInfo2, result.get(1));
+        assertEquals(0, result.size());
     }
 
     @Test
-    public void testGetSchedulingInfoAwaisProvisionFilter() {
+    public void testGetSchedulingInfoAwaitProvisionFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
@@ -962,7 +960,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoAwaisDeProvisionNoFilter() {
+    public void testGetSchedulingInfoAwaitsDeProvisionNoFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
@@ -970,13 +968,11 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), null);
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
-        assertEquals(2, result.size());
-        assertEquals(schedulingInfo1, result.get(0));
-        assertEquals(schedulingInfo2, result.get(1));
+        assertEquals(0, result.size());
     }
 
     @Test
-    public void testGetSchedulingInfoAwaisDeProvisionFilter() {
+    public void testGetSchedulingInfoAwaitsDeProvisionFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
