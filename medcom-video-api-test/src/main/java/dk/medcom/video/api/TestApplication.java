@@ -86,7 +86,13 @@ public class TestApplication extends SpringBootServletInitializer {
 
         System.setProperty("ALLOWED_ORIGINS", "http://allowed");
 
-		SpringApplication.run(TestApplication.class, args);
+//        System.setProperty("event.organisation.filter", "");
+        System.setProperty("pool.fill.organisation.user", "some@user");
+        System.setProperty("pool.fill.organisation", "kvak");
+        System.setProperty("pool.fill.interval", "PT5S");
+        System.setProperty("pool.fill.disabled", "true");
+
+        SpringApplication.run(TestApplication.class, args);
 	}
 
     private static void startNats(Network n) {

@@ -48,8 +48,10 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | audit.nats.client.id       | Nats client id                                                                                   | Yes                                                                           |
 | audit.nats.curl            | Nats url to connect to                                                                           | Yes                                                                           |
 | audit.nats.subject         | Nats subject to publish to                                                                       | Yes                                                                           |
-| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING                                                       |
-| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                  | Yes                                                                           |
-| event.organisation.filter | List of organisations to send events for | Yes                                                                           |
-| pool.fill.organisation.user | User to set as created by on pool scheduling info. | Yes                                                                           |
-| pool.fill.organisation | Organisation to set as created by on pool scheduling info. | Yes                                                                           |
+| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                                               | No  Defaults to WARNING                                                       |
+| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                                       | Yes                                                                           |
+| event.organisation.filter | List of organisations to send events for                                                         | Yes                                                                           |
+| pool.fill.organisation.user | User to set as created by on pool scheduling info.                                               | Yes                                                                           |
+| pool.fill.organisation | Organisation to set as created by on pool scheduling info.                                       | Yes                                                                           |
+| pool.fill.interval | Fixed delay in java.time.Duration format.                                                        | Yes                                                                           |
+| pool.fill.disabled | Set to true if pool filling should be disabled                                                   | No                                                                            |

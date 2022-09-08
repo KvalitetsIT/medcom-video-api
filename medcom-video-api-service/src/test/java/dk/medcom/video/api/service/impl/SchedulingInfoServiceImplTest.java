@@ -1063,7 +1063,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator) {
-        return createSchedulingInfoService(customUriValidator, null);
+        return createSchedulingInfoService(customUriValidator, new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
     }
 
     private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator, NewProvisionerOrganisationFilter excludeOrganisationsFilter) {

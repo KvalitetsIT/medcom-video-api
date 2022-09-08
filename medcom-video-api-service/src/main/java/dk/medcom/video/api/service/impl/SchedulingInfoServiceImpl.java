@@ -627,7 +627,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
 
-		var organisationFromSchedulinInfo = schedulingInfo.getOrganisation().getOrganisationId();
+		var organisationFromSchedulingInfo = schedulingInfo.getOrganisation().getOrganisationId();
 
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
@@ -651,13 +651,19 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
-//		if(provisionExcludeOrganisations.isEmpty() || provisionExcludeOrganisations.contains(organisationFromSchedulinInfo)) { // TODO Overvej om dette skal være aktiveret?
-//			LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulinInfo);
-//			var createSchedulingInfoDto = new CreateSchedulingInfoDto();
-//			createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
-//			createSchedulingInfoDto.setOrganizationId(organisationFromSchedulinInfo);
-//			createSchedulingInfo(createSchedulingInfoDto);
-//		}
+		if(newProvisionerOrganisationFilter.newProvisioner(organisationFromSchedulingInfo)) {
+			try {
+				LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulingInfo);
+				var createSchedulingInfoDto = new CreateSchedulingInfoDto();
+				createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
+				createSchedulingInfoDto.setOrganizationId(organisationFromSchedulingInfo);
+				createSchedulingInfo(createSchedulingInfoDto);
+			}
+			catch(Exception e) {
+				// Only log error.
+				LOGGER.warn("Could not create new pool item. Pool item will be created later.");
+			}
+		}
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");
