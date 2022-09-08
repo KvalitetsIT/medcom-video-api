@@ -1,0 +1,20 @@
+CREATE TABLE if not exists `entities_ivrtheme` (
+  `uuid` varchar(36) NOT NULL,
+  `legacy_id` int(11) DEFAULT NULL,
+  `group_id` bigint(20) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `inherit` bit(1) NOT NULL DEFAULT b'0',
+  `blobdata` longblob,
+  `blob_updated_time` datetime DEFAULT NULL,
+  `provision_status` varchar(30) DEFAULT 'AWAITS_PROVISION',
+  `provision_status_description` varchar(250) DEFAULT NULL,
+  `provision_id` varchar(50) DEFAULT NULL,
+  `provision_timestamp` datetime DEFAULT '0001-01-01 00:00:00',
+  `created_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` varchar(250) NOT NULL DEFAULT 'system',
+  `updated_time` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+  `updated_by` varchar(250) DEFAULT NULL,
+  `deleted_time` datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+  `deleted_by` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`uuid`)
+);

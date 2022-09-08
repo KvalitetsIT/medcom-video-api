@@ -7,14 +7,13 @@ import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.domain.MessageType;
+import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +25,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Component
 public class SchedulingInfoServiceImpl implements SchedulingInfoService {
@@ -43,6 +43,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
 	private final CustomUriValidator customUriValidator;
+	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
+	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
@@ -61,7 +63,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 									 @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
 									 OrganisationTreeServiceClient organisationTreeServiceClient,
 									 AuditService auditService,
-									 CustomUriValidator customUriValidator) {
+									 CustomUriValidator customUriValidator,
+									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -73,6 +77,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditService;
 		this.customUriValidator = customUriValidator;
+		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
+
+		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -87,12 +94,16 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
-		return schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
+
+		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
-		return schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
+		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
+
+		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
@@ -271,12 +282,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		var performanceLogger = new PerformanceLogger("Save scheduling info");
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+
+		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
+		schedulingInfoEventPublisher.publishCreate(schedulingInfoEvent);
+
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 		performanceLogger.logTimeSinceCreation();
 		LOGGER.debug("Exit createSchedulingInfo");
 		return schedulingInfo;
+	}
+
+	private SchedulingInfoEvent createSchedulingInfoEvent(SchedulingInfo schedulingInfo, MessageType messageType) {
+		return SchedulingInfoEventMapper.map(schedulingInfo, messageType);
 	}
 
 	private String generateUriWithoutDomain(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {
@@ -392,6 +411,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
+
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
 		LOGGER.debug("Entry updateSchedulingInfo");
@@ -405,7 +426,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE));
+
 		LOGGER.debug("Exit deleteeSchedulingInfo");
 	}
 
@@ -455,6 +477,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		return createSchedulingInfoWithCustomCreatedBy(createSchedulingInfoDto, meetingUserService.getOrCreateCurrentMeetingUser());
+	}
+
+	@Override
+	@Transactional
+	public SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException {
 		LOGGER.debug("Entry createSchedulingInfo");
 
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
@@ -501,7 +529,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
 		schedulingInfo.setProvisionStatusDescription("Pooled awaiting provisioning.");
 
-		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
+		schedulingInfo.setMeetingUser(createdBy);
 
 		schedulingInfo.setCreatedTime(new Date());
 
@@ -524,6 +552,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
@@ -595,8 +624,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	@Override
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
+
+		var organisationFromSchedulingInfo = schedulingInfo.getOrganisation().getOrganisationId();
+
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
 		schedulingInfo.setUpdatedByUser(meeting.getMeetingUser());
@@ -617,6 +649,22 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
+
+		if(newProvisionerOrganisationFilter.newProvisioner(organisationFromSchedulingInfo)) {
+			try {
+				LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulingInfo);
+				var createSchedulingInfoDto = new CreateSchedulingInfoDto();
+				createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
+				createSchedulingInfoDto.setOrganizationId(organisationFromSchedulingInfo);
+				createSchedulingInfo(createSchedulingInfoDto);
+			}
+			catch(Exception e) {
+				// Only log error.
+				LOGGER.warn("Could not create new pool item. Pool item will be created later.");
+			}
+		}
+
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
@@ -626,13 +674,13 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
 		SchedulingInfo schedulingInfo = null;
-		var performanceLogger = new PerformanceLogger("get unushed scheduling info for org");
+		var performanceLogger = new PerformanceLogger("get unused scheduling info for org");
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto); // Try to get scheduling info from organisation
 		performanceLogger.logTimeSinceCreation();
 
@@ -724,6 +772,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReservationId(UUID.randomUUID().toString());
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
+		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
 
 		return resultingSchedulingInfo;
