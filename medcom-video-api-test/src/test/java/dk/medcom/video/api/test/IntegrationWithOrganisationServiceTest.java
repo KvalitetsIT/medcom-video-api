@@ -142,6 +142,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
 
 				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist")
+				.withEnv("pool.fill.organisation.user", "some@email")
+				.withEnv("pool.fill.organisation", "some_org")
 
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)

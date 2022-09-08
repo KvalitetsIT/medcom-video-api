@@ -11,26 +11,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.function.Function;
-
 public class PoolServiceImpl implements PoolService {
-    private Logger logger = LoggerFactory.getLogger(PoolServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(PoolServiceImpl.class);
     private final PoolInfoService poolInfoService;
     private final SchedulingInfoService schedulingInfoService;
     private final MeetingUserRepository meetingUserRepository;
     private final OrganisationRepository organisationRepository;
-    private final Function<String, Boolean> organisationFilter;
+    private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
+    private final String poolOrganisation;
+    private final String poolOrganisationUser;
 
     public PoolServiceImpl(PoolInfoService poolInfoService,
                            SchedulingInfoService schedulingInfoService,
                            MeetingUserRepository meetingUserRepository,
                            OrganisationRepository organisationRepository,
-                           Function<String, Boolean> organisationFilter) {
+                           NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+                           String poolOrganisation,
+                           String poolOrganisationUser) {
         this.poolInfoService = poolInfoService;
         this.schedulingInfoService = schedulingInfoService;
         this.meetingUserRepository = meetingUserRepository;
         this.organisationRepository = organisationRepository;
-        this.organisationFilter = organisationFilter;
+        this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
+        this.poolOrganisation = poolOrganisation;
+        this.poolOrganisationUser = poolOrganisationUser;
     }
 
     @Override
@@ -40,8 +44,8 @@ public class PoolServiceImpl implements PoolService {
         var poolInfo = poolInfoService.getPoolInfo();
 
         poolInfo.forEach( x -> {
-            logger.info("Handling pool for organisation {}. Ignoring? {}.", x.getOrganizationId(), !organisationFilter.apply(x.getOrganizationId()));
-            if(organisationFilter.apply(x.getOrganizationId())) {
+            logger.info("Handling pool for organisation {}. Ignoring? {}.", x.getOrganizationId(), !newProvisionerOrganisationFilter.newProvisioner(x.getOrganizationId()));
+            if(newProvisionerOrganisationFilter.newProvisioner(x.getOrganizationId())) {
                 logger.info("Organisation wants {} pool rooms and {} is available.", x.getDesiredPoolSize(), x.getAvailablePoolSize());
                 if(x.getDesiredPoolSize() > x.getAvailablePoolSize()) {
                     logger.info("Filling pool for {}.", x.getOrganizationId());
@@ -63,11 +67,11 @@ public class PoolServiceImpl implements PoolService {
         createSchedulingInfoDto.setSchedulingTemplateId(x.getSchedulingTemplate().getTemplateId());
 
         try {
-            MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationRepository.findByOrganisationId("medcom"), "medcom@medcom.dk"); // TODO Flyt til parameter.
+            MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationRepository.findByOrganisationId(poolOrganisation), poolOrganisationUser);
             if (meetingUser == null) {
                 meetingUser = new MeetingUser();
-                meetingUser.setEmail("medcom@medcom.dk");
-                meetingUser.setOrganisation(organisationRepository.findByOrganisationId("medcom"));
+                meetingUser.setEmail(poolOrganisationUser);
+                meetingUser.setOrganisation(organisationRepository.findByOrganisationId(poolOrganisation));
                 meetingUser = meetingUserRepository.save(meetingUser);
             }
             schedulingInfoService.createSchedulingInfoWithCustomCreatedBy(createSchedulingInfoDto, meetingUser);

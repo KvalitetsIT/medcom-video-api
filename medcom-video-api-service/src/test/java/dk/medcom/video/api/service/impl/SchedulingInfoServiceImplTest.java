@@ -14,10 +14,7 @@ import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.AuditService;
-import dk.medcom.video.api.service.CustomUriValidator;
-import dk.medcom.video.api.service.MeetingUserService;
-import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
+import dk.medcom.video.api.service.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -940,7 +937,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), null);
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsProvision();
         assertEquals(0, result.size());
@@ -952,7 +949,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), Collections.singletonList("org1"));
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.singletonList("org1")));
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsProvision();
         assertEquals(1, result.size());
@@ -965,7 +962,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), null);
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
         assertEquals(0, result.size());
@@ -977,7 +974,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo2 = createSchedulingInfo("org2");
         Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), Collections.singletonList("org1"));
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.singletonList("org1")));
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
         assertEquals(1, result.size());
@@ -1069,7 +1066,7 @@ public class SchedulingInfoServiceImplTest {
         return createSchedulingInfoService(customUriValidator, null);
     }
 
-    private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator, List<String> excludeOrganisationsFilter) {
+    private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator, NewProvisionerOrganisationFilter excludeOrganisationsFilter) {
         return new SchedulingInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, customUriValidator, schedulingInfoEventPublisher, excludeOrganisationsFilter);
     }
 

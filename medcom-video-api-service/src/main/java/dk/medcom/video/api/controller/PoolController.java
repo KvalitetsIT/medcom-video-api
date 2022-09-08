@@ -1,19 +1,17 @@
 package dk.medcom.video.api.controller;
 
 import dk.medcom.video.api.api.PoolInfoDto;
+import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
 import dk.medcom.video.api.service.PoolInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -24,18 +22,18 @@ public class PoolController {
 	private static final Logger logger = LoggerFactory.getLogger(PoolController.class);
 
 	private final PoolInfoService poolInfoService;
-	private final List<String> provisionExcludeOrganisations;
+	private final NewProvisionerOrganisationFilter provisionExcludeOrganisations;
 
-	public PoolController(PoolInfoService poolInfoService, @Value("${event.organisation.filter:#{null}}") List<String> provisionExcludeOrganisations) {
+	public PoolController(PoolInfoService poolInfoService, NewProvisionerOrganisationFilter provisionExcludeOrganisations) {
 		this.poolInfoService = poolInfoService;
-		this.provisionExcludeOrganisations = Objects.requireNonNullElse(provisionExcludeOrganisations, Collections.emptyList());
+		this.provisionExcludeOrganisations = provisionExcludeOrganisations;
 	}
 
 	@RequestMapping(value = "/pool", method = RequestMethod.GET)
 	public CollectionModel<PoolInfoDto> getPoolInfo() {
 		logger.debug("Entering /pool");
 
-		List<PoolInfoDto> response = poolInfoService.getPoolInfo().stream().filter(x -> !provisionExcludeOrganisations.isEmpty() && !provisionExcludeOrganisations.contains(x.getOrganizationId())).collect(Collectors.toList());
+		List<PoolInfoDto> response = poolInfoService.getPoolInfo().stream().filter(x -> !provisionExcludeOrganisations.newProvisioner(x.getOrganizationId())).collect(Collectors.toList());
 		CollectionModel<PoolInfoDto> resources = new CollectionModel<>(response);
 
 		Link selfRelLink = linkTo(methodOn(PoolController.class).getPoolInfo()).withSelfRel();

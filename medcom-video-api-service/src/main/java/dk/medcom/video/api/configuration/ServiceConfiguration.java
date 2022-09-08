@@ -76,9 +76,19 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PoolService poolService(PoolInfoService poolInfoService, SchedulingInfoService schedulingInfoService, MeetingUserRepository meetingUserRepository, OrganisationRepository organisationRepository, @Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
-		List<String> finalFilterOrganisations = filterOrganisations == null ? Collections.emptyList() : filterOrganisations;;
-		return new PoolServiceImpl(poolInfoService, schedulingInfoService, meetingUserRepository, organisationRepository, x -> finalFilterOrganisations.isEmpty() || finalFilterOrganisations.contains(x));
+	public PoolService poolService(PoolInfoService poolInfoService,
+								   SchedulingInfoService schedulingInfoService,
+								   MeetingUserRepository meetingUserRepository,
+								   OrganisationRepository organisationRepository,
+								   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+								   @Value("${pool.fill.organisation}") String poolOrganisation,
+								   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
+		return new PoolServiceImpl(poolInfoService, schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
+	}
+
+	@Bean
+	public NewProvisionerOrganisationFilter organisationFilter(@Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
+		return new NewProvisionerOrganisationFilterImpl(filterOrganisations == null ? Collections.emptyList() : filterOrganisations);
 	}
 
 	@Bean
@@ -111,10 +121,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, @Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
-		List<String> finalFilterOrganisations = filterOrganisations == null ? Collections.emptyList() : filterOrganisations;;
-		LOGGER.info("Only sending events for the following organisations: {}", finalFilterOrganisations);
-		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, x -> finalFilterOrganisations.isEmpty() || finalFilterOrganisations.contains(x));
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
+		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, filterOrganisations);
 	}
 
 	@Bean

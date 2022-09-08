@@ -2,31 +2,30 @@ package dk.medcom.video.api.service.impl;
 
 import dk.medcom.audit.client.messaging.nats.NatsPublisher;
 import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
+import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
 import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
     private NatsPublisher natsPublisher;
     private final EntitiesIvrThemeDao entitiesIvrThemeDao;
-    private final Function<String, Boolean> organisationFilter;
+    private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
-    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, Function<String, Boolean> organisationFilter) {
+    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
         this.natsPublisher = natsPublisher;
         this.entitiesIvrThemeDao = entitiesIvrThemeDao;
-        this.organisationFilter = organisationFilter;
+        this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
     }
 
     @Override
     public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
-        if(!organisationFilter.apply(schedulingInfoEvent.getOrganisationCode())) {
+        if(!newProvisionerOrganisationFilter.newProvisioner(schedulingInfoEvent.getOrganisationCode())) {
             logger.info("Not publishing event due to organisation {} not configured for events.", schedulingInfoEvent.getOrganisationCode());
             return;
         }

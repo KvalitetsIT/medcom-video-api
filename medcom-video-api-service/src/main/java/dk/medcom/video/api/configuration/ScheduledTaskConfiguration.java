@@ -34,6 +34,14 @@ public class ScheduledTaskConfiguration {
         poolHistoryService.calculateHistory();
     }
 
+    @SchedulerLock(name = "fillPools", lockAtLeastFor = "PT0S")
+    @Scheduled(fixedDelayString = "PT1M")
+    public void fillPools() {
+        LockAssert.assertLocked();
+
+        poolService.fillPools();
+    }
+
     @Bean
     public LockProvider lockProvider(DataSource dataSource) {
         return new JdbcTemplateLockProvider(
@@ -42,13 +50,5 @@ public class ScheduledTaskConfiguration {
                         .usingDbTime()
                         .build()
         );
-    }
-
-    @SchedulerLock(name = "fillPools")
-    @Scheduled(fixedDelayString = "PT1M")
-    public void fillPools() { // Make it configurable if it should be enabled.
-        LockAssert.assertLocked();
-
-        poolService.fillPools();
     }
 }

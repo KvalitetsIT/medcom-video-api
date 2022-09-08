@@ -44,7 +44,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final AuditService auditService;
 	private final CustomUriValidator customUriValidator;
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
-	private final List<String> provisionExcludeOrganisations;
+	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
@@ -65,7 +65,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 									 AuditService auditService,
 									 CustomUriValidator customUriValidator,
 									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-									 @Value("${event.organisation.filter:#{null}}") List<String> provisionExcludeOrganisations) {
+									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -79,7 +79,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.customUriValidator = customUriValidator;
 		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
 
-		this.provisionExcludeOrganisations = Objects.requireNonNullElse(provisionExcludeOrganisations, Collections.emptyList());
+		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -96,14 +96,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
 
-		return schedulingInfos.stream().filter(x -> !provisionExcludeOrganisations.isEmpty() && !provisionExcludeOrganisations.contains(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
 
-		return schedulingInfos.stream().filter(x -> !provisionExcludeOrganisations.isEmpty() && !provisionExcludeOrganisations.contains(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
 	@Override
