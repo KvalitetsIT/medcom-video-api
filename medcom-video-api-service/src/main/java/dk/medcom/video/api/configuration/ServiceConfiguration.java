@@ -2,7 +2,6 @@ package dk.medcom.video.api.configuration;
 
 import dk.medcom.audit.client.AuditClient;
 import dk.medcom.audit.client.messaging.nats.NatsPublisher;
-import dk.medcom.video.api.actuator.VdxApiMetrics;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.*;
@@ -107,20 +106,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	@ConditionalOnProperty(value="organisation.service.enabled", matchIfMissing = true, havingValue = "false")
-	public OrganisationStrategy organisationDbStrategy(OrganisationRepository organisationRepository) {
-		LOGGER.info("Starting up with database organisation strategy.");
-		return new OrganisationDatabaseStrategy(organisationRepository);
-	}
-
-	@Bean
-	@ConditionalOnProperty(value="organisation.service.enabled", matchIfMissing = false, havingValue = "true")
-	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
-		LOGGER.info("Starting up with service organisation strategy.");
-		return new OrganisationServiceStrategy(endpoint);
-	}
-
-	@Bean
 	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
 		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, filterOrganisations);
 	}
@@ -162,11 +147,5 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {
 		return new PrometheusScrapeEndpoint(collectorRegistry);
-	}
-
-	@Bean
-	public PrometheusScrapeEndpoint appmetricsScrapeEndpoint() {
-		PrometheusMeterRegistry registry = new PrometheusMeterRegistry(prometheusConfig, new CollectorRegistry(false), clock);
-		return new VdxApiMetrics(registry.getPrometheusRegistry(), poolInfoService);
 	}
 }

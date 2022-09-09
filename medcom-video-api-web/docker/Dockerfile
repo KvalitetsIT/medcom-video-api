@@ -1,4 +1,4 @@
-FROM ibm-semeru-runtimes:open-11-jre
+FROM ibm-semeru-runtimes:open-17-jre
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y gettext-base tzdata inetutils-telnet
@@ -16,8 +16,9 @@ WORKDIR /home/appuser
 ## Default ENV
 
 ENV management_server_port=8081
-ENV management_server_servlet_context-path=/manage
-ENV management_endpoints_web_exposure_include=health,info,prometheus,appmetrics
+ENV management_endpoints_web_base-path=/manage/actuator
+ENV spring_mvc_pathmatch_matching-strategy=ant_path_matcher
+ENV management_endpoints_web_exposure_include=*
 
 USER appuser
 

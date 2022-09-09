@@ -19,7 +19,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
     @Before
     public void setupApiClient() {
         var apiClient = new ApiClient()
-                .setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
+                .setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
                 .setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
         schedulingTemplate = new SchedulingTemplateAdministrationApi(apiClient);

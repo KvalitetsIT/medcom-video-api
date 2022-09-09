@@ -48,7 +48,7 @@ public class SchedulingTemplateController {
 			SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 			schedulingTemplateDtos.add(schedulingTemplateDto);
 		}
-		CollectionModel<SchedulingTemplateDto> resources = new CollectionModel<>(schedulingTemplateDtos);
+		CollectionModel<SchedulingTemplateDto> resources = CollectionModel.of(schedulingTemplateDtos);
 		
 		Link selfRelLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplates()).withSelfRel();
 		resources.add(selfRelLink);
@@ -64,7 +64,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(id); 
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.get resource: " + resource);
 		return resource;
@@ -78,7 +78,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
 		return resource;
@@ -92,7 +92,7 @@ public class SchedulingTemplateController {
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(id, updateSchedulingTemplateDto);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
-		EntityModel <SchedulingTemplateDto> resource = new EntityModel<>(schedulingTemplateDto);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
 		
 		LOGGER.debug("Exit of /scheduling-template.put resource: " + resource);
 		return resource;
@@ -109,5 +109,4 @@ public class SchedulingTemplateController {
 		LOGGER.debug("Exit of /scheduling-template.delete");
 		return null;
 	}
-	
 }

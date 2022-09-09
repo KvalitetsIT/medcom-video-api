@@ -50,7 +50,7 @@ public class SchedulingInfoController {
 
 		SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(createSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
+		EntityModel <SchedulingInfoDto> resource = EntityModel.of(schedulingInfoDto);
 
 		LOGGER.debug("Exit of /scheduling-info.post resource: " + resource);
 		return resource;
@@ -69,7 +69,7 @@ public class SchedulingInfoController {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 			schedulingInfoDtos.add(schedulingInfoDto);
 		}
-		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
+		CollectionModel<SchedulingInfoDto> resources = CollectionModel.of(schedulingInfoDtos);
 		
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfo(fromStartTime, toEndTime, provisionStatus)).withSelfRel();
 		resources.add(selfRelLink);
@@ -86,7 +86,7 @@ public class SchedulingInfoController {
 
 		performanceLogger.logTimeSinceCreation();
 
-		return  new EntityModel<>(schedulingInfoDto);
+		return EntityModel.of(schedulingInfoDto);
 	}
 
 	@APISecurityAnnotation({UserRole.PROVISIONER_USER}) //full user context is required in order to update, because of updatedbyuser
@@ -96,7 +96,7 @@ public class SchedulingInfoController {
 
 		SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(uuid, updateSchedulingInfoDto);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-		EntityModel <SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
+		EntityModel <SchedulingInfoDto> resource = EntityModel.of(schedulingInfoDto);
 		
 		LOGGER.info("Exit of /scheduling-info.put resource: {}, status: {}", resource.getContent().getUuid(), resource.getContent().getProvisionStatus());
 		return resource;
@@ -113,7 +113,7 @@ public class SchedulingInfoController {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 			schedulingInfoDtos.add(schedulingInfoDto);
 		}
-		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
+		CollectionModel<SchedulingInfoDto> resources = CollectionModel.of(schedulingInfoDtos);
 
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsProvision()).withSelfRel();
 		resources.add(selfRelLink);
@@ -134,7 +134,7 @@ public class SchedulingInfoController {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
 			schedulingInfoDtos.add(schedulingInfoDto);
 		}
-		CollectionModel<SchedulingInfoDto> resources = new CollectionModel<>(schedulingInfoDtos);
+		CollectionModel<SchedulingInfoDto> resources = CollectionModel.of(schedulingInfoDtos);
 
 		Link selfRelLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoAwaitsDeProvision()).withSelfRel();
 		resources.add(selfRelLink);
