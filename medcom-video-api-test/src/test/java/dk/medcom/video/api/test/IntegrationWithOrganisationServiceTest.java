@@ -196,7 +196,7 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage/", videoApi.getContainerIpAddress(), videoAdminApiPort)));
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
 
 		return target;
 	}
@@ -209,7 +209,7 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort)));
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
 
 		return target;
 	}

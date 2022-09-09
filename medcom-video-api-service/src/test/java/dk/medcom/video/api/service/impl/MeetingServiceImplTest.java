@@ -1046,7 +1046,7 @@ public class MeetingServiceImplTest {
 		List<Meeting> result = meetingService.getMeetingsByOrganizedBy("john@invalid.com");
 		assertEquals(0, result.size());
 
-		Mockito.verifyZeroInteractions(meetingRepository);
+		Mockito.verifyNoInteractions(meetingRepository);
 	}
 
 	@Test

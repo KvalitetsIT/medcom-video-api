@@ -34,7 +34,7 @@ public class PoolController {
 		logger.debug("Entering /pool");
 
 		List<PoolInfoDto> response = poolInfoService.getPoolInfo().stream().filter(x -> !provisionExcludeOrganisations.newProvisioner(x.getOrganizationId())).collect(Collectors.toList());
-		CollectionModel<PoolInfoDto> resources = new CollectionModel<>(response);
+		CollectionModel<PoolInfoDto> resources = CollectionModel.of(response);
 
 		Link selfRelLink = linkTo(methodOn(PoolController.class).getPoolInfo()).withSelfRel();
 		resources.add(selfRelLink);
