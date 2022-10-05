@@ -80,10 +80,10 @@ public class TestApplication extends SpringBootServletInitializer {
         Consumer<CreateContainerCmd> cmd = e -> e.withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort)));
 
         System.out.println("------------------------");
-        System.out.println(mysql.getNetworkAliases().get(0));
+        System.out.println(mariadb.getNetworkAliases().get(0));
 
         HashMap<String, String> environmentMap = new HashMap<>();
-        environmentMap.put("PMA_HOST", (String) mysql.getNetworkAliases().get(0));
+        environmentMap.put("PMA_HOST", (String) mariadb.getNetworkAliases().get(0));
         environmentMap.put("PMA_USER", "videouser");
         environmentMap.put("PMA_PASSWORD", "secret1234");
         GenericContainer phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").

@@ -11,14 +11,19 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.service.MeetingService;
+import dk.medcom.video.api.service.impl.RetryOnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.sql.SQLTransactionRollbackException;
 
 @RestController
 public class MeetingCreateController {
@@ -37,14 +42,23 @@ public class MeetingCreateController {
 
 		var performanceLogger = new PerformanceLogger("create meeting");
 
-		Meeting meeting = meetingService.createMeeting(createMeetingDto);
-		LOGGER.info(meeting.getShortId());
-		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
-		EntityModel<MeetingDto> resource = EntityModel.of(meetingDto);
+		try {
+			Meeting meeting = RetryOnException.retry(10, SQLTransactionRollbackException.class, () -> meetingService.createMeeting(createMeetingDto));
+			LOGGER.info(meeting.getShortId());
+			MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
+			EntityModel<MeetingDto> resource = EntityModel.of(meetingDto);
 
-		performanceLogger.logTimeSinceCreation();
+			performanceLogger.logTimeSinceCreation();
 
-		LOGGER.debug("Exit of /meetings.post resource: " + resource);
-		return resource;
+			LOGGER.debug("Exit of /meetings.post resource: " + resource);
+			return resource;
+		}
+		catch (PermissionDeniedException | NotAcceptableException | NotValidDataException e) {
+			throw e;
+		}
+		catch(Exception e) {
+			// Not sure this can happen?
+			throw new RuntimeException(e);
+		}
 	}
 }
