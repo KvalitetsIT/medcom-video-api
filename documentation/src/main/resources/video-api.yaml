@@ -108,12 +108,12 @@ info:
     <Ul>
       <Li> Added custom portal to scheduling template and scheduling info.
     </Ul>
-    1.8.0
+    1.7.12
     <Ul>
-      <Li> Renamed vmrQuality item full_hd to fullhd.
+      <Li> Renamed vmrQuality item full_hd to fullhd. Have not yet been used, so it is not causing compatibility problems.
     </Ul>
 
-  version: "1.8.0"
+  version: "1.7.12"
   contact:
     email: development@kvalitetitsit.dk
 tags:
