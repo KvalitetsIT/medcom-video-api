@@ -345,7 +345,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
         assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
         assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
-        assertEquals(VmrQuality.full_hd, capturedSchedulingInfo.getVmrQuality());
+        assertEquals(VmrQuality.fullhd, capturedSchedulingInfo.getVmrQuality());
         assertTrue(capturedSchedulingInfo.getEnableOverlayText());
         assertTrue(capturedSchedulingInfo.getGuestsCanPresent());
         assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
@@ -398,7 +398,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(VmrType.conference, capturedSchedulingInfo.getVmrType());
         assertEquals(ViewType.one_main_seven_pips, capturedSchedulingInfo.getHostView());
         assertEquals(ViewType.two_mains_twentyone_pips, capturedSchedulingInfo.getGuestView());
-        assertEquals(VmrQuality.full_hd, capturedSchedulingInfo.getVmrQuality());
+        assertEquals(VmrQuality.fullhd, capturedSchedulingInfo.getVmrQuality());
         assertTrue(capturedSchedulingInfo.getEnableOverlayText());
         assertTrue(capturedSchedulingInfo.getGuestsCanPresent());
         assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
@@ -847,7 +847,7 @@ public class SchedulingInfoServiceImplTest {
                 VmrType.lecture,
                 ViewType.one_main_zero_pips,
                 ViewType.four_mains_zero_pips,
-                VmrQuality.full_hd,
+                VmrQuality.fullhd,
                 true,
                 true,
                 true,
@@ -863,7 +863,7 @@ public class SchedulingInfoServiceImplTest {
                 Mockito.eq(VmrType.lecture.name()),
                 Mockito.eq(ViewType.one_main_zero_pips.name()),
                 Mockito.eq(ViewType.four_mains_zero_pips.name()),
-                Mockito.eq(VmrQuality.full_hd.name()),
+                Mockito.eq(VmrQuality.fullhd.name()),
                 Mockito.eq(true),
                 Mockito.eq(true),
                 Mockito.eq(true),
@@ -900,7 +900,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfoService.reserveSchedulingInfo(VmrType.lecture,
                 ViewType.one_main_zero_pips,
                 ViewType.four_mains_zero_pips,
-                VmrQuality.full_hd,
+                VmrQuality.fullhd,
                 true,
                 true,
                 true,
@@ -1013,7 +1013,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setVmrType(VmrType.conference);
         schedulingTemplate.setHostView(ViewType.one_main_seven_pips);
         schedulingTemplate.setGuestView(ViewType.two_mains_twentyone_pips);
-        schedulingTemplate.setVmrQuality(VmrQuality.full_hd);
+        schedulingTemplate.setVmrQuality(VmrQuality.fullhd);
         schedulingTemplate.setEnableOverlayText(true);
         schedulingTemplate.setGuestsCanPresent(true);
         schedulingTemplate.setForcePresenterIntoMain(true);
