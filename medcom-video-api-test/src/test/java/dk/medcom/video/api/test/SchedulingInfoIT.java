@@ -156,7 +156,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
 
-		var result = schedulingInfo.schedulingInfoReserveGet(VmrType.LECTURE,null,null, VmrQuality.FULL_HD,null,null,null,null,null);
+		var result = schedulingInfo.schedulingInfoReserveGet(VmrType.LECTURE,null,null, VmrQuality.FULLHD,null,null,null,null,null);
 		assertNotNull(result);
 		assertNotNull(result.getReservationId());
 

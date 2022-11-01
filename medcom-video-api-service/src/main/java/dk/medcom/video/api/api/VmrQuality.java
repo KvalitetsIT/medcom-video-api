@@ -3,7 +3,7 @@ package dk.medcom.video.api.api;
 public enum VmrQuality {
     sd(0),
     hd(1),
-    full_hd(2);
+    fullhd(2);
 
     private final int value;
 
