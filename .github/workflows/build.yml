@@ -2,9 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ master ]
-    tags:
-      - 'v*.*.*'
+    branches: [ provisioner ]
 
 jobs:
   build:
@@ -64,10 +62,10 @@ jobs:
 
 # Tag and push docker images
     - name: Tag service dev docker image
-      run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:dev
+      run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:provisioner
 
     - name: Push service dev docker image
-      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:dev
+      run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:provisioner
 
     - name: Tag service git id docker image
       run: ./build/docker-tag.sh ${{ env.DOCKER_SERVICE }}:latest ${{ env.DOCKER_SERVICE }}:${{ github.sha }}
@@ -76,10 +74,10 @@ jobs:
       run: ./build/docker-push.sh ${{ env.DOCKER_SERVICE }}:${{ github.sha }}
 
     - name: Tag documentation dev docker image
-      run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:dev
+      run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:provisioner
 
     - name: Push documentation dev docker image
-      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:dev
+      run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:provisioner
 
     - name: Tag documentation git id docker image
       run: ./build/docker-tag.sh ${{ env.DOCKER_DOCUMENTATION }}:latest ${{ env.DOCKER_DOCUMENTATION }}:${{ github.sha }}
