@@ -632,7 +632,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
 		SchedulingInfo schedulingInfo = null;
-		var performanceLogger = new PerformanceLogger("get unushed scheduling info for org");
+		var performanceLogger = new PerformanceLogger("get unused scheduling info for org");
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto); // Try to get scheduling info from organisation
 		performanceLogger.logTimeSinceCreation();
 
