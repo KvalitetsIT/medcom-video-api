@@ -651,20 +651,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
-		if(newProvisionerOrganisationFilter.newProvisioner(organisationFromSchedulingInfo)) {
-			try {
-				LOGGER.info("Creating scheduling Info for organisation {} as this is configured for the service.", organisationFromSchedulingInfo);
-				var createSchedulingInfoDto = new CreateSchedulingInfoDto();
-				createSchedulingInfoDto.setSchedulingTemplateId(schedulingInfo.getSchedulingTemplate().getId());
-				createSchedulingInfoDto.setOrganizationId(organisationFromSchedulingInfo);
-				createSchedulingInfo(createSchedulingInfoDto);
-			}
-			catch(Exception e) {
-				// Only log error.
-				LOGGER.warn("Could not create new pool item. Pool item will be created later.");
-			}
-		}
-
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");
 		auditService.auditSchedulingInformation(resultingSchedulingInfo, "update");
