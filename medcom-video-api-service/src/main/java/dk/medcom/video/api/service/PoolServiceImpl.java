@@ -61,10 +61,10 @@ public class PoolServiceImpl implements PoolService {
         });
     }
 
-    private void fillPool(PoolInfoDto x) {
+    private void fillPool(PoolInfoDto poolInfoDto) {
         var createSchedulingInfoDto = new CreateSchedulingInfoDto();
-        createSchedulingInfoDto.setOrganizationId(x.getOrganizationId());
-        createSchedulingInfoDto.setSchedulingTemplateId(x.getSchedulingTemplate().getTemplateId());
+        createSchedulingInfoDto.setOrganizationId(poolInfoDto.getOrganizationId());
+        createSchedulingInfoDto.setSchedulingTemplateId(poolInfoDto.getSchedulingTemplate().getTemplateId());
 
         try {
             MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationRepository.findByOrganisationId(poolOrganisation), poolOrganisationUser);
