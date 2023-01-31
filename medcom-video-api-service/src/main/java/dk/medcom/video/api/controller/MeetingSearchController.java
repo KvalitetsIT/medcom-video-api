@@ -49,7 +49,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetings(fromStartTime, toStartTime)).withSelfRel();
         resources.add(selfRelLink);
@@ -68,7 +68,7 @@ public class MeetingSearchController {
 
         Link schedulingInfoLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(meeting.getUuid())).withRel("scheduling-info");
         meetingDto.add(schedulingInfoLink);
-        EntityModel<MeetingDto> resources = new EntityModel<>(meetingDto);
+        EntityModel<MeetingDto> resources = EntityModel.of(meetingDto);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingByShortId(shortId)).withSelfRel();
         resources.add(selfRelLink);
@@ -90,7 +90,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetings(subject)).withSelfRel();
         resources.add(selfRelLink);
@@ -112,7 +112,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingsOrganizedBy(organizedBy)).withSelfRel();
         resources.add(selfRelLink);
@@ -134,7 +134,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingsUriWithDomain(uriWithDomain)).withSelfRel();
         resources.add(selfRelLink);
@@ -155,7 +155,7 @@ public class MeetingSearchController {
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingsUriWithDomain(uriWithDomain)).withSelfRel();
 
-        var resources = new EntityModel<>(meetingDto);
+        var resources = EntityModel.of(meetingDto);
         resources.add(selfRelLink);
 
         LOGGER.debug("end og get meeting by uri with domain: " + resources);
@@ -174,7 +174,7 @@ public class MeetingSearchController {
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingsUriWithDomain(uriWithoutDomain)).withSelfRel();
 
-        var resources = new EntityModel<>(meetingDto);
+        var resources = EntityModel.of(meetingDto);
         resources.add(selfRelLink);
 
         LOGGER.debug("end og get meeting by uri without domain: " + resources);
@@ -200,7 +200,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).genericSearchMeetings(search, fromStartTime, toStartTime)).withSelfRel();
         resources.add(selfRelLink);
@@ -222,7 +222,7 @@ public class MeetingSearchController {
             meetingDto.add(schedulingInfoLink);
             meetingDtos.add(meetingDto);
         }
-        CollectionModel<MeetingDto> resources = new CollectionModel<>(meetingDtos);
+        CollectionModel<MeetingDto> resources = CollectionModel.of(meetingDtos);
 
         Link selfRelLink = linkTo(methodOn(MeetingSearchController.class).getMeetingsByLabel(label)).withSelfRel();
         resources.add(selfRelLink);
@@ -237,7 +237,7 @@ public class MeetingSearchController {
 
         Meeting meeting = meetingService.getMeetingByUuid(uuid);
         MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
-        EntityModel <MeetingDto> resource = new EntityModel<>(meetingDto);
+        EntityModel <MeetingDto> resource = EntityModel.of(meetingDto);
 
         LOGGER.debug("Exit of /meetings.get resource: " + resource);
         return resource;

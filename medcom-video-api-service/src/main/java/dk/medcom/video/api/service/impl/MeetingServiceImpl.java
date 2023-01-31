@@ -12,6 +12,7 @@ import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
+	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 
 	MeetingServiceImpl(MeetingRepository meetingRepository,
 					   MeetingUserService meetingUserService,
@@ -47,7 +49,8 @@ public class MeetingServiceImpl implements MeetingService {
 					   MeetingLabelRepository meetingLabelRepository,
 					   OrganisationRepository organisationRepository,
 					   OrganisationTreeServiceClient organisationTreeServiceClient,
-					   AuditService auditClient) {
+					   AuditService auditClient,
+					   SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -58,6 +61,7 @@ public class MeetingServiceImpl implements MeetingService {
 		this.organisationRepository = organisationRepository;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditClient;
+		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
 
 		this.idGenerator = new IdGeneratorImpl();
 	}
@@ -222,7 +226,7 @@ public class MeetingServiceImpl implements MeetingService {
 		}
 	}
 
-	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
+	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("attach reserved scheduling info");
 		try {
 			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
@@ -355,6 +359,10 @@ public class MeetingServiceImpl implements MeetingService {
 					meeting.getStartTime(),
 					updateMeetingDto.getHostPin() != null ? updateMeetingDto.getHostPin().longValue() : null,
 					updateMeetingDto.getGuestPin() != null ? updateMeetingDto.getGuestPin().longValue() : null);
+		}
+		else {
+			var event = SchedulingInfoEventMapper.map(schedulingInfo, MessageType.UPDATE);
+			schedulingInfoEventPublisher.publishCreate(event);
 		}
 
 		auditService.auditMeeting(meeting, "update");

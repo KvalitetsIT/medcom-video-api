@@ -40,7 +40,7 @@ public class MeetingUpdateController {
 
         Meeting meeting = meetingService.updateMeeting(uuid, updateMeetingDto);
         MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
-        EntityModel <MeetingDto> resource = new EntityModel<>(meetingDto);
+        EntityModel <MeetingDto> resource = EntityModel.of(meetingDto);
 
         LOGGER.debug("Exit of /meetings.put resource: " + resource);
         return resource;
@@ -53,7 +53,7 @@ public class MeetingUpdateController {
 
         var response = meetingService.patchMeeting(uuid, patchMeetingDto);
 
-        var entityModel = new EntityModel<>(new MeetingMapper().mapFromMeeting(response, shortLinkBaseUrl));
+        var entityModel = EntityModel.of(new MeetingMapper().mapFromMeeting(response, shortLinkBaseUrl));
 
         LOGGER.debug("Exit of /meetings.patch ressource: {}", entityModel);
         return entityModel;

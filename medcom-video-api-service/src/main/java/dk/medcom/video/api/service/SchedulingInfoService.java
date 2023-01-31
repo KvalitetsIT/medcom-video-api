@@ -6,6 +6,7 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +39,11 @@ public interface SchedulingInfoService {
     @Transactional(rollbackFor = Throwable.class)
     SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException;
 
-    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow);
+    SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException;
 
-    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto);
+    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException;
+
+    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException;
 
     SchedulingInfo reserveSchedulingInfo(VmrType vmrType,
                                          ViewType hostView,

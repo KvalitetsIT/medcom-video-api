@@ -1,15 +1,15 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,7 +31,6 @@ public class PoolInfoServiceTest {
 	@Mock
     PoolInfoRepository poolInfoRepository;
 
-	
     @Before
     public void setup() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -55,8 +54,6 @@ public class PoolInfoServiceTest {
         OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
 
-        
-        
 		PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
