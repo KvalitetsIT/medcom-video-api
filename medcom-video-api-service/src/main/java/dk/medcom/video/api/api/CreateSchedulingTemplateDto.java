@@ -63,6 +63,7 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	private String ivrTheme;
 	
 	private boolean isDefaultTemplate;
+	private boolean isPoolTemplate;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -190,6 +191,14 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
+	}
+
+	public boolean getIsPoolTemplate() {
+		return isPoolTemplate;
+	}
+
+	public void setIsPoolTemplate(boolean isPoolTemplate) {
+		this.isPoolTemplate = isPoolTemplate;
 	}
 
 	public VmrType getVmrType() {
