@@ -1,5 +1,6 @@
 package dk.medcom.video.api.test;
 
+import dk.medcom.vdx.organisation.api.OrganisationDto;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
@@ -437,6 +438,50 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 			assertTrue(e.getResponseBody().contains("\"errorCode\":11"));
 			assertTrue(e.getResponseBody().contains("\"errorText\":\"Meeting must have status AWAITS_PROVISION (0) in order to be deleted\""));
 		}
+
+
+	}
+
+	@Test
+	public void testReadOrganisation() {
+		var response = getClient()
+				.path("services").path("organisation").path("test-org")
+				.request(MediaType.APPLICATION_JSON_TYPE)
+				.get(OrganisationDto.class);
+
+		assertNotNull(response);
+		assertEquals("test-org", response.getCode());
+		assertEquals("company name test-org", response.getName());
+	}
+
+	@Test
+	public void testReadOrganisationTree() throws ApiException {
+		var response = organisationApi.servicesOrganisationtreeCodeGet("child");
+
+		assertNotNull(response);
+		assertEquals("super_parent", response.getName());
+		assertEquals(0, response.getPoolSize().intValue());
+		assertEquals("10", response.getCode());
+		assertEquals(1, response.getChildren().size());
+
+		var child = response.getChildren().get(0);
+		assertEquals("parent", child.getCode());
+		assertEquals(20, child.getPoolSize().intValue());
+		assertEquals("parent org", child.getName());
+		assertEquals(1, child.getChildren().size());
+
+		child = child.getChildren().get(0);
+		assertEquals("child_one", child.getName());
+		assertEquals(0, child.getPoolSize().intValue());
+		assertEquals("12", child.getCode());
+		assertEquals(1, child.getChildren().size());
+
+		child = child.getChildren().get(0);
+		assertEquals("child", child.getCode());
+		assertEquals(0, child.getPoolSize().intValue());
+		assertEquals("child org", child.getName());
+		assertEquals(0, child.getChildren().size());
+
 	}
 
 	@Test

@@ -5,7 +5,6 @@ import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.organisation.Organisation;
-import dk.medcom.video.api.organisation.OrganisationServiceClient;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import org.junit.Before;
@@ -26,15 +25,13 @@ public class OrganisationInterceptorTest {
     private OrganisationInterceptor organisationInterceptor;
 
     private static final String ORG = "ORG";
-    private OrganisationServiceClient organisationServiceClient;
 
     @Before
     public void setup() {
        organisationRepository = Mockito.mock(OrganisationRepository.class);
        organisationStrategy = Mockito.mock(OrganisationStrategy.class);
-       organisationServiceClient = Mockito.mock(OrganisationServiceClient.class);
 
-       organisationInterceptor = new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
+       organisationInterceptor = new OrganisationInterceptor(organisationStrategy, organisationRepository);
 
        MockitoAnnotations.initMocks(this);
     }
@@ -67,26 +64,6 @@ public class OrganisationInterceptorTest {
         serviceOrganisation.setCode(ORG);
         serviceOrganisation.setPoolSize(10);
         Mockito.when(organisationStrategy.findOrganisationByCode(ORG)).thenReturn(serviceOrganisation);
-
-        dk.medcom.video.api.dao.entity.Organisation dbOrganisation = new dk.medcom.video.api.dao.entity.Organisation();
-        dbOrganisation.setOrganisationId(ORG);
-        Mockito.when(organisationRepository.findByOrganisationId(ORG)).thenReturn(dbOrganisation);
-
-        organisationInterceptor.preHandle(null, null, null);
-
-        Mockito.verify(organisationRepository, Mockito.never()).save(Mockito.any(dk.medcom.video.api.dao.entity.Organisation.class));
-    }
-
-    @Test
-    public void testOrganisationCreatedFromTempalte()  {
-        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN);
-        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-
-        Organisation serviceOrganisation = new Organisation();
-        serviceOrganisation.setCode(ORG);
-        serviceOrganisation.setPoolSize(10);
-        Mockito.when(organisationStrategy.findOrganisationByCode(ORG)).thenReturn(null);
-        Mockito.when(organisationServiceClient.getOrganisationByCode(ORG, true)).thenReturn(serviceOrganisation);
 
         dk.medcom.video.api.dao.entity.Organisation dbOrganisation = new dk.medcom.video.api.dao.entity.Organisation();
         dbOrganisation.setOrganisationId(ORG);

@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 
 public class OrganisationServiceStrategy implements OrganisationStrategy {
     private final OrganisationServiceClient client;
+    private String endpoint;
 
     public OrganisationServiceStrategy(String endpoint) {
+        this.endpoint = endpoint;
         client = new OrganisationServiceClientImpl(endpoint);
     }
     @Override

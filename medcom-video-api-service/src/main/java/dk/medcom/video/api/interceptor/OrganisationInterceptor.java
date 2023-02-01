@@ -2,7 +2,6 @@ package dk.medcom.video.api.interceptor;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.organisation.Organisation;
-import dk.medcom.video.api.organisation.OrganisationServiceClient;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 public class OrganisationInterceptor extends HandlerInterceptorAdapter {
     private final OrganisationStrategy organisationFacade;
     private final OrganisationRepository organisationRepository;
-    private final OrganisationServiceClient organisationServiceClient;
 
     @Autowired
     private UserContextService userContextService;
 
-    public OrganisationInterceptor(OrganisationStrategy organisationFacade,
-                                   OrganisationRepository organisationRepository,
-                                   OrganisationServiceClient organisationServiceClient) {
+    public OrganisationInterceptor(OrganisationStrategy organisationFacade, OrganisationRepository organisationRepository) {
         this.organisationFacade = organisationFacade;
         this.organisationRepository = organisationRepository;
-        this.organisationServiceClient = organisationServiceClient;
     }
 
     @Override
@@ -34,10 +29,6 @@ public class OrganisationInterceptor extends HandlerInterceptorAdapter {
         String organisationCode = userContextService.getUserContext().getUserOrganisation();
 
         Organisation organisation = organisationFacade.findOrganisationByCode(organisationCode);
-
-        if(organisation == null) {
-            organisation = organisationServiceClient.getOrganisationByCode(organisationCode, true);
-        }
 
         if(organisation != null) {
             ensureCreatedLocally(organisation);

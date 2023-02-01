@@ -46,9 +46,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private OrganisationRepository organisationRepository;
 
-	@Autowired
-	private OrganisationServiceClient organisationServiceClient;
-
 	@Value("${ALLOWED_ORIGINS}")
 	private List<String> allowedOrigins;
 
@@ -88,7 +85,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
-		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
+		return new OrganisationInterceptor(organisationStrategy, organisationRepository);
 	}
 
 	@Bean
@@ -96,11 +93,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	public OrganisationStrategy organisationDbStrategy(OrganisationRepository organisationRepository) {
 		LOGGER.info("Starting up with database organisation strategy.");
 		return new OrganisationDatabaseStrategy(organisationRepository);
-	}
-
-	@Bean
-	public OrganisationServiceClient organisationServiceClient(@Value("${organisation.service.endpoint}") String endpoint) {
-		return new OrganisationServiceClientImpl(endpoint);
 	}
 
 	@Bean

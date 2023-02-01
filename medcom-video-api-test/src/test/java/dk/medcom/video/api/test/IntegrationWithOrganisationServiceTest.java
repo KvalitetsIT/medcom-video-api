@@ -3,8 +3,6 @@ package dk.medcom.video.api.test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.net.MediaType;
-import dk.medcom.video.api.organisation.OrganisationTree;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.mockserver.client.server.MockServerClient;
@@ -12,7 +10,6 @@ import org.mockserver.matchers.Times;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.*;
@@ -34,7 +31,6 @@ public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
 	protected static final Logger natsLogger = LoggerFactory.getLogger("nats");
-	private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
 
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
@@ -88,15 +84,6 @@ public class IntegrationWithOrganisationServiceTest {
 		MockServerClient mockServerClient = new MockServerClient(userService.getContainerIpAddress(), userService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
-		// Organisation mock server
-		var organisationService = new MockServerContainer().
-				withNetwork(dockerNetwork).
-				withNetworkAliases("organisation");
-		organisationService.start();
-		attachLogger(organisationService, organisationLogger);
-		mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
-		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree/pool-test-org")).respond(organisationServiceResponse());
-
 		setupNats();
 
 		// VideoAPI
@@ -138,7 +125,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V902__create_view.sql", "/app/sql/V902__create_view.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
-				.withEnv("organisationtree.service.endpoint", "http://organisation:1080")
+				.withEnv("organisationtree.service.endpoint", "http://localhost:8080/api")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
 
@@ -157,16 +144,6 @@ public class IntegrationWithOrganisationServiceTest {
 		videoApiPort = videoApi.getMappedPort(8080);
 		videoAdminApiPort = videoApi.getMappedPort(8081);
 		attachLogger(videoApi, videoApiLogger);
-	}
-
-	private static HttpResponse organisationServiceResponse() {
-		OrganisationTree t = new OrganisationTree();
-		t.setPoolSize(10);
-		t.setCode("pool-test-org");
-		t.setName("company name another-test-org");
-		t.setChildren(null);
-
-		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
 	}
 
 	String getJdbcUrl() {
