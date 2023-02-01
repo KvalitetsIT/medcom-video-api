@@ -1551,6 +1551,7 @@ components:
         - uriNumberRangeHigh
         - ivrTheme
         - isDefaultTemplate
+        - isPoolTemplate
       properties:
         id:
           type: integer
@@ -1620,6 +1621,11 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        isPoolTemplate:
+          type: boolean
+          default: false
+          example: true
+          description: only one pool template per organization
         customPortalGuest:
           type: string
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
@@ -1700,6 +1706,7 @@ components:
         - uriNumberRangeHigh
         - ivrTheme
         - isDefaultTemplate
+        - isPoolTemplate
       properties:
         conferencingSysId:
           type: integer
@@ -1766,6 +1773,11 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        isPoolTemplate:
+          type: boolean
+          default: false
+          example: true
+          description: only one pool template per organization
         customPortalGuest:
           type: string
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
@@ -1825,6 +1837,7 @@ components:
         - uriNumberRangeHigh
         - ivrTheme
         - isDefaultTemplate
+        - isPoolTemplate
       properties:
         conferencingSysId:
           type: integer
@@ -1891,6 +1904,11 @@ components:
           type: boolean
           example: true
           description: only one default template per organization. Setting it will unset other default template
+        isPoolTemplate:
+          type: boolean
+          default: false
+          example: true
+          description: only one pool template per organization
         customPortalGuest:
           type: string
           example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
@@ -1971,6 +1989,8 @@ components:
           errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
         - errorCode: 31
           errorText: 'The host pincode assignment failed due to invalid setup on the template used'
+        - errorCode: 32
+          errorText: "Create or update of pool template failed due to only one pool template allowed"
     bad-request:
       type: integer
       enum:
