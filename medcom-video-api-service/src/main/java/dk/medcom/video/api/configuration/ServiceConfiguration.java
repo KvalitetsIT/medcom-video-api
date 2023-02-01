@@ -108,25 +108,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
 	}
 
-	@Bean
-	@ConditionalOnProperty(value="organisation.service.enabled", matchIfMissing = true, havingValue = "false")
-	public OrganisationStrategy organisationDbStrategy(OrganisationRepository organisationRepository) {
-		LOGGER.info("Starting up with database organisation strategy.");
-		return new OrganisationDatabaseStrategy(organisationRepository);
-	}
-
-	@Bean
-	public OrganisationServiceClient organisationServiceClient(@Value("${organisation.service.endpoint}") String endpoint) {
-		return new OrganisationServiceClientImpl(endpoint);
-	}
-
-	@Bean
-	@ConditionalOnProperty(value="organisation.service.enabled", matchIfMissing = false, havingValue = "true")
-	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
-		LOGGER.info("Starting up with service organisation strategy.");
-		return new OrganisationServiceStrategy(endpoint);
-  }
-  
   @Bean
   public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
 		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, filterOrganisations);
