@@ -48,7 +48,7 @@ public class SchedulingInfoReservationController {
 
         SchedulingInfo schedulingInfo = schedulingInfoService.reserveSchedulingInfo(vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption, muteAllGuests);
         SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-        EntityModel<SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
+        EntityModel<SchedulingInfoDto> resource = EntityModel.of(schedulingInfoDto);
 
         LOGGER.debug("Exit of /scheduling-info-reserve");
 
@@ -62,7 +62,7 @@ public class SchedulingInfoReservationController {
 
         SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(reservationId);
         SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
-        EntityModel<SchedulingInfoDto> resource = new EntityModel<>(schedulingInfoDto);
+        EntityModel<SchedulingInfoDto> resource = EntityModel.of(schedulingInfoDto);
 
         LOGGER.debug("Exit of /scheduling-info-reserve/{reservationId}");
 

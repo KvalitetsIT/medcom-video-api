@@ -40,7 +40,7 @@ public class MeetingCreateController {
 		Meeting meeting = meetingService.createMeeting(createMeetingDto);
 		LOGGER.info(meeting.getShortId());
 		MeetingDto meetingDto = new MeetingDto(meeting, shortLinkBaseUrl);
-		EntityModel<MeetingDto> resource = new EntityModel<>(meetingDto);
+		EntityModel<MeetingDto> resource = EntityModel.of(meetingDto);
 
 		performanceLogger.logTimeSinceCreation();
 

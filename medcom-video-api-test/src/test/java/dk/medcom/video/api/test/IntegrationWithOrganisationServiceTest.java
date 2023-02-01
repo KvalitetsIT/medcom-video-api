@@ -136,6 +136,16 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("audit.nats.cluster.id", "test-cluster")
 				.withEnv("audit.nats.client.id", "natsClientId")
 
+				.withEnv("events.nats.url", "nats://nats:4222")
+				.withEnv("events.nats.cluster.id", "test-cluster")
+				.withEnv("events.nats.client.id", "natsClientId")
+				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
+
+				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist")
+				.withEnv("pool.fill.organisation.user", "some@email")
+				.withEnv("pool.fill.organisation", "some_org")
+				.withEnv("pool.fill.interval", "PT1M")
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
@@ -186,7 +196,7 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage/", videoApi.getContainerIpAddress(), videoAdminApiPort)));
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
 
 		return target;
 	}
@@ -199,7 +209,7 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort)));
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
 
 		return target;
 	}

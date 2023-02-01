@@ -1,19 +1,20 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
-import dk.medcom.video.api.entity.PoolInfoEntity;
-import dk.medcom.video.api.organisation.Organisation;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.organisation.Organisation;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.service.PoolInfoService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

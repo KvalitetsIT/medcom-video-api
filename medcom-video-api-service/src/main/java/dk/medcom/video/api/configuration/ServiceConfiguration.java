@@ -1,18 +1,17 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.audit.client.AuditClient;
-import dk.medcom.video.api.actuator.VdxApiMetrics;
+import dk.medcom.audit.client.messaging.nats.NatsPublisher;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.impl.AuditServiceImpl;
 import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
+import dk.medcom.video.api.service.impl.SchedulingInfoEventPublisherImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -20,6 +19,7 @@ import io.prometheus.client.CollectorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,6 +32,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -77,6 +78,22 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public PoolService poolService(PoolInfoService poolInfoService,
+								   SchedulingInfoService schedulingInfoService,
+								   MeetingUserRepository meetingUserRepository,
+								   OrganisationRepository organisationRepository,
+								   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+								   @Value("${pool.fill.organisation}") String poolOrganisation,
+								   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
+		return new PoolServiceImpl(poolInfoService, schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
+	}
+
+	@Bean
+	public NewProvisionerOrganisationFilter organisationFilter(@Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
+		return new NewProvisionerOrganisationFilterImpl(filterOrganisations == null ? Collections.emptyList() : filterOrganisations);
+	}
+
+	@Bean
 	public CustomUriValidator customUriValidator() {
 		return new CustomUriValidatorImpl();
 	}
@@ -108,6 +125,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
 		LOGGER.info("Starting up with service organisation strategy.");
 		return new OrganisationServiceStrategy(endpoint);
+  }
+  
+  @Bean
+  public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
+		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, filterOrganisations);
 	}
 
 	@Bean
@@ -147,11 +169,5 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {
 		return new PrometheusScrapeEndpoint(collectorRegistry);
-	}
-
-	@Bean
-	public PrometheusScrapeEndpoint appmetricsScrapeEndpoint() {
-		PrometheusMeterRegistry registry = new PrometheusMeterRegistry(prometheusConfig, new CollectorRegistry(false), clock);
-		return new VdxApiMetrics(registry.getPrometheusRegistry(), poolInfoService);
 	}
 }

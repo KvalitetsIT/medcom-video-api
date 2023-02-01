@@ -60,6 +60,11 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("audit.nats.client.id", "natsClientId");
 //        System.setProperty("audit.nats.disabled", "true");
 
+        System.setProperty("events.nats.url", natsPath);
+        System.setProperty("events.nats.cluster.id", "test-cluster");
+        System.setProperty("events.nats.client.id", "natsClientId");
+        System.setProperty("events.nats.subject.scheduling-info", "schedulingInfo");
+
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
         Consumer<CreateContainerCmd> cmd = e -> e.withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort)));
@@ -81,7 +86,13 @@ public class TestApplication extends SpringBootServletInitializer {
 
         System.setProperty("ALLOWED_ORIGINS", "http://allowed");
 
-		SpringApplication.run(TestApplication.class, args);
+//        System.setProperty("event.organisation.filter", "");
+        System.setProperty("pool.fill.organisation.user", "some@user");
+        System.setProperty("pool.fill.organisation", "kvak");
+        System.setProperty("pool.fill.interval", "PT5S");
+        System.setProperty("pool.fill.disabled", "true");
+
+        SpringApplication.run(TestApplication.class, args);
 	}
 
     private static void startNats(Network n) {
