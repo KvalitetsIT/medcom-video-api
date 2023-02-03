@@ -291,7 +291,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate template = getSchedulingTemplateWithDefaultValues(organisation, 1L);
 		template.setIsPoolTemplate(true);
 		templates.add(template);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(organisation)).thenReturn(templates);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisation, true)).thenReturn(templates);
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
 
 		//Then
@@ -311,7 +311,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate template = getSchedulingTemplateWithDefaultValues(organisation, 1L);
 		template.setIsPoolTemplate(true);
 		templates.add(template);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(organisation)).thenReturn(templates);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisation, true)).thenReturn(templates);
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
 
 		//Then

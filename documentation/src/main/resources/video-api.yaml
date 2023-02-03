@@ -1706,7 +1706,6 @@ components:
         - uriNumberRangeHigh
         - ivrTheme
         - isDefaultTemplate
-        - isPoolTemplate
       properties:
         conferencingSysId:
           type: integer
@@ -1837,7 +1836,6 @@ components:
         - uriNumberRangeHigh
         - ivrTheme
         - isDefaultTemplate
-        - isPoolTemplate
       properties:
         conferencingSysId:
           type: integer

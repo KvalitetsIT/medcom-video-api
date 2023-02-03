@@ -331,13 +331,9 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 
 	private boolean checkIfPoolTemplateAlreadyExists() throws PermissionDeniedException {
-		List<SchedulingTemplate> templates = getSchedulingTemplates();
-		for (SchedulingTemplate template : templates) {
-			if (template.getIsPoolTemplate()) {
-				return true;
-			}
-		}
-		return false;
+		List<SchedulingTemplate> poolTemplates = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);
+
+		return poolTemplates.size() == 1;
 	}
 
 	private CreateSchedulingTemplateDto getSchedulingTemplateDto()  {
