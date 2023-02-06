@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.service.SchedulingTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,7 @@ public class SchedulingTemplateController {
 	
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.POST)
-	public EntityModel <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException {
+	public EntityModel <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry of /scheduling-template.post");
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
@@ -86,7 +87,7 @@ public class SchedulingTemplateController {
 	}	
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.PUT)
-	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException  {
+	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 	
 		LOGGER.debug("Entry of /scheduling-template.put id: " + id);
 		
