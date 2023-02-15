@@ -11,7 +11,8 @@ import org.junit.Test;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest {
     private SchedulingTemplateAdministrationApi schedulingTemplate;
@@ -60,6 +61,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(create.getReturnUrl(), result.getReturnUrl());
         assertEquals(create.getGuestView(), result.getGuestView());
+        assertFalse(create.isIsPoolTemplate());
     }
 
     @Test
@@ -128,5 +130,66 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
         assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
+        assertFalse(result.isIsPoolTemplate());
+    }
+
+    @Test
+    public void testOnlyOnePoolTemplate() throws ApiException {
+        CreateSchedulingTemplate createOne = new CreateSchedulingTemplate();
+        createOne.setConferencingSysId(43);
+        createOne.setUriPrefix("43");
+        createOne.setUriDomain("test.dk");
+        createOne.setHostPinRequired(true);
+        createOne.setGuestPinRequired(true);
+        createOne.setUriNumberRangeLow(1);
+        createOne.setUriNumberRangeHigh(100);
+        createOne.setIsPoolTemplate(true);
+
+        CreateSchedulingTemplate createTwo = new CreateSchedulingTemplate();
+        createTwo.setConferencingSysId(43);
+        createTwo.setUriPrefix("43");
+        createTwo.setUriDomain("test.dk");
+        createTwo.setHostPinRequired(true);
+        createTwo.setGuestPinRequired(true);
+        createTwo.setUriNumberRangeLow(1);
+        createTwo.setUriNumberRangeHigh(100);
+        createTwo.setIsPoolTemplate(true);
+
+        CreateSchedulingTemplate createThree = new CreateSchedulingTemplate();
+        createThree.setConferencingSysId(43);
+        createThree.setUriPrefix("43");
+        createThree.setUriDomain("test.dk");
+        createThree.setHostPinRequired(true);
+        createThree.setGuestPinRequired(true);
+        createThree.setUriNumberRangeLow(1);
+        createThree.setUriNumberRangeHigh(100);
+
+        SchedulingTemplate resultCreateOne = schedulingTemplate.schedulingTemplatesPost(createOne);
+        SchedulingTemplate resultOne = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreateOne.getId());
+        assertNotNull(resultOne);
+        assertTrue(resultOne.isIsPoolTemplate());
+
+        var expectedExceptionCreate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesPost(createTwo));
+        assertEquals(406, expectedExceptionCreate.getCode());
+        assertTrue(expectedExceptionCreate.getResponseBody().contains("Create or update of pool template failed due to only one pool template allowed"));
+
+        SchedulingTemplate resultCreateThree = schedulingTemplate.schedulingTemplatesPost(createThree);
+        SchedulingTemplate resultThree = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreateThree.getId());
+        assertNotNull(resultThree);
+        assertFalse(resultThree.isIsPoolTemplate());
+
+        UpdateSchedulingTemplate updateSchedulingTemplateThree = new UpdateSchedulingTemplate();
+        updateSchedulingTemplateThree.setConferencingSysId(createThree.getConferencingSysId());
+        updateSchedulingTemplateThree.setUriPrefix(createThree.getUriPrefix());
+        updateSchedulingTemplateThree.setUriDomain(createThree.getUriDomain());
+        updateSchedulingTemplateThree.setHostPinRequired(createThree.isHostPinRequired());
+        updateSchedulingTemplateThree.setGuestPinRequired(createThree.isGuestPinRequired());
+        updateSchedulingTemplateThree.setUriNumberRangeLow(createThree.getUriNumberRangeLow());
+        updateSchedulingTemplateThree.setUriNumberRangeHigh(createThree.getUriNumberRangeHigh());
+        updateSchedulingTemplateThree.setIsPoolTemplate(true);
+
+        var expectedExceptionUpdate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesIdPut(updateSchedulingTemplateThree, resultThree.getId()));
+        assertEquals(406, expectedExceptionUpdate.getCode());
+        assertTrue(expectedExceptionUpdate.getResponseBody().contains("Create or update of pool template failed due to only one pool template allowed"));
     }
 }

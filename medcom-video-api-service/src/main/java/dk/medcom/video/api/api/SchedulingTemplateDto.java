@@ -35,6 +35,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private Long uriNumberRangeHigh;		
 	private String ivrTheme;
 	private boolean isDefaultTemplate;
+	private boolean isPoolTemplate;
 	private VmrType vmrType;
 	private ViewType hostView;
 	private ViewType guestView;
@@ -81,6 +82,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		uriNumberRangeHigh = schedulingTemplate.getUriNumberRangeHigh();
 		ivrTheme = schedulingTemplate.getIvrTheme();
 		isDefaultTemplate = schedulingTemplate.getIsDefaultTemplate();
+		isPoolTemplate = schedulingTemplate.getIsPoolTemplate();
 		vmrType = schedulingTemplate.getVmrType();
 		hostView =  schedulingTemplate.getHostView();
 		guestView = schedulingTemplate.getGuestView();
@@ -256,6 +258,14 @@ public class SchedulingTemplateDto extends RepresentationModel {
 
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
+	}
+
+	public boolean getIsPoolTemplate() {
+		return isPoolTemplate;
+	}
+
+	public void setIsPoolTemplate(boolean isPoolTemplate) {
+		this.isPoolTemplate = isPoolTemplate;
 	}
 
 	public MeetingUserDto getCreatedBy() {
