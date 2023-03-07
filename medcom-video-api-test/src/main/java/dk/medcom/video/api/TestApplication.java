@@ -54,6 +54,8 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("overflow.pool.organisation.id", "overflow");
         System.setProperty("organisationtree.service.endpoint", "http://localhost:8081");
 
+        System.setProperty("userservice.token.attribute.auto.create.organisation", "auto-create-parent");
+
         System.setProperty("audit.nats.url", natsPath);
         System.setProperty("audit.nats.subject", "natsSubject");
         System.setProperty("audit.nats.cluster.id", "test-cluster");

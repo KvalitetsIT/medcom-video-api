@@ -1,5 +1,4 @@
 
-
 ![Build Status](https://github.com/KvalitetsIT/medcom-video-api/workflows/Java%20CI%20with%20Maven/badge.svg) 
 
 
@@ -12,7 +11,7 @@ Video api'ets database er struktureret som følger
 API'ets snitflade dokumentation kan findes på swaggerhub:
 https://api-docs.vconf.dk/videoapi/v1/videoapi/
 
-## Test
+## Test7
 ### Unit test
 Der udvikles løbende unit test til koden på formen: præcondition (Given), udførsel (When), tjek (Then)
 
@@ -40,16 +39,17 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | sessiondata_headername     | Hvis denne er sat, vil video api'et lede efter sessiondata i HTTP request header af dette navn   | Ikke krævet / Ingen default                                                   |
 |organisation.service.enabled| Hvis denne er sat til true kaldes Organisations Servicen for at hente organisations information. | Ikke krævet. Default false.                                                   |
 |organisation.service.endpoint| Endpoint URL på organisations servicen. F.eks. http://organisationfrontend:80/services           | Ikke krævet. Skal være sat hvis organisation.service.enabled er sat til true. |
-|short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/                               | Krævet                                                                        
-|overflow.pool.organisation.id | Organisation id to use for pool overflow.                                                        | Krævet                                                                        
-|organisationtree.service.endpoint| Endpoint URL på organisation tree servicen. F.eks. http://organisationfrontend:80/services       | Krævet                                                                        
-|audit.nats.disabled         | Disable audit logging to nats.                                                                   | No                                                                            
-| audit.nats.cluster.id      | Nats cluster id                                                                                  | Yes                                                                           |
-| audit.nats.client.id       | Nats client id                                                                                   | Yes                                                                           |
-| audit.nats.curl            | Nats url to connect to                                                                           | Yes                                                                           |
-| audit.nats.subject         | Nats subject to publish to                                                                       | Yes                                                                           |
-| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                                               | No  Defaults to WARNING                                                       |
-| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                                       | Yes                                                                           |
+|short.link.base.url        | Base url to prefix short id with. F.eks. https://landing.video.dk/                               | Krævet
+|overflow.pool.organisation.id | Organisation id to use for pool overflow.                                                        | Krævet
+|organisationtree.service.endpoint| Endpoint URL på organisation tree servicen. F.eks. http://organisationfrontend:80/services       | Krævet
+|audit.nats.disabled         | Disable audit logging to nats.                                                                   | No
+| audit.nats.cluster.id      | Nats cluster id                                                                                  | Yes |
+| audit.nats.client.id       | Nats client id                                                                                   | Yes |
+| audit.nats.curl            | Nats url to connect to                                                                           | Yes |
+| audit.nats.subject         | Nats subject to publish to                                                                       | Yes |
+| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                                               | No  Defaults to WARNING |
+| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                                       | Yes |
+| userservice.token.attribute.auto.create.organisation | Attribut der angiver hvilken parent organisation der automatisk skal oprettes organisation i.   | Yes                                                                                              |
 | event.organisation.filter | List of organisations to send events for                                                         | Yes                                                                           |
 | pool.fill.organisation.user | User to set as created by on pool scheduling info.                                               | Yes                                                                           |
 | pool.fill.organisation | Organisation to set as created by on pool scheduling info.                                       | Yes                                                                           |

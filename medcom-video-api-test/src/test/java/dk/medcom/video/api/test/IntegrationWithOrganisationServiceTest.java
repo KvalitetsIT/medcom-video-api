@@ -112,6 +112,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("userservice_token_attribute_username", "username")
 				.withEnv("userservice.token.attribute.email", "email")
 				.withEnv("userservice.token.attribute.userrole", "userrole")
+				.withEnv("userservice.token.attribute.auto.create.organisation", "parent_org")
 				.withEnv("scheduling.template.default.conferencing.sys.id", "22")
 				.withEnv("scheduling.template.default.uri.prefix", "abc")
 				.withEnv("scheduling.template.default.uri.domain", "test.dk")
