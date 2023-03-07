@@ -31,12 +31,17 @@ public class OrganisationInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        String organisationCode = userContextService.getUserContext().getUserOrganisation();
+        var userContext = userContextService.getUserContext();
+
+        var autoCreateOrganisation = userContext.getAutoCreateOrganisation();
+        var organisationCode = userContext.getUserOrganisation();
 
         Organisation organisation = organisationFacade.findOrganisationByCode(organisationCode);
 
-        if(organisation == null) {
-            organisation = organisationServiceClient.getOrganisationByCode(organisationCode, true);
+        if(organisation == null && autoCreateOrganisation.isPresent()) {
+            var organisationToCreate = new Organisation();
+            organisationToCreate.setCode(organisationCode);
+            organisation = organisationServiceClient.createOrganisation(autoCreateOrganisation.get(), organisationToCreate);
         }
 
         if(organisation != null) {

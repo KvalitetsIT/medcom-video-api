@@ -11,7 +11,7 @@ Video api'ets database er struktureret som følger
 API'ets snitflade dokumentation kan findes på swaggerhub:
 https://api-docs.vconf.dk/videoapi/v1/videoapi/
 
-## Test
+## Test7
 ### Unit test
 Der udvikles løbende unit test til koden på formen: præcondition (Given), udførsel (When), tjek (Then)
 
@@ -47,5 +47,6 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | audit.nats.client.id       | Nats client id                                                                                   | Yes |
 | audit.nats.curl            | Nats url to connect to                                                                           | Yes |
 | audit.nats.subject         | Nats subject to publish to                                                                       | Yes |
-| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                          | No  Defaults to WARNING |
-| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                  | Yes |
+| LOG_LEVEL_PERFORMANCE      | Do performance logging. Set to INFO to do logging.                                               | No  Defaults to WARNING |
+| ALLOWED_ORIGINS            | List of allowed origins for CORS requests.                                                       | Yes |
+| userservice.token.attribute.auto.create.organisation | Attribut der angiver hvilken parent organisation der automatisk skal oprettes organisation i.   | Yes                                                                                              |

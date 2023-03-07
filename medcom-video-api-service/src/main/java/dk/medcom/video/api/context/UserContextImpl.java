@@ -2,22 +2,25 @@ package dk.medcom.video.api.context;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserContextImpl extends AbstractUserContextImpl {
 
 	protected String userOrganisation;
 	protected String userEmail;
 	protected List<UserRole> userRoles;
-	
-	
-	public UserContextImpl(String userOrganisation, String userEmail, UserRole userRole) {
-		this(userOrganisation, userEmail, UserContextImpl.createList(userRole));
+	private String autoCreateOrganisation;
+
+
+	public UserContextImpl(String userOrganisation, String userEmail, UserRole userRole, String autoCreateOrganisation) {
+		this(userOrganisation, userEmail, UserContextImpl.createList(userRole), autoCreateOrganisation);
 	}
 	
-	public UserContextImpl(String userOrganisation, String userEmail, List<UserRole> userRoles) {
+	public UserContextImpl(String userOrganisation, String userEmail, List<UserRole> userRoles, String autoCreateOrganisation) {
 		this.userOrganisation = userOrganisation;
 		this.userEmail = userEmail;
 		this.userRoles = userRoles;
+		this.autoCreateOrganisation = autoCreateOrganisation;
 	}
 	
 	@Override
@@ -34,7 +37,12 @@ public class UserContextImpl extends AbstractUserContextImpl {
 	public List<UserRole> getUserRoles() {
 		return userRoles;
 	}
-	
+
+	@Override
+	public Optional<String> getAutoCreateOrganisation() {
+		return Optional.ofNullable(autoCreateOrganisation);
+	}
+
 	private static List<UserRole> createList(UserRole userRole) {
 		List<UserRole> userRoles = new LinkedList<>();
 		userRoles.add(userRole);

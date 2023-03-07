@@ -41,7 +41,7 @@ public class OrganisationInterceptorTest {
 
     @Test
     public void testCreateOrganisationInDatabase()  {
-        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Organisation serviceOrganisation = new Organisation();
@@ -60,7 +60,7 @@ public class OrganisationInterceptorTest {
 
     @Test
     public void testExistingOrganisationNotCreatedInDatabase()  {
-        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Organisation serviceOrganisation = new Organisation();
@@ -79,14 +79,14 @@ public class OrganisationInterceptorTest {
 
     @Test
     public void testOrganisationCreatedFromTempalte()  {
-        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN, "auto");
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Organisation serviceOrganisation = new Organisation();
         serviceOrganisation.setCode(ORG);
         serviceOrganisation.setPoolSize(10);
         Mockito.when(organisationStrategy.findOrganisationByCode(ORG)).thenReturn(null);
-        Mockito.when(organisationServiceClient.getOrganisationByCode(ORG, true)).thenReturn(serviceOrganisation);
+        Mockito.when(organisationServiceClient.createOrganisation(Mockito.eq(userContext.getAutoCreateOrganisation().get()), Mockito.argThat(x -> x.getCode().equals(userContext.getUserOrganisation())))).thenReturn(serviceOrganisation);
 
         dk.medcom.video.api.dao.entity.Organisation dbOrganisation = new dk.medcom.video.api.dao.entity.Organisation();
         dbOrganisation.setOrganisationId(ORG);
@@ -101,7 +101,7 @@ public class OrganisationInterceptorTest {
     public void testNotFoundOrganisationNotCreated()  {
         Mockito.when(organisationStrategy.findOrganisationByCode(ORG)).thenReturn(null);
 
-        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl(ORG, "EMAIL", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         organisationInterceptor.preHandle(null, null, null);
