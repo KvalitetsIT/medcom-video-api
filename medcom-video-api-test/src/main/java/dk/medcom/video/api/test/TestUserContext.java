@@ -32,7 +32,7 @@ public class TestUserContext implements UserContextFactory {
 //		return new UserContextImpl("test-org", "me@me101.dk", UserRole.USER);  				//3 meetings for this user in test data
 					//		return new UserContextImpl("company 2", "me@me107.dk", UserRole.USER);  				//testing schedulingTemplate
 //							return new UserContextImpl("company 2", "me@me107.dk", UserRole.PROVISIONER_USER); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
-		return new UserContextImpl("pool-test-org", "me@me107.dk", UserRole.ADMIN); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
+		return new UserContextImpl("pool-test-org", "me@me107.dk", UserRole.ADMIN, null); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
 //		return new UserContextImpl("pool-test-org", "me@me107.dk", UserRole.ADMIN); 		//testing schedulingTemplate - manual check: vmrAvailableBefore is 2
 		// 0
 //		return new UserContextImpl(testuserorg, "me@me101.dk", UserRole.ADMIN);	//4 meetings for this user in test data (two as organizer, one as creator

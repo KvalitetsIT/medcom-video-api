@@ -54,7 +54,7 @@ public class SchedulingTemplateServiceTest {
 	@Test 
 	public void testCreateSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
@@ -79,7 +79,7 @@ public class SchedulingTemplateServiceTest {
 	@Test 
 	public void testUpdateSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
@@ -108,7 +108,7 @@ public class SchedulingTemplateServiceTest {
 	public void testDeleteSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException  {
 		
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, false);
 		updateSchedulingTemplateDto.setGuestPinRequired(false);
@@ -124,7 +124,7 @@ public class SchedulingTemplateServiceTest {
 	public void getGetSchedulingTemplateInOrganisationTree() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
@@ -152,7 +152,7 @@ public class SchedulingTemplateServiceTest {
 	@Test
 	public void getGetSchedulingTemplateInOrganisationTreeOtherOrganisation() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
@@ -186,7 +186,7 @@ public class SchedulingTemplateServiceTest {
 	public void testGetSharedSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
@@ -229,7 +229,7 @@ public class SchedulingTemplateServiceTest {
 	public void testGetSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException  {
 		
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
@@ -254,7 +254,7 @@ public class SchedulingTemplateServiceTest {
 	public void testGetSchedulingTemplates() throws PermissionDeniedException, RessourceNotFoundException {
 		
 		// Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(userContext, meetingUser, schedulingTemplateRepository);
@@ -282,7 +282,7 @@ public class SchedulingTemplateServiceTest {
 	@Test
 	public void testCreateSchedulingTemplateOnlyOnePool() throws RessourceNotFoundException, PermissionDeniedException {
 		//Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
 
@@ -302,7 +302,7 @@ public class SchedulingTemplateServiceTest {
 	@Test
 	public void testUpdateSchedulingTemplateOnlyOnePool() throws RessourceNotFoundException, PermissionDeniedException {
 		//Given
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
 

@@ -1,6 +1,7 @@
 package dk.medcom.video.api.context;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserContext {
 
@@ -17,4 +18,6 @@ public interface UserContext {
 	boolean hasOnlyRole(UserRole role);
 	
 	boolean isOrganisationalMeetingAdministrator();
+
+	Optional<String> getAutoCreateOrganisation();
 }

@@ -540,7 +540,7 @@ public class SchedulingInfoServiceImplTest {
     public void testAttachMeetingToSchedulingInfoOverflowPool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
 
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Calendar calendar = Calendar.getInstance();
@@ -598,7 +598,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testAttachMeetingToSchedulingInfoNoFreePool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Calendar calendar = Calendar.getInstance();
@@ -648,7 +648,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testAttachMeetingToSchedulingInfoNoPoolOrganisation() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
-        UserContext userContext = new UserContextImpl(NON_POOL_ORG, "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl(NON_POOL_ORG, "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Calendar calendar = Calendar.getInstance();
@@ -838,7 +838,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testReserveSchedulingInfo() throws RessourceNotFoundException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfoService = createSchedulingInfoService();
@@ -878,7 +878,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test(expected = RessourceNotFoundException.class)
     public void testReserveSchedulingInfoNoFree() throws RessourceNotFoundException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Mockito.reset(schedulingInfoRepository);
@@ -910,7 +910,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testGetSchedulingInfoByReservation() throws RessourceNotFoundException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfoService = createSchedulingInfoService();
@@ -923,7 +923,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test(expected = RessourceNotFoundException.class)
     public void testGetSchedulingInfoByReservationNotFound() throws RessourceNotFoundException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN);
+        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfoService = createSchedulingInfoService();
