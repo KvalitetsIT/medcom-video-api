@@ -3,6 +3,8 @@ package dk.medcom.video.api.organisation;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 public class OrganisationTreeServiceClientImpl implements OrganisationTreeServiceClient {
     private final String endpoint;
@@ -17,8 +19,9 @@ public class OrganisationTreeServiceClientImpl implements OrganisationTreeServic
                 .target(UriBuilder.fromPath(endpoint))
                 .path("services")
                 .path("organisationtree")
-                .path(organisationCode)
+                .path(URLEncoder.encode(organisationCode, Charset.defaultCharset()))
                 .request()
-                .get(new GenericType<OrganisationTree>(){});
+                .get(new GenericType<>() {
+                });
     }
 }
