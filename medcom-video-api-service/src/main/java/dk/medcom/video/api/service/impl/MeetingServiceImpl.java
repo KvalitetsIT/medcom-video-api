@@ -175,6 +175,8 @@ public class MeetingServiceImpl implements MeetingService {
 	}
 
 	private void attachOrCreateSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException {
+		var performanceLogger = new PerformanceLogger("attachOrCreateSchedulingInfo");
+
 		// Custom URI
 		if(createMeetingDto.getUriWithoutDomain() != null) {
 			if(organisationService.getUserOrganisation().getAllowCustomUriWithoutDomain()) {
@@ -190,7 +192,8 @@ public class MeetingServiceImpl implements MeetingService {
 				throw new NotValidDataException(NotValidDataErrors.CUSTOM_MEETING_ADDRESS_NOT_ALLOWED);
 			}
 		}
-
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("attachOrCreateSchedulingInfo.check pin");
 		// If host pin or guest pin used we can not use pool scheduling info.
 		if(createMeetingDto.getHostPin() != null || createMeetingDto.getGuestPin() != null) {
 			LOGGER.info("Using custom guest pin ({}) or host pin ({}) for meeting.", createMeetingDto.getGuestPin(), createMeetingDto.getHostPin());
@@ -198,18 +201,26 @@ public class MeetingServiceImpl implements MeetingService {
 			return;
 		}
 
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("attachOrCreateSchedulingInfo.reservation id");
 		if(createMeetingDto.getSchedulingInfoReservationId() != null) {
 			attachReservedSchedulingInfo(meeting, createMeetingDto);
 			return;
 		}
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("attachOrCreateSchedulingInfo. future meeting");
 
 		if(isFutureMeeting(createMeetingDto)) {
 			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			return;
 		}
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("attachOrCreateSchedulingInfo.scheduling info attach meeting.");
 
 		SchedulingInfo schedulingInfo = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, createMeetingDto);
+		performanceLogger.logTimeSinceCreation();
 
+		performanceLogger.reset("attachOrCreateSchedulingInfo.scheduling info create");
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			if(schedulingInfo == null) {
 				throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_NOT_FOUND_ORGANISATION, meeting.getOrganisation().getOrganisationId());
@@ -220,6 +231,8 @@ public class MeetingServiceImpl implements MeetingService {
 				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			}
 		}
+
+		performanceLogger.logTimeSinceCreation();
 	}
 
 	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
