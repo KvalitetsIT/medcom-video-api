@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,6 +26,15 @@ public class OrganisationTreeController {
     public OrganisationTreeController(OrganisationTreeService organisationTreeService, OrganisationTreeBuilder organisationTreeBuilder) {
         this.organisationTreeService = organisationTreeService;
         this.organisationTreeBuilder = organisationTreeBuilder;
+    }
+
+    @APISecurityAnnotation({UserRole.ADMIN})
+    @RequestMapping(method = RequestMethod.GET, value = "/services/organisationtree/**")
+    public OrganisationTreeDto getOrganisationTreeSlash(HttpServletRequest request) {
+        var organisation = request.getServletPath().replaceFirst("/services/organisationtree/", "");;
+        logger.info("Reading organisation tree with slash. Translated to {}.", organisation);
+
+        return getOrganisationTree(organisation);
     }
 
     @APISecurityAnnotation({UserRole.ADMIN})

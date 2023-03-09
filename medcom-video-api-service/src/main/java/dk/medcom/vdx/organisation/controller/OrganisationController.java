@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,15 @@ public class OrganisationController {
 	private OrganisationNameService organisationService;
 	@Autowired
 	private OrganisationByUriService organisationByUriService;
+
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(method = RequestMethod.GET, value = "/services/organisation/**")
+	public OrganisationDto getOrganisationSlash(HttpServletRequest request) throws RessourceNotFoundException {
+		var organisation = request.getServletPath().replaceFirst("/services/organisation/", "");;
+		LOGGER.info("Reading organisation with slash. Translated to {}.", organisation);
+
+		return getOrganisation(organisation);
+	}
 
 	@APISecurityAnnotation({ UserRole.ADMIN })
 	@GetMapping(value = "/services/organisation/{code}")
