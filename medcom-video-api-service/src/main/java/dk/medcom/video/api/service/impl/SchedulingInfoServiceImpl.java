@@ -616,7 +616,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			return null;
 		}
 
-		LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}' Time: '{}'",
+		LOGGER.info("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}' Time: '{}'",
 				schedulingInfos.get(0).longValue(),
 				organisation.getId(),
 				cal.getTime());
