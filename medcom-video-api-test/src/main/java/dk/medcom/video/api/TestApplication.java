@@ -58,10 +58,7 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("audit.nats.subject", "natsSubject");
         System.setProperty("audit.nats.cluster.id", "test-cluster");
         System.setProperty("audit.nats.client.id", "natsClientId");
-
-        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
 //        System.setProperty("audit.nats.disabled", "true");
-
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
