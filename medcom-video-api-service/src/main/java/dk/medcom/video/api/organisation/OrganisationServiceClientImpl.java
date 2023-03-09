@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;
 import java.util.List;
@@ -28,15 +29,14 @@ public class OrganisationServiceClientImpl implements OrganisationServiceClient 
     }
 
     @Override
-    public Organisation getOrganisationByCode(String organisationCode, boolean createFromTemplate) {
+    public Organisation createOrganisation(String parentOrganisation, Organisation organisation) {
         try {
             return ClientBuilder.newClient()
                     .target(UriBuilder.fromPath(endpoint))
                     .path("organisation")
-                    .queryParam("from_template", createFromTemplate)
-                    .path(organisationCode)
+                    .path(parentOrganisation)
                     .request()
-                    .get(Organisation.class);
+                    .post(Entity.json(organisation), Organisation.class);
         }
         catch(NotFoundException e) {
             logger.info("Organisation not found");

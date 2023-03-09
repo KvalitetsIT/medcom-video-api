@@ -54,13 +54,18 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 	@Value("${mapping.role.meeting_planner}")
 	private String mappingRoleMeetingPlanner;
 
+	@Value("${userservice.token.attribute.auto.create.organisation}")
+	private String userServiceTokenAttributeAutoCreateOrganisation;
+
 	@Override
 	public UserContext getUserContext() {
 		SessionData sessionData = getSessionData();
 		String organisationId = sessionData.getUserAttribute(userServiceTokenAttributeOrganisation);
 		String email = sessionData.getUserAttribute(userServiceTokenAttributeEmail);
 		List<UserRole> userRoles = getUserRoles(sessionData);
-		return new UserContextImpl(organisationId, email, userRoles);
+		var autoCreateOrganisation = sessionData.getUserAttribute(userServiceTokenAttributeAutoCreateOrganisation);
+
+		return new UserContextImpl(organisationId, email, userRoles, autoCreateOrganisation);
 	}
 
 	private List<UserRole> getUserRoles(SessionData sessionData) {

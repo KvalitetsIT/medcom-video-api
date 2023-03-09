@@ -214,7 +214,7 @@ public class MeetingServiceImplTest {
 
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
@@ -237,7 +237,7 @@ public class MeetingServiceImplTest {
 	public void testUpdateMeetingUpdatesLabels() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 
@@ -266,7 +266,7 @@ public class MeetingServiceImplTest {
 	public void testPatchMeeting() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
 		UUID uuid = UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fce");
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.AWAITS_PROVISION);
 
@@ -302,7 +302,7 @@ public class MeetingServiceImplTest {
 	public void deleteMeetingDeletesLabels() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 
@@ -318,7 +318,7 @@ public class MeetingServiceImplTest {
 
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.MEETING_PLANNER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.MEETING_PLANNER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
@@ -341,7 +341,7 @@ public class MeetingServiceImplTest {
 	public void testRoleUserUpdateMeetingWithStatusProvisionedOkUpdatesEndTimeUpdatedTimeAndupdateUserOnly() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException, NotValidDataException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.PROVISIONED_OK);
 		Meeting meetingToCompare = getMeetingWithDefaultValues(meetingUser, uuid);
@@ -363,7 +363,7 @@ public class MeetingServiceImplTest {
 
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.PROVISION_PROBLEMS);
 		getMeetingWithDefaultValues(meetingUser, uuid);
@@ -381,7 +381,7 @@ public class MeetingServiceImplTest {
 	public void testConversionFromDtoToDao() throws PermissionDeniedException, NotValidDataException, RessourceNotFoundException {
 		// Given
 		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
 
@@ -401,7 +401,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreatePooledMeeting() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -428,7 +428,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingSchedulingInfoReserved() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -452,7 +452,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testCreateMeetingSchedulingInfoReservedNotFound() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -472,7 +472,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testCreateMeetingSchedulingInfoReservedOtherOrganisation() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -491,7 +491,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreatePooledMeetingFutureNewSchedulingInfo() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -520,7 +520,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testCanNotCreateMeetingWhenNoScheduleAvailable() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -541,7 +541,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeeting() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 		MeetingLabel firstLabel = new MeetingLabel();
@@ -600,7 +600,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingCustomUriWithoutDomain() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
 
@@ -638,7 +638,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingCustomGuestPin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
 
@@ -676,7 +676,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingCustomHostPin() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
 
@@ -714,7 +714,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingPinAndReservationCombination() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
 
@@ -759,7 +759,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingCustomUriWithoutDomainNotAllowed() throws RessourceNotFoundException, PermissionDeniedException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 
@@ -784,7 +784,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFuture() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 		MeetingLabel firstLabel = new MeetingLabel();
@@ -838,7 +838,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testCanNotCreateAdhocMeetingOnNonAdhocOrganisation() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setPoolSize(null);
 
@@ -859,7 +859,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testCanNotCreateAdhocMeetingOnNonAdhocOrganisationInTree() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		meetingUser.getOrganisation().setPoolSize(null);
 
@@ -895,7 +895,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreatePooledMeetingFromPoolInOrganisationTree() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -950,7 +950,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testHandleDuplicateShortId() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -989,7 +989,7 @@ public class MeetingServiceImplTest {
 	@Test(expected = NotValidDataException.class)
 	public void testFailureOnManyDuplicateShortId() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1033,7 +1033,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByOrganizedByOtherUser() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1047,7 +1047,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByOrganizedBySameUser() throws PermissionDeniedException, RessourceNotFoundException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1061,7 +1061,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByOrganizedAdmin() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1074,7 +1074,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriUser() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1087,7 +1087,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriAdmin() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1100,7 +1100,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriWithoutDomainUser() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1114,7 +1114,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriWithoutDomainAdmin() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1128,7 +1128,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriWithDomainUserSingle() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1142,7 +1142,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByUriWithDomainAdminSingle() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1156,7 +1156,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByLabelUser() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1169,7 +1169,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGetMeetingByLabelAdmin() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
@@ -1182,7 +1182,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFromPooledOrganization() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1208,7 +1208,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFromPooledOrganizationVmrTypeLecture() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1236,7 +1236,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFromPooledOrganizationNoFreePool() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1263,7 +1263,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFromPooledOrganizationNoFreePoolVmrTypeLecture() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1301,7 +1301,7 @@ public class MeetingServiceImplTest {
 		meetingUser.setEmail("test@test.dk");
 
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1330,7 +1330,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGenericSearchAdmin() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		Calendar oneWeekAgo = Calendar.getInstance();
 		oneWeekAgo.add(Calendar.DATE, -7);
@@ -1370,7 +1370,7 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testGenericSearchAdminWithoutDates() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
-		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN);
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
 		Calendar oneWeekAgo = Calendar.getInstance();
 		oneWeekAgo.add(Calendar.DATE, -7);
