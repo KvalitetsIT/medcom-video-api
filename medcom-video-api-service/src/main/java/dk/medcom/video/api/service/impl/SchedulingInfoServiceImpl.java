@@ -627,12 +627,16 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
+		var performanceLogger = new PerformanceLogger("SchedulingInfoServiceImpl.attachMeetingToSchedulingInfo");
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
 		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
 
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("get unused scheduling info for org");
+
 		SchedulingInfo schedulingInfo = null;
-		var performanceLogger = new PerformanceLogger("get unused scheduling info for org");
+		performanceLogger.reset("get unused scheduling info for org");
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto); // Try to get scheduling info from organisation
 		performanceLogger.logTimeSinceCreation();
 
@@ -657,14 +661,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	private Long findPoolOrganisation(Organisation organisation) {
+		var performanceLogger = new PerformanceLogger("SchedulingInfoServiceImpl.findPoolOrganisation");
 		if(organisation.getPoolSize() != null && organisation.getPoolSize() > 0) {
 			return organisation.getId();
 		}
 
 		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId());
+		performanceLogger.logTimeSinceCreation();
+		performanceLogger.reset("find pool organisation");
 
 		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisation.getOrganisationId(), organisationTree);
-		return organisationRepository.findByOrganisationId(poolOrganisation.getCode()).getId();
+		var result =  organisationRepository.findByOrganisationId(poolOrganisation.getCode()).getId();
+		performanceLogger.logTimeSinceCreation();
+
+		return result;
 	}
 
 	private Long getSchedulingInfoFromOverflowPool(CreateMeetingDto createMeetingDto) {
