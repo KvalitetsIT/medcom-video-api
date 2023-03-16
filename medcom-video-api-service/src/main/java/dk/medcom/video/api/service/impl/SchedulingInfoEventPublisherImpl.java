@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
-    private NatsPublisher natsPublisher;
+    private final NatsPublisher natsPublisher;
     private final EntitiesIvrThemeDao entitiesIvrThemeDao;
     private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 

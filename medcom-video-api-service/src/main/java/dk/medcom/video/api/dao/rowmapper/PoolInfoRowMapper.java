@@ -1,6 +1,6 @@
 package dk.medcom.video.api.dao.rowmapper;
 
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

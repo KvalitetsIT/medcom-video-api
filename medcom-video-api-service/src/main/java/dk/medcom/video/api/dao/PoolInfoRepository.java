@@ -2,7 +2,7 @@ package dk.medcom.video.api.dao;
 
 import java.util.List;
 
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 
 public interface PoolInfoRepository {
 

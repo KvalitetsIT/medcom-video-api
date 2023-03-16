@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
 import dk.medcom.video.api.api.PoolInfoDto;
@@ -7,6 +7,10 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
+import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.PoolService;
+import dk.medcom.video.api.service.SchedulingInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

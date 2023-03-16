@@ -10,11 +10,10 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.service.PoolInfoService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

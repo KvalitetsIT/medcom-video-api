@@ -9,6 +9,7 @@ import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.service.impl.PoolServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
