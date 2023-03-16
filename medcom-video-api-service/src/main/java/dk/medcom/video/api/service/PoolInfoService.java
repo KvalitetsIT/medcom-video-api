@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.PoolInfoDto;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 
 import java.util.List;
 

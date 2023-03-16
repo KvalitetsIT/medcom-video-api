@@ -52,7 +52,7 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
         System.setProperty("short.link.base.url", "http://shortlink");
         System.setProperty("overflow.pool.organisation.id", "overflow");
-        System.setProperty("organisationtree.service.endpoint", "http://localhost:8081");
+        System.setProperty("organisationtree.service.endpoint", "http://localhost:" + testOrganisationFrontend.getMappedPort(80));
 
         System.setProperty("userservice.token.attribute.auto.create.organisation", "auto-create-parent");
 
@@ -128,7 +128,7 @@ public class TestApplication extends SpringBootServletInitializer {
 
         organisationMysql.start();
 
-        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
                 .withNetwork(n)
                 .withNetworkAliases("organisationservice")
                 .withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
@@ -142,6 +142,7 @@ public class TestApplication extends SpringBootServletInitializer {
                 .withEnv("userrole_monitor_values", "monitorrole")
                 .withEnv("userrole_provisioner_values", "provisionerrole")
                 .withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+
                 .withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
                 .withExposedPorts(8080)
                 ;

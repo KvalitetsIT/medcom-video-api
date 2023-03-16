@@ -2,18 +2,16 @@ package dk.medcom.video.api.dao.impl;
 
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.List;
 
 public class PoolInfoRepositoryImpl implements PoolInfoRepository {
+	private final DataSource dataSource;
 
-	
-	private DataSource dataSource;
-
-	private PoolInfoRowMapper poolInfoRowMapper = new PoolInfoRowMapper();
+	private final PoolInfoRowMapper poolInfoRowMapper = new PoolInfoRowMapper();
 
 	public PoolInfoRepositoryImpl(DataSource dataSource) {
 		this.dataSource = dataSource;
