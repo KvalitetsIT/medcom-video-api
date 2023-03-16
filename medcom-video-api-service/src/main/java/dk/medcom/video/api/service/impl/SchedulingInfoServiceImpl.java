@@ -674,7 +674,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Long unusedId = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto); // Try to get scheduling info from organisation
 		performanceLogger.logTimeSinceCreation();
 
-		if(unusedId == null && organisation.getPoolSize() != null) { // not scheduling info found and org is pool organization.
+		if(unusedId == null && organisation.getPoolSize() != null && organisation.getPoolSize() > 0) { // no scheduling info found and org is pool organization.
 			performanceLogger.reset("Get unused scheduling info from pool");
 			unusedId = getSchedulingInfoFromOverflowPool(createMeetingDto);
 			performanceLogger.logTimeSinceCreation();

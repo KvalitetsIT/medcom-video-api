@@ -5,23 +5,23 @@ import dk.medcom.video.api.organisation.OrganisationTree;
 import java.util.Optional;
 
 public class OrganisationFinder {
-    public OrganisationTree findPoolOrganisation(String code, OrganisationTree organistionTree) {
-        var organisation = findOrganisation(code, organistionTree);
+    public OrganisationTree findPoolOrganisation(String code, OrganisationTree organisationTree) {
+        var organisation = findOrganisation(code, organisationTree);
         if(organisation.getPoolSize() != 0) {
             return organisation;
         }
 
-        var parent = findParentOrganisation(code, organistionTree);
+        var parent = findParentOrganisation(code, organisationTree);
         while(parent.isPresent()) {
             if(parent.get().getPoolSize() != 0) {
                 return parent.get();
             }
             else {
-                parent = findParentOrganisation(parent.get().getCode(), organistionTree);
+                parent = findParentOrganisation(parent.get().getCode(), organisationTree);
             }
         }
 
-        return organistionTree;
+        return organisationTree;
     }
 
     private OrganisationTree findOrganisation(String code, OrganisationTree organisationTree) {
