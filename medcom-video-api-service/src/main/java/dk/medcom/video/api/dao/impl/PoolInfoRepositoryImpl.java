@@ -27,7 +27,7 @@ public class PoolInfoRepositoryImpl implements PoolInfoRepository {
 				+ " 	   and s.reservation_id is null "
 				+ "where o.pool_size > 0 "
 			// Kopieret fra "job" + "  AND created_time < ADDDATE(UTC_TIMESTAMP, INTERVAL -1 MINUTE) "
-				+ " group by o.organisation_id";
+				+ " group by o.organisation_id, o.name, o.pool_size";
 		
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(dataSource);
 		return template.query(sql, poolInfoRowMapper);
