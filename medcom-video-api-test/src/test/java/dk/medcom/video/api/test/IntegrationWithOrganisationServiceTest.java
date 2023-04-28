@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.net.MediaType;
+import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -39,21 +40,16 @@ public class IntegrationWithOrganisationServiceTest {
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
 	protected static Network dockerNetwork;
-	protected static GenericContainer resourceContainer;
-	protected static GenericContainer videoApi;
+	protected static GenericContainer<?> resourceContainer;
+	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	protected static GenericContainer testOrganisationFrontend;
-	private static GenericContainer natsService;
-	private static String natsPath;
-	private static MySQLContainer mysql;
+	private static final MySQLContainer<?> mysql;
 	private static final String DB_USER = "videouser";
 	private static final String DB_PASSWORD = "secret1234";
 
 	static {
 		dockerNetwork = Network.newNetwork();
-
-		createOrganisationService(dockerNetwork);
 
         resourceContainer = new GenericContainer<>(new ImageFromDockerfile()
                 .withFileFromClasspath("/collections/medcom-video-api.postman_collection.json", "docker/collections/medcom-video-api.postman_collection.json")
@@ -70,7 +66,7 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+		mysql = new MySQLContainer<>("mysql:5.7")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
@@ -95,7 +91,10 @@ public class IntegrationWithOrganisationServiceTest {
 		organisationService.start();
 		attachLogger(organisationService, organisationLogger);
 		mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
-		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree/pool-test-org")).respond(organisationServiceResponse());
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
 
 		setupNats();
 
@@ -138,7 +137,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withClasspathResourceMapping("db/migration/V902__create_view.sql", "/app/sql/V902__create_view.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
-				.withEnv("organisation.service.endpoint", "http://organisationfrontend:80/services")
+				.withEnv("organisation.service.endpoint", "http://organisation:1080/services")
 				.withEnv("organisationtree.service.endpoint", "http://organisation:1080")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
@@ -170,12 +169,20 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(videoApi, videoApiLogger);
 	}
 
-	private static HttpResponse organisationServiceResponse() {
+	private static HttpResponse organisationTreeServiceResponse() {
 		OrganisationTree t = new OrganisationTree();
 		t.setPoolSize(10);
 		t.setCode("pool-test-org");
 		t.setName("company name another-test-org");
 		t.setChildren(null);
+
+		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
+	}
+
+	private static HttpResponse organisationServiceResponse(String code) {
+		Organisation t = new Organisation();
+		t.setPoolSize(10);
+		t.setCode(code);
 
 		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
 	}
@@ -188,18 +195,17 @@ public class IntegrationWithOrganisationServiceTest {
 		var natsContainerName = "nats-streaming";
 		var natsContainerVersion = "0.19.0";
 
-		natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
+		GenericContainer<?> natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("nats")
 				.withExposedPorts(4222)
 				.withExposedPorts(8222)
-				.waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"))
-				;
+				.waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"));
 
 		natsService.start();
 		attachLogger(natsService, natsLogger);
 
-		natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
+		String natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
 		var natsHttpPath = "http://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(8222);
 		logger.info("NATS path: " + natsPath);
 		logger.info("NATS http path: " + natsHttpPath);
@@ -219,10 +225,9 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
-		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
 
-		return target;
+		return ClientBuilder.newClient(new ClientConfig(provider))
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
 	}
 
 	WebTarget getClient() {
@@ -232,57 +237,13 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
-		WebTarget target =  ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
 
-		return target;
+		return ClientBuilder.newClient(new ClientConfig(provider))
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
 	}
 
 	private static HttpResponse getResponse() {
 		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\", \"dk:medcom:role:provisioner\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
-	}
-
-	private static void createOrganisationService(Network n) {
-		MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
-				.withDatabaseName("organisationdb")
-				.withUsername("orguser")
-				.withPassword("secret1234")
-				.withNetwork(n)
-				.withNetworkAliases("organisationdb")
-				;
-
-		organisationMysql.start();
-
-		GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
-				.withNetwork(n)
-				.withNetworkAliases("organisationservice")
-				.withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb?serverTimezone=UTC")
-				.withEnv("jdbc_user", "orguser")
-				.withEnv("jdbc_pass", "secret1234")
-				.withEnv("usercontext_header_name", "X-Test-Auth")
-				.withEnv("userattributes_role_key", "UserRoles")
-				.withEnv("userattributes_org_key", "organisation")
-				.withEnv("userrole_admin_values", "adminrole")
-				.withEnv("userrole_user_values", "userrole1,userrole2")
-				.withEnv("userrole_monitor_values", "monitorrole")
-				.withEnv("userrole_provisioner_values", "provisionerrole")
-				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
-				.withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
-				.withStartupTimeout(Duration.ofSeconds(180))
-				.withExposedPorts(8080)
-				;
-
-		organisationContainer.start();
-		organisationContainer.withLogConsumer(outputFrame -> System.out.println(outputFrame));
-		testOrganisationFrontend = new GenericContainer("kvalitetsit/gooioidwsrest:1.1.14")
-				.withNetwork(n)
-				.withNetworkAliases("organisationfrontend")
-				.withCommand("-config", "/caddy/config.json")
-				.withClasspathResourceMapping("organisation/caddy.json", "/caddy/config.json", BindMode.READ_ONLY)
-				.withExposedPorts(80)
-				.waitingFor(Wait.forLogMessage(".*", 1));
-
-		testOrganisationFrontend.start();
 	}
 
 	void verifyRowExistsInDatabase(String sql) throws SQLException {
