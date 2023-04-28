@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.audit.client.AuditClient;
-import dk.medcom.audit.client.api.v1.AuditEvent;
+import dk.kvalitetsit.audit.client.AuditClient;
+import dk.kvalitetsit.audit.client.api.v1.AuditEvent;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;

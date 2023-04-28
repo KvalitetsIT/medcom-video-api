@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.net.MediaType;
 import dk.medcom.video.api.organisation.OrganisationTree;
+import io.nats.client.JetStreamApiException;
+import io.nats.client.Nats;
+import io.nats.client.api.StreamConfiguration;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.mockserver.client.server.MockServerClient;
@@ -24,6 +27,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -33,9 +37,8 @@ public class IntegrationWithOrganisationServiceTest {
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
-	protected static final Logger natsLogger = LoggerFactory.getLogger("nats");
 	private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
-
+	private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
 	protected static Network dockerNetwork;
@@ -44,8 +47,10 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
 	protected static GenericContainer testOrganisationFrontend;
-	private static GenericContainer natsService;
-	private static String natsPath;
+	private static GenericContainer<?> jetStreamService;
+	private static String jetStreamPath;
+	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
+	private static final String natsSubjectAudit = "natsSubject";
 	private static MySQLContainer mysql;
 	private static final String DB_USER = "videouser";
 	private static final String DB_PASSWORD = "secret1234";
@@ -97,7 +102,11 @@ public class IntegrationWithOrganisationServiceTest {
 		mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree/pool-test-org")).respond(organisationServiceResponse());
 
-		setupNats();
+		try {
+			setupJetStream();
+		} catch (JetStreamApiException | IOException | InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 
 		// VideoAPI
 		videoApi = new GenericContainer<>("kvalitetsit/medcom-video-api:latest")
@@ -146,13 +155,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200")
 
 				.withEnv("audit.nats.url", "nats://nats:4222")
-				.withEnv("audit.nats.subject", "natsSubject")
-				.withEnv("audit.nats.cluster.id", "test-cluster")
-				.withEnv("audit.nats.client.id", "natsClientId")
+				.withEnv("audit.nats.subject", natsSubjectAudit)
 
-				.withEnv("events.nats.url", "nats://nats:4222")
-				.withEnv("events.nats.cluster.id", "test-cluster")
-				.withEnv("events.nats.client.id", "natsClientId")
 				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
 
 				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist")
@@ -184,25 +188,40 @@ public class IntegrationWithOrganisationServiceTest {
 		return mysql.getJdbcUrl();
 	}
 
-	public static void setupNats() {
-		var natsContainerName = "nats-streaming";
-		var natsContainerVersion = "0.19.0";
+	public static void setupJetStream() throws JetStreamApiException, IOException, InterruptedException {
+		var natsContainerName = "nats";
+		var natsContainerVersion = "2.9-alpine";
 
-		natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
-				.withNetwork(dockerNetwork)
+		jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
+
+		jetStreamService.withNetwork(dockerNetwork)
 				.withNetworkAliases("nats")
-				.withExposedPorts(4222)
-				.withExposedPorts(8222)
-				.waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"))
-				;
+				.withExposedPorts(4222, 8222)
+				.withCommand("-js")
+				.waitingFor(new LogMessageWaitStrategy().withRegEx(".*Server is ready.*"));
 
-		natsService.start();
-		attachLogger(natsService, natsLogger);
 
-		natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
-		var natsHttpPath = "http://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(8222);
-		logger.info("NATS path: " + natsPath);
+		jetStreamService.start();
+		attachLogger(jetStreamService, jetStreamLogger);
+
+		jetStreamPath = "nats://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(4222);
+		var natsHttpPath = "http://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(8222);
+		logger.info("NATS path: " + jetStreamPath);
 		logger.info("NATS http path: " + natsHttpPath);
+
+		addStream(natsSubjectSchedulingInfo);
+		addStream(natsSubjectAudit);
+	}
+
+	private static void addStream(String subject) throws IOException, InterruptedException, JetStreamApiException {
+		try(var natsConnection = Nats.connect(jetStreamPath)) {
+			var streamConfiguration = StreamConfiguration.builder()
+					.addSubjects(subject)
+					.name(subject)
+					.build();
+
+			natsConnection.jetStreamManagement().addStream(streamConfiguration);
+		}
 	}
 
 	protected static void attachLogger(GenericContainer container, Logger logger) {
