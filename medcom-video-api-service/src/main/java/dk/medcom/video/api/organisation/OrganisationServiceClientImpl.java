@@ -23,7 +23,7 @@ public class OrganisationServiceClientImpl implements OrganisationServiceClient 
         return ClientBuilder.newClient()
                 .target(UriBuilder.fromPath(endpoint))
                 .path("organisation")
-                .path(organisationCode)
+                .queryParam("organisationCode", organisationCode)
                 .request()
                 .get(Organisation.class);
     }
@@ -34,7 +34,7 @@ public class OrganisationServiceClientImpl implements OrganisationServiceClient 
             return ClientBuilder.newClient()
                     .target(UriBuilder.fromPath(endpoint))
                     .path("organisation")
-                    .path(parentOrganisation)
+                    .queryParam("parent_code", parentOrganisation)
                     .request()
                     .post(Entity.json(organisation), Organisation.class);
         }

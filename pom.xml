@@ -83,13 +83,6 @@
 				<version>6.0.8</version>
 			</dependency>
 
-			<!-- Actuator and prometheus -->
-			<dependency>
-				<groupId>dk.kvalitetsit</groupId>
-				<artifactId>spring-prometheus-app-info</artifactId>
-				<version>${spring-prometheus-app-info-version}</version>
-			</dependency>
-
 			<!-- Request ID logger -->
 			<dependency>
 				<groupId>dk.kvalitetsit</groupId>
@@ -114,9 +107,9 @@
 
 			<!-- Audit logging -->
 			<dependency>
-				<groupId>dk.medcom</groupId>
-				<artifactId>medcom-audit-api</artifactId>
-				<version>1.0.0</version>
+				<groupId>dk.kvalitetsit</groupId>
+				<artifactId>audit-api</artifactId>
+				<version>2.0.1</version>
 			</dependency>
 
 			<!-- Nats driver -->
@@ -124,12 +117,6 @@
 				<groupId>io.nats</groupId>
 				<artifactId>jnats</artifactId>
 				<version>2.16.9</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.nats</groupId>
-				<artifactId>java-nats-streaming</artifactId>
-				<version>2.2.3</version>
 			</dependency>
 
 			<!-- Task locking -->
