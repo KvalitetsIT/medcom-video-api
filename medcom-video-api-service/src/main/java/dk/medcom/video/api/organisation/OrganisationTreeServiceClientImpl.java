@@ -17,7 +17,7 @@ public class OrganisationTreeServiceClientImpl implements OrganisationTreeServic
                 .target(UriBuilder.fromPath(endpoint))
                 .path("services")
                 .path("organisationtree")
-                .path(organisationCode)
+                .queryParam("organisationCode", organisationCode)
                 .request()
                 .get(new GenericType<OrganisationTree>(){});
     }

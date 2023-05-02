@@ -1,4 +1,4 @@
-package dk.medcom.video.api.entity;
+package dk.medcom.video.api.dao.entity;
 
 public class PoolInfoEntity {
 

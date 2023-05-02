@@ -38,7 +38,46 @@ public class PoolInfoServiceTest {
     }
 
     @Test
-    public void testGetPoolInfo() {
+    public void testGetPoolInfoWithPoolTemplate() {
+        SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
+
+        List<Organisation> organisations = createOrganisationList();
+        OrganisationRepository organisationRepository = Mockito.mock(OrganisationRepository.class);
+        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
+        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
+
+        SchedulingTemplate schedulingTemplate = createPoolSchedulingTemplate();
+        SchedulingTemplateRepository schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
+        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
+
+        OrganisationStrategy organisationStrategy = Mockito.mock(OrganisationStrategy.class);
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
+
+
+        PoolInfoServiceImpl poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
+
+        List<PoolInfoDto> response = poolInfoService.getPoolInfo();
+
+        assertNotNull(response);
+        assertEquals(2, response.size());
+
+        PoolInfoDto firstPoolInfo = response.get(0);
+        assertEquals(organisations.get(0).getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
+        assertEquals(2, firstPoolInfo.getAvailablePoolSize());
+
+        assertNotNull(firstPoolInfo.getSchedulingTemplate());
+
+        PoolInfoDto secondPoolInfo = response.get(1);
+        assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
+        assertEquals(0, secondPoolInfo.getAvailablePoolSize());
+        assertNotNull(secondPoolInfo.getSchedulingTemplate());
+    }
+
+    @Test
+    public void testGetPoolInfoNoPoolTemplate() {
         SchedulingInfoRepository schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
@@ -188,6 +227,29 @@ public class PoolInfoServiceTest {
     private SchedulingTemplate createDefaultSchedulingTemplate() {
         SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
         schedulingTemplate.setIsDefaultTemplate(true);
+        schedulingTemplate.setConferencingSysId(1L);
+        schedulingTemplate.setEndMeetingOnEndTime(true);
+        schedulingTemplate.setGuestPinRangeHigh(2000L);
+        schedulingTemplate.setGuestPinRangeLow(1000L);
+        schedulingTemplate.setGuestPinRequired(true);
+        schedulingTemplate.setHostPinRangeHigh(4000L);
+        schedulingTemplate.setHostPinRangeLow(3000L);
+        schedulingTemplate.setHostPinRequired(false);
+        schedulingTemplate.setIvrTheme("some theme");
+        schedulingTemplate.setMaxParticipants(10);
+        schedulingTemplate.setUriDomain("uri domain");
+        schedulingTemplate.setUriNumberRangeHigh(9000L);
+        schedulingTemplate.setUriNumberRangeLow(8000L);
+        schedulingTemplate.setUriPrefix("uri prefix");
+        schedulingTemplate.setVMRAvailableBefore(10);
+        schedulingTemplate.setId(2L);
+
+        return schedulingTemplate;
+    }
+
+    private SchedulingTemplate createPoolSchedulingTemplate() {
+        SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
+        schedulingTemplate.setIsPoolTemplate(true);
         schedulingTemplate.setConferencingSysId(1L);
         schedulingTemplate.setEndMeetingOnEndTime(true);
         schedulingTemplate.setGuestPinRangeHigh(2000L);

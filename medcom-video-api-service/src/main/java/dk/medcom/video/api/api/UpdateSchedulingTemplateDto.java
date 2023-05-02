@@ -51,6 +51,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String ivrTheme;
 	
 	private boolean isDefaultTemplate;
+	private boolean isPoolTemplate;
 
 	private VmrType vmrType;
 	private ViewType hostView;
@@ -191,6 +192,14 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
+	}
+
+	public boolean getIsPoolTemplate() {
+		return isPoolTemplate;
+	}
+
+	public void setIsPoolTemplate(boolean isPoolTemplate) {
+		this.isPoolTemplate = isPoolTemplate;
 	}
 
 	public VmrType getVmrType() {

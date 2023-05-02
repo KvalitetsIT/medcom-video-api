@@ -35,6 +35,7 @@ public class SchedulingTemplate {
 	private Long uriNumberRangeHigh;		//when random generating
 	private String ivrTheme;  				//theme to use in Pexip
 	private boolean isDefaultTemplate;		//an organisation can have one default template
+	private boolean isPoolTemplate;				//an organisation can have one or zero pool templates
 	@Enumerated(EnumType.STRING)
 	private VmrType vmrType;				//type of the virtual meeting room.
 	@Enumerated(EnumType.STRING)
@@ -175,7 +176,12 @@ public class SchedulingTemplate {
 	public void setIsDefaultTemplate(boolean isDefaultTemplate) {
 		this.isDefaultTemplate = isDefaultTemplate;
 	}
-	
+	public boolean getIsPoolTemplate() {
+		return isPoolTemplate;
+	}
+	public void setIsPoolTemplate(boolean isPoolTemplate) {
+		this.isPoolTemplate = isPoolTemplate;
+	}
 	public MeetingUser getCreatedBy() {
 		return createdBy;
 	}
@@ -221,9 +227,10 @@ public class SchedulingTemplate {
 				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vMRAvailableBefore=" + vMRAvailableBefore
 				+ ", maxParticipants=" + maxParticipants + ", endMeetingOnEndTime=" + endMeetingOnEndTime
 				+ ", uriNumberRangeLow=" + uriNumberRangeLow + ", uriNumberRangeHigh=" + uriNumberRangeHigh
-				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + ", createdBy=" + createdBy
-				+ ", createdTime=" + createdTime + ", updatedBy=" + updatedBy + ", updatedTime=" + updatedTime
-				+ ", deletedBy=" + deletedBy + ", deletedTime=" + deletedTime + "]";
+				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + ", isPoolTemplate="
+				+ isPoolTemplate + ", createdBy=" + createdBy + ", createdTime=" + createdTime + ", updatedBy="
+				+ updatedBy + ", updatedTime=" + updatedTime + ", deletedBy=" + deletedBy + ", deletedTime="
+				+ deletedTime + "]";
 	}
 
 	public VmrType getVmrType() {

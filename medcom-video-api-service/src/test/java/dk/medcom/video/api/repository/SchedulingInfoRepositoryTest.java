@@ -495,7 +495,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         createMeetingDto.setVmrType(VmrType.lecture);
         createMeetingDto.setHostView(ViewType.one_main_zero_pips);
         createMeetingDto.setGuestView(ViewType.four_mains_zero_pips);
-        createMeetingDto.setVmrQuality(VmrQuality.full_hd);
+        createMeetingDto.setVmrQuality(VmrQuality.fullhd);
         createMeetingDto.setEnableOverlayText(false);
         createMeetingDto.setGuestsCanPresent(false);
         createMeetingDto.setForcePresenterIntoMain(false);

@@ -10,11 +10,10 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.service.PoolInfoService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -66,10 +65,15 @@ public class PoolInfoServiceImpl implements PoolInfoService {
     private SchedulingTemplateDto getSchedulingTemplate(Organisation o) {
         dk.medcom.video.api.dao.entity.Organisation org = organisationRepository.findByOrganisationId(o.getCode());
         if(org != null) {
-            List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(org, true);
+            List<SchedulingTemplate> schedulingTemplatesPool = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(org, true);
+            if (schedulingTemplatesPool != null && schedulingTemplatesPool.size() > 0) {
+                return mapSchedulingTemplate(schedulingTemplatesPool.get(0));
+            }
 
-            if(schedulingTemplates != null && schedulingTemplates.size() > 0) {
-                return mapSchedulingTemplate(schedulingTemplates.get(0));
+            List<SchedulingTemplate> schedulingTemplatesDefault = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(org, true);
+
+            if(schedulingTemplatesDefault != null && schedulingTemplatesDefault.size() > 0) {
+                return mapSchedulingTemplate(schedulingTemplatesDefault.get(0));
             }
         }
 

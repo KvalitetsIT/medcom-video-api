@@ -1,9 +1,7 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.organisation.OrganisationDatabaseStrategy;
-import dk.medcom.video.api.organisation.OrganisationServiceStrategy;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,5 +25,10 @@ public class OrganisationStrategyConfiguration {
 	public OrganisationStrategy organisationServiceStrategy(@Value("${organisation.service.endpoint}") String endpoint) {
 		LOGGER.info("Starting up with service organisation strategy.");
 		return new OrganisationServiceStrategy(endpoint);
+	}
+
+	@Bean
+	public OrganisationServiceClient organisationServiceClient(@Value("${organisation.service.endpoint}") String endpoint) {
+		return new OrganisationServiceClientImpl(endpoint);
 	}
 }

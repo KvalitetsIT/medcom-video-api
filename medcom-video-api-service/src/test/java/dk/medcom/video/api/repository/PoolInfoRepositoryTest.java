@@ -2,7 +2,7 @@ package dk.medcom.video.api.repository;
 
 
 import dk.medcom.video.api.dao.PoolInfoRepository;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import org.junit.Assert;
 import org.junit.Test;
 

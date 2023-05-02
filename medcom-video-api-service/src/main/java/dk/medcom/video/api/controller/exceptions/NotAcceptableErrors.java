@@ -7,7 +7,8 @@ public enum NotAcceptableErrors {
     URI_ASSIGNMENT_FAILED_INVALID_TEMPLATE_USED(20, "The Uri assignment failed due to invalid setup on the template used"),
     URI_ASSIGNMENT_FAILED_NOT_POSSIBLE_TO_CREATE_UNIQUE(21, "The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template"),
     GUEST_PINCODE_ASSIGNMENT_FAILED(30, "The guest pincode assignment failed due to invalid setup on the template used"),
-    HOST_PINCODE_ASSIGNMENT_FAILED(31, "The host pincode assignment failed due to invalid setup on the template used");
+    HOST_PINCODE_ASSIGNMENT_FAILED(31, "The host pincode assignment failed due to invalid setup on the template used"),
+    CREATE_OR_UPDATE_POOL_TEMPLATE_FAILED(32, "Create or update of pool template failed due to only one pool template allowed");
 
     private final int errorCode;
     private final String errorText;

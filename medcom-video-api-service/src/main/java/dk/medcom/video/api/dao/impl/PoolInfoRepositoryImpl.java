@@ -2,18 +2,16 @@ package dk.medcom.video.api.dao.impl;
 
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
-import dk.medcom.video.api.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.util.List;
 
 public class PoolInfoRepositoryImpl implements PoolInfoRepository {
+	private final DataSource dataSource;
 
-	
-	private DataSource dataSource;
-
-	private PoolInfoRowMapper poolInfoRowMapper = new PoolInfoRowMapper();
+	private final PoolInfoRowMapper poolInfoRowMapper = new PoolInfoRowMapper();
 
 	public PoolInfoRepositoryImpl(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -29,7 +27,7 @@ public class PoolInfoRepositoryImpl implements PoolInfoRepository {
 				+ " 	   and s.reservation_id is null "
 				+ "where o.pool_size > 0 "
 			// Kopieret fra "job" + "  AND created_time < ADDDATE(UTC_TIMESTAMP, INTERVAL -1 MINUTE) "
-				+ " group by o.organisation_id";
+				+ " group by o.organisation_id, o.name, o.pool_size";
 		
 		NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(dataSource);
 		return template.query(sql, poolInfoRowMapper);

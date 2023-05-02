@@ -12,7 +12,6 @@ import dk.medcom.video.api.service.domain.UpdateMeeting;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 public class DomainMapper {
     public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting, SchedulingInfo schedulingInfo) {
@@ -47,7 +46,7 @@ public class DomainMapper {
         updateMeetingDto.setProjectCode(meeting.getProjectCode());
         updateMeetingDto.setEndTime(meeting.getEndTime());
         updateMeetingDto.setStartTime(meeting.getStartTime());
-        updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList()));
+        updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).toList());
         updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
         if(schedulingInfo.getHostPin() != null) {

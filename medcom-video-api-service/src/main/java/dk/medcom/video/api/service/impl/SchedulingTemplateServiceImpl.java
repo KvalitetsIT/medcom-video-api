@@ -2,6 +2,8 @@ package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.controller.exceptions.NotAcceptableErrors;
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
@@ -88,7 +90,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 
 	@Override
-	public SchedulingTemplate getSchedulingTemplateInOrganisationTree() throws PermissionDeniedException {
+	public SchedulingTemplate getSchedulingTemplateInOrganisationTree() throws PermissionDeniedException, NotAcceptableException {
 		Organisation organisation = organisationService.getUserOrganisation();
 		List<SchedulingTemplate> schedulingTemplates = null;
 		if (organisation != null) {
@@ -148,11 +150,20 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 
 	@Override
-	public SchedulingTemplate createSchedulingTemplate(CreateSchedulingTemplateDto createSchedulingTemplateDto, boolean includeOrganisation) throws PermissionDeniedException  {
+	public SchedulingTemplate createSchedulingTemplate(CreateSchedulingTemplateDto createSchedulingTemplateDto, boolean includeOrganisation) throws PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry createSchedulingTemplate");
 
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
-		
+
+		//check if pool template and if so, if another pool template already exists
+		if (createSchedulingTemplateDto.getIsPoolTemplate()) {
+			LOGGER.debug("SchedulingTemplate is a pool template");
+			if (checkIfPoolTemplateAlreadyExists()) {
+				LOGGER.debug("There was already a pool template in the organisation");
+				throw new NotAcceptableException(NotAcceptableErrors.CREATE_OR_UPDATE_POOL_TEMPLATE_FAILED);
+			}
+		}
+
 		//first find any other default template and make it non-default 
 		if (createSchedulingTemplateDto.getIsDefaultTemplate()) {
 			LOGGER.debug("SchedulingTemplate is a default template");
@@ -185,6 +196,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setUriNumberRangeHigh(createSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(createSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(createSchedulingTemplateDto.getIsDefaultTemplate());
+		schedulingTemplate.setIsPoolTemplate(createSchedulingTemplateDto.getIsPoolTemplate());
 
 		schedulingTemplate.setVmrType(createSchedulingTemplateDto.getVmrType() != null ? createSchedulingTemplateDto.getVmrType() : VmrType.conference);
 		schedulingTemplate.setHostView(createSchedulingTemplateDto.getHostView() != null ? createSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
@@ -209,10 +221,19 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 	
 	@Override
-	public SchedulingTemplate updateSchedulingTemplate(Long id, UpdateSchedulingTemplateDto updateSchedulingTemplateDto) throws PermissionDeniedException, RessourceNotFoundException  {
+	public SchedulingTemplate updateSchedulingTemplate(Long id, UpdateSchedulingTemplateDto updateSchedulingTemplateDto) throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		LOGGER.debug("Entry updateSchedulingTemplate. id/updateSchedulingTemplateDto. id=" + id);
 		
 		SchedulingTemplate schedulingTemplate = getSchedulingTemplateFromOrganisationAndId(id);
+
+		//check if pool template and if so, if another pool template already exists
+		if (updateSchedulingTemplateDto.getIsPoolTemplate()) {
+			LOGGER.debug("SchedulingTemplate is a pool template");
+			if (checkIfPoolTemplateAlreadyExists()) {
+				LOGGER.debug("There was already a pool template in the organisation");
+				throw new NotAcceptableException(NotAcceptableErrors.CREATE_OR_UPDATE_POOL_TEMPLATE_FAILED);
+			}
+		}
 
 		//first find any other default template and make it non-default 
 		if (updateSchedulingTemplateDto.getIsDefaultTemplate() && !schedulingTemplate.getIsDefaultTemplate() ) {
@@ -239,6 +260,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setUriNumberRangeHigh(updateSchedulingTemplateDto.getUriNumberRangeHigh());
 		schedulingTemplate.setIvrTheme(updateSchedulingTemplateDto.getIvrTheme());
 		schedulingTemplate.setIsDefaultTemplate(updateSchedulingTemplateDto.getIsDefaultTemplate());
+		schedulingTemplate.setIsPoolTemplate(updateSchedulingTemplateDto.getIsPoolTemplate());
 
 		schedulingTemplate.setVmrType(updateSchedulingTemplateDto.getVmrType() != null ? updateSchedulingTemplateDto.getVmrType() : VmrType.conference);
 		schedulingTemplate.setHostView(updateSchedulingTemplateDto.getHostView() != null ? updateSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
@@ -307,7 +329,13 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		LOGGER.debug("Existing default templates prevent adding a new one. Organisation : " + organisationService.getUserOrganisation().toString());
 		return false;
 	}
-	
+
+	private boolean checkIfPoolTemplateAlreadyExists() throws PermissionDeniedException {
+		List<SchedulingTemplate> poolTemplates = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);
+
+		return poolTemplates.size() == 1;
+	}
+
 	private CreateSchedulingTemplateDto getSchedulingTemplateDto()  {
 		CreateSchedulingTemplateDto createSchedulingTemplateDto = new CreateSchedulingTemplateDto();
 		//schedulingTemplate.setOrganisation(organisation); //for default schedulingTemplate the organisation is null
