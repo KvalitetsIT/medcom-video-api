@@ -47,15 +47,11 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	protected static GenericContainer testOrganisationFrontend;
-	private static GenericContainer natsService;
-	private static String natsPath;
 	private static MariaDBContainer mariadb;
 	private static GenericContainer<?> jetStreamService;
 	private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
 	private static final String natsSubjectAudit = "natsSubject";
-	private static final MySQLContainer<?> mysql;
 
 	private static final String DB_USER = "videouser";
 	private static final String DB_PASSWORD = "secret1234";
@@ -127,6 +123,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("userservice_token_attribute_username", "username")
 				.withEnv("userservice.token.attribute.email", "email")
 				.withEnv("userservice.token.attribute.userrole", "userrole")
+				.withEnv("userservice.token.attribute.auto.create.organisation", "parent_org")
 				.withEnv("scheduling.template.default.conferencing.sys.id", "22")
 				.withEnv("scheduling.template.default.uri.prefix", "abc")
 				.withEnv("scheduling.template.default.uri.domain", "test.dk")
