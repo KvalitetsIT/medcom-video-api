@@ -4,6 +4,9 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
+import io.nats.client.JetStreamApiException;
+import io.nats.client.Nats;
+import io.nats.client.api.StreamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +23,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.function.Consumer;
@@ -30,15 +34,17 @@ import java.util.function.Consumer;
 public class TestApplication extends SpringBootServletInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
     private static GenericContainer testOrganisationFrontend;
-    private static GenericContainer natsService;
-    private static String natsPath;
+    private static GenericContainer<?> jetStreamService;
+    private static final String natsSubjectSchedulingInfo = "schedulingInfo";
+    private static final String natsSubjectAudit = "natsSubject";
+    private static String jetStreamPath;
     private final DataSource dataSource;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws JetStreamApiException, IOException, InterruptedException {
         Network n = Network.newNetwork();
 	    createOrganisationService(n);
 
-        startNats(n);
+        setupJetStream(n);
 
 		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
                 .withDatabaseName("videodb")
@@ -52,18 +58,15 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
         System.setProperty("short.link.base.url", "http://shortlink");
         System.setProperty("overflow.pool.organisation.id", "overflow");
-        System.setProperty("organisationtree.service.endpoint", "http://localhost:8081");
+        System.setProperty("organisationtree.service.endpoint", "http://localhost:" + testOrganisationFrontend.getMappedPort(80));
 
-        System.setProperty("audit.nats.url", natsPath);
-        System.setProperty("audit.nats.subject", "natsSubject");
-        System.setProperty("audit.nats.cluster.id", "test-cluster");
-        System.setProperty("audit.nats.client.id", "natsClientId");
+        System.setProperty("userservice.token.attribute.auto.create.organisation", "auto-create-parent");
+
+        System.setProperty("audit.nats.url", jetStreamPath);
+        System.setProperty("audit.nats.subject", natsSubjectAudit);
 //        System.setProperty("audit.nats.disabled", "true");
 
-        System.setProperty("events.nats.url", natsPath);
-        System.setProperty("events.nats.cluster.id", "test-cluster");
-        System.setProperty("events.nats.client.id", "natsClientId");
-        System.setProperty("events.nats.subject.scheduling-info", "schedulingInfo");
+        System.setProperty("events.nats.subject.scheduling-info", natsSubjectSchedulingInfo);
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
@@ -95,24 +98,39 @@ public class TestApplication extends SpringBootServletInitializer {
         SpringApplication.run(TestApplication.class, args);
 	}
 
-    private static void startNats(Network n) {
-        var natsContainerName = "nats-streaming";
-        var natsContainerVersion = "0.19.0";
+    private static void setupJetStream(Network n) throws JetStreamApiException, IOException, InterruptedException {
+        var natsContainerName = "nats";
+        var natsContainerVersion = "2.9-alpine";
 
-        natsService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion)
-                .withNetwork(n)
+        jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
+
+        jetStreamService.withNetwork(n)
                 .withNetworkAliases("nats")
-                .withExposedPorts(4222)
-                .withExposedPorts(8222)
-                .waitingFor(new LogMessageWaitStrategy().withRegEx(".*Streaming Server is ready.*"))
-        ;
+                .withExposedPorts(4222, 8222)
+                .withCommand("-js")
+                .waitingFor(new LogMessageWaitStrategy().withRegEx(".*Server is ready.*"));
 
-        natsService.start();
 
-        natsPath = "nats://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(4222);
-        var natsHttpPath = "http://" + natsService.getContainerIpAddress() + ":" + natsService.getMappedPort(8222);
-        logger.info("NATS path: " + natsPath);
+        jetStreamService.start();
+
+        jetStreamPath = "nats://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(4222);
+        var natsHttpPath = "http://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(8222);
+        logger.info("NATS path: " + jetStreamPath);
         logger.info("NATS http path: " + natsHttpPath);
+
+        addStream(natsSubjectSchedulingInfo);
+        addStream(natsSubjectAudit);
+    }
+
+    private static void addStream(String subject) throws IOException, InterruptedException, JetStreamApiException {
+        try(var natsConnection = Nats.connect(jetStreamPath)) {
+            var streamConfiguration = StreamConfiguration.builder()
+                    .addSubjects(subject)
+                    .name(subject)
+                    .build();
+
+            natsConnection.jetStreamManagement().addStream(streamConfiguration);
+        }
     }
 
     private static void createOrganisationService(Network n) {
@@ -126,7 +144,7 @@ public class TestApplication extends SpringBootServletInitializer {
 
         organisationMysql.start();
 
-        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:latest")
+        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
                 .withNetwork(n)
                 .withNetworkAliases("organisationservice")
                 .withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
@@ -140,6 +158,7 @@ public class TestApplication extends SpringBootServletInitializer {
                 .withEnv("userrole_monitor_values", "monitorrole")
                 .withEnv("userrole_provisioner_values", "provisionerrole")
                 .withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
+
                 .withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
                 .withExposedPorts(8080)
                 ;

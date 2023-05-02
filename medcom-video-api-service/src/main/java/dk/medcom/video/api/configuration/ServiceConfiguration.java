@@ -1,7 +1,7 @@
 package dk.medcom.video.api.configuration;
 
-import dk.medcom.audit.client.AuditClient;
-import dk.medcom.audit.client.messaging.nats.NatsPublisher;
+import dk.kvalitetsit.audit.client.AuditClient;
+import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.*;
@@ -9,12 +9,9 @@ import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
-import dk.medcom.video.api.service.impl.AuditServiceImpl;
-import dk.medcom.video.api.service.impl.CustomUriValidatorImpl;
-import dk.medcom.video.api.service.impl.SchedulingInfoEventPublisherImpl;
+import dk.medcom.video.api.service.impl.*;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.CollectorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.*;
 import org.springframework.web.context.WebApplicationContext;
@@ -46,6 +42,9 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Autowired
 	private OrganisationRepository organisationRepository;
+
+	@Autowired
+	private OrganisationServiceClient organisationServiceClient;
 
 	@Value("${ALLOWED_ORIGINS}")
 	private List<String> allowedOrigins;
@@ -102,11 +101,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
-		return new OrganisationInterceptor(organisationStrategy, organisationRepository);
+		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
 	}
 
 	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") NatsPublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
+	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") MessagePublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter filterOrganisations) {
 		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao, filterOrganisations);
 	}
 

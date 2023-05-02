@@ -1,23 +1,23 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.audit.client.messaging.nats.NatsPublisher;
+import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
 import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
 import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
+import io.nats.client.JetStreamApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPublisher {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
-    private NatsPublisher natsPublisher;
+    private final MessagePublisher natsPublisher;
     private final EntitiesIvrThemeDao entitiesIvrThemeDao;
     private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
-    public SchedulingInfoEventPublisherImpl(NatsPublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
+    public SchedulingInfoEventPublisherImpl(MessagePublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
         this.natsPublisher = natsPublisher;
         this.entitiesIvrThemeDao = entitiesIvrThemeDao;
         this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
@@ -41,7 +41,7 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
         try {
             natsPublisher.publishMessage(schedulingInfoEvent);
         }
-        catch(IOException | InterruptedException | TimeoutException e) {
+        catch(IOException | JetStreamApiException e) {
             logger.warn("Error publishing nats message", e);
 
             throw new MessagingException("Error during publish of event.", e);

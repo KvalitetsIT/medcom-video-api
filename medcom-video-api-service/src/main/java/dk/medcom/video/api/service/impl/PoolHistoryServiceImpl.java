@@ -1,8 +1,9 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.entity.PoolHistory;
+import dk.medcom.video.api.service.PoolHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +13,8 @@ import java.time.Instant;
 public class PoolHistoryServiceImpl implements PoolHistoryService {
     private static final Logger logger = LoggerFactory.getLogger(PoolHistoryServiceImpl.class);
 
-    private PoolInfoRepository poolInfoRepository;
-    private PoolHistoryDao poolHistoryDao;
+    private final PoolInfoRepository poolInfoRepository;
+    private final PoolHistoryDao poolHistoryDao;
 
     public PoolHistoryServiceImpl(PoolInfoRepository poolInfoRepository, PoolHistoryDao poolHistoryDao) {
         this.poolInfoRepository = poolInfoRepository;
