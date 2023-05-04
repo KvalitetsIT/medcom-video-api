@@ -4,11 +4,11 @@ package dk.medcom.video.api.repository;
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.helper.TestDataHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -463,13 +463,114 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
-        createMeetingDto.setDefaults();
-
-        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+                ProvisionStatus.PROVISIONED_OK.name(),
+                cal2.getTime(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(207, schedulingInfos.get(0).intValue());
+        assertEquals(207, schedulingInfos.get(0).getId().intValue());
+    }
+
+    @Test
+    public void testFindUnusedSchedulingInfoForOrganizationGuestCanPresentAndVmrType() {
+        Organisation organisation = new Organisation();
+        organisation.setId(7L);
+
+        var optionalSchedulingInfo = subject.findById(207L);
+        assertTrue(optionalSchedulingInfo.isPresent());
+        SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 61);
+
+        schedulingInfo.setProvisionTimestamp(cal.getTime());
+        subject.save(schedulingInfo);
+
+        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisation);
+        schedulingInfoVmrType.setVmrType(VmrType.lecture);
+        schedulingInfoVmrType.setGuestsCanPresent(true);
+        schedulingInfoVmrType.setProvisionTimestamp(cal.getTime());
+        schedulingInfoVmrType.setOrganisation(schedulingInfo.getOrganisation());
+        schedulingInfoVmrType.setUpdatedByUser(schedulingInfo.getUpdatedByUser());
+        schedulingInfoVmrType.setMeetingUser(schedulingInfo.getMeetingUser());
+        schedulingInfoVmrType.setSchedulingTemplate(schedulingInfo.getSchedulingTemplate());
+        schedulingInfoVmrType = subject.save(schedulingInfoVmrType);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(new Date());
+        cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
+
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+                ProvisionStatus.PROVISIONED_OK.name(),
+                cal2.getTime(),
+                "lecture",
+                null,
+                null,
+                null,
+                null,
+                true,
+                null,
+                null,
+                null);
+        assertNotNull(schedulingInfos);
+        assertEquals(1, schedulingInfos.size());
+        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.get(0).getId());
+    }
+
+    @Test
+    public void testFindUnusedSchedulingInfoForOrganizationVmrType() {
+        Organisation organisation = new Organisation();
+        organisation.setId(7L);
+
+        var optionalSchedulingInfo = subject.findById(207L);
+        assertTrue(optionalSchedulingInfo.isPresent());
+        SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - 61);
+
+        schedulingInfo.setProvisionTimestamp(cal.getTime());
+        subject.save(schedulingInfo);
+
+        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisation);
+        schedulingInfoVmrType.setVmrType(VmrType.lecture);
+        schedulingInfoVmrType.setProvisionTimestamp(cal.getTime());
+        schedulingInfoVmrType.setOrganisation(schedulingInfo.getOrganisation());
+        schedulingInfoVmrType.setUpdatedByUser(schedulingInfo.getUpdatedByUser());
+        schedulingInfoVmrType.setMeetingUser(schedulingInfo.getMeetingUser());
+        schedulingInfoVmrType.setSchedulingTemplate(schedulingInfo.getSchedulingTemplate());
+        schedulingInfoVmrType = subject.save(schedulingInfoVmrType);
+
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(new Date());
+        cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
+
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+                ProvisionStatus.PROVISIONED_OK.name(),
+                cal2.getTime(),
+                "lecture",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        assertNotNull(schedulingInfos);
+        assertEquals(1, schedulingInfos.size());
+        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.get(0).getId());
     }
 
     @Test
@@ -502,10 +603,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         createMeetingDto.setForceEncryption(true);
         createMeetingDto.setMuteAllGuests(true);
 
-        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(211, schedulingInfos.get(0).intValue());
+        assertEquals(211, schedulingInfos.get(0).getId().intValue());
     }
 
     @Test
@@ -527,10 +628,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
-        createMeetingDto.setDefaults();
 
-        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), null, null, null, null, null, null, null, null, null);
         assertNotNull(schedulingInfos);
         assertEquals(0, schedulingInfos.size());
 
@@ -539,10 +638,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setProvisionTimestamp(cal.getTime());
         subject.save(schedulingInfo);
 
-        schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+        schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), null, null, null, null, null, null, null, null, null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(207, schedulingInfos.get(0).intValue());
+        assertEquals(207, schedulingInfos.get(0).getId().intValue());
     }
 
     @Test
@@ -554,10 +653,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
-        createMeetingDto.setDefaults();
-
-        List<BigInteger> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(), ProvisionStatus.PROVISIONED_OK.name(), cal2.getTime(), null, null, null, null, null, null, null, null, null);
         assertNotNull(schedulingInfos);
         assertEquals(0, schedulingInfos.size());
     }

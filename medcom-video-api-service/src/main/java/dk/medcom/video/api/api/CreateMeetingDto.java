@@ -76,36 +76,6 @@ public class CreateMeetingDto {
 	@Min(value = 1000, message = "guestPin should not be less than 1000.")
 	private Integer guestPin;
 
-	public void setDefaults(){
-        if (this.vmrType == null){
-            this.vmrType = VmrType.conference;
-        }
-		if (this.hostView == null){
-            this.hostView = ViewType.one_main_seven_pips;
-        }
-        if (this.guestView == null ){
-            this.guestView = ViewType.one_main_seven_pips;
-        }
-        if (this.vmrQuality == null){
-            this.vmrQuality = VmrQuality.hd;
-        }
-        if (this.enableOverlayText == null){
-            this.enableOverlayText = true;
-        }
-        if (this.guestsCanPresent == null){
-            this.guestsCanPresent = true;
-        }
-		if (this.forcePresenterIntoMain == null){
-            this.forcePresenterIntoMain = true;
-        }
-        if (this.forceEncryption == null ){
-            this.forceEncryption = false;
-        }
-        if (this.muteAllGuests ==null){
-            this.muteAllGuests = false;
-        }
-	}
-
 	public List<String> getLabels() {
 		return labels;
 	}

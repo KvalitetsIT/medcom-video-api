@@ -54,6 +54,7 @@ public class SchedulingInfoServiceImplTest {
     private OrganisationTreeServiceClient organisationTreeServiceClient;
     private AuditService auditService;
     private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
+    private PoolFinderService poolFinderService;
 
     @Before
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
@@ -71,20 +72,6 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(schedulingInfoRepository.findOneByUuid(schedulingInfoUuid.toString())).thenReturn(schedulingInfo);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).then(i -> i.getArgument(0));
         Mockito.when(schedulingInfoRepository.findOneByReservationId(reservationId.toString())).thenReturn(schedulingInfo);
-        BigInteger id = new BigInteger("123");
-
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(Long.class),
-                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
-                Mockito.any(), Mockito.any(String.class),
-                Mockito.any(String.class),
-                Mockito.any(String.class),
-                Mockito.any(String.class),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(Collections.singletonList(id));
 
         Mockito.when(schedulingInfoRepository.findById(Mockito.eq(123L))).thenReturn(Optional.of(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
@@ -112,13 +99,27 @@ public class SchedulingInfoServiceImplTest {
         userContextService = Mockito.mock(UserContextService.class);
 
         schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
+
+        poolFinderService = Mockito.mock(PoolFinderService.class);
     }
-
-
 
     @Test(expected = RessourceNotFoundException.class)
     public void testUpdateSchedulingInfoNotFound() throws RessourceNotFoundException, PermissionDeniedException {
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, null, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository,
+                null,
+                null,
+                null,
+                null,
+                organizationRepository,
+                null,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null);
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L);
     }
@@ -139,7 +140,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
 
@@ -171,7 +172,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
 
@@ -202,7 +203,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -235,7 +236,7 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -510,7 +511,12 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testAttachMeetingToSchedulingInfo() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
-        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+        var organisation = createOrganisation();
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(organisation));
+
+        var poolSchedulingInfo = new SchedulingInfo();
+        poolSchedulingInfo.setId(123L);
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(poolSchedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -540,8 +546,14 @@ public class SchedulingInfoServiceImplTest {
     public void testAttachMeetingToSchedulingInfoOverflowPool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
 
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
+        UserContext userContext = new UserContextImpl(POOL_ORG, "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfo = new SchedulingInfo();
+        schedulingInfo.setId(123L);
+
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.empty());
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -558,36 +570,11 @@ public class SchedulingInfoServiceImplTest {
         meeting.setMeetingUser(createMeetingUser(createOrganisation()));
         meeting.setEndTime(new Date());
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(null).thenReturn(Collections.singletonList(new BigInteger("123")));
-
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
         assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
@@ -598,7 +585,7 @@ public class SchedulingInfoServiceImplTest {
 
     @Test
     public void testAttachMeetingToSchedulingInfoNoFreePool() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
-        UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
+        UserContext userContext = new UserContextImpl(POOL_ORG, "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Calendar calendar = Calendar.getInstance();
@@ -612,36 +599,11 @@ public class SchedulingInfoServiceImplTest {
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setOrganisation(createOrganisation());
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(null);
-
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(2)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNull(result);
     }
@@ -668,37 +630,13 @@ public class SchedulingInfoServiceImplTest {
         organisationTree.setCode(NON_POOL_ORG);
         organisationTree.setName("nonPoolOrg name");
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(null);
         Mockito.when(organisationTreeServiceClient.getOrganisationTree(NON_POOL_ORG)).thenReturn(organisationTree);
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(NON_POOL_ORG)), Mockito.any());
+
         Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree(NON_POOL_ORG);
 
         assertNull(result);
@@ -711,7 +649,7 @@ public class SchedulingInfoServiceImplTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -722,7 +660,7 @@ public class SchedulingInfoServiceImplTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
 
         schedulingInfoService.createSchedulingInfo(input);
         Mockito.verifyNoMoreInteractions(auditService);
@@ -786,6 +724,10 @@ public class SchedulingInfoServiceImplTest {
     public void testAttachMeetingToSchedulingInfoMicrophoneOff() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
 
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setId(123L);
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
         Date startTime = calendar.getTime();
@@ -812,6 +754,10 @@ public class SchedulingInfoServiceImplTest {
     @Test
     public void testAttachMeetingToSchedulingInfoMicrophoneMuted() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(createOrganisation()));
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setId(123L);
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -841,6 +787,10 @@ public class SchedulingInfoServiceImplTest {
         UserContext userContext = new UserContextImpl("poolOrg", "test@test.dk", UserRole.ADMIN, null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
+        var schedulingInfo = new SchedulingInfo();
+        schedulingInfo.setId(123L);
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+
         var schedulingInfoService = createSchedulingInfoService();
 
         var result = schedulingInfoService.reserveSchedulingInfo(
@@ -856,23 +806,11 @@ public class SchedulingInfoServiceImplTest {
         assertNotNull(result);
 
         Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
-        Mockito.verify(schedulingInfoRepository, times(1)).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(1L),
-                Mockito.eq("PROVISIONED_OK"),
-                Mockito.any(),
-                Mockito.eq(VmrType.lecture.name()),
-                Mockito.eq(ViewType.one_main_zero_pips.name()),
-                Mockito.eq(ViewType.four_mains_zero_pips.name()),
-                Mockito.eq(VmrQuality.fullhd.name()),
-                Mockito.eq(true),
-                Mockito.eq(true),
-                Mockito.eq(true),
-                Mockito.eq(false),
-                Mockito.eq(false));
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
         var schedulingInfoCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoCaptor.capture());
         assertNotNull(schedulingInfoCaptor.getValue());
-        var schedulingInfo = schedulingInfoCaptor.getValue();
+        schedulingInfo = schedulingInfoCaptor.getValue();
         assertNotNull(schedulingInfo.getReservationId());
     }
 
@@ -882,19 +820,6 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         Mockito.reset(schedulingInfoRepository);
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.anyLong(),
-                Mockito.anyString(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(null);
         var schedulingInfoService = createSchedulingInfoService();
 
         schedulingInfoService.reserveSchedulingInfo(VmrType.lecture,
@@ -1067,7 +992,7 @@ public class SchedulingInfoServiceImplTest {
     }
 
     private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator, NewProvisionerOrganisationFilter excludeOrganisationsFilter) {
-        return new SchedulingInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, customUriValidator, schedulingInfoEventPublisher, excludeOrganisationsFilter);
+        return new SchedulingInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, OVERFLOW_POOL, organisationTreeServiceClient, auditService, customUriValidator, schedulingInfoEventPublisher, excludeOrganisationsFilter, poolFinderService);
     }
 
 

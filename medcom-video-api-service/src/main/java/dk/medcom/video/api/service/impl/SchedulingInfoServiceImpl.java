@@ -45,12 +45,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final CustomUriValidator customUriValidator;
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
-
+	private final PoolFinderService poolFinderService;
 	@Value("${scheduling.info.citizen.portal}")
 	private String citizenPortal;
-
-	@Value("${pool.meeting.minimumAgeSec:60}")
-	private int meetingMinimumAgeSec;
 
 	public SchedulingInfoServiceImpl(SchedulingInfoRepository schedulingInfoRepository,
 									 SchedulingTemplateRepository schedulingTemplateRepository,
@@ -65,7 +62,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 									 AuditService auditService,
 									 CustomUriValidator customUriValidator,
 									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
+									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+									 PoolFinderService poolFinderService) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -80,6 +78,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
 
 		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
+		this.poolFinderService = poolFinderService;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -570,57 +569,20 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		return dbOrganisation;
-
 	}
 
 	private Long getUnusedSchedulingInfoForOrganisation(Organisation organisation, CreateMeetingDto createMeetingDto) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
+		var schedulingInfo = poolFinderService.findPoolSubject(organisation, createMeetingDto);
 
-		if (createMeetingDto == null){
-			createMeetingDto = new CreateMeetingDto();
-		}
-		createMeetingDto.setDefaults();
-
-		LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus - Org: '{}' Time: '{}' VMR Type: '{}' HostView: '{}' GuestView: '{}' VmrQuality: '{}' EnableOverlayText: '{}' GuestsCanPresent: '{}' ForcePresenterIntoMain: '{}' ForceEncryption: '{}' MuteAllGuests: '{}'",
-				organisation.getId(),
-				cal.getTime(),
-				createMeetingDto.getVmrType().name(),
-				createMeetingDto.getHostView().name(),
-				createMeetingDto.getGuestView().name(),
-				createMeetingDto.getVmrQuality().name(),
-				createMeetingDto.getEnableOverlayText(),
-				createMeetingDto.getGuestsCanPresent(),
-				createMeetingDto.getForcePresenterIntoMain(),
-				createMeetingDto.getForceEncryption(),
-				createMeetingDto.getMuteAllGuests());
-
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
-				ProvisionStatus.PROVISIONED_OK.name(),
-				cal.getTime(),
-				createMeetingDto.getVmrType().name(),
-				createMeetingDto.getHostView().name(),
-				createMeetingDto.getGuestView().name(),
-				createMeetingDto.getVmrQuality().name(),
-				createMeetingDto.getEnableOverlayText(),
-				createMeetingDto.getGuestsCanPresent(),
-				createMeetingDto.getForcePresenterIntoMain(),
-				createMeetingDto.getForceEncryption(),
-				createMeetingDto.getMuteAllGuests());
-
-		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
-			LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus Result NULL- Org: '{}' Time: '{}'",
-					organisation.getId(),
-					cal.getTime());
+		if(schedulingInfo.isEmpty()) {
+			LOGGER.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus Result NULL");
 			return null;
 		}
 
-		LOGGER.info("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}' Time: '{}'",
-				schedulingInfos.get(0).longValue(),
-				organisation.getId(),
-				cal.getTime());
-		return schedulingInfos.get(0).longValue();
+		LOGGER.info("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}'.",
+				schedulingInfo.get().getId(),
+				organisation.getId());
+		return schedulingInfo.get().getId();
 	}
 
 	@Override
@@ -715,22 +677,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		LOGGER.info("Organisation {} is using scheduling info from overflow pool organisation {}.", userContextService.getUserContext().getUserOrganisation(), overflowPoolOrganisationId);
 		var organisation = organisationRepository.findByOrganisationId(overflowPoolOrganisationId);
 		LOGGER.debug("Organisation found: {}", organisation != null);
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
 
 		if (createMeetingDto == null) {
 			createMeetingDto = new CreateMeetingDto();
 		}
-		createMeetingDto.setDefaults();
 
-		List<BigInteger> schedulingInfos = schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),  ProvisionStatus.PROVISIONED_OK.name(), cal.getTime(), createMeetingDto.getVmrType().name(), createMeetingDto.getHostView().name(), createMeetingDto.getGuestView().name(), createMeetingDto.getVmrQuality().name(), createMeetingDto.getEnableOverlayText(), createMeetingDto.getGuestsCanPresent(), createMeetingDto.getForcePresenterIntoMain(), createMeetingDto.getForceEncryption(), createMeetingDto.getMuteAllGuests());
+		var schedulingInfo = poolFinderService.findPoolSubject(organisation, createMeetingDto);
 
-		if(schedulingInfos == null || schedulingInfos.isEmpty()) {
-			return null;
-		}
-
-		return schedulingInfos.get(0).longValue();
+		return schedulingInfo.map(SchedulingInfo::getId).orElse(null);
 	}
 
 	@Override
