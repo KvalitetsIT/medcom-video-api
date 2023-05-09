@@ -85,6 +85,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public PoolFinderService poolFinderService(SchedulingInfoRepository schedulingInfoRepository, @Value("${pool.meeting.minimumAgeSec:60}") int minimumAgeSec) {
+		return new PoolFinderServiceImpl(schedulingInfoRepository, minimumAgeSec);
+	}
+
+	@Bean
 	public NewProvisionerOrganisationFilter organisationFilter(@Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
 		return new NewProvisionerOrganisationFilterImpl(filterOrganisations == null ? Collections.emptyList() : filterOrganisations);
 	}

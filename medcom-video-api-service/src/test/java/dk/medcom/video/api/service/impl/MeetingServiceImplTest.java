@@ -113,14 +113,11 @@ public class MeetingServiceImplTest {
 		CreateMeetingDto createMeetingDto = new CreateMeetingDto();
 		createMeetingDto.setSubject("Test mødev2");
 		createMeetingDto.setStartTime(calendarStart.getTime());
-//		createMeetingDto.setStartTime(calendarStartUpdated.getTime());
-//		createMeetingDto.setEndTime(calendarEndUpdated.getTime());
 		createMeetingDto.setEndTime(calendarEnd.getTime());
 		createMeetingDto.setDescription("Meeting Description long textv2");
 		createMeetingDto.setProjectCode("P001v2");
 		createMeetingDto.setOrganizedByEmail("you@mail.dk");
 
-		createMeetingDto.setDefaults();
 		return createMeetingDto;
 	}
 

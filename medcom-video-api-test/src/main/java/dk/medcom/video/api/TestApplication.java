@@ -4,6 +4,14 @@ import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
+import com.google.common.net.MediaType;
+import dk.medcom.video.api.organisation.Organisation;
+import dk.medcom.video.api.organisation.OrganisationTree;
+import org.mockserver.client.server.MockServerClient;
+import org.mockserver.model.Header;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
+import org.mockserver.model.JsonBody;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
 import io.nats.client.api.StreamConfiguration;
@@ -14,12 +22,11 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -55,10 +62,10 @@ public class TestApplication extends SpringBootServletInitializer {
         mysql.start();
         String jdbcUrl = mysql.getJdbcUrl();
         System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
-        System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(80)));
+        System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(1080)));
         System.setProperty("short.link.base.url", "http://shortlink");
         System.setProperty("overflow.pool.organisation.id", "overflow");
-        System.setProperty("organisationtree.service.endpoint", "http://localhost:" + testOrganisationFrontend.getMappedPort(80));
+        System.setProperty("organisationtree.service.endpoint", "http://localhost:" + testOrganisationFrontend.getMappedPort(1080));
 
         System.setProperty("userservice.token.attribute.auto.create.organisation", "auto-create-parent");
 
@@ -134,47 +141,18 @@ public class TestApplication extends SpringBootServletInitializer {
     }
 
     private static void createOrganisationService(Network n) {
-        MySQLContainer organisationMysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
-                .withDatabaseName("organisationdb")
-                .withUsername("orguser")
-                .withPassword("secret1234")
-                .withNetwork(n)
-                .withNetworkAliases("organisationdb")
-                ;
-
-        organisationMysql.start();
-
-        GenericContainer organisationContainer = new GenericContainer("kvalitetsit/medcom-vdx-organisation:0.0.3")
-                .withNetwork(n)
-                .withNetworkAliases("organisationservice")
-                .withEnv("jdbc_url", "jdbc:mysql://organisationdb/organisationdb")
-                .withEnv("jdbc_user", "orguser")
-                .withEnv("jdbc_pass", "secret1234")
-                .withEnv("usercontext_header_name", "X-Test-Auth")
-                .withEnv("userattributes_role_key", "UserRoles")
-                .withEnv("userattributes_org_key", "organisation")
-                .withEnv("userrole_admin_values", "adminrole")
-                .withEnv("userrole_user_values", "userrole1,userrole2")
-                .withEnv("userrole_monitor_values", "monitorrole")
-                .withEnv("userrole_provisioner_values", "provisionerrole")
-                .withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
-
-                .withClasspathResourceMapping("organisation/V901__organisation_test_data.sql", "/app/sql/V901__organisation_test_data.sql", BindMode.READ_ONLY)
-                .withExposedPorts(8080)
-                ;
-
-        organisationContainer.start();
-        organisationContainer.withLogConsumer(outputFrame -> System.out.println(outputFrame));
-        testOrganisationFrontend = new GenericContainer("kvalitetsit/gooioidwsrest:1.1.14")
-                .withNetwork(n)
-                .withNetworkAliases("organisationfrontend")
-                .withCommand("-config", "/caddy/config.json")
-                .withClasspathResourceMapping("organisation/caddy.json", "/caddy/config.json", BindMode.READ_ONLY)
-                .withExposedPorts(80)
-                .waitingFor(Wait.forLogMessage(".*", 1));
-
-        testOrganisationFrontend.start();
-
+        // Organisation mock server
+        var organisationService = new MockServerContainer().
+                withNetwork(n).
+                withNetworkAliases("organisation");
+        organisationService.start();
+        testOrganisationFrontend = organisationService;
+//        attachLogger(organisationService, organisationLogger);
+        var mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
     }
 
     public TestApplication(DataSource dataSource) {
@@ -185,4 +163,22 @@ public class TestApplication extends SpringBootServletInitializer {
 	public void setSchedulingTemplateTestData() throws SQLException  {
 		dataSource.getConnection().createStatement();
 	}
+
+    private static HttpResponse organisationTreeServiceResponse() {
+        OrganisationTree t = new OrganisationTree();
+        t.setPoolSize(10);
+        t.setCode("pool-test-org");
+        t.setName("company name another-test-org");
+        t.setChildren(null);
+
+        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
+    }
+
+    private static HttpResponse organisationServiceResponse(String code) {
+        Organisation t = new Organisation();
+        t.setPoolSize(10);
+        t.setCode(code);
+
+        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
+    }
 }
