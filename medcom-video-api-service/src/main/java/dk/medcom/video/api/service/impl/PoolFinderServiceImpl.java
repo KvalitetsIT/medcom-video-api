@@ -42,7 +42,8 @@ public class PoolFinderServiceImpl implements PoolFinderService {
                 nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getGuestsCanPresent()),
                 nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForcePresenterIntoMain()),
                 nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForceEncryption()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()));
+                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()),
+                nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getDirectMedia()));
 
         return schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                         organisation.getId(),
@@ -56,7 +57,8 @@ public class PoolFinderServiceImpl implements PoolFinderService {
                         nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getGuestsCanPresent()),
                         nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForcePresenterIntoMain()),
                         nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForceEncryption()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()))
+                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()),
+                        nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getDirectMedia()))
                 .stream()
                 .findFirst();
     }

@@ -305,8 +305,9 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
+        assertEquals(DirectMedia.best_effort, capturedSchedulingInfo.getDirectMedia());
 
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishCreate(Mockito.any()); // TODO Assert content.
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishCreate(Mockito.any());
     }
 
     @Test
@@ -328,6 +329,7 @@ public class SchedulingInfoServiceImplTest {
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+        createMeetingDto.setDirectMedia(DirectMedia.best_effort);
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
         assertNotNull(schedulingInfo);
@@ -355,6 +357,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
+        assertEquals(createMeetingDto.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
     }
 
     @Test
@@ -948,6 +951,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setCustomPortalHost("some_portal_host");
         schedulingTemplate.setReturnUrl("some_return_url");
         schedulingTemplate.setVmrType(VmrType.conference);
+        schedulingTemplate.setDirectMedia(DirectMedia.best_effort);
 
         return schedulingTemplate;
     }

@@ -1,9 +1,6 @@
 package dk.medcom.video.api.dao.entity;
 
-import dk.medcom.video.api.api.ProvisionStatus;
-import dk.medcom.video.api.api.ViewType;
-import dk.medcom.video.api.api.VmrQuality;
-import dk.medcom.video.api.api.VmrType;
+import dk.medcom.video.api.api.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -79,6 +76,8 @@ public class SchedulingInfo {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	@Enumerated(EnumType.STRING)
+	private DirectMedia directMedia;
 
 	public Long getId() {
 		return id;
@@ -347,5 +346,13 @@ public class SchedulingInfo {
 
 	public void setReturnUrl(String returnUrl) {
 		this.returnUrl = returnUrl;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
 	}
 }

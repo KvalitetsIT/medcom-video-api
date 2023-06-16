@@ -95,6 +95,7 @@ public class AuditServiceImpl implements AuditService {
         auditSchedulingInfo.setUpdatedBy(input.getUpdatedByUser() == null ? null : input.getUpdatedByUser().getEmail());
         auditSchedulingInfo.setUpdatedTime(toOffsetDateTime(input.getUpdatedTime()));
         auditSchedulingInfo.setReservationId(input.getReservationId());
+        auditSchedulingInfo.setDirectMedia(toStringOrNull(input.getDirectMedia()));
 
         return auditSchedulingInfo;
     }

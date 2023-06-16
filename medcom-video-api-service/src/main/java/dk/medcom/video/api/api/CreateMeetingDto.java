@@ -64,6 +64,7 @@ public class CreateMeetingDto {
 	private Boolean forcePresenterIntoMain;
 	private Boolean forceEncryption;
 	private Boolean muteAllGuests;
+	private DirectMedia directMedia;
 
 	@Size(max = 100, message = "uriWithoutDomain should have a maximum length of 100 characters.")
 	private String uriWithoutDomain;
@@ -300,5 +301,13 @@ public class CreateMeetingDto {
 
 	public void setHostPin(Integer hostPin) {
 		this.hostPin = hostPin;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }
