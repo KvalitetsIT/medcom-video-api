@@ -190,6 +190,7 @@ public class MeetingServiceImplTest {
 		schedulingInfo = new SchedulingInfo();
 		schedulingInfo.setId(100L);
 		schedulingInfo.setProvisionStatus(provisionStatus);
+		schedulingInfo.setDirectMedia(DirectMedia.best_effort);
 		schedulingInfo.setMeetingUser(meetingUser);
 		Organisation organisation = new Organisation();
 		organisation.setOrganisationId("org");

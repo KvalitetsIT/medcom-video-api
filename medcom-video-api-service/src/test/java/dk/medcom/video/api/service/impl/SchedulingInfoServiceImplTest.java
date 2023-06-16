@@ -983,6 +983,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setCreatedTime(new Date());
         schedulingInfo.setSchedulingTemplate(schedulingTemplateIdOne);
         schedulingInfo.setvMRStartTime(new Date());
+        schedulingInfo.setDirectMedia(DirectMedia.best_effort);
 
         return schedulingInfo;
     }
