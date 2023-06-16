@@ -112,6 +112,10 @@ info:
     <Ul>
       <Li> Renamed vmrQuality item full_hd to fullhd. Have not yet been used, so it is not causing compatibility problems.
     </Ul>
+    1.10.0
+    <Ul>
+    <Li> Add direct_media to scheduling info and POST /meetings.
+    </Ul>
 
   version: "1.7.12"
   contact:
@@ -1209,6 +1213,8 @@ components:
           format: int32
           minimum: 10000
           maximum: 999999999
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
 
     update-meeting:
       type: object
@@ -1533,6 +1539,14 @@ components:
         - sd
         - hd
         - fullhd
+    directMedia:
+      example: best_effort
+      description: Direct media
+      type: string
+      default: never
+      enum:
+        - never
+        - best_effort
 
     scheduling-template:
       type: object
@@ -1673,6 +1687,8 @@ components:
           example: false
           default: false
           description: controls whether to mute guests when they first join the conference
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
         createdBy:
           $ref: '#/components/schemas/meetingUser'
         updatedBy:
@@ -1824,6 +1840,8 @@ components:
           example: false
           default: false
           description: controls whether to mute guests when they first join the conference
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
     update-scheduling-template:
       type: object
       required:
@@ -1954,6 +1972,8 @@ components:
           example: false
           default: false
           description: controls whether to mute guests when they first join the conference
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
     pool-info:
       type: object
       required:
