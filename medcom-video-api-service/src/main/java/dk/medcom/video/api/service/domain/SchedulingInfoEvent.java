@@ -12,7 +12,7 @@ public class SchedulingInfoEvent {
     private Long hostPin;
     private Long guestPin;
     private int VMRAvailableBefore;
-    private Instant vMRStartTime; // TODO SKal dette være en instant?
+    private Instant vMRStartTime;
     private String ivrTheme;
     private String uriWithoutDomain;
     private String uriDomain;
@@ -29,7 +29,7 @@ public class SchedulingInfoEvent {
     private boolean forceEncryption;
     private boolean muteAllGuests;
     private String meetingUser;
-    private Instant createdTime; // TODO Skal dette være en instant?
+    private Instant createdTime;
     private String customPortalGuest;
     private String customPortalHost;
     private String returnUrl;
@@ -37,6 +37,7 @@ public class SchedulingInfoEvent {
     private String vmrQuality;
     private String ivrThemeProvisionId;
     private Instant meetingEndTime;
+    private String directMedia;
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
@@ -284,5 +285,13 @@ public class SchedulingInfoEvent {
 
     public void setSchedulingInfoIdentifier(Long schedulingInfoIdentifier) {
         this.schedulingInfoIdentifier = schedulingInfoIdentifier;
+    }
+
+    public String getDirectMedia() {
+        return directMedia;
+    }
+
+    public void setDirectMedia(String directMedia) {
+        this.directMedia = directMedia;
     }
 }
