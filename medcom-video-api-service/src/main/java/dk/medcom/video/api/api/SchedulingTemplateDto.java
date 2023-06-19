@@ -48,6 +48,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	private DirectMedia directMedia;
 
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;
@@ -95,6 +96,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		customPortalGuest = schedulingTemplate.getCustomPortalGuest();
 		customPortalHost = schedulingTemplate.getCustomPortalHost();
 		returnUrl = schedulingTemplate.getReturnUrl();
+		directMedia = schedulingTemplate.getDirectMedia();
 
 		createdTime = schedulingTemplate.getCreatedTime();
 		updatedTime = schedulingTemplate.getUpdatedTime();
@@ -112,7 +114,9 @@ public class SchedulingTemplateDto extends RepresentationModel {
 			Link selfLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplateById(templateId)).withRel("self");
 	
 			add(selfLink);
-		} catch (RessourceNotFoundException e) {
+		}
+		catch (RessourceNotFoundException e) {
+			// Empty
 		}
 	}
 
@@ -395,5 +399,13 @@ public class SchedulingTemplateDto extends RepresentationModel {
 
 	public void setReturnUrl(String returnUrl) {
 		this.returnUrl = returnUrl;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }

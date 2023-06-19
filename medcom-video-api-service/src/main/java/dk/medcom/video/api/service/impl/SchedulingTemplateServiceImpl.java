@@ -210,6 +210,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalGuest(createSchedulingTemplateDto.getCustomPortalGuest());
 		schedulingTemplate.setCustomPortalHost(createSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(createSchedulingTemplateDto.getReturnUrl());
+		schedulingTemplate.setDirectMedia(createSchedulingTemplateDto.getDirectMedia() != null ? createSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
 
 		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
@@ -274,6 +275,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalGuest(updateSchedulingTemplateDto.getCustomPortalGuest());
 		schedulingTemplate.setCustomPortalHost(updateSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(updateSchedulingTemplateDto.getReturnUrl());
+		schedulingTemplate.setDirectMedia(updateSchedulingTemplateDto.getDirectMedia() != null ? updateSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
 
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();

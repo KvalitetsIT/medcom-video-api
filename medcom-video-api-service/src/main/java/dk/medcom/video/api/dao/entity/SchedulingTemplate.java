@@ -1,5 +1,6 @@
 package dk.medcom.video.api.dao.entity;
 
+import dk.medcom.video.api.api.DirectMedia;
 import dk.medcom.video.api.api.ViewType;
 import dk.medcom.video.api.api.VmrQuality;
 import dk.medcom.video.api.api.VmrType;
@@ -49,7 +50,8 @@ public class SchedulingTemplate {
 	private boolean forcePresenterIntoMain;	//controls whether the Host who is presenting is locked into the main video position
 	private boolean forceEncryption;
 	private boolean muteAllGuests;			//controls whether to mute guests when they first join the conference
-
+	@Enumerated(EnumType.STRING)
+	private DirectMedia directMedia;
 	@ManyToOne
     @JoinColumn(name="created_by")
 	private MeetingUser createdBy;
@@ -327,5 +329,13 @@ public class SchedulingTemplate {
 
 	public void setReturnUrl(String returnUrl) {
 		this.returnUrl = returnUrl;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }

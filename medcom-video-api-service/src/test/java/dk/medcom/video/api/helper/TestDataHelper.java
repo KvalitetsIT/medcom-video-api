@@ -1,5 +1,6 @@
 package dk.medcom.video.api.helper;
 
+import dk.medcom.video.api.api.DirectMedia;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
@@ -43,6 +44,7 @@ public class TestDataHelper {
         schedulingInfo.setSchedulingTemplate(createSchedulingTemplate());
         schedulingInfo.setUriWithDomain("uri with domain");
         schedulingInfo.setUriWithoutDomain("uri without domain");
+        schedulingInfo.setDirectMedia(DirectMedia.never);
         schedulingInfo.setId(1L);
 
         return schedulingInfo;

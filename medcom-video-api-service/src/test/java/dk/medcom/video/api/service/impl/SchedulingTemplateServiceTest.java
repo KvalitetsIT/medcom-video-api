@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import dk.medcom.video.api.api.DirectMedia;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.organisation.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
@@ -58,6 +59,7 @@ public class SchedulingTemplateServiceTest {
 
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
+		createSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
 
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
@@ -74,6 +76,28 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(createSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
 		assertEquals(createSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 		assertEquals(createSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
+		assertEquals(createSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+	}
+
+	@Test
+	public void testCreateSchedulingTemplateDefaultValues() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		// Given
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
+
+		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, true);
+
+		// When
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
+
+		// Then
+		assertNotNull(schedulingTemplate);
+
+		assertEquals(createSchedulingTemplateDto.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+
+		ArgumentCaptor<SchedulingTemplate> schedulingTemplateArgumentCaptor = ArgumentCaptor.forClass(SchedulingTemplate.class);
+		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
+		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
+		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 	}
 	
 	@Test 
@@ -87,6 +111,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setCustomPortalHost("some_portal_host");
 		updateSchedulingTemplateDto.setReturnUrl("return_url");
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
+		updateSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
@@ -102,6 +127,26 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(updateSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
 		assertEquals(updateSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 		assertEquals(updateSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
+		assertEquals(updateSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+	}
+
+	@Test
+	public void testUpdateSchedulingTemplateDefaultValues() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+		// Given
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
+
+		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(userContext, meetingUser, false);
+
+		// When
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
+
+		// Then
+		assertNotNull(schedulingTemplate);
+
+		ArgumentCaptor<SchedulingTemplate> schedulingTemplateArgumentCaptor = ArgumentCaptor.forClass(SchedulingTemplate.class);
+		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
+		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
+		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 	}
 
 	@Test(expected = RessourceNotFoundException.class)

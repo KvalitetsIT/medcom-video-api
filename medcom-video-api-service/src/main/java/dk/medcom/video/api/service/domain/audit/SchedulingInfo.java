@@ -1,7 +1,5 @@
 package dk.medcom.video.api.service.domain.audit;
 
-import dk.medcom.video.api.dao.entity.Meeting;
-
 import java.time.OffsetDateTime;
 
 public class SchedulingInfo {
@@ -39,6 +37,7 @@ public class SchedulingInfo {
     private String updatedBy;
     private OffsetDateTime updatedTime;
     private String reservationId;
+    private String directMedia;
 
     public Long getId() {
         return id;
@@ -310,5 +309,13 @@ public class SchedulingInfo {
 
     public void setReservationId(String reservationId) {
         this.reservationId = reservationId;
+    }
+
+    public void setDirectMedia(String directMedia) {
+        this.directMedia = directMedia;
+    }
+
+    public String getDirectMedia() {
+        return directMedia;
     }
 }

@@ -35,14 +35,38 @@ public class PoolFinderServiceTest {
 
         var schedulingInfo = new SchedulingInfo();
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
 
         var result = poolFinderService.findPoolSubject(organisation, null);
         assertNotNull(result);
         assertTrue(result.isPresent());
         assertEquals(schedulingInfo, result.get());
 
-        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId),Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         Mockito.verifyNoMoreInteractions(schedulingInfoRepository);
     }
@@ -54,13 +78,37 @@ public class PoolFinderServiceTest {
         var organisation = new Organisation();
         organisation.setId(orgId);
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Collections.emptyList());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.emptyList());
 
         var result = poolFinderService.findPoolSubject(organisation, null);
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
-        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId),Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         Mockito.verifyNoMoreInteractions(schedulingInfoRepository);
     }
@@ -76,7 +124,19 @@ public class PoolFinderServiceTest {
         createMeetingDto.setVmrQuality(VmrQuality.fullhd);
 
         var schedulingInfo = new SchedulingInfo();
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(VmrQuality.fullhd.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.eq(VmrQuality.fullhd.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
 
         var result = poolFinderService.findPoolSubject(organisation, createMeetingDto);
 
@@ -84,7 +144,19 @@ public class PoolFinderServiceTest {
         assertTrue(result.isPresent());
         assertEquals(schedulingInfo, result.get());
 
-        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId),Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(VmrQuality.fullhd.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.eq(VmrQuality.fullhd.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         Mockito.verifyNoMoreInteractions(schedulingInfoRepository);
     }
@@ -99,14 +171,38 @@ public class PoolFinderServiceTest {
         var createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setVmrQuality(VmrQuality.fullhd);
 
-        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId), Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(VmrQuality.fullhd.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(Collections.emptyList());
+        Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.eq(VmrQuality.fullhd.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(Collections.emptyList());
 
         var result = poolFinderService.findPoolSubject(organisation, createMeetingDto);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
 
-        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(Mockito.eq(orgId),Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(VmrQuality.fullhd.name()), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
+                Mockito.eq(orgId),
+                Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.eq(VmrQuality.fullhd.name()),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any());
 
         Mockito.verifyNoMoreInteractions(schedulingInfoRepository);
     }

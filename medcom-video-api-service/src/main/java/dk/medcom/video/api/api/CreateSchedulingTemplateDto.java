@@ -58,6 +58,7 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	private DirectMedia directMedia;
 
 	@Size(max=100, message="ivrThme should have a maximum of 100 characters")
 	private String ivrTheme;
@@ -295,5 +296,13 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setReturnUrl(String returnUrl) {
 		this.returnUrl = returnUrl;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }

@@ -39,6 +39,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private boolean forcePresenterIntoMain;
 	private boolean forceEncryption;
 	private boolean muteAllGuests;
+	private DirectMedia directMedia;
 	
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
@@ -93,6 +94,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		customPortalGuest = schedulingInfo.getCustomPortalGuest();
 		customPortalHost = schedulingInfo.getCustomPortalHost();
 		returnUrl = schedulingInfo.getReturnUrl();
+		directMedia = schedulingInfo.getDirectMedia();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
@@ -344,5 +346,13 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setReturnUrl(String returnUrl) {
 		this.returnUrl = returnUrl;
+	}
+
+	public DirectMedia getDirectMedia() {
+		return directMedia;
+	}
+
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }
