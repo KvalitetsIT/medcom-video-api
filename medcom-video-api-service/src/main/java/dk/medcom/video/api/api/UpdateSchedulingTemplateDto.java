@@ -65,7 +65,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
-	private DirectMedia directmedia;
+	private DirectMedia directMedia;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -299,11 +299,11 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 		this.returnUrl = returnUrl;
 	}
 
-	public DirectMedia getDirectmedia() {
-		return directmedia;
+	public DirectMedia getDirectMedia() {
+		return directMedia;
 	}
 
-	public void setDirectmedia(DirectMedia directmedia) {
-		this.directmedia = directmedia;
+	public void setDirectMedia(DirectMedia directMedia) {
+		this.directMedia = directMedia;
 	}
 }

@@ -48,6 +48,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("custom_portal_guest", result.getCustomPortalGuest());
 		assertEquals("custom_portal_host", result.getCustomPortalHost());
 		assertEquals("return_url", result.getReturnUrl());
+		assertEquals(DirectMedia.NEVER.toString(), result.getDirectMedia().toString());
 	}
 
 	@Test

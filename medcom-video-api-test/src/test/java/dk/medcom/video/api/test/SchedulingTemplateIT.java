@@ -62,6 +62,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getReturnUrl(), result.getReturnUrl());
         assertEquals(create.getGuestView(), result.getGuestView());
         assertFalse(create.isIsPoolTemplate());
+        assertEquals(DirectMedia.NEVER, result.getDirectMedia());
     }
 
     @Test
@@ -78,6 +79,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setVmrType(VmrType.LECTURE);
         create.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
         create.setEnableOverlayText(false);
+        create.setDirectMedia(DirectMedia.BEST_EFFORT);
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -88,6 +90,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
         assertEquals(create.isEnableOverlayText(), result.isEnableOverlayText());
+        assertEquals(create.getDirectMedia(), result.getDirectMedia());
     }
 
     @Test
@@ -116,6 +119,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
         updateSchedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
         updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
+        updateSchedulingTemplate.setDirectMedia(DirectMedia.BEST_EFFORT);
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -131,6 +135,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
         assertFalse(result.isIsPoolTemplate());
+        assertEquals(DirectMedia.BEST_EFFORT, result.getDirectMedia());
     }
 
     @Test

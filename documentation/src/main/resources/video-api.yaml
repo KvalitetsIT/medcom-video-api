@@ -1564,6 +1564,7 @@ components:
         - ivrTheme
         - isDefaultTemplate
         - isPoolTemplate
+        - directMedia
       properties:
         id:
           type: integer

@@ -275,7 +275,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalGuest(updateSchedulingTemplateDto.getCustomPortalGuest());
 		schedulingTemplate.setCustomPortalHost(updateSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(updateSchedulingTemplateDto.getReturnUrl());
-		schedulingTemplate.setDirectMedia(updateSchedulingTemplateDto.getDirectmedia() != null ? updateSchedulingTemplateDto.getDirectmedia() : DirectMedia.never);
+		schedulingTemplate.setDirectMedia(updateSchedulingTemplateDto.getDirectMedia() != null ? updateSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
 
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();

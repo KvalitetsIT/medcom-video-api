@@ -111,7 +111,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setCustomPortalHost("some_portal_host");
 		updateSchedulingTemplateDto.setReturnUrl("return_url");
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
-		updateSchedulingTemplateDto.setDirectmedia(DirectMedia.best_effort);
+		updateSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
@@ -127,7 +127,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(updateSchedulingTemplateDto.getCustomPortalHost(), schedulingTemplateArgumentCaptor.getValue().getCustomPortalHost());
 		assertEquals(updateSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 		assertEquals(updateSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
-		assertEquals(updateSchedulingTemplateDto.getDirectmedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+		assertEquals(updateSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 	}
 
 	@Test
