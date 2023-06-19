@@ -196,6 +196,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setOrganisation(meeting.getOrganisation());
 
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
+		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
 		//Overwrite template value with input parameters 
 		if (createMeetingDto.getMaxParticipants() > 0) { 
@@ -263,13 +264,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			LOGGER.debug("MuteAllGuests is taken from input: " + createMeetingDto.getMuteAllGuests().toString());
 		}else {
 			schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
-		}
-		if(createMeetingDto.getDirectMedia() != null) {
-			schedulingInfo.setDirectMedia(createMeetingDto.getDirectMedia());
-			LOGGER.debug("DirectMedia taken from request: " + createMeetingDto.getDirectMedia());
-		}
-		else {
-			schedulingInfo.setDirectMedia(DirectMedia.never);
 		}
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);

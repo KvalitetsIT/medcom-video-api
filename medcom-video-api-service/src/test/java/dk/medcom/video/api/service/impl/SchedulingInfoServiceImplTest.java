@@ -329,7 +329,6 @@ public class SchedulingInfoServiceImplTest {
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
-        createMeetingDto.setDirectMedia(DirectMedia.best_effort);
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
         assertNotNull(schedulingInfo);
@@ -357,7 +356,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
-        assertEquals(createMeetingDto.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
+        assertEquals(schedulingTemplateIdOne.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
     }
 
     @Test

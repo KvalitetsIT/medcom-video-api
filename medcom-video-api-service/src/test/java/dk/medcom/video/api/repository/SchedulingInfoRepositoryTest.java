@@ -476,7 +476,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
-                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
@@ -522,7 +521,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 true,
-                null,
                 null,
                 null,
                 null);
@@ -571,7 +569,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
-                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
@@ -607,7 +604,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         createMeetingDto.setForcePresenterIntoMain(false);
         createMeetingDto.setForceEncryption(true);
         createMeetingDto.setMuteAllGuests(true);
-        createMeetingDto.setDirectMedia(DirectMedia.best_effort);
 
         List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 organisation.getId(),
@@ -621,8 +617,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 createMeetingDto.getGuestsCanPresent(),
                 createMeetingDto.getForcePresenterIntoMain(),
                 createMeetingDto.getForceEncryption(),
-                createMeetingDto.getMuteAllGuests(),
-                createMeetingDto.getDirectMedia().name());
+                createMeetingDto.getMuteAllGuests());
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
         assertEquals(211, schedulingInfos.get(0).getId().intValue());
@@ -659,7 +654,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
-                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(0, schedulingInfos.size());
@@ -673,7 +667,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 organisation.getId(),
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
-                null,
                 null,
                 null,
                 null,
@@ -701,7 +694,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 organisation.getId(),
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
-                null,
                 null,
                 null,
                 null,

@@ -47,7 +47,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
-                Mockito.any(),
                 Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
 
         var result = poolFinderService.findPoolSubject(organisation, null);
@@ -58,7 +57,6 @@ public class PoolFinderServiceTest {
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 Mockito.eq(orgId),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
-                Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
@@ -92,7 +90,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
-                Mockito.any(),
                 Mockito.any())).thenReturn(Collections.emptyList());
 
         var result = poolFinderService.findPoolSubject(organisation, null);
@@ -102,7 +99,6 @@ public class PoolFinderServiceTest {
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 Mockito.eq(orgId),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
-                Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
@@ -140,7 +136,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
-                Mockito.any(),
                 Mockito.any())).thenReturn(Collections.singletonList(schedulingInfo));
 
         var result = poolFinderService.findPoolSubject(organisation, createMeetingDto);
@@ -157,7 +152,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.eq(VmrQuality.fullhd.name()),
-                Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
@@ -189,7 +183,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
-                Mockito.any(),
                 Mockito.any())).thenReturn(Collections.emptyList());
 
         var result = poolFinderService.findPoolSubject(organisation, createMeetingDto);
@@ -205,7 +198,6 @@ public class PoolFinderServiceTest {
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.eq(VmrQuality.fullhd.name()),
-                Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),

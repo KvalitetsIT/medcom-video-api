@@ -39,10 +39,9 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 			"   AND ifnull(?10, -1) in (-1, s.force_presenter_into_main)\n" +
 			"   AND ifnull(?11, -1) in (-1, s.force_encryption)\n" +
 			"   AND ifnull(?12, -1) in (-1, s.mute_all_guests))\n" +
-			"   AND ifnull(?13, '__UNDEFINED__') in ('__UNDEFINED__', s.direct_media) \n" +
 			"   and reservation_id is null \n" +
 			"   and provision_timestamp < ?3 LIMIT 1 FOR UPDATE", nativeQuery=true)
-	List<SchedulingInfo> findByMeetingIsNullAndOrganisationAndProvisionStatus(Long organisationId, String provisionStatus, Date provisionTimestampOlderThen, String vmrType, String hostView, String guestView, String vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests, String directMedia);
+	List<SchedulingInfo> findByMeetingIsNullAndOrganisationAndProvisionStatus(Long organisationId, String provisionStatus, Date provisionTimestampOlderThen, String vmrType, String hostView, String guestView, String vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests);
 
     List<SchedulingInfo> findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus provisionStatus);
 
