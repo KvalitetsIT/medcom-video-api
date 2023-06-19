@@ -114,7 +114,7 @@ info:
     </Ul>
     1.10.0
     <Ul>
-    <Li> Add direct_media to scheduling info.
+    <Li> Add direct_media to scheduling info and scheduling template.
     </Ul>
 
   version: "1.7.12"
