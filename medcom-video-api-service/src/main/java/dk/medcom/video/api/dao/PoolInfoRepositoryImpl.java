@@ -1,8 +1,7 @@
 package dk.medcom.video.api.dao;
 
-import dk.medcom.video.api.dao.PoolInfoRepository;
-import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
 import dk.medcom.video.api.dao.entity.PoolInfoEntity;
+import dk.medcom.video.api.dao.rowmapper.PoolInfoRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import javax.sql.DataSource;

@@ -2,7 +2,6 @@ package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.controller.exceptions.NotValidDataErrors;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
-import dk.medcom.video.api.service.CustomUriValidator;
 
 public class CustomUriValidatorImpl implements CustomUriValidator {
     @Override

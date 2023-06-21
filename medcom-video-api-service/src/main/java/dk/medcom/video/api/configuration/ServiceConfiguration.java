@@ -77,7 +77,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public SchedulingTemplateService schedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository,
-															   UserContextService userContextService,
 															   OrganisationService organisationService,
 															   MeetingUserService meetingUserService,
 															   OrganisationTreeServiceClient organisationTreeServiceClient,
@@ -99,7 +98,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 		return new SchedulingTemplateServiceImpl(
 				schedulingTemplateRepository,
-				userContextService,
 				organisationService,
 				meetingUserService,
 				organisationTreeServiceClient,

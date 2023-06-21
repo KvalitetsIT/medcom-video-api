@@ -13,7 +13,6 @@ import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.service.PoolInfoService;
 
 import java.util.List;
 import java.util.stream.Collectors;

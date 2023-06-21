@@ -158,8 +158,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return savedResult;
 		}
 		catch(DataIntegrityViolationException e) {
-			if(e.getCause() instanceof ConstraintViolationException) {
-				var constraint = (ConstraintViolationException) e.getCause();
+			if(e.getCause() instanceof ConstraintViolationException constraint) {
 				if(constraint.getConstraintName().equals("short_id")) {
 					if(count < 5) {
 						return saveMeetingWithShortLink(meeting, ++count);

@@ -1,7 +1,5 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
-
 import java.util.List;
 
 public class NewProvisionerOrganisationFilterImpl implements NewProvisionerOrganisationFilter {

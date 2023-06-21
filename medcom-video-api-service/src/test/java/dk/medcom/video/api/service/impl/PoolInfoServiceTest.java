@@ -28,9 +28,8 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
 public class PoolInfoServiceTest {
-
 	@Mock
-    PoolInfoRepository poolInfoRepository;
+    private PoolInfoRepository poolInfoRepository;
 
     @Before
     public void setup() {

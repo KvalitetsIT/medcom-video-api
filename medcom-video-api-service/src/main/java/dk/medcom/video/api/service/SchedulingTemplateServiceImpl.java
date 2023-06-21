@@ -48,7 +48,6 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
 	public SchedulingTemplateServiceImpl(SchedulingTemplateRepository schedulingTemplateRepository,
-										 UserContextService userService,
 										 OrganisationService organisationService,
 										 MeetingUserService meetingUserService,
 										 OrganisationTreeServiceClient organisationTreeServiceClient,
