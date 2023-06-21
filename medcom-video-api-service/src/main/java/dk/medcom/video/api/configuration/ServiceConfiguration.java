@@ -7,7 +7,10 @@ import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.*;
+import dk.medcom.video.api.organisation.OrganisationServiceClient;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.impl.*;
 import io.micrometer.core.instrument.Clock;
@@ -71,6 +74,63 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		bean.setOrder(0);
 
 		return bean;
+	}
+
+	@Bean
+	public SchedulingTemplateService schedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository,
+															   UserContextService userContextService,
+															   OrganisationService organisationService,
+															   MeetingUserService meetingUserService,
+															   OrganisationTreeServiceClient organisationTreeServiceClient,
+															   @Value("${scheduling.template.default.conferencing.sys.id}") Long conferencingSysId,
+															   @Value("${scheduling.template.default.uri.prefix}") String uriPrefix,
+															   @Value("${scheduling.template.default.uri.domain}") String uriDomain,
+															   @Value("${scheduling.template.default.host.pin.required}") boolean hostPinRequired,
+															   @Value("${scheduling.template.default.host.pin.range.low}") Long hostPinRangeLow,
+															   @Value("${scheduling.template.default.host.pin.range.high}") Long hostPinRangeHigh,
+															   @Value("${scheduling.template.default.guest.pin.required}") boolean guestPinRequired,
+															   @Value("${scheduling.template.default.guest.pin.range.low}") Long guestPinRangeLow,
+															   @Value("${scheduling.template.default.guest.pin.range.high}") Long guestPinRangeHigh,
+															   @Value("${scheduling.template.default.vmravailable.before}") int vMRAvailableBefore,
+															   @Value("${scheduling.template.default.max.participants}") int maxParticipants,
+															   @Value("${scheduling.template.default.end.meeting.on.end.time}") boolean endMeetingOnEndTime,
+															   @Value("${scheduling.template.default.uri.number.range.low}") Long uriNumberRangeLow,
+															   @Value("${scheduling.template.default.uri.number.range.high}") Long uriNumberRangeHigh,
+															   @Value("${scheduling.template.default.ivr.theme}") String ivrTheme) {
+
+		return new SchedulingTemplateServiceImpl(
+				schedulingTemplateRepository,
+				userContextService,
+				organisationService,
+				meetingUserService,
+				organisationTreeServiceClient,
+				conferencingSysId,
+				uriPrefix,
+				uriDomain,
+				hostPinRequired,
+				hostPinRangeLow,
+				hostPinRangeHigh,
+				guestPinRequired,
+				guestPinRangeLow,
+				guestPinRangeHigh,
+				vMRAvailableBefore,
+				maxParticipants,
+				endMeetingOnEndTime,
+				uriNumberRangeLow,
+				uriNumberRangeHigh,
+				ivrTheme
+		);
+
+	}
+
+	@Bean
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
+		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
+	}
+
+	@Bean
+	public MeetingUserService meetingUserService(MeetingUserRepository meetingUserRepository, UserContextService userContextService, OrganisationService organisationService) {
+		return new MeetingUserServiceImpl(meetingUserRepository, userContextService, organisationService);
 	}
 
 	@Bean

@@ -471,7 +471,27 @@ public class SchedulingTemplateServiceTest {
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
 		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
 
-		SchedulingTemplateServiceImpl schedulingTemplateService = new SchedulingTemplateServiceImpl(schedulingTemplateRepository, userService, organisationService, meetingUserService, organisationTreeServiceClient);
+		SchedulingTemplateServiceImpl schedulingTemplateService = new SchedulingTemplateServiceImpl(
+				schedulingTemplateRepository,
+				userService,
+				organisationService,
+				meetingUserService,
+				organisationTreeServiceClient,
+				null,
+				null,
+				null,
+				false,
+				null,
+				null,
+				false,
+				null,
+				null,
+				0,
+				0,
+				false,
+				null,
+				null,
+				null);
 
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
