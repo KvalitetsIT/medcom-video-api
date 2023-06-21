@@ -74,6 +74,90 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public MeetingService meetingService(MeetingRepository meetingRepository,
+										 MeetingUserService meetingUserService,
+										 SchedulingInfoService schedulingInfoService,
+										 SchedulingStatusService schedulingStatusService,
+										 OrganisationService organisationService,
+										 UserContextService userService,
+										 MeetingLabelRepository meetingLabelRepository,
+										 OrganisationRepository organisationProxy,
+										 OrganisationTreeServiceClient organisationTreeServiceClient,
+										 AuditService auditClient, SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+		return new MeetingServiceImpl(
+				meetingRepository,
+				meetingUserService,
+				schedulingInfoService,
+				schedulingStatusService,
+				organisationService,
+				userService,
+				meetingLabelRepository,
+				organisationProxy,
+				organisationTreeServiceClient,
+				auditClient,
+				schedulingInfoEventPublisher);
+	}
+
+	@Bean
+	public SchedulingInfoService schedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
+													   SchedulingTemplateRepository schedulingTemplateRepository,
+													   SchedulingTemplateService schedulingTemplateService,
+													   SchedulingStatusService schedulingStatusService,
+													   MeetingUserService meetingUserService,
+													   OrganisationRepository organisationRepository,
+													   OrganisationStrategy organisationStrategy,
+													   UserContextService userContextService,
+													   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+													   OrganisationTreeServiceClient organisationTreeServiceClient,
+													   AuditService auditService,
+													   CustomUriValidator customUriValidator,
+													   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+													   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+													   PoolFinderService poolFinderService,
+													   @Value("${scheduling.info.citizen.portal}") String citizenPortal) {
+		return new SchedulingInfoServiceImpl(
+				schedulingInfoRepository,
+				schedulingTemplateRepository,
+				schedulingTemplateService,
+				schedulingStatusService,
+				meetingUserService,
+				organisationRepository,
+				organisationStrategy,
+				userContextService,
+				overflowPoolOrganisationId,
+				organisationTreeServiceClient,
+				auditService,
+				customUriValidator,
+				schedulingInfoEventPublisher,
+				newProvisionerOrganisationFilter,
+				poolFinderService,
+				citizenPortal
+		);
+	}
+
+	@Bean
+	public SchedulingStatusService schedulingStatusService(SchedulingStatusRepository schedulingStatusRepository) {
+		return new SchedulingStatusServiceImpl(
+				schedulingStatusRepository
+		);
+	}
+
+	@Bean
+	public PoolInfoService poolInfoService(OrganisationRepository organisationRepository,
+										   SchedulingInfoRepository schedulingInfoRepository,
+										   SchedulingTemplateRepository schedulingTemplateRepository,
+										   OrganisationStrategy organisationStrategy,
+										   PoolInfoRepository poolInfoRepository) {
+		return new PoolInfoServiceImpl(
+				organisationRepository,
+				schedulingInfoRepository,
+				schedulingTemplateRepository,
+				organisationStrategy,
+				poolInfoRepository
+		);
+	}
+
+	@Bean
 	public PoolService poolService(PoolInfoService poolInfoService,
 								   SchedulingInfoService schedulingInfoService,
 								   MeetingUserRepository meetingUserRepository,
@@ -144,9 +228,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Autowired
 	private CollectorRegistry collectorRegistry;
-
-	@Autowired
-    private PoolInfoService poolInfoService;
 
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class PoolInfoServiceImpl implements PoolInfoService {
     private final OrganisationStrategy organisationStrategy;
     private final SchedulingInfoRepository schedulingInfoRepository;
@@ -27,7 +26,7 @@ public class PoolInfoServiceImpl implements PoolInfoService {
     private final OrganisationRepository organisationRepository;
     private final PoolInfoRepository poolInfoRepository;
 
-    PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
+    public PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
         this.organisationStrategy = organisationStrategy;
         this.schedulingInfoRepository = schedulingInfoRepository;
         this.schedulingTemplateRepository = schedulingTemplateRepository;

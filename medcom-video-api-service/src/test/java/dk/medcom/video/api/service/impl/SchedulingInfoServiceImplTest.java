@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import java.math.BigInteger;
 import java.util.*;
 
 import static dk.medcom.video.api.helper.TestDataHelper.createMeetingUser;
@@ -119,7 +118,8 @@ public class SchedulingInfoServiceImplTest {
                 new CustomUriValidatorImpl(),
                 schedulingInfoEventPublisher,
                 null,
-                null);
+                null,
+                "");
 
         schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L);
     }
@@ -140,7 +140,22 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository,
+                null,
+                null,
+                null,
+                meetingUserService,
+                organizationRepository,
+                null,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "citizen_portal");
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
 
@@ -152,7 +167,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
 
@@ -172,7 +187,23 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                null,
+                null,
+                null,
+                meetingUserService,
+                organizationRepository,
+                null,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "citizen_portal");
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
 
@@ -184,7 +215,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
 
@@ -203,7 +234,23 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                null,
+                null,
+                schedulingStatusService,
+                meetingUserService,
+                organizationRepository,
+                null,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "");
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -236,7 +283,23 @@ public class SchedulingInfoServiceImplTest {
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, schedulingStatusService, meetingUserService, organizationRepository, null, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                null,
+                null,
+                schedulingStatusService,
+                meetingUserService,
+                organizationRepository,
+                null,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "");
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -538,7 +601,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -579,7 +642,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -651,7 +714,23 @@ public class SchedulingInfoServiceImplTest {
         input.setOrganizationId(NON_POOL_ORG);
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                null,
+                null,
+                null,
+                meetingUserService,
+                organizationRepository,
+                organisationStrategy,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "");
 
         schedulingInfoService.createSchedulingInfo(input);
     }
@@ -662,7 +741,23 @@ public class SchedulingInfoServiceImplTest {
         input.setOrganizationId("non existing org");
         input.setSchedulingTemplateId(2L);
 
-        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository, null, null, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, "overflow", organisationTreeServiceClient, auditService, new CustomUriValidatorImpl(), schedulingInfoEventPublisher, null, null);
+        SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                null,
+                null,
+                null,
+                meetingUserService,
+                organizationRepository,
+                organisationStrategy,
+                userContextService,
+                "overflow",
+                organisationTreeServiceClient,
+                auditService,
+                new CustomUriValidatorImpl(),
+                schedulingInfoEventPublisher,
+                null,
+                null,
+                "");
 
         schedulingInfoService.createSchedulingInfo(input);
         Mockito.verifyNoMoreInteractions(auditService);
@@ -749,7 +844,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=off", result.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=off", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -780,7 +875,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("null/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=muted", result.getPortalLink());
+        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=muted", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -996,7 +1091,23 @@ public class SchedulingInfoServiceImplTest {
     }
 
     private SchedulingInfoServiceImpl createSchedulingInfoService(CustomUriValidator customUriValidator, NewProvisionerOrganisationFilter excludeOrganisationsFilter) {
-        return new SchedulingInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, schedulingTemplateService, null, meetingUserService, organizationRepository, organisationStrategy, userContextService, OVERFLOW_POOL, organisationTreeServiceClient, auditService, customUriValidator, schedulingInfoEventPublisher, excludeOrganisationsFilter, poolFinderService);
+        return new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                schedulingTemplateRepository,
+                schedulingTemplateService,
+                null,
+                meetingUserService,
+                organizationRepository,
+                organisationStrategy,
+                userContextService,
+                OVERFLOW_POOL,
+                organisationTreeServiceClient,
+                auditService,
+                customUriValidator,
+                schedulingInfoEventPublisher,
+                excludeOrganisationsFilter,
+                poolFinderService,
+                "citizen_portal");
     }
 
 
