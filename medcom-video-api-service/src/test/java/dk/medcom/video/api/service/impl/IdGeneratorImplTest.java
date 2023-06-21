@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service.impl;
 
+import dk.medcom.video.api.service.IdGeneratorImpl;
 import org.junit.Test;
 
 import java.util.UUID;

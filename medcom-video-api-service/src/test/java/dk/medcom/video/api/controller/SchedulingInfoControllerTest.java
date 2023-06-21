@@ -8,7 +8,7 @@ import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import dk.medcom.video.api.helper.TestDataHelper;
-import dk.medcom.video.api.service.impl.SchedulingInfoServiceImpl;
+import dk.medcom.video.api.service.SchedulingInfoServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

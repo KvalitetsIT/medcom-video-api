@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.*;
@@ -11,7 +11,6 @@ import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;

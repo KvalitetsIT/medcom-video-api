@@ -12,7 +12,6 @@ import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
 import dk.medcom.video.api.service.*;
-import dk.medcom.video.api.service.impl.*;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.prometheus.client.CollectorRegistry;

@@ -1,9 +1,8 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.entity.PoolHistory;
-import dk.medcom.video.api.service.PoolHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

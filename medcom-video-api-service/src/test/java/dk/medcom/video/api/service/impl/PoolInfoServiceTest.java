@@ -10,6 +10,7 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.service.PoolInfoServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

@@ -1,4 +1,4 @@
-package dk.medcom.video.api.dao.impl;
+package dk.medcom.video.api.dao;
 
 import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.entity.PoolHistory;

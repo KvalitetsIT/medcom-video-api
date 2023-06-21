@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.controller.exceptions.NotValidDataErrors;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;

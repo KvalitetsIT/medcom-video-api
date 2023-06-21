@@ -1,9 +1,9 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.video.api.dao.*;
-import dk.medcom.video.api.dao.impl.EntitiesIvrThemeDaoImpl;
-import dk.medcom.video.api.dao.impl.PoolHistoryDaoImpl;
-import dk.medcom.video.api.dao.impl.PoolInfoRepositoryImpl;
+import dk.medcom.video.api.dao.EntitiesIvrThemeDaoImpl;
+import dk.medcom.video.api.dao.PoolHistoryDaoImpl;
+import dk.medcom.video.api.dao.PoolInfoRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

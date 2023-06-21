@@ -4,6 +4,7 @@ import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.entity.PoolHistory;
 import dk.medcom.video.api.dao.entity.PoolInfoEntity;
+import dk.medcom.video.api.service.PoolHistoryServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

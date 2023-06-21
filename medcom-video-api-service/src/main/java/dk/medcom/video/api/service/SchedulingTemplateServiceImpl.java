@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
@@ -10,9 +10,6 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.MeetingUserService;
-import dk.medcom.video.api.service.OrganisationService;
-import dk.medcom.video.api.service.SchedulingTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
