@@ -1,7 +1,7 @@
 package dk.medcom.video.api.interceptor;
 
 import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.organisation.Organisation;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationServiceClient;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;

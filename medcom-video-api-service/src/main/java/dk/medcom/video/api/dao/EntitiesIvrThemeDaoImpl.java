@@ -1,6 +1,5 @@
-package dk.medcom.video.api.dao.impl;
+package dk.medcom.video.api.dao;
 
-import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import dk.medcom.video.api.dao.entity.EntitiesIvrTheme;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;

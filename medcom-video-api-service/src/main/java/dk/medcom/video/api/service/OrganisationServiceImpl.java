@@ -1,30 +1,28 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.service.OrganisationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-
-@Component
 public class OrganisationServiceImpl implements OrganisationService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationServiceImpl.class);
-	
-	@Autowired
-	UserContextService userService;
-	
-	@Autowired
-	OrganisationRepository organisationRepository;
 
-	@Autowired
-	private OrganisationStrategy organisationStrategy;
+	private final UserContextService userService;
+	private final OrganisationRepository organisationRepository;
+	private final OrganisationStrategy organisationStrategy;
+
+	public OrganisationServiceImpl(UserContextService userContextService,
+								   OrganisationRepository organisationRepository,
+								   OrganisationStrategy organisationStrategy) {
+		this.organisationRepository = organisationRepository;
+		this.organisationStrategy = organisationStrategy;
+		this.userService = userContextService;
+	}
 
 	@Override
 	public Integer getPoolSizeForUserOrganisation() {

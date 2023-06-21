@@ -1,5 +1,6 @@
 package dk.medcom.video.api.organisation;
 
+import dk.medcom.video.api.organisation.model.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

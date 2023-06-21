@@ -2,6 +2,7 @@ package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.service.CustomUriValidator;
+import dk.medcom.video.api.service.CustomUriValidatorImpl;
 import org.junit.Before;
 import org.junit.Test;
 

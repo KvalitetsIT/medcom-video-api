@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.api.ProvisionStatus;
@@ -11,15 +11,12 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.dao.entity.PoolInfoEntity;
-import dk.medcom.video.api.organisation.Organisation;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.service.PoolInfoService;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class PoolInfoServiceImpl implements PoolInfoService {
     private final OrganisationStrategy organisationStrategy;
     private final SchedulingInfoRepository schedulingInfoRepository;
@@ -27,7 +24,7 @@ public class PoolInfoServiceImpl implements PoolInfoService {
     private final OrganisationRepository organisationRepository;
     private final PoolInfoRepository poolInfoRepository;
 
-    PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
+    public PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
         this.organisationStrategy = organisationStrategy;
         this.schedulingInfoRepository = schedulingInfoRepository;
         this.schedulingTemplateRepository = schedulingTemplateRepository;

@@ -7,9 +7,11 @@ import dk.medcom.video.api.context.UserContextServiceImpl;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.*;
+import dk.medcom.video.api.organisation.OrganisationServiceClient;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
 import dk.medcom.video.api.service.*;
-import dk.medcom.video.api.service.impl.*;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.prometheus.client.CollectorRegistry;
@@ -71,6 +73,145 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		bean.setOrder(0);
 
 		return bean;
+	}
+
+	@Bean
+	public SchedulingTemplateService schedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository,
+															   OrganisationService organisationService,
+															   MeetingUserService meetingUserService,
+															   OrganisationTreeServiceClient organisationTreeServiceClient,
+															   @Value("${scheduling.template.default.conferencing.sys.id}") Long conferencingSysId,
+															   @Value("${scheduling.template.default.uri.prefix}") String uriPrefix,
+															   @Value("${scheduling.template.default.uri.domain}") String uriDomain,
+															   @Value("${scheduling.template.default.host.pin.required}") boolean hostPinRequired,
+															   @Value("${scheduling.template.default.host.pin.range.low}") Long hostPinRangeLow,
+															   @Value("${scheduling.template.default.host.pin.range.high}") Long hostPinRangeHigh,
+															   @Value("${scheduling.template.default.guest.pin.required}") boolean guestPinRequired,
+															   @Value("${scheduling.template.default.guest.pin.range.low}") Long guestPinRangeLow,
+															   @Value("${scheduling.template.default.guest.pin.range.high}") Long guestPinRangeHigh,
+															   @Value("${scheduling.template.default.vmravailable.before}") int vMRAvailableBefore,
+															   @Value("${scheduling.template.default.max.participants}") int maxParticipants,
+															   @Value("${scheduling.template.default.end.meeting.on.end.time}") boolean endMeetingOnEndTime,
+															   @Value("${scheduling.template.default.uri.number.range.low}") Long uriNumberRangeLow,
+															   @Value("${scheduling.template.default.uri.number.range.high}") Long uriNumberRangeHigh,
+															   @Value("${scheduling.template.default.ivr.theme}") String ivrTheme) {
+
+		return new SchedulingTemplateServiceImpl(
+				schedulingTemplateRepository,
+				organisationService,
+				meetingUserService,
+				organisationTreeServiceClient,
+				conferencingSysId,
+				uriPrefix,
+				uriDomain,
+				hostPinRequired,
+				hostPinRangeLow,
+				hostPinRangeHigh,
+				guestPinRequired,
+				guestPinRangeLow,
+				guestPinRangeHigh,
+				vMRAvailableBefore,
+				maxParticipants,
+				endMeetingOnEndTime,
+				uriNumberRangeLow,
+				uriNumberRangeHigh,
+				ivrTheme
+		);
+
+	}
+
+	@Bean
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
+		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
+	}
+
+	@Bean
+	public MeetingUserService meetingUserService(MeetingUserRepository meetingUserRepository, UserContextService userContextService, OrganisationService organisationService) {
+		return new MeetingUserServiceImpl(meetingUserRepository, userContextService, organisationService);
+	}
+
+	@Bean
+	public MeetingService meetingService(MeetingRepository meetingRepository,
+										 MeetingUserService meetingUserService,
+										 SchedulingInfoService schedulingInfoService,
+										 SchedulingStatusService schedulingStatusService,
+										 OrganisationService organisationService,
+										 UserContextService userService,
+										 MeetingLabelRepository meetingLabelRepository,
+										 OrganisationRepository organisationProxy,
+										 OrganisationTreeServiceClient organisationTreeServiceClient,
+										 AuditService auditClient, SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+		return new MeetingServiceImpl(
+				meetingRepository,
+				meetingUserService,
+				schedulingInfoService,
+				schedulingStatusService,
+				organisationService,
+				userService,
+				meetingLabelRepository,
+				organisationProxy,
+				organisationTreeServiceClient,
+				auditClient,
+				schedulingInfoEventPublisher);
+	}
+
+	@Bean
+	public SchedulingInfoService schedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
+													   SchedulingTemplateRepository schedulingTemplateRepository,
+													   SchedulingTemplateService schedulingTemplateService,
+													   SchedulingStatusService schedulingStatusService,
+													   MeetingUserService meetingUserService,
+													   OrganisationRepository organisationRepository,
+													   OrganisationStrategy organisationStrategy,
+													   UserContextService userContextService,
+													   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+													   OrganisationTreeServiceClient organisationTreeServiceClient,
+													   AuditService auditService,
+													   CustomUriValidator customUriValidator,
+													   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+													   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+													   PoolFinderService poolFinderService,
+													   @Value("${scheduling.info.citizen.portal}") String citizenPortal) {
+		return new SchedulingInfoServiceImpl(
+				schedulingInfoRepository,
+				schedulingTemplateRepository,
+				schedulingTemplateService,
+				schedulingStatusService,
+				meetingUserService,
+				organisationRepository,
+				organisationStrategy,
+				userContextService,
+				overflowPoolOrganisationId,
+				organisationTreeServiceClient,
+				auditService,
+				customUriValidator,
+				schedulingInfoEventPublisher,
+				newProvisionerOrganisationFilter,
+				poolFinderService,
+				citizenPortal
+		);
+	}
+
+	@Bean
+	public SchedulingStatusService schedulingStatusService(SchedulingStatusRepository schedulingStatusRepository) {
+		return new SchedulingStatusServiceImpl(
+				schedulingStatusRepository
+		);
+	}
+
+	@Bean
+	public PoolInfoService poolInfoService(OrganisationRepository organisationRepository,
+										   SchedulingInfoRepository schedulingInfoRepository,
+										   SchedulingTemplateRepository schedulingTemplateRepository,
+										   OrganisationStrategy organisationStrategy,
+										   PoolInfoRepository poolInfoRepository) {
+		return new PoolInfoServiceImpl(
+				organisationRepository,
+				schedulingInfoRepository,
+				schedulingTemplateRepository,
+				organisationStrategy,
+				poolInfoRepository
+		);
 	}
 
 	@Bean
@@ -144,9 +285,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Autowired
 	private CollectorRegistry collectorRegistry;
-
-	@Autowired
-    private PoolInfoService poolInfoService;
 
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {

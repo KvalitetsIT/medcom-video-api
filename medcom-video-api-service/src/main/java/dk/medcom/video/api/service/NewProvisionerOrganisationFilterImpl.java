@@ -1,6 +1,4 @@
-package dk.medcom.video.api.service.impl;
-
-import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
+package dk.medcom.video.api.service;
 
 import java.util.List;
 

@@ -1,5 +1,7 @@
 package dk.medcom.video.api.organisation;
 
+import dk.medcom.video.api.organisation.model.OrganisationTree;
+
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.UriBuilder;

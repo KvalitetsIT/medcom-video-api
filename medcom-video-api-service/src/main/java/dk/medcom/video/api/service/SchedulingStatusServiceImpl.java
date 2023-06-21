@@ -1,15 +1,12 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.dao.SchedulingStatusRepository;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingStatus;
-import dk.medcom.video.api.service.SchedulingStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public class SchedulingStatusServiceImpl implements SchedulingStatusService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingStatusServiceImpl.class);
 	

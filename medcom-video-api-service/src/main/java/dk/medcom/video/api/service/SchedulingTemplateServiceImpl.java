@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
@@ -10,83 +10,81 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.MeetingUserService;
-import dk.medcom.video.api.service.OrganisationService;
-import dk.medcom.video.api.service.SchedulingTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-@Component
 public class SchedulingTemplateServiceImpl implements SchedulingTemplateService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoServiceImpl.class);
 
-	@Autowired
-	SchedulingTemplateRepository schedulingTemplateRepository;
-	
-	@Autowired
-	UserContextService userService;
-	
-	@Autowired
-	OrganisationService organisationService;
-	
-	@Autowired
-	MeetingUserService meetingUserService;
+	private final SchedulingTemplateRepository schedulingTemplateRepository;
 
+	private final OrganisationService organisationService;
 	
-	@Value("${scheduling.template.default.conferencing.sys.id}")
-	private Long conferencingSysId;
-	@Value("${scheduling.template.default.uri.prefix}")
-	private String uriPrefix;  		
-	@Value("${scheduling.template.default.uri.domain}")
-	private String uriDomain;  		
-	@Value("${scheduling.template.default.host.pin.required}")
-	private boolean hostPinRequired;
-	@Value("${scheduling.template.default.host.pin.range.low}")
-	private Long hostPinRangeLow; 	
-	@Value("${scheduling.template.default.host.pin.range.high}")
-	private Long hostPinRangeHigh; 	
-	@Value("${scheduling.template.default.guest.pin.required}")
-	private boolean guestPinRequired;
-	@Value("${scheduling.template.default.guest.pin.range.low}")
-	private Long guestPinRangeLow;	
-	@Value("${scheduling.template.default.guest.pin.range.high}")
-	private Long guestPinRangeHigh;	
-	@Value("${scheduling.template.default.vmravailable.before}")
-	private int vMRAvailableBefore;	
-	@Value("${scheduling.template.default.max.participants}")
-	private int maxParticipants;	
-	@Value("${scheduling.template.default.end.meeting.on.end.time}")
-	private boolean endMeetingOnEndTime;	
-	@Value("${scheduling.template.default.uri.number.range.low}")
-	private Long uriNumberRangeLow;			
-	@Value("${scheduling.template.default.uri.number.range.high}")
-	private Long uriNumberRangeHigh;		
-	@Value("${scheduling.template.default.ivr.theme}")
-	private String ivrTheme;
+	private final MeetingUserService meetingUserService;
+
+	private final Long conferencingSysId;
+	private final String uriPrefix;
+	private final String uriDomain;
+	private final boolean hostPinRequired;
+	private final Long hostPinRangeLow;
+	private final Long hostPinRangeHigh;
+	private final boolean guestPinRequired;
+	private final Long guestPinRangeLow;
+	private final Long guestPinRangeHigh;
+	private final int vMRAvailableBefore;
+	private final int maxParticipants;
+	private final boolean endMeetingOnEndTime;
+	private final Long uriNumberRangeLow;
+	private final Long uriNumberRangeHigh;
+	private final String ivrTheme;
 
 	private final OrganisationFinder organisationFinder = new OrganisationFinder();
 
-	@Autowired
-	private OrganisationTreeServiceClient organisationTreeServiceClient;
+	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
-	public SchedulingTemplateServiceImpl() {
-		
-	}
-	
-	public SchedulingTemplateServiceImpl(SchedulingTemplateRepository schedulingTemplateRepository, UserContextService userService, OrganisationService organisationService, MeetingUserServiceImpl meetingUserService, OrganisationTreeServiceClient organisationTreeServiceClient) {
+	public SchedulingTemplateServiceImpl(SchedulingTemplateRepository schedulingTemplateRepository,
+										 OrganisationService organisationService,
+										 MeetingUserService meetingUserService,
+										 OrganisationTreeServiceClient organisationTreeServiceClient,
+										 Long conferencingSysId,
+										 String uriPrefix,
+										 String uriDomain,
+										 boolean hostPinRequired,
+										 Long hostPinRangeLow,
+										 Long hostPinRangeHigh,
+										 boolean guestPinRequired,
+										 Long guestPinRangeLow,
+										 Long guestPinRangeHigh,
+										 int vMRAvailableBefore,
+										 int maxParticipants,
+										 boolean endMeetingOnEndTime,
+										 Long uriNumberRangeLow,
+										 Long uriNumberRangeHigh,
+										 String ivrTheme) {
 	 	this.schedulingTemplateRepository = schedulingTemplateRepository;
-	 	this.userService = userService;
-	 	this.organisationService = organisationService;
+		this.organisationService = organisationService;
 	 	this.meetingUserService = meetingUserService;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
+		this.conferencingSysId = conferencingSysId;
+		this.uriPrefix = uriPrefix;
+		this.uriDomain = uriDomain;
+		this.hostPinRequired = hostPinRequired;
+		this.hostPinRangeLow = hostPinRangeLow;
+		this.hostPinRangeHigh = hostPinRangeHigh;
+		this.guestPinRequired = guestPinRequired;
+		this.guestPinRangeLow = guestPinRangeLow;
+		this.guestPinRangeHigh = guestPinRangeHigh;
+		this.vMRAvailableBefore = vMRAvailableBefore;
+		this.maxParticipants = maxParticipants;
+		this.endMeetingOnEndTime = endMeetingOnEndTime;
+		this.uriNumberRangeLow = uriNumberRangeLow;
+		this.uriNumberRangeHigh = uriNumberRangeHigh;
+		this.ivrTheme = ivrTheme;
 	}
 
 	@Override

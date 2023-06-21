@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.kvalitetsit.audit.client.AuditClient;
 import dk.kvalitetsit.audit.client.api.v1.AuditEvent;
@@ -6,7 +6,6 @@ import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.service.AuditService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

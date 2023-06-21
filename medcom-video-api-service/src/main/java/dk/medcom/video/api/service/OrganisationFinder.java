@@ -1,6 +1,6 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 
 import java.util.Optional;
 

@@ -10,6 +10,7 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.service.PoolInfoServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,9 +28,8 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
 public class PoolInfoServiceTest {
-
 	@Mock
-    PoolInfoRepository poolInfoRepository;
+    private PoolInfoRepository poolInfoRepository;
 
     @Before
     public void setup() {
@@ -196,15 +196,15 @@ public class PoolInfoServiceTest {
         return organisations;
     }
 
-    private List<dk.medcom.video.api.organisation.Organisation> createStrategyOrganisationList() {
+    private List<dk.medcom.video.api.organisation.model.Organisation> createStrategyOrganisationList() {
         List<Organisation> organisations = new ArrayList<>();
 
         organisations.add(createOrganiztion(1));
         organisations.add(createOrganiztion(2));
 
-        List<dk.medcom.video.api.organisation.Organisation> returnOrganisations = new ArrayList<>();
+        List<dk.medcom.video.api.organisation.model.Organisation> returnOrganisations = new ArrayList<>();
         organisations.forEach(x -> {
-            dk.medcom.video.api.organisation.Organisation organisation = new dk.medcom.video.api.organisation.Organisation();
+            dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
             organisation.setCode(x.getOrganisationId());
             organisation.setPoolSize(x.getPoolSize());
 

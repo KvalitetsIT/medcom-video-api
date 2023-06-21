@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.*;
@@ -9,32 +9,27 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-@Component
 public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingInfoServiceImpl.class);
 
 	private final SchedulingInfoRepository schedulingInfoRepository;
 	private final SchedulingTemplateRepository schedulingTemplateRepository;
 	private final SchedulingTemplateService schedulingTemplateService;
-	private final SchedulingStatusServiceImpl schedulingStatusService;
+	private final SchedulingStatusService schedulingStatusService;
 	private final MeetingUserService meetingUserService;
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationStrategy organisationStrategy;
@@ -46,24 +41,24 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 	private final PoolFinderService poolFinderService;
-	@Value("${scheduling.info.citizen.portal}")
-	private String citizenPortal;
+	private final String citizenPortal;
 
 	public SchedulingInfoServiceImpl(SchedulingInfoRepository schedulingInfoRepository,
 									 SchedulingTemplateRepository schedulingTemplateRepository,
 									 SchedulingTemplateService schedulingTemplateService,
-									 SchedulingStatusServiceImpl schedulingStatusService,
+									 SchedulingStatusService schedulingStatusService,
 									 MeetingUserService meetingUserService,
 									 OrganisationRepository organisationRepository,
 									 OrganisationStrategy organisationStrategy,
 									 UserContextService userContextService,
-									 @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+									 String overflowPoolOrganisationId,
 									 OrganisationTreeServiceClient organisationTreeServiceClient,
 									 AuditService auditService,
 									 CustomUriValidator customUriValidator,
 									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
 									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
-									 PoolFinderService poolFinderService) {
+									 PoolFinderService poolFinderService,
+									 String citizenPortal) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -79,6 +74,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
 		this.poolFinderService = poolFinderService;
+		this.citizenPortal = citizenPortal;
 
 		if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -486,7 +482,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 
-		dk.medcom.video.api.organisation.Organisation organisation = organisationStrategy.findOrganisationByCode(createSchedulingInfoDto.getOrganizationId());
+		dk.medcom.video.api.organisation.model.Organisation organisation = organisationStrategy.findOrganisationByCode(createSchedulingInfoDto.getOrganizationId());
 		if(organisation == null) {
 			throw new NotValidDataException(NotValidDataErrors.ORGANISATION_ID_NOT_FOUND ,createSchedulingInfoDto.getOrganizationId());
 		}

@@ -1,4 +1,4 @@
-package dk.medcom.video.api.organisation;
+package dk.medcom.video.api.organisation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.organisation.OrganisationTree;
-import dk.medcom.video.api.service.impl.OrganisationFinder;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
+import dk.medcom.video.api.service.OrganisationFinder;
 import org.junit.Before;
 import org.junit.Test;
 

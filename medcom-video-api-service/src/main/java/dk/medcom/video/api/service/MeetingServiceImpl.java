@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service.impl;
+package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.*;
@@ -9,21 +9,18 @@ import dk.medcom.video.api.dao.MeetingLabelRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.*;
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-@Component
 public class MeetingServiceImpl implements MeetingService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingServiceImpl.class);
 	private final IdGenerator idGenerator;
@@ -40,17 +37,17 @@ public class MeetingServiceImpl implements MeetingService {
 	private final AuditService auditService;
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 
-	MeetingServiceImpl(MeetingRepository meetingRepository,
-					   MeetingUserService meetingUserService,
-					   SchedulingInfoService schedulingInfoService,
-					   SchedulingStatusService schedulingStatusService,
-					   OrganisationService organisationService,
-					   UserContextService userService,
-					   MeetingLabelRepository meetingLabelRepository,
-					   OrganisationRepository organisationRepository,
-					   OrganisationTreeServiceClient organisationTreeServiceClient,
-					   AuditService auditClient,
-					   SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+	public MeetingServiceImpl(MeetingRepository meetingRepository,
+							  MeetingUserService meetingUserService,
+							  SchedulingInfoService schedulingInfoService,
+							  SchedulingStatusService schedulingStatusService,
+							  OrganisationService organisationService,
+							  UserContextService userService,
+							  MeetingLabelRepository meetingLabelRepository,
+							  OrganisationRepository organisationRepository,
+							  OrganisationTreeServiceClient organisationTreeServiceClient,
+							  AuditService auditClient,
+							  SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -161,8 +158,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return savedResult;
 		}
 		catch(DataIntegrityViolationException e) {
-			if(e.getCause() instanceof ConstraintViolationException) {
-				var constraint = (ConstraintViolationException) e.getCause();
+			if(e.getCause() instanceof ConstraintViolationException constraint) {
 				if(constraint.getConstraintName().equals("short_id")) {
 					if(count < 5) {
 						return saveMeetingWithShortLink(meeting, ++count);

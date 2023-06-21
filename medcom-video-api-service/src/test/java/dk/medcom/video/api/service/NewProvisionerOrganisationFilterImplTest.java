@@ -1,6 +1,5 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.service.impl.NewProvisionerOrganisationFilterImpl;
 import org.junit.Before;
 import org.junit.Test;
 

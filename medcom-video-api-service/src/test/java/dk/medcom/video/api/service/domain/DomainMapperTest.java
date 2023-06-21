@@ -7,7 +7,7 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import dk.medcom.video.api.service.impl.DomainMapper;
+import dk.medcom.video.api.service.DomainMapper;
 import org.junit.Test;
 
 import java.util.Collections;
