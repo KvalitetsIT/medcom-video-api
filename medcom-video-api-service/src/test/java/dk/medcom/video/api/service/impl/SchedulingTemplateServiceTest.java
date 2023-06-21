@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import dk.medcom.video.api.api.DirectMedia;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.OrganisationService;
 import org.junit.Assert;

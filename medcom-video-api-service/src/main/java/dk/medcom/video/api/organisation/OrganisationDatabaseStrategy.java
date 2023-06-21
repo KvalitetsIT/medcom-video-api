@@ -1,12 +1,13 @@
 package dk.medcom.video.api.organisation;
 
 import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.organisation.model.Organisation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrganisationDatabaseStrategy implements OrganisationStrategy {
-    private OrganisationRepository organisationRepository;
+    private final OrganisationRepository organisationRepository;
 
     public OrganisationDatabaseStrategy(OrganisationRepository organisationRepository) {
         this.organisationRepository = organisationRepository;

@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PoolInfoRowMapper implements RowMapper<PoolInfoEntity> {
-
 	@Override
 	public PoolInfoEntity mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         if(resultSet.wasNull()) {

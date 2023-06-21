@@ -13,7 +13,7 @@ import dk.medcom.video.api.dao.MeetingLabelRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.*;
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.AuditService;
 import dk.medcom.video.api.service.MeetingService;

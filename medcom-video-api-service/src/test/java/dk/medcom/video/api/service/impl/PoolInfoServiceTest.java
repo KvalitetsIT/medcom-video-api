@@ -196,15 +196,15 @@ public class PoolInfoServiceTest {
         return organisations;
     }
 
-    private List<dk.medcom.video.api.organisation.Organisation> createStrategyOrganisationList() {
+    private List<dk.medcom.video.api.organisation.model.Organisation> createStrategyOrganisationList() {
         List<Organisation> organisations = new ArrayList<>();
 
         organisations.add(createOrganiztion(1));
         organisations.add(createOrganiztion(2));
 
-        List<dk.medcom.video.api.organisation.Organisation> returnOrganisations = new ArrayList<>();
+        List<dk.medcom.video.api.organisation.model.Organisation> returnOrganisations = new ArrayList<>();
         organisations.forEach(x -> {
-            dk.medcom.video.api.organisation.Organisation organisation = new dk.medcom.video.api.organisation.Organisation();
+            dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
             organisation.setCode(x.getOrganisationId());
             organisation.setPoolSize(x.getPoolSize());
 

@@ -9,8 +9,7 @@ public class UserContextImpl extends AbstractUserContextImpl {
 	protected String userOrganisation;
 	protected String userEmail;
 	protected List<UserRole> userRoles;
-	private String autoCreateOrganisation;
-
+	private final String autoCreateOrganisation;
 
 	public UserContextImpl(String userOrganisation, String userEmail, UserRole userRole, String autoCreateOrganisation) {
 		this(userOrganisation, userEmail, UserContextImpl.createList(userRole), autoCreateOrganisation);
@@ -48,6 +47,4 @@ public class UserContextImpl extends AbstractUserContextImpl {
 		userRoles.add(userRole);
 		return userRoles;
 	}
-
-
 }

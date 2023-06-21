@@ -12,7 +12,7 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTree;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.*;
 import org.junit.Before;
@@ -1119,16 +1119,16 @@ public class SchedulingInfoServiceImplTest {
         return TestDataHelper.createOrganisation(poolEnabled, orgId, id);
     }
 
-    private dk.medcom.video.api.organisation.Organisation createNonPoolStrategyOrganisation() {
-        dk.medcom.video.api.organisation.Organisation organisation = new dk.medcom.video.api.organisation.Organisation();
+    private dk.medcom.video.api.organisation.model.Organisation createNonPoolStrategyOrganisation() {
+        dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
         organisation.setPoolSize(null);
         organisation.setCode(NON_POOL_ORG);
 
         return organisation;
     }
 
-    private dk.medcom.video.api.organisation.Organisation createStrategyOrganisation() {
-        dk.medcom.video.api.organisation.Organisation organisation = new dk.medcom.video.api.organisation.Organisation();
+    private dk.medcom.video.api.organisation.model.Organisation createStrategyOrganisation() {
+        dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
         organisation.setPoolSize(10);
         organisation.setCode(POOL_ORG);
 
