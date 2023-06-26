@@ -33,7 +33,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testcontainers.version>1.18.3</testcontainers.version>
 		<spring-prometheus-app-info-version>1.2.0</spring-prometheus-app-info-version>
-		<shed-lock-version>5.2.0</shed-lock-version>
+		<shed-lock-version>5.5.0</shed-lock-version>
 	</properties>
 	<dependencies>
 		<!-- Test -->
