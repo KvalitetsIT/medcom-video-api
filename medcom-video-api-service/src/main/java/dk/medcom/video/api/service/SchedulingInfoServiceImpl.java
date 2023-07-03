@@ -280,7 +280,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
-		schedulingInfoEventPublisher.publishCreate(schedulingInfoEvent);
+		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent);
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
@@ -406,7 +406,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
 
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
@@ -421,9 +421,21 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE));
 
-		LOGGER.debug("Exit deleteeSchedulingInfo");
+		LOGGER.debug("Exit deleteSchedulingInfo");
+	}
+
+	@Transactional(rollbackFor = Throwable.class)
+	@Override
+	public void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException {
+		LOGGER.debug("Entry deleteSchedulingInfoPool. uuid=" + uuid);
+
+		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+		schedulingInfoRepository.delete(schedulingInfo);
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE));
+
+		LOGGER.debug("Exit deleteSchedulingInfoPool");
 	}
 
 	private String createPortalLink(Date startTime, SchedulingInfo schedulingInfo) {
@@ -548,7 +560,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
@@ -608,7 +620,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");

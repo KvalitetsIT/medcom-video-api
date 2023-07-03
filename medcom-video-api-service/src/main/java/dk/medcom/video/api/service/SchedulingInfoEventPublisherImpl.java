@@ -22,7 +22,7 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
     }
 
     @Override
-    public void publishCreate(SchedulingInfoEvent schedulingInfoEvent) {
+    public void publishEvent(SchedulingInfoEvent schedulingInfoEvent) {
         if(!newProvisionerOrganisationFilter.newProvisioner(schedulingInfoEvent.getOrganisationCode())) {
             logger.info("Not publishing event due to organisation {} not configured for events.", schedulingInfoEvent.getOrganisationCode());
             return;

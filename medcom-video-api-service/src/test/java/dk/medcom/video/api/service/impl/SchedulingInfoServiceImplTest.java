@@ -370,7 +370,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
         assertEquals(DirectMedia.best_effort, capturedSchedulingInfo.getDirectMedia());
 
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishCreate(Mockito.any());
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any());
     }
 
     @Test
