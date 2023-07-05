@@ -37,6 +37,9 @@ public interface SchedulingInfoService {
     void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException;
 
     @Transactional(rollbackFor = Throwable.class)
+    void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException;
+
+    @Transactional(rollbackFor = Throwable.class)
     SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException;
 
     SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException;

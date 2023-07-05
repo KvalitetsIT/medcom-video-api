@@ -44,7 +44,7 @@ public class ScheduledTaskConfiguration {
         LockAssert.assertLocked();
 
         if(!poolFillDisabled) {
-            poolService.fillPools();
+            poolService.fillAndDeletePools();
         }
     }
 

@@ -371,7 +371,7 @@ public class MeetingServiceImpl implements MeetingService {
 		}
 		else {
 			var event = SchedulingInfoEventMapper.map(schedulingInfo, MessageType.UPDATE);
-			schedulingInfoEventPublisher.publishCreate(event);
+			schedulingInfoEventPublisher.publishEvent(event);
 		}
 
 		auditService.auditMeeting(meeting, "update");
