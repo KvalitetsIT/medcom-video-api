@@ -108,6 +108,7 @@ public class SchedulingInfoController {
 		LOGGER.debug("Entry of /scheduling-info-provision.get");
 
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfoAwaitsProvision();
+		LOGGER.debug("getSchedulingInfoAwaitsProvision returned ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
 		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();
 		for (SchedulingInfo schedulingInfo : schedulingInfos) {
 			SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
