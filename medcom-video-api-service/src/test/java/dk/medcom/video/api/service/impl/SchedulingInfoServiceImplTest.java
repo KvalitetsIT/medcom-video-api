@@ -956,7 +956,9 @@ public class SchedulingInfoServiceImplTest {
     @Test
     public void testGetSchedulingInfoAwaitProvisionNoFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
+        schedulingInfo1.setId(1L);
         var schedulingInfo2 = createSchedulingInfo("org2");
+        schedulingInfo2.setId(2L);
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
@@ -968,7 +970,9 @@ public class SchedulingInfoServiceImplTest {
     @Test
     public void testGetSchedulingInfoAwaitProvisionFilter() {
         var schedulingInfo1 = createSchedulingInfo("org1");
+        schedulingInfo1.setId(1L);
         var schedulingInfo2 = createSchedulingInfo("org2");
+        schedulingInfo2.setId(2L);
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.singletonList("org1")));
