@@ -91,6 +91,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
 
+		LOGGER.debug("getSchedulingInfoAwaitsProvision found follwing ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
+
 		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
 	}
 
