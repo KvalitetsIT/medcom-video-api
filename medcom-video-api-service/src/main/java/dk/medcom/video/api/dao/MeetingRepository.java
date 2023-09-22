@@ -56,4 +56,7 @@ public interface MeetingRepository extends CrudRepository<Meeting, Long> {
 	List<Meeting> findByOrganizedByAndSubjectLikeOrDescriptionLike(MeetingUser orCreateCurrentMeetingUser, String subject, String description);
 
     Meeting findOneByShortId(String shortId);
+
+	@Query("select s.meeting from SchedulingInfo s inner join s.meeting m where s.uriWithDomain = ?1")
+	List<Meeting> findByUriWithDomain(String uriWithDomain);
 }

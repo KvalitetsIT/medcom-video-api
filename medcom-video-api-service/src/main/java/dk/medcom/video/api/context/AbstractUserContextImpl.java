@@ -32,7 +32,22 @@ public abstract class AbstractUserContextImpl implements UserContext {
 		}
 		return false;
 	}
-	
+
+	@Override
+	public boolean hasRole(UserRole role) {
+		var userRoles = getUserRoles();
+
+		if(role == null) {
+			return false;
+		}
+
+		if(userRoles == null) {
+			return false;
+		}
+
+		return userRoles.stream().anyMatch(x -> x == role);
+	}
+
 	@Override
 	public boolean isOrganisationalMeetingAdministrator() {
 		return hasAnyNumberOfRoles(MEETINGADMIN_TYPE_ROLES);
