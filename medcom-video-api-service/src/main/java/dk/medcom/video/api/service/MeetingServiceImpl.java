@@ -448,7 +448,11 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public List<Meeting> getMeetingsByUriWithDomain(String uriWithDomain) throws PermissionDeniedException {
-		if (userService.getUserContext().hasOnlyRole(UserRole.USER)) {
+		if(userService.getUserContext().hasRole(UserRole.PROVISIONER_USER)) {
+			LOGGER.debug("Finding meetings using findByUriWithDomain");
+			return meetingRepository.findByUriWithDomain(uriWithDomain);
+		}
+		else if (userService.getUserContext().hasRole(UserRole.USER)) {
 			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganizedBy");
 			return meetingRepository.findByUriWithDomainAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), uriWithDomain);
 		} else {

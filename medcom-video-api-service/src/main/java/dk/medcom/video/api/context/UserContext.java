@@ -16,7 +16,9 @@ public interface UserContext {
 	boolean hasAnyNumberOfRoles(List<UserRole> userRoles);
 	
 	boolean hasOnlyRole(UserRole role);
-	
+
+	boolean hasRole(UserRole role);
+
 	boolean isOrganisationalMeetingAdministrator();
 
 	Optional<String> getAutoCreateOrganisation();
