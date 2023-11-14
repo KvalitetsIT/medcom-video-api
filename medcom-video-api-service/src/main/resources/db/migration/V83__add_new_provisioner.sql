@@ -1,0 +1,1 @@
+ALTER TABLE scheduling_info ADD COLUMN new_provisioner tinyint(1) NOT NULL DEFAULT 0;

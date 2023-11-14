@@ -61,6 +61,10 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(result);
 		assertTrue(result.contains("AWAITS_PROVISION"));
 		assertFalse(result.contains("PROVISIONED_OK"));
+
+		assertTrue(result.contains("\"uriWithDomain\":\"1231@test.dk\""));
+		assertTrue(result.contains("\"uriWithDomain\":\"1241@test.dk\""));
+		assertFalse(result.contains("\"uriWithDomain\":\"1242@test.dk\""));
 	}
 
 	@Test
@@ -107,6 +111,10 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(result);
 		assertFalse(result.contains("AWAITS_PROVISION"));
 		assertTrue(result.contains("PROVISIONED_OK"));
+
+		assertTrue(result.contains("\"uriWithDomain\":\"1239@test.dk\""));
+		assertTrue(result.contains("\"uriWithDomain\":\"1243@test.dk\""));
+		assertFalse(result.contains("\"uriWithDomain\":\"1244@test.dk\""));
 	}
 
 	@Test

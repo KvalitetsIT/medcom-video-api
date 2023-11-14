@@ -91,16 +91,16 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
 
-		LOGGER.debug("getSchedulingInfoAwaitsProvision found follwing ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
+		LOGGER.debug("getSchedulingInfoAwaitsProvision found following ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
 
-		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
 
-		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -196,7 +196,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
-		//Overwrite template value with input parameters 
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+
+		//Overwrite template value with input parameters
 		if (createMeetingDto.getMaxParticipants() > 0) { 
 			schedulingInfo.setMaxParticipants(createMeetingDto.getMaxParticipants());
 			LOGGER.debug("MaxParticipants is taken from input: " + createMeetingDto.getMaxParticipants());
@@ -560,6 +562,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
