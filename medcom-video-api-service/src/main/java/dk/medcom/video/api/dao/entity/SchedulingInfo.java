@@ -78,6 +78,7 @@ public class SchedulingInfo {
 	private String returnUrl;
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
+	private boolean newProvisioner;				//using the new (true) or old (false) provisioner service
 
 	public Long getId() {
 		return id;
@@ -354,5 +355,13 @@ public class SchedulingInfo {
 
 	public DirectMedia getDirectMedia() {
 		return directMedia;
+	}
+
+	public boolean isNewProvisioner() {
+		return newProvisioner;
+	}
+
+	public void setNewProvisioner(boolean newProvisioner) {
+		this.newProvisioner = newProvisioner;
 	}
 }

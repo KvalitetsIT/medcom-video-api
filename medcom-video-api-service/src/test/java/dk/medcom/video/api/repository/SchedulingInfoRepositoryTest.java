@@ -107,6 +107,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setCustomPortalHost(customPortalHost);
         schedulingInfo.setReturnUrl(returnUrl);
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
+        schedulingInfo.setNewProvisioner(true);
 
         // When
         schedulingInfo = subject.save(schedulingInfo);
@@ -147,6 +148,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(customPortalHost, schedulingInfo.getCustomPortalHost());
         assertEquals(returnUrl, schedulingInfo.getReturnUrl());
         assertEquals(DirectMedia.best_effort, schedulingInfo.getDirectMedia());
+        assertTrue(schedulingInfo.isNewProvisioner());
     }
 
     @Test
@@ -186,6 +188,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals("custom_portal_guest", schedulingInfo.getCustomPortalGuest());
         assertEquals("custom_portal_host", schedulingInfo.getCustomPortalHost());
         assertEquals("return_url", schedulingInfo.getReturnUrl());
+        assertFalse(schedulingInfo.isNewProvisioner());
     }
 
     @Test
