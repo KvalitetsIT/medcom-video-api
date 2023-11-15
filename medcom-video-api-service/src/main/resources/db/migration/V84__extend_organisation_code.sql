@@ -1,0 +1,1 @@
+alter table pool_history modify organisation_code varchar(250) not null;
