@@ -564,6 +564,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+		LOGGER.debug("Organisation id is: %s, and new provisioner is: %s".formatted(schedulingInfo.getOrganisation().getOrganisationId(), schedulingInfo.isNewProvisioner()));
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
@@ -605,6 +606,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
 
 		var organisationFromSchedulingInfo = schedulingInfo.getOrganisation().getOrganisationId();
+		LOGGER.debug("Organisation id from scheduling info is: " + organisationFromSchedulingInfo);
 
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
@@ -625,6 +627,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			schedulingInfo.setPoolOverflow(true);
 		}
 
+		LOGGER.debug("Scheduling info organisation id is: %s, new provisioner is: %s".formatted(schedulingInfo.getOrganisation().getOrganisationId(), schedulingInfo.isNewProvisioner()));
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
 
