@@ -371,7 +371,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(DirectMedia.best_effort, capturedSchedulingInfo.getDirectMedia());
         assertTrue(capturedSchedulingInfo.isNewProvisioner());
 
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any());
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(true));
     }
 
     @Test
@@ -1058,7 +1058,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setSchedulingTemplate(schedulingTemplateIdOne);
         schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
-        schedulingInfo.setNewProvisioner(false);
+        schedulingInfo.setNewProvisioner(true);
 
         return schedulingInfo;
     }
