@@ -13,18 +13,16 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
     private static final Logger logger = LoggerFactory.getLogger(SchedulingInfoEventPublisherImpl.class);
     private final MessagePublisher natsPublisher;
     private final EntitiesIvrThemeDao entitiesIvrThemeDao;
-    private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
-    public SchedulingInfoEventPublisherImpl(MessagePublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao, NewProvisionerOrganisationFilter newProvisionerOrganisationFilter) {
+    public SchedulingInfoEventPublisherImpl(MessagePublisher natsPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
         this.natsPublisher = natsPublisher;
         this.entitiesIvrThemeDao = entitiesIvrThemeDao;
-        this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
     }
 
     @Override
-    public void publishEvent(SchedulingInfoEvent schedulingInfoEvent) {
-        if(!newProvisionerOrganisationFilter.newProvisioner(schedulingInfoEvent.getOrganisationCode())) {
-            logger.info("Not publishing event due to organisation {} not configured for events.", schedulingInfoEvent.getOrganisationCode());
+    public void publishEvent(SchedulingInfoEvent schedulingInfoEvent, boolean newProvisioner) {
+        if(!newProvisioner) {
+            logger.info("Not publishing event due to new_provisioner is false. Organisation is: {}.", schedulingInfoEvent.getOrganisationCode());
             return;
         }
 
