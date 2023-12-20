@@ -114,10 +114,14 @@ info:
     </Ul>
     1.10.0
     <Ul>
-    <Li> Add direct_media to scheduling info and scheduling template.
+      <Li> Add direct_media to scheduling info and scheduling template.
+    </Ul>
+    1.12.0
+    <Ul>
+      <Li> Add additional_information to meeting and create-meeting.
     </Ul>
 
-  version: "1.7.12"
+  version: "1.12.0"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -1088,6 +1092,10 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
     create-meeting:
       type: object
       required:
@@ -1213,6 +1221,10 @@ components:
           format: int32
           minimum: 10000
           maximum: 999999999
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
 
     update-meeting:
       type: object
@@ -1545,6 +1557,20 @@ components:
       enum:
         - never
         - best_effort
+    additionalInformationType:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          maxLength: 100
+          description: additional information key
+        value:
+          type: string
+          maxLength: 100
+          description: additional information value
 
     scheduling-template:
       type: object

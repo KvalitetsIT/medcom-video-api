@@ -9,9 +9,7 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.MeetingLabelRepository;
-import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
@@ -52,6 +50,7 @@ public class MeetingServiceImplTest {
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
 	private OrganisationRepository organisationRepository;
 	private AuditService auditService;
+	private MeetingAdditionalInfoRepository meetingAdditionalInfoRepository;
 
 	@Before
 	public void prepareTest() {
@@ -91,6 +90,11 @@ public class MeetingServiceImplTest {
 		var label = new MeetingLabel();
 		label.setLabel("SOME_LABEL");
 		meeting.addMeetingLabel(label);
+
+		var additionalInfo = new MeetingAdditionalInfo();
+		additionalInfo.setInfoKey("SOME_KEY");
+		additionalInfo.setInfoValue("SOME_VALUE");
+		meeting.addMeetingAdditionalInformation(additionalInfo);
 
 		return meeting;
 	}
@@ -153,6 +157,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(organisationRepository.findByOrganisationId(userContext.getUserOrganisation())).thenReturn(o);
 
 		var schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
+		meetingAdditionalInfoRepository = Mockito.mock(MeetingAdditionalInfoRepository.class);
 
 		MeetingService meetingService = new MeetingServiceImpl(meetingRepository,
 				meetingUserService,
@@ -164,7 +169,8 @@ public class MeetingServiceImplTest {
 				organisationRepository,
 				organisationTreeServiceClient,
 				auditService,
-				schedulingInfoEventPublisher);
+				schedulingInfoEventPublisher,
+				meetingAdditionalInfoRepository);
 
 		Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
@@ -196,7 +202,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
 		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(reservationId)).thenReturn(schedulingInfo);
 		Mockito.when(meetingRepository.save(meetingInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeething call
-		Mockito.when(meetingRepository.save((Meeting) argThat(x -> ((Meeting) x).getUuid().equals(meetingUuid)))).thenAnswer(i -> {
+		Mockito.when(meetingRepository.save(argThat(x -> x.getUuid().equals(meetingUuid)))).thenAnswer(i -> {
 			Meeting meeting = (Meeting) i.getArguments()[0];
 			meeting.setId(57483L);
 			return meeting;
@@ -423,6 +429,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -447,6 +454,7 @@ public class MeetingServiceImplTest {
 		assertEquals(input.getStartTime(), result.getStartTime());
 
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result, schedulingInfo, false);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -467,6 +475,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(Mockito.any())).thenThrow(new RessourceNotFoundException("NOT FOUND", "reservationID"));
 
 		meetingService.createMeeting(input);
+		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -486,6 +495,7 @@ public class MeetingServiceImplTest {
 		schedulingInfo.getOrganisation().setOrganisationId("some_other_org");
 
 		meetingService.createMeeting(input);
+		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -515,6 +525,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(0)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -536,6 +547,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
 
 		meetingService.createMeeting(input);
+		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -562,6 +574,7 @@ public class MeetingServiceImplTest {
 		input.setUuid(uuid);
 		input.setEndTime(new Date());
 		input.setLabels(Arrays.asList("first label", "second label"));
+		input.setAdditionalInformation(Arrays.asList(new AdditionalInformationType("key one", "value 1"), new AdditionalInformationType("key two", "value 2")));
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
 		Meeting result = meetingService.createMeeting(input);
@@ -573,6 +586,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 
 		ArgumentCaptor<Set<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Set.class);
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(labelsCaptor.capture());
@@ -586,6 +600,20 @@ public class MeetingServiceImplTest {
 		Optional<MeetingLabel> secondSavedLabel = savedLabels.stream().filter(x -> x.getLabel().equals("second label")).findFirst();
 		assertTrue(secondSavedLabel.isPresent());
 		assertEquals(secondLabel.getLabel(), secondSavedLabel.get().getLabel());
+
+		ArgumentCaptor<Set<MeetingAdditionalInfo>> additionalInfo = ArgumentCaptor.forClass(Set.class);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(additionalInfo.capture());
+		Set<MeetingAdditionalInfo> savedAddInfo = additionalInfo.getValue();
+		assertEquals(2, savedAddInfo.size());
+		Optional<MeetingAdditionalInfo> addInfoOne = savedAddInfo.stream().filter(x -> x.getInfoKey().equals("key one")).findFirst();
+		assertTrue(addInfoOne.isPresent());
+		assertEquals("key one", addInfoOne.get().getInfoKey());
+		assertEquals("value 1", addInfoOne.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> addInfoTwo = savedAddInfo.stream().filter(x -> x.getInfoKey().equals("key two")).findFirst();
+		assertTrue(addInfoTwo.isPresent());
+		assertEquals("key two", addInfoTwo.get().getInfoKey());
+		assertEquals("value 2", addInfoTwo.get().getInfoValue());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 
@@ -624,6 +652,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 
@@ -662,6 +691,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 
@@ -700,6 +730,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(Mockito.argThat(x -> !x.iterator().hasNext()));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 
@@ -754,6 +785,7 @@ public class MeetingServiceImplTest {
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 		Mockito.verifyNoMoreInteractions(meetingLabelRepository);
 		Mockito.verifyNoMoreInteractions(meetingRepository);
+		Mockito.verifyNoMoreInteractions(meetingAdditionalInfoRepository);
 	}
 
 	@Test
@@ -807,6 +839,7 @@ public class MeetingServiceImplTest {
 		input.setUuid(uuid);
 		input.setEndTime(new Date());
 		input.setLabels(Arrays.asList("first label", "second label"));
+		input.setAdditionalInformation(Arrays.asList(new AdditionalInformationType("key one", "value 1"), new AdditionalInformationType("key two", "value 2")));
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
 		Meeting result = meetingService.createMeeting(input);
@@ -818,6 +851,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(0)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 
 		ArgumentCaptor<Set<MeetingLabel>> labelsCaptor = ArgumentCaptor.forClass(Set.class);
 		Mockito.verify(meetingLabelRepository, times(1)).saveAll(labelsCaptor.capture());
@@ -831,6 +865,20 @@ public class MeetingServiceImplTest {
 		Optional<MeetingLabel> secondSavedLabel = savedLabels.stream().filter(x -> x.getLabel().equals("second label")).findFirst();
 		assertTrue(secondSavedLabel.isPresent());
 		assertEquals(secondLabel.getLabel(), secondSavedLabel.get().getLabel());
+
+		ArgumentCaptor<Set<MeetingAdditionalInfo>> additionalInfo = ArgumentCaptor.forClass(Set.class);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(additionalInfo.capture());
+		Set<MeetingAdditionalInfo> savedAddInfo = additionalInfo.getValue();
+		assertEquals(2, savedAddInfo.size());
+		Optional<MeetingAdditionalInfo> addInfoOne = savedAddInfo.stream().filter(x -> x.getInfoKey().equals("key one")).findFirst();
+		assertTrue(addInfoOne.isPresent());
+		assertEquals("key one", addInfoOne.get().getInfoKey());
+		assertEquals("value 1", addInfoOne.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> addInfoTwo = savedAddInfo.stream().filter(x -> x.getInfoKey().equals("key two")).findFirst();
+		assertTrue(addInfoTwo.isPresent());
+		assertEquals("key two", addInfoTwo.get().getInfoKey());
+		assertEquals("value 2", addInfoTwo.get().getInfoValue());
 
 		Mockito.verifyNoMoreInteractions(schedulingInfoService);
 	}
@@ -854,6 +902,7 @@ public class MeetingServiceImplTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		meetingService.createMeeting(input);
+		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -890,6 +939,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(organisationRepository.findByOrganisationId("superParent")).thenReturn(o);
 
 		meetingService.createMeeting(input);
+		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -933,6 +983,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	private OrganisationTree createOrganisation(String name, String code, List<OrganisationTree> children, int poolSize) {
@@ -984,6 +1035,7 @@ public class MeetingServiceImplTest {
 		assertEquals(12, result.getShortId().length());
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotValidDataException.class)
@@ -1028,6 +1080,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result, Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1203,6 +1256,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1231,6 +1285,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.eq(input));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1258,6 +1313,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1286,6 +1342,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), argThat(createMeetingDto -> createMeetingDto.getVmrType().equals(input.getVmrType())));
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), argThat(createMeetingDto -> createMeetingDto.getVmrType().equals(input.getVmrType())));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1325,6 +1382,7 @@ public class MeetingServiceImplTest {
 
 		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -1403,10 +1461,8 @@ public class MeetingServiceImplTest {
 	}
 
 	private List<Meeting> wrapInList(Meeting... meeting) {
-		ArrayList<Meeting> list = new ArrayList<>();
-		list.addAll(Arrays.asList(meeting));
 
-		return list;
+		return new ArrayList<>(Arrays.asList(meeting));
 	}
 
 	private Meeting createMeeting(Long id, Date startDate) {

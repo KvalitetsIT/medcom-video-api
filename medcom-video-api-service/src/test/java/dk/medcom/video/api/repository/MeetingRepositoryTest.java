@@ -3,10 +3,7 @@ package dk.medcom.video.api.repository;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.MeetingLabel;
-import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.*;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,6 +73,18 @@ public class MeetingRepositoryTest extends RepositoryTest {
 	    meetingLabels.add(label);
 	    meeting.setMeetingLabels(meetingLabels);
 
+		HashSet<MeetingAdditionalInfo> meetingAdditionalInfo = new HashSet<>();
+		MeetingAdditionalInfo additionalInfo = new MeetingAdditionalInfo();
+		additionalInfo.setInfoKey("first key");
+		additionalInfo.setInfoValue("first value");
+		meetingAdditionalInfo.add(additionalInfo);
+
+		additionalInfo = new MeetingAdditionalInfo();
+		additionalInfo.setInfoKey("second key");
+		additionalInfo.setInfoValue("second value");
+		meetingAdditionalInfo.add(additionalInfo);
+		meeting.setMeetingAdditionalInfo(meetingAdditionalInfo);
+
 		var shortId = UUID.randomUUID().toString().substring(1, 8);
 	    meeting.setShortId(shortId);
 
@@ -96,6 +105,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(calendarCreate.getTime(), meeting.getCreatedTime());
 		assertEquals(calendarCreate.getTime(), meeting.getUpdatedTime());
 		assertEquals(shortId, meeting.getShortId());
+		assertTrue(meeting.getMeetingAdditionalInfo().containsAll(meetingAdditionalInfo));
 	}
 	
 	@Test
@@ -167,8 +177,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 			fail();
 		}
 		catch(DataIntegrityViolationException e) {
-			if(e.getCause() instanceof ConstraintViolationException) {
-				ConstraintViolationException constraint = (ConstraintViolationException) e.getCause();
+			if(e.getCause() instanceof ConstraintViolationException constraint) {
 				assertEquals("short_id", constraint.getConstraintName());
 			}
 			else {
@@ -189,6 +198,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertNotNull(meeting);
 		assertEquals(7, meeting.getId().intValue());
 		assertEquals("TestMeeting-xyz7", meeting.getSubject());
+		assertNotNull(meeting.getMeetingAdditionalInfo());
+		assertEquals(2, meeting.getMeetingAdditionalInfo().size());
 	}
 
 	@Test
@@ -232,7 +243,7 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		
 		// Then
 		assertNotNull(meeting);
-		assertEquals(new Long(3), meeting.getId());
+		assertEquals(3L, meeting.getId(), 0);
 		assertEquals(exitstingUUid, meeting.getUuid());
 		assertEquals("TestMeeting-123", meeting.getSubject());
 		assertEquals("test-org", meeting.getOrganisation().getOrganisationId());
@@ -494,6 +505,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(7, meeting.getId().longValue());
 		assertEquals("TestMeeting-xyz7", meeting.getSubject());
 		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+		assertNotNull(meeting.getMeetingAdditionalInfo());
+		assertEquals(2, meeting.getMeetingAdditionalInfo().size());
 	}
 
 	@Test
@@ -509,6 +522,8 @@ public class MeetingRepositoryTest extends RepositoryTest {
 		assertEquals(7, meeting.getId().longValue());
 		assertEquals("TestMeeting-xyz7", meeting.getSubject());
 		assertEquals(organisation.getId(), meeting.getOrganisation().getId());
+		assertNotNull(meeting.getMeetingAdditionalInfo());
+		assertEquals(2, meeting.getMeetingAdditionalInfo().size());
 	}
 
 	@Test
@@ -534,5 +549,13 @@ public class MeetingRepositoryTest extends RepositoryTest {
 
 		assertEquals(4, result.size());
 		result.forEach(x ->	assertTrue(x.getSubject().contains("Meeting-xyz") || x.getDescription().contains("beskrivelse")));
+	}
+
+	@Test
+	public void testGetMeetingContainsAdditionalInfo() {
+		var result = subject.findById(7L);
+		assertTrue(result.isPresent());
+		assertNotNull(result.get().getMeetingAdditionalInfo());
+		assertEquals(2, result.get().getMeetingAdditionalInfo().size());
 	}
 }
