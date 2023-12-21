@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 
 public class MeetingServiceImpl implements MeetingService {
@@ -304,6 +305,7 @@ public class MeetingServiceImpl implements MeetingService {
 			MeetingAdditionalInfo meetingAdditionalInfo = new MeetingAdditionalInfo();
 			meetingAdditionalInfo.setInfoKey(x.key());
 			meetingAdditionalInfo.setInfoValue(x.value());
+			meetingAdditionalInfo.setCreatedTime(Instant.now());
 
 			meeting.addMeetingAdditionalInformation(meetingAdditionalInfo);
 		});

@@ -11,6 +11,7 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Test;
 
 import javax.annotation.Resource;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,11 +58,13 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
         assertTrue(meetingAdditionalInfoOne.isPresent());
         assertEquals("value one", meetingAdditionalInfoOne.get().getInfoValue());
         assertEquals(meeting.getId(), meetingAdditionalInfoOne.get().getMeeting().getId());
+        assertNotNull(meetingAdditionalInfoOne.get().getCreatedTime());
 
         var meetingAdditionalInfoTwo = additionalInformation.stream().filter(x -> x.getInfoKey().equals("key two")).findFirst();
         assertTrue(meetingAdditionalInfoTwo.isPresent());
         assertEquals("value two", meetingAdditionalInfoTwo.get().getInfoValue());
         assertEquals(meeting.getId(), meetingAdditionalInfoTwo.get().getMeeting().getId());
+        assertNotNull(meetingAdditionalInfoTwo.get().getCreatedTime());
 
         // When - delete
         additionalInfoRepository.deleteByMeeting(meeting);
@@ -82,6 +85,7 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
         additionalInfo.setMeeting(meeting);
         additionalInfo.setInfoKey(key);
         additionalInfo.setInfoValue(value);
+        additionalInfo.setCreatedTime(Instant.now());
 
         return additionalInfo;
     }
