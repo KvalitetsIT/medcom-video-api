@@ -30,6 +30,7 @@ public class UpdateMeetingDto {
 	
 	public String organizedByEmail;
 	private List<String> labels = new ArrayList<>();
+	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
 	public String getSubject() {
 		return subject;
@@ -81,5 +82,13 @@ public class UpdateMeetingDto {
 
 	public List<String> getLabels() {
 		return labels;
+	}
+
+	public List<AdditionalInformationType> getAdditionalInformation() {
+		return additionalInformation;
+	}
+
+	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+		this.additionalInformation = additionalInformation;
 	}
 }

@@ -1,5 +1,7 @@
 package dk.medcom.video.api.service.domain;
 
+import dk.medcom.video.api.api.AdditionalInformationType;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +19,7 @@ public class UpdateMeeting {
     private boolean GuestPinRequired;
     private BigDecimal guestPin;
     private BigDecimal hostPin;
+    private List<AdditionalInformationType> meetingAdditionalInfo = new ArrayList<>();
 
     public String getSubject() {
         return subject;
@@ -104,5 +107,13 @@ public class UpdateMeeting {
 
     public void setGuestPin(BigDecimal guestPin) {
         this.guestPin = guestPin;
+    }
+
+    public List<AdditionalInformationType> getMeetingAdditionalInfo() {
+        return meetingAdditionalInfo;
+    }
+
+    public void setMeetingAdditionalInfo(List<AdditionalInformationType> meetingAdditionalInfo) {
+        this.meetingAdditionalInfo = meetingAdditionalInfo;
     }
 }

@@ -206,13 +206,14 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals(createMeeting.getExternalId(), updatedMeeting.getExternalId());
 		assertEquals(1, updatedMeeting.getLabels().size());
 		assertTrue(updateMeeting.getLabels().containsAll(updatedMeeting.getLabels()));
+		assertTrue(updatedMeeting.getAdditionalInformation().isEmpty());
 
 		var readMeeting = videoMeetings.meetingsUuidGet(createdMeeting.getUuid());
 		assertNotNull(readMeeting);
 		assertEquals(createMeeting.getExternalId(), readMeeting.getExternalId());
 		assertEquals(1, readMeeting.getLabels().size());
 		assertTrue(updateMeeting.getLabels().containsAll(readMeeting.getLabels()));
-		assertTrue(createMeeting.getAdditionalInformation().containsAll(readMeeting.getAdditionalInformation()));
+		assertTrue(readMeeting.getAdditionalInformation().isEmpty());
 	}
 
 	@Test
@@ -384,6 +385,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setEndTime(inTwoHours);
 		createMeeting.setSubject("This is a subject!");
 		createMeeting.setGuestMicrophone(GuestMicrophone.muted);
+		createMeeting.setAdditionalInformation(List.of(new dk.medcom.video.api.api.AdditionalInformationType("key", "value")));
 
 		var createResponse = getClient()
 				.path("meetings")
@@ -398,6 +400,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var request = new PatchMeeting();
 		request.setDescription("SOME DESCRIPTION");
 		request.setGuestPinRequired(true);
+		request.setAdditionalInformation(List.of(createAdditionalInformationType("new key", "new value"), createAdditionalInformationType("another key", "another value")));
 		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
 		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
@@ -411,6 +414,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
 		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
 		assertEquals(true, getResponse.isGuestPinRequired());
+		assertEquals(2, getResponse.getAdditionalInformation().size());
+		assertTrue(getResponse.getAdditionalInformation().containsAll(request.getAdditionalInformation()));
 		assertEquals(originalSchedulingInfo.getHostPin(), updatedSchedulingInfo.getHostPin());
 		assertEquals(originalSchedulingInfo.getGuestPin(), updatedSchedulingInfo.getGuestPin());
 
@@ -429,6 +434,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertEquals(request.getHostPin(), updatedSchedulingInfo.getHostPin());
 		assertEquals(request.getGuestPin(), updatedSchedulingInfo.getGuestPin());
+		assertEquals(2, getResponse.getAdditionalInformation().size());
 	}
 
 	@Test

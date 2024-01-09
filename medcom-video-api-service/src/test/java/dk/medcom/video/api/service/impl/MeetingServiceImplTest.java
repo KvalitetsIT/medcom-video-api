@@ -237,6 +237,10 @@ public class MeetingServiceImplTest {
 		assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
 		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
 		assertEquals(meetingUser, meeting.getOrganizedByUser());
+		assertTrue(meeting.getMeetingAdditionalInfo().isEmpty());
+
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(meeting);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -266,6 +270,44 @@ public class MeetingServiceImplTest {
 		Optional<MeetingLabel> secondLabel = labels.stream().filter(x -> x.getLabel().equals("second label")).findFirst();
 		assertTrue(secondLabel.isPresent());
 		assertEquals("second label", secondLabel.get().getLabel());
+	}
+
+	@Test
+	public void testMeetingUpdatesAdditionalInformation() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
+		// Given
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
+
+		// When
+		updateMeetingDto.setAdditionalInformation(Arrays.asList(new AdditionalInformationType("one key", "one value"),
+				new AdditionalInformationType("two key", "two value"),
+				new AdditionalInformationType("three key", "three value")));
+		meetingService.updateMeeting(uuid, updateMeetingDto);
+
+		// Then
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
+		ArgumentCaptor<Iterable<MeetingAdditionalInfo>> addInfoCaptor = ArgumentCaptor.forClass(Iterable.class);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(addInfoCaptor.capture());
+
+		List<MeetingAdditionalInfo> additionalInfos = new ArrayList<>();
+		addInfoCaptor.getValue().forEach(additionalInfos::add);
+		assertEquals(3, additionalInfos.size());
+		Optional<MeetingAdditionalInfo> firstAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("one key")).findFirst();
+		assertTrue(firstAddInfo.isPresent());
+		assertEquals("one key", firstAddInfo.get().getInfoKey());
+		assertEquals("one value", firstAddInfo.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> secondAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("two key")).findFirst();
+		assertTrue(secondAddInfo.isPresent());
+		assertEquals("two key", secondAddInfo.get().getInfoKey());
+		assertEquals("two value", secondAddInfo.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> thirdAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("three key")).findFirst();
+		assertTrue(thirdAddInfo.isPresent());
+		assertEquals("three key", thirdAddInfo.get().getInfoKey());
+		assertEquals("three value", thirdAddInfo.get().getInfoValue());
 	}
 
 	@Test
@@ -301,6 +343,75 @@ public class MeetingServiceImplTest {
 		var savedMeeting = meetingArgumentCaptor.getValue();
 		assertEquals(patchMeetingDto.getDescription(), savedMeeting.getDescription());
 		assertEquals(patchMeetingDto.getGuestMicrophone().name(), savedMeeting.getGuestMicrophone().name());
+
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
+	}
+
+	@Test
+	public void testPatchUpdatesAdditionalInfoIfGiven() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
+		// Given
+		UUID uuid = UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fce");
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.AWAITS_PROVISION);
+
+		// When
+		var patchMeetingDto = new PatchMeetingDto();
+		patchMeetingDto.setAdditionalInformation(Arrays.asList(new AdditionalInformationType("one key", "one value"),
+				new AdditionalInformationType("two key", "two value"),
+				new AdditionalInformationType("three key", "three value")));
+		meetingService.patchMeeting(uuid, patchMeetingDto);
+
+		// Then
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
+		ArgumentCaptor<Iterable<MeetingAdditionalInfo>> addInfoCaptor = ArgumentCaptor.forClass(Iterable.class);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(addInfoCaptor.capture());
+
+		List<MeetingAdditionalInfo> additionalInfos = new ArrayList<>();
+		addInfoCaptor.getValue().forEach(additionalInfos::add);
+		assertEquals(3, additionalInfos.size());
+		Optional<MeetingAdditionalInfo> firstAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("one key")).findFirst();
+		assertTrue(firstAddInfo.isPresent());
+		assertEquals("one key", firstAddInfo.get().getInfoKey());
+		assertEquals("one value", firstAddInfo.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> secondAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("two key")).findFirst();
+		assertTrue(secondAddInfo.isPresent());
+		assertEquals("two key", secondAddInfo.get().getInfoKey());
+		assertEquals("two value", secondAddInfo.get().getInfoValue());
+
+		Optional<MeetingAdditionalInfo> thirdAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("three key")).findFirst();
+		assertTrue(thirdAddInfo.isPresent());
+		assertEquals("three key", thirdAddInfo.get().getInfoKey());
+		assertEquals("three value", thirdAddInfo.get().getInfoValue());
+	}
+
+	@Test
+	public void testPatchDoesNotUpdateAdditionalInfoIfNotGiven() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
+		// Given
+		UUID uuid = UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fce");
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.AWAITS_PROVISION);
+
+		// When
+		var patchMeetingDto = new PatchMeetingDto();
+		meetingService.patchMeeting(uuid, patchMeetingDto);
+
+		// Then
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
+		ArgumentCaptor<Iterable<MeetingAdditionalInfo>> addInfoCaptor = ArgumentCaptor.forClass(Iterable.class);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(addInfoCaptor.capture());
+
+		List<MeetingAdditionalInfo> additionalInfos = new ArrayList<>();
+		addInfoCaptor.getValue().forEach(additionalInfos::add);
+		assertEquals(1, additionalInfos.size());
+		System.out.println(additionalInfos.get(0).getInfoKey());
+		Optional<MeetingAdditionalInfo> firstAddInfo = additionalInfos.stream().filter(x -> x.getInfoKey().equals("SOME_KEY")).findFirst();
+		assertTrue(firstAddInfo.isPresent());
+		assertEquals("SOME_KEY", firstAddInfo.get().getInfoKey());
+		assertEquals("SOME_VALUE", firstAddInfo.get().getInfoValue());
 	}
 
 
@@ -317,6 +428,21 @@ public class MeetingServiceImplTest {
 
 		// Then
 		Mockito.verify(meetingLabelRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
+	}
+
+	@Test
+	public void deleteMeetingDeletesAdditionalInfo() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException, NotValidDataException {
+		// Given
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
+
+		// When
+		meetingService.deleteMeeting(uuid);
+
+		// Then
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
 	}
 
 	@Test
@@ -341,6 +467,9 @@ public class MeetingServiceImplTest {
 		assertEquals(updateMeetingDto.getProjectCode(), meeting.getProjectCode());
 		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
 		Assert.assertNotEquals(meetingUser, meeting.getOrganizedByUser());
+
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(meeting);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test
@@ -362,6 +491,9 @@ public class MeetingServiceImplTest {
 		assertEquals(meetingToCompare.getDescription(), meeting.getDescription());
 		assertEquals(meetingToCompare.getProjectCode(), meeting.getProjectCode());
 		Assert.assertNotEquals(meetingToCompare.getUpdatedTime(), meeting.getUpdatedTime());
+
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(meeting);
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
 	}
 
 	@Test(expected = NotAcceptableException.class)
@@ -379,6 +511,7 @@ public class MeetingServiceImplTest {
 
 		// Then
 		// assert Excpetion
+		Mockito.verifyNoMoreInteractions(meetingAdditionalInfoRepository);
 
 	}
 

@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.api.AdditionalInformationType;
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
 import dk.medcom.video.api.controller.exceptions.NotValidDataErrors;
@@ -16,6 +17,7 @@ import java.util.Collections;
 public class DomainMapper {
     public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting, SchedulingInfo schedulingInfo) {
         var updateMeeting = new UpdateMeeting();
+        updateMeeting.setMeetingAdditionalInfo(updateMeetingDto.getAdditionalInformation());
         updateMeeting.setLabels(updateMeetingDto.getLabels());
         updateMeeting.setSubject(updateMeetingDto.getSubject());
         updateMeeting.setEndTime(updateMeetingDto.getEndTime());
@@ -49,6 +51,7 @@ public class DomainMapper {
         updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).toList());
         updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
+        updateMeetingDto.setMeetingAdditionalInfo(meeting.getMeetingAdditionalInfo().stream().map(x -> new AdditionalInformationType(x.getInfoKey(), x.getInfoValue())).toList());
         if(schedulingInfo.getHostPin() != null) {
             updateMeetingDto.setHostPin(new BigDecimal(schedulingInfo.getHostPin()));
         }
@@ -115,6 +118,13 @@ public class DomainMapper {
             }
             else {
                 updateMeetingDto.setHostPin(new BigDecimal(patchMeetingDto.getHostPin()));
+            }
+        }
+        if (patchMeetingDto.isAdditionalInfoSet()) {
+            if (patchMeetingDto.getAdditionalInformation() == null) {
+                updateMeetingDto.setMeetingAdditionalInfo(Collections.emptyList());
+            } else {
+                updateMeetingDto.setMeetingAdditionalInfo(patchMeetingDto.getAdditionalInformation());
             }
         }
 

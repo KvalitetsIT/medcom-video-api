@@ -1261,6 +1261,10 @@ components:
           items:
             type: string
             description: Array of labels to attach to meeting.
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
     patch-meeting:
       type: object
       properties:
@@ -1316,6 +1320,10 @@ components:
           format: int32
           minimum: 10000
           maximum: 999999999
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
 
     scheduling-info:
       type: object

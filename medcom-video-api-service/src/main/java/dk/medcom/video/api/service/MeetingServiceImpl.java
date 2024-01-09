@@ -374,6 +374,22 @@ public class MeetingServiceImpl implements MeetingService {
 
 		meetingLabelRepository.saveAll(meetingLabels);
 
+		meetingAdditionalInfoRepository.deleteByMeeting(meeting);
+
+		List<MeetingAdditionalInfo> additionalInformation = new ArrayList<>();
+		updateMeetingDto.getMeetingAdditionalInfo().forEach(x -> {
+			MeetingAdditionalInfo meetingAdditionalInfo = new MeetingAdditionalInfo();
+			meetingAdditionalInfo.setInfoKey(x.key());
+			meetingAdditionalInfo.setInfoValue(x.value());
+			meetingAdditionalInfo.setMeeting(finalMeeting);
+			meetingAdditionalInfo.setCreatedTime(Instant.now());
+
+			additionalInformation.add(meetingAdditionalInfo);
+		});
+
+		meetingAdditionalInfoRepository.saveAll(additionalInformation);
+		meeting.setMeetingAdditionalInfo(new HashSet<>(additionalInformation));
+
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time and pin codes is allowed to be updated, because booking has status AWAITS_PROVISION");
 			schedulingInfoService.updateSchedulingInfo(uuid,

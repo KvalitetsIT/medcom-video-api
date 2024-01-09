@@ -58,6 +58,10 @@ public class PatchMeetingDto {
     @JsonIgnore
     private boolean guestPinSet;
 
+    private List<AdditionalInformationType> additionalInformation;
+    @JsonIgnore
+    private boolean additionalInfoSet;
+
 
     public String getSubject() {
         return subject;
@@ -200,5 +204,18 @@ public class PatchMeetingDto {
 
     public boolean isGuestPinSet() {
         return guestPinSet;
+    }
+
+    public List<AdditionalInformationType> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+        this.additionalInformation = additionalInformation;
+        this.additionalInfoSet = true;
+    }
+
+    public boolean isAdditionalInfoSet() {
+        return additionalInfoSet;
     }
 }
