@@ -427,6 +427,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 		// Then
 		assertNotNull(response);
+		assertEquals(2, response.getAdditionalInformation().size());
 
 		getResponse = videoMeetings.meetingsUuidGet(UUID.fromString(createResponse.getUuid()));
 		updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
