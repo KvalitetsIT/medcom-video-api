@@ -109,3 +109,7 @@ INSERT INTO scheduling_status (id, time_stamp, provision_status, provision_statu
 -- * meeting_labels *
 insert into meeting_labels(id, meeting_id, label) values(301, 7, 'first label');
 insert into meeting_labels(id, meeting_id, label) values(302, 7, 'second label');
+
+-- * meeting_additional_info *
+insert into meeting_additional_info(id, meeting_id, info_key, info_value) values(301, 7, 'first key', 'first value');
+insert into meeting_additional_info(id, meeting_id, info_key, info_value) values(302, 7, 'second key', 'second value');

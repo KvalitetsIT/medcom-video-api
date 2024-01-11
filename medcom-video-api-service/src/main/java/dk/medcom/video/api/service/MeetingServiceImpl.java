@@ -5,9 +5,7 @@ import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
-import dk.medcom.video.api.dao.MeetingLabelRepository;
-import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
@@ -19,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.*;
 
 public class MeetingServiceImpl implements MeetingService {
@@ -36,6 +35,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
+	private final MeetingAdditionalInfoRepository meetingAdditionalInfoRepository;
 
 	public MeetingServiceImpl(MeetingRepository meetingRepository,
 							  MeetingUserService meetingUserService,
@@ -47,7 +47,8 @@ public class MeetingServiceImpl implements MeetingService {
 							  OrganisationRepository organisationRepository,
 							  OrganisationTreeServiceClient organisationTreeServiceClient,
 							  AuditService auditClient,
-							  SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+							  SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+							  MeetingAdditionalInfoRepository meetingAdditionalInfoRepository) {
 	 	this.meetingRepository = meetingRepository;
 	 	this.meetingUserService = meetingUserService;
 	 	this.schedulingInfoService = schedulingInfoService;
@@ -59,6 +60,7 @@ public class MeetingServiceImpl implements MeetingService {
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditClient;
 		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
+		this.meetingAdditionalInfoRepository = meetingAdditionalInfoRepository;
 
 		this.idGenerator = new IdGeneratorImpl();
 	}
@@ -130,6 +132,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.reset("create meeting save");
 		meeting = saveMeetingWithShortLink(meeting, 0);
 		meetingLabelRepository.saveAll(meeting.getMeetingLabels());
+		meetingAdditionalInfoRepository.saveAll(meeting.getMeetingAdditionalInfo());
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("attach or create scheduling info");
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
@@ -298,6 +301,15 @@ public class MeetingServiceImpl implements MeetingService {
 			meeting.setGuestMicrophone(GuestMicrophone.on);
 		}
 
+		createMeetingDto.getAdditionalInformation().forEach(x -> {
+			MeetingAdditionalInfo meetingAdditionalInfo = new MeetingAdditionalInfo();
+			meetingAdditionalInfo.setInfoKey(x.key());
+			meetingAdditionalInfo.setInfoValue(x.value());
+			meetingAdditionalInfo.setCreatedTime(Instant.now());
+
+			meeting.addMeetingAdditionalInformation(meetingAdditionalInfo);
+		});
+
 		return meeting;
 	}
 
@@ -362,6 +374,22 @@ public class MeetingServiceImpl implements MeetingService {
 
 		meetingLabelRepository.saveAll(meetingLabels);
 
+		meetingAdditionalInfoRepository.deleteByMeeting(meeting);
+
+		List<MeetingAdditionalInfo> additionalInformation = new ArrayList<>();
+		updateMeetingDto.getMeetingAdditionalInfo().forEach(x -> {
+			MeetingAdditionalInfo meetingAdditionalInfo = new MeetingAdditionalInfo();
+			meetingAdditionalInfo.setInfoKey(x.key());
+			meetingAdditionalInfo.setInfoValue(x.value());
+			meetingAdditionalInfo.setMeeting(finalMeeting);
+			meetingAdditionalInfo.setCreatedTime(Instant.now());
+
+			additionalInformation.add(meetingAdditionalInfo);
+		});
+
+		meetingAdditionalInfoRepository.saveAll(additionalInformation);
+		meeting.setMeetingAdditionalInfo(new HashSet<>(additionalInformation));
+
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time and pin codes is allowed to be updated, because booking has status AWAITS_PROVISION");
 			schedulingInfoService.updateSchedulingInfo(uuid,
@@ -393,6 +421,7 @@ public class MeetingServiceImpl implements MeetingService {
 		schedulingInfoService.deleteSchedulingInfo(uuid);
 		schedulingStatusService.deleteSchedulingStatus(meeting);
 		meetingLabelRepository.deleteByMeeting(meeting);
+		meetingAdditionalInfoRepository.deleteByMeeting(meeting);
 		meetingRepository.delete(meeting);
 
 	}
@@ -521,7 +550,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
     public List<Meeting> searchMeetings(String search, Date fromStartTime, Date toStartTime) throws PermissionDeniedException {
-		Map<Long, Meeting> distinctMeetnings = new HashMap<>();
+		Map<Long, Meeting> distinctMeetings = new HashMap<>();
 
 		List<Meeting> meetings = getMeetingsByOrganizedBy(search);
 		meetings.addAll(getMeetingsByLabel(search));
@@ -537,11 +566,11 @@ public class MeetingServiceImpl implements MeetingService {
 			}
 
 			if(includeMeeting) {
-				distinctMeetnings.putIfAbsent(meeting.getId(), meeting);
+				distinctMeetings.putIfAbsent(meeting.getId(), meeting);
 			}
 		});
 
-		return new ArrayList<>(distinctMeetnings.values());
+		return new ArrayList<>(distinctMeetings.values());
     }
 
 	@Override

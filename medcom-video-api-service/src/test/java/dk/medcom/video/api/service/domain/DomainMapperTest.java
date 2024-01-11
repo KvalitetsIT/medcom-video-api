@@ -1,5 +1,6 @@
 package dk.medcom.video.api.service.domain;
 
+import dk.medcom.video.api.api.AdditionalInformationType;
 import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
@@ -35,6 +36,7 @@ public class DomainMapperTest {
         input.setOrganizedByEmail("ORG EMAIL");
         input.setSubject("SUBJECT");
         input.getLabels().add("LABEL");
+        input.getAdditionalInformation().add(new AdditionalInformationType("KEY", "VALUE"));
 
         // WHEN
         var service = new DomainMapper();
@@ -48,6 +50,9 @@ public class DomainMapperTest {
         assertEquals(input.getOrganizedByEmail(), result.getOrganizedByEmail());
         assertEquals(input.getSubject(), result.getSubject());
         assertEquals(input.getLabels(), result.getLabels());
+        assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
+        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
+        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
         assertEquals(meeting.getGuestMicrophone().toString(), result.getGuestMicrophone().toString());
         assertEquals(meeting.getGuestPinRequired(), result.isGuestPinRequired());
         assertEquals(schedulingInfo.getHostPin().longValue(), result.getHostPin().longValue());
@@ -79,6 +84,7 @@ public class DomainMapperTest {
         input.setGuestPinRequired(true);
         input.setHostPin(1234);
         input.setGuestPin(4321);
+        input.setAdditionalInformation(Collections.singletonList(new AdditionalInformationType("KEY", "VALUE")));
 
         // WHEN
         var service = new DomainMapper();
@@ -96,6 +102,9 @@ public class DomainMapperTest {
         assertEquals(input.isGuestPinRequired(), result.isGuestPinRequired());
         assertEquals(input.getHostPin().intValue(), result.getHostPin().intValue());
         assertEquals(input.getGuestPin().intValue(), result.getGuestPin().intValue());
+        assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
+        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
+        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
     }
 
     @Test

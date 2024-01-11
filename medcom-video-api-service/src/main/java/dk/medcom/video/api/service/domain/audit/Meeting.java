@@ -1,9 +1,9 @@
 package dk.medcom.video.api.service.domain.audit;
 
 import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.MeetingAdditionalInfo;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +26,7 @@ public class Meeting {
     private Set<String> meetingLabels = new HashSet<>();
     private GuestMicrophone guestMicrophone;
     private boolean guestPinRequired;
+    private Set<MeetingAdditionalInfo> meetingAdditionalInfo = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -169,5 +170,13 @@ public class Meeting {
 
     public void setGuestPinRequired(boolean guestPinRequired) {
         this.guestPinRequired = guestPinRequired;
+    }
+
+    public Set<MeetingAdditionalInfo> getAdditionalInfo() {
+        return meetingAdditionalInfo;
+    }
+
+    public void setAdditionalInfo(Set<MeetingAdditionalInfo> meetingAdditionalInfo) {
+        this.meetingAdditionalInfo = meetingAdditionalInfo;
     }
 }

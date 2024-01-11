@@ -6,7 +6,6 @@ import dk.medcom.video.api.api.MeetingDto;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.InfoApi;
-import io.swagger.client.api.OrganisationApi;
 import io.swagger.client.api.VideoMeetingsApi;
 import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.*;
@@ -48,14 +47,13 @@ import static org.junit.Assert.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	private VideoMeetingsApi videoMeetings;
-	private OrganisationApi organisationApi;
 	private VideoSchedulingInformationApi schedulingInfoApi;
 	private InfoApi infoApi;
 
 	@Before
 	public void setupApiClient() {
 		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
+				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		videoMeetings = new VideoMeetingsApi(apiClient);
@@ -63,11 +61,6 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		infoApi = new InfoApi(apiClient);
 
 		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
-
-		var organisationApiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort))
-				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
-		organisationApi = new OrganisationApi(apiClient);
 	}
 
 	@Test
@@ -77,7 +70,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		TemporaryFolder folder = new TemporaryFolder();
 		folder.create();
 
-		GenericContainer newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
+		GenericContainer<?> newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
 					.withNetwork(dockerNetwork)
 					.withVolumesFrom(resourceContainer, BindMode.READ_WRITE)
 					.withCommand("run /collections/medcom-video-api.postman_collection.json -r cli,junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi --global-var port=8081");
@@ -183,12 +176,16 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setUriWithoutDomain("12345");
 		createMeeting.setGuestPin(4321);
 		createMeeting.setHostPin(1234);
+		createMeeting.setAdditionalInformation(new ArrayList<>());
+		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key one", "value one"));
+		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key two", "value two"));
 
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(createdMeeting);
 		assertEquals(createMeeting.getExternalId(), createdMeeting.getExternalId());
 		assertEquals(2, createdMeeting.getLabels().size());
 		assertTrue(createMeeting.getLabels().containsAll(createdMeeting.getLabels()));
+		assertTrue(createMeeting.getAdditionalInformation().containsAll(createdMeeting.getAdditionalInformation()));
 
 		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
 		assertNotNull(schedulingInfo);
@@ -209,12 +206,14 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals(createMeeting.getExternalId(), updatedMeeting.getExternalId());
 		assertEquals(1, updatedMeeting.getLabels().size());
 		assertTrue(updateMeeting.getLabels().containsAll(updatedMeeting.getLabels()));
+		assertTrue(updatedMeeting.getAdditionalInformation().isEmpty());
 
 		var readMeeting = videoMeetings.meetingsUuidGet(createdMeeting.getUuid());
 		assertNotNull(readMeeting);
 		assertEquals(createMeeting.getExternalId(), readMeeting.getExternalId());
 		assertEquals(1, readMeeting.getLabels().size());
 		assertTrue(updateMeeting.getLabels().containsAll(readMeeting.getLabels()));
+		assertTrue(readMeeting.getAdditionalInformation().isEmpty());
 	}
 
 	@Test
@@ -335,6 +334,14 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		return createMeeting;
 	}
 
+	private AdditionalInformationType createAdditionalInformationType(String key, String value) {
+		var additionalInfo = new AdditionalInformationType();
+		additionalInfo.setKey(key);
+		additionalInfo.setValue(value);
+
+		return additionalInfo;
+	}
+
 	@Test
 	public void testCanCreateMeetingAndSearchByShortId() {
 		var createMeeting = new CreateMeetingDto();
@@ -378,6 +385,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setEndTime(inTwoHours);
 		createMeeting.setSubject("This is a subject!");
 		createMeeting.setGuestMicrophone(GuestMicrophone.muted);
+		createMeeting.setAdditionalInformation(List.of(new dk.medcom.video.api.api.AdditionalInformationType("key", "value")));
 
 		var createResponse = getClient()
 				.path("meetings")
@@ -392,6 +400,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var request = new PatchMeeting();
 		request.setDescription("SOME DESCRIPTION");
 		request.setGuestPinRequired(true);
+		request.setAdditionalInformation(List.of(createAdditionalInformationType("new key", "new value"), createAdditionalInformationType("another key", "another value")));
 		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
 		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
@@ -405,6 +414,8 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
 		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
 		assertEquals(true, getResponse.isGuestPinRequired());
+		assertEquals(2, getResponse.getAdditionalInformation().size());
+		assertTrue(getResponse.getAdditionalInformation().containsAll(request.getAdditionalInformation()));
 		assertEquals(originalSchedulingInfo.getHostPin(), updatedSchedulingInfo.getHostPin());
 		assertEquals(originalSchedulingInfo.getGuestPin(), updatedSchedulingInfo.getGuestPin());
 
@@ -423,6 +434,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertEquals(request.getHostPin(), updatedSchedulingInfo.getHostPin());
 		assertEquals(request.getGuestPin(), updatedSchedulingInfo.getGuestPin());
+		assertEquals(2, getResponse.getAdditionalInformation().size());
 	}
 
 	@Test
@@ -441,7 +453,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testCorsAllowed() throws IOException, InterruptedException {
-		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getContainerIpAddress(), videoApiPort)))
+		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getHost(), videoApiPort)))
 				.method("OPTIONS", HttpRequest.BodyPublishers.noBody())
 				.header("Origin", "http://allowed:4100")
 				.header("Access-Control-Request-Method", "POST")
@@ -454,7 +466,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 
 	@Test
 	public void testCorsDenied() throws IOException, InterruptedException {
-		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getContainerIpAddress(), videoApiPort)))
+		var request = HttpRequest.newBuilder(URI.create(String.format("http://%s:%s/api/meetings", videoApi.getHost(), videoApiPort)))
 				.method("OPTIONS", HttpRequest.BodyPublishers.noBody())
 				.header("Origin", "http://denied:4200")
 				.header("Access-Control-Request-Method", "POST")

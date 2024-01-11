@@ -55,6 +55,9 @@ public class Meeting {
 
 	private boolean guestPinRequired;
 
+	@OneToMany(mappedBy = "meeting")
+	private Set<MeetingAdditionalInfo> meetingAdditionalInfo = new HashSet<>();
+
 	public Long getId() {
 		return id;
 	}
@@ -193,5 +196,18 @@ public class Meeting {
 
 	public void setGuestPinRequired(boolean guestPinRequired) {
 		this.guestPinRequired = guestPinRequired;
+	}
+
+	public Set<MeetingAdditionalInfo> getMeetingAdditionalInfo() {
+		return meetingAdditionalInfo;
+	}
+
+	public void setMeetingAdditionalInfo(Set<MeetingAdditionalInfo> meetingAdditionalInformation) {
+		this.meetingAdditionalInfo = meetingAdditionalInformation;
+	}
+
+	public void addMeetingAdditionalInformation(MeetingAdditionalInfo meetingAdditionalInformation) {
+		meetingAdditionalInformation.setMeeting(this);
+		meetingAdditionalInfo.add(meetingAdditionalInformation);
 	}
 }

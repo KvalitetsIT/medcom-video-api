@@ -140,7 +140,9 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 										 MeetingLabelRepository meetingLabelRepository,
 										 OrganisationRepository organisationProxy,
 										 OrganisationTreeServiceClient organisationTreeServiceClient,
-										 AuditService auditClient, SchedulingInfoEventPublisher schedulingInfoEventPublisher) {
+										 AuditService auditClient,
+										 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+										 MeetingAdditionalInfoRepository meetingAdditionalInfoRepository) {
 		return new MeetingServiceImpl(
 				meetingRepository,
 				meetingUserService,
@@ -152,7 +154,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				organisationProxy,
 				organisationTreeServiceClient,
 				auditClient,
-				schedulingInfoEventPublisher);
+				schedulingInfoEventPublisher,
+				meetingAdditionalInfoRepository);
 	}
 
 	@Bean
