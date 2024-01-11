@@ -1,7 +1,5 @@
 package dk.medcom.video.api.service.domain;
 
-import dk.medcom.video.api.api.AdditionalInformationType;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;

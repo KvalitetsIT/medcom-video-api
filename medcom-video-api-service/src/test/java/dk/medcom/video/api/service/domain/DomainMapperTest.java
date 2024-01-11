@@ -50,7 +50,9 @@ public class DomainMapperTest {
         assertEquals(input.getOrganizedByEmail(), result.getOrganizedByEmail());
         assertEquals(input.getSubject(), result.getSubject());
         assertEquals(input.getLabels(), result.getLabels());
-        assertEquals(input.getAdditionalInformation(), result.getMeetingAdditionalInfo());
+        assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
+        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
+        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
         assertEquals(meeting.getGuestMicrophone().toString(), result.getGuestMicrophone().toString());
         assertEquals(meeting.getGuestPinRequired(), result.isGuestPinRequired());
         assertEquals(schedulingInfo.getHostPin().longValue(), result.getHostPin().longValue());
@@ -100,7 +102,9 @@ public class DomainMapperTest {
         assertEquals(input.isGuestPinRequired(), result.isGuestPinRequired());
         assertEquals(input.getHostPin().intValue(), result.getHostPin().intValue());
         assertEquals(input.getGuestPin().intValue(), result.getGuestPin().intValue());
-        assertEquals(input.getAdditionalInformation(), result.getMeetingAdditionalInfo());
+        assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
+        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
+        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
     }
 
     @Test
