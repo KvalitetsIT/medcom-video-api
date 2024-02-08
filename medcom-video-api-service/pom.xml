@@ -45,8 +45,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>3.0.6</version>
 		</dependency>
 
 		<!-- Bean validation -->
@@ -114,7 +115,7 @@
 		<!-- Test -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mysql</artifactId>
+			<artifactId>mariadb</artifactId>
 			<scope>test</scope>
 		</dependency>
 

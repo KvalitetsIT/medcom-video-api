@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 
 @Ignore
 public class IntegrationTest {
-	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
+	private static final Logger mariaDbLogger = LoggerFactory.getLogger("MariaDb");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	private static final Logger newmanLogger = LoggerFactory.getLogger("newman");
@@ -69,14 +69,14 @@ public class IntegrationTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+		MariaDBContainer mariadb = (MariaDBContainer) new MariaDBContainer("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername("videouser")
 				.withPassword("secret1234")
 				.withNetwork(dockerNetwork)
-				.withNetworkAliases("mysql");
-		mysql.start();
-		attachLogger(mysql, mysqlLogger);
+				.withNetworkAliases("mariadb");
+		mariadb.start();
+		attachLogger(mariadb, mariaDbLogger);
 
 		// Mock server
 		MockServerContainer userService = new MockServerContainer()
@@ -92,7 +92,7 @@ public class IntegrationTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
+				.withEnv("jdbc_url", "jdbc:mariadb://mariadb:3306/videodb?useSSL=false&serverTimezone=UTC")
 				.withEnv("jdbc_user", "videouser")
 				.withEnv("jdbc_pass", "secret1234")
 				.withEnv("userservice_url", "http://userservice:1080")
