@@ -11,7 +11,7 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.service.MeetingService;
-import dk.medcom.video.api.service.impl.RetryOnException;
+import dk.medcom.video.api.service.RetryOnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
