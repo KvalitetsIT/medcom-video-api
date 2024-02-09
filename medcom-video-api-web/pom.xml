@@ -31,12 +31,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-<!--		&lt;!&ndash; Test dependencies &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>junit</groupId>-->
-<!--			<artifactId>junit</artifactId>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
 	</dependencies>
 	<build>
 		<plugins>

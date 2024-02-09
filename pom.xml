@@ -10,24 +10,6 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.7.5</version>
 	</parent>
-	<repositories>
-		<repository>
-			<id>Central</id>
-			<url>https://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
-			<id>github-public</id>
-			<url>https://public:&#103;hp_Y6nRFazi9yNo0IMpxwTFIagW352c1539nyfn@maven.pkg.github.com/kvalitetsit/*</url>
-		</repository>
-		<repository>
-			<id>github-public1</id>
-			<url>https://public:&#103;hp_Y6nRFazi9yNo0IMpxwTFIagW352c1539nyfn@maven.pkg.github.com/kvalitetsit/*</url>
-		</repository>
-		<repository>
-			<id>github-public2</id>
-			<url>https://public:&#103;hp_Y6nRFazi9yNo0IMpxwTFIagW352c1539nyfn@maven.pkg.github.com/kvalitetsit/*</url>
-		</repository>
-	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,8 +42,9 @@
 
 			<dependency>
 				<groupId>org.testcontainers</groupId>
-				<artifactId>mysql</artifactId>
+				<artifactId>mariadb</artifactId>
 				<version>${testcontainers.version}</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>

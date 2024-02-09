@@ -23,8 +23,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 
@@ -53,14 +53,14 @@ public class TestApplication extends SpringBootServletInitializer {
 
         setupJetStream(n);
 
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+        MariaDBContainer mariadb = (MariaDBContainer) new MariaDBContainer("mariadb:10.6")
                 .withDatabaseName("videodb")
                 .withUsername("videouser")
                 .withPassword("secret1234")
                 .withNetwork(n);
 
-        mysql.start();
-        String jdbcUrl = mysql.getJdbcUrl();
+        mariadb.start();
+        String jdbcUrl = mariadb.getJdbcUrl();
         System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(1080)));
         System.setProperty("short.link.base.url", "http://shortlink");
@@ -80,10 +80,10 @@ public class TestApplication extends SpringBootServletInitializer {
         Consumer<CreateContainerCmd> cmd = e -> e.withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort)));
 
         System.out.println("------------------------");
-        System.out.println(mysql.getNetworkAliases().get(0));
+        System.out.println(mariadb.getNetworkAliases().get(0));
 
         HashMap<String, String> environmentMap = new HashMap<>();
-        environmentMap.put("PMA_HOST", (String) mysql.getNetworkAliases().get(0));
+        environmentMap.put("PMA_HOST", (String) mariadb.getNetworkAliases().get(0));
         environmentMap.put("PMA_USER", "videouser");
         environmentMap.put("PMA_PASSWORD", "secret1234");
         GenericContainer phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").

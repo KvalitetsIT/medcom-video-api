@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 
 public class IntegrationWithOrganisationServiceTest {
-	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
+	private static final Logger mariadbLogger = LoggerFactory.getLogger("mariadb");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
@@ -47,12 +47,11 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	protected static GenericContainer testOrganisationFrontend;
+	private static MariaDBContainer mariadb;
 	private static GenericContainer<?> jetStreamService;
 	private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
 	private static final String natsSubjectAudit = "natsSubject";
-	private static final MySQLContainer<?> mysql;
 
 	private static final String DB_USER = "videouser";
 	private static final String DB_PASSWORD = "secret1234";
@@ -75,14 +74,14 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mysql = new MySQLContainer<>("mysql:5.7")
+		mariadb = (MariaDBContainer) new MariaDBContainer("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
 				.withNetwork(dockerNetwork)
-				.withNetworkAliases("mysql");
-		mysql.start();
-		attachLogger(mysql, mysqlLogger);
+				.withNetworkAliases("mariadb");
+		mariadb.start();
+		attachLogger(mariadb, mariadbLogger);
 
 		// Mock server
 		MockServerContainer userService = new MockServerContainer()
@@ -116,7 +115,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
+				.withEnv("jdbc_url", "jdbc:mariadb://mariadb:3306/videodb?useSSL=false&serverTimezone=UTC")
 				.withEnv("jdbc_user", DB_USER)
 				.withEnv("jdbc_pass", DB_PASSWORD)
 				.withEnv("userservice_url", "http://userservice:1080")
@@ -196,7 +195,7 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	String getJdbcUrl() {
-		return mysql.getJdbcUrl();
+		return mariadb.getJdbcUrl();
 	}
 
 	public static void setupJetStream() throws JetStreamApiException, IOException, InterruptedException {
@@ -270,7 +269,7 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	void verifyRowExistsInDatabase(String sql) throws SQLException {
-		Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), DB_USER, DB_PASSWORD);
+		Connection conn = DriverManager.getConnection(mariadb.getJdbcUrl(), DB_USER, DB_PASSWORD);
 
 		Statement st = conn.createStatement();
 
