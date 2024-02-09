@@ -3,6 +3,7 @@ package dk.medcom.video.api.service;
 import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
 import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
+import dk.medcom.video.api.service.exception.MessagingException;
 import io.nats.client.JetStreamApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

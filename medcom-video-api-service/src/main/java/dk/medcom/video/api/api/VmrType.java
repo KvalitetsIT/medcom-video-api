@@ -6,7 +6,7 @@ public enum VmrType {
 
     private final int value;
 
-    private VmrType(int value) {
+    VmrType(int value) {
         this.value = value;
     }
     public int getValue() {
