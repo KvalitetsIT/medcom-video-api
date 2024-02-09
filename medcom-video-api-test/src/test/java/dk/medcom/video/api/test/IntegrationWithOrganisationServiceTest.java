@@ -3,7 +3,6 @@ package dk.medcom.video.api.test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.net.MediaType;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
@@ -11,12 +10,9 @@ import io.nats.client.Nats;
 import io.nats.client.api.StreamConfiguration;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
-import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
+import org.mockserver.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.*;
@@ -24,6 +20,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.DockerImageName;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -84,7 +81,7 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(mariadb, mariadbLogger);
 
 		// Mock server
-		MockServerContainer userService = new MockServerContainer()
+		MockServerContainer userService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("userservice");
 		userService.start();
@@ -93,7 +90,7 @@ public class IntegrationWithOrganisationServiceTest {
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// Organisation mock server
-		var organisationService = new MockServerContainer().
+		var organisationService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0")).
 				withNetwork(dockerNetwork).
 				withNetworkAliases("organisation");
 		organisationService.start();

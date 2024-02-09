@@ -4,7 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
