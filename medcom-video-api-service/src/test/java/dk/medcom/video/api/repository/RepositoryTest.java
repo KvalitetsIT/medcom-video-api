@@ -9,10 +9,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.testcontainers.containers.MariaDBContainer;
 
 import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
+import org.testcontainers.containers.MariaDBContainer;
 
 import java.util.TimeZone;
 
