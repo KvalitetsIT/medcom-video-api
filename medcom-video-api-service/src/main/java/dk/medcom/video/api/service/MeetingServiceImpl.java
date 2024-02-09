@@ -11,6 +11,8 @@ import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
+import dk.medcom.video.api.service.mapper.DomainMapper;
+import dk.medcom.video.api.service.mapper.SchedulingInfoEventMapper;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

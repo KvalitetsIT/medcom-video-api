@@ -7,7 +7,7 @@ public enum VmrQuality {
 
     private final int value;
 
-    private VmrQuality(int value) {
+    VmrQuality(int value) {
         this.value = value;
     }
     public int getValue() {

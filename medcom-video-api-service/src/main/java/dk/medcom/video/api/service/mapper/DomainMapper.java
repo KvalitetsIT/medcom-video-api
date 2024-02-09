@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.mapper;
 
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;

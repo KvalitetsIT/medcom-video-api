@@ -13,7 +13,7 @@ public enum ViewType {
     twentyfive_mains_zero_pips(9);
     private final int value;
 
-    private ViewType(int value) {
+    ViewType(int value) {
         this.value = value;
     }
     public int getValue() {
