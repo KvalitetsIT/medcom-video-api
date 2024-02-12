@@ -1,8 +1,13 @@
 package dk.medcom.video.api.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.Callable;
 
 public class RetryOnException {
+    private static final Logger logger = LoggerFactory.getLogger(RetryOnException.class);
+
     /**
      * Retry the function when retryException happens. Try at maximum for retryCount.
      * @param retryCount Number of times to retry at maximum.
@@ -15,6 +20,7 @@ public class RetryOnException {
     public static <R> R retry(int retryCount, Class<? extends Exception> retryException, Callable<R> callable) throws Exception {
         for(int i = 0; i < retryCount; i++) {
             try {
+                logger.debug("Calling method.");
                 return callable.call();
             }
             catch(Exception e) {
@@ -30,12 +36,15 @@ public class RetryOnException {
 
                 if(retryExceptionIsCause) {
                     if(i >= retryCount-1) {
+                        logger.info("Retried call {} times without success. Throwing exception.", retryCount);
                         throw e;
                     }
 
+                    logger.info("Retrying call. Retry {} out of {}.", i+1, retryCount);
                     Thread.sleep(100);
                 }
                 else {
+                    logger.debug("Exception not retryable. Throwing exception.");
                     throw e;
                 }
             }
