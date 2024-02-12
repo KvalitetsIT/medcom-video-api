@@ -23,6 +23,8 @@ public class PoolHistoryServiceImpl implements PoolHistoryService {
     @Override
     @Transactional
     public void calculateHistory() {
+        var start = System.currentTimeMillis();
+        logger.debug("Starting to calculate pool history.");
         var poolInfo = poolInfoRepository.getPoolInfos();
         logger.info("Found data for {} pools. Updating pool history.", poolInfo.size());
         poolInfo.forEach(x -> {
@@ -37,5 +39,7 @@ public class PoolHistoryServiceImpl implements PoolHistoryService {
             poolHistoryDao.create(poolHistory);
             logger.debug("Updated pool history for {} with {} desired rooms and {} available rooms.", poolHistory.getOrganisationCode(), poolHistory.getDesiredPoolSize(), poolHistory.getAvailablePoolRooms());
         });
+
+        logger.debug("Ended calculating pool history. Took {} ms.", System.currentTimeMillis() - start);
     }
 }
