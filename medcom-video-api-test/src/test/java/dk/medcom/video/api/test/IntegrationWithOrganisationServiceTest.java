@@ -166,7 +166,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
-				.waitingFor(Wait.forListeningPort()).withStartupTimeout(Duration.ofSeconds(180));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
+				.waitingFor(Wait.forHttp("/manage/actuator/health").forPort(8081).forStatusCode(200).withStartupTimeout(Duration.ofSeconds(180)));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		videoAdminApiPort = videoApi.getMappedPort(8081);
