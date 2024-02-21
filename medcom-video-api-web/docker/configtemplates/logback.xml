@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		
-  	<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+		<filter>dk.medcom.video.api.logging.ShedlockSqlLoggingFilter</filter>
+	  	<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
 			<providers>
 				<timestamp />
 				<pattern>
