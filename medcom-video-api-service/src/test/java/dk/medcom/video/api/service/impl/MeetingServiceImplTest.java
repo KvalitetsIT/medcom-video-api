@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 
 import java.sql.SQLException;
@@ -308,6 +309,24 @@ public class MeetingServiceImplTest {
 		assertTrue(thirdAddInfo.isPresent());
 		assertEquals("three key", thirdAddInfo.get().getInfoKey());
 		assertEquals("three value", thirdAddInfo.get().getInfoValue());
+	}
+
+	@Test
+	public void testMeetingUpdatesAdditionalInformationThrowsException() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
+		// Given
+		String uuid = "7cc82183-0d47-439a-a00c-38f7a5a01fce";
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.USER, null);
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid, ProvisionStatus.AWAITS_PROVISION);
+
+		Mockito.when(meetingAdditionalInfoRepository.saveAll(Mockito.any())).thenThrow(DataIntegrityViolationException.class);
+
+		// When + Then
+		var exception = assertThrows(NotValidDataException.class, () -> meetingService.updateMeeting(uuid, updateMeetingDto));
+		assertEquals(120, exception.getErrorCode());
+		assertEquals("Additional info keys not unique for meeting.", exception.getErrorText());
+
+		Mockito.verify(meetingAdditionalInfoRepository, times(1)).deleteByMeeting(Mockito.any(Meeting.class));
 	}
 
 	@Test
@@ -1214,6 +1233,36 @@ public class MeetingServiceImplTest {
 		Mockito.verify(schedulingInfoService, times(0)).createSchedulingInfo(Mockito.any(), Mockito.any());
 		Mockito.verify(schedulingInfoService, times(1)).attachMeetingToSchedulingInfo(result, Mockito.any(CreateMeetingDto.class));
 		Mockito.verify(meetingAdditionalInfoRepository, times(1)).saveAll(Mockito.any());
+	}
+
+	@Test
+	public void testCreateMeetingFailsOnDuplicateInfoKey() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
+
+		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
+		MeetingLabel label = new MeetingLabel();
+		label.setId(1L);
+		label.setLabel("label");
+
+		List<MeetingLabel> labels = List.of(label);
+		Mockito.when(meetingLabelRepository.saveAll(Mockito.anyList())).thenReturn(labels);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+		input.setLabels(List.of("label"));
+		input.setAdditionalInformation(Arrays.asList(new AdditionalInformationType("key one", "value 1"), new AdditionalInformationType("key one", "value 2")));
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, meetingLabelRepository, null);
+		Mockito.when(meetingAdditionalInfoRepository.saveAll(Mockito.any())).thenThrow(DataIntegrityViolationException.class);
+
+		var exception = assertThrows(NotValidDataException.class, () -> meetingService.createMeeting(input));
+		assertEquals(120, exception.getErrorCode());
+		assertEquals("Additional info keys not unique for meeting.", exception.getErrorText());
 	}
 
 	@Test

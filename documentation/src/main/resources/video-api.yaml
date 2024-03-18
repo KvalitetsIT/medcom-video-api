@@ -120,8 +120,12 @@ info:
     <Ul>
       <Li> Add additional_information to meeting and create-meeting.
     </Ul>
+    1.12.3
+    <Ul>
+      <Li> Add error message for duplicate key in additional information.
+    </Ul>
 
-  version: "1.12.0"
+  version: "1.12.3"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -2077,3 +2081,5 @@ components:
           errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'
         - errorCode: 110
           errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.'
+        - errorCode: 120
+          errorText: "Additional info keys not unique for meeting."

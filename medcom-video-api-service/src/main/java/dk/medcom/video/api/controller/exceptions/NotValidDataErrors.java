@@ -17,7 +17,8 @@ public enum NotValidDataErrors {
     CUSTOM_MEETING_ADDRESS_NOT_ALLOWED(80, "Organisation does not allow setting custom meeting address."),
     URI_ALREADY_USED(90, "Supplied URI already used"),
     URI_IS_INVALID(100, "Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9]." ),
-    SCHEDULING_INFO_RESERVATION_PIN_COMBINATION(110, "Scheduling info reservation can not be used in combination with guest pin and/or host pin.");
+    SCHEDULING_INFO_RESERVATION_PIN_COMBINATION(110, "Scheduling info reservation can not be used in combination with guest pin and/or host pin."),
+    ADDITIONAL_INFO_KEYS_NOT_UNIQUE_FOR_MEETING(120, "Additional info keys not unique for meeting.");
 
     private final int errorCode;
     private final String errorText;

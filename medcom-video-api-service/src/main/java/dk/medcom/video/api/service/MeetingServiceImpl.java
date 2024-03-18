@@ -134,7 +134,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.reset("create meeting save");
 		meeting = saveMeetingWithShortLink(meeting, 0);
 		meetingLabelRepository.saveAll(meeting.getMeetingLabels());
-		meetingAdditionalInfoRepository.saveAll(meeting.getMeetingAdditionalInfo());
+		saveAdditionalInfo(meeting.getMeetingAdditionalInfo());
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("attach or create scheduling info");
 		attachOrCreateSchedulingInfo(meeting, createMeetingDto);
@@ -377,8 +377,9 @@ public class MeetingServiceImpl implements MeetingService {
 		meetingLabelRepository.saveAll(meetingLabels);
 
 		meetingAdditionalInfoRepository.deleteByMeeting(meeting);
+		meetingAdditionalInfoRepository.flush();
 
-		List<MeetingAdditionalInfo> additionalInformation = new ArrayList<>();
+		Set<MeetingAdditionalInfo> additionalInformation = new HashSet<>();
 		updateMeetingDto.getMeetingAdditionalInfo().forEach(x -> {
 			MeetingAdditionalInfo meetingAdditionalInfo = new MeetingAdditionalInfo();
 			meetingAdditionalInfo.setInfoKey(x.key());
@@ -389,8 +390,8 @@ public class MeetingServiceImpl implements MeetingService {
 			additionalInformation.add(meetingAdditionalInfo);
 		});
 
-		meetingAdditionalInfoRepository.saveAll(additionalInformation);
-		meeting.setMeetingAdditionalInfo(new HashSet<>(additionalInformation));
+		saveAdditionalInfo(additionalInformation);
+		meeting.setMeetingAdditionalInfo(additionalInformation);
 
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION) {
 			LOGGER.debug("Start time and pin codes is allowed to be updated, because booking has status AWAITS_PROVISION");
@@ -434,6 +435,15 @@ public class MeetingServiceImpl implements MeetingService {
 		if (calendar.get(Calendar.YEAR) > 9999) {
 			LOGGER.debug("Date must be less than 9999 but is not. Actual value is: " + calendar.get(Calendar.YEAR));
 			throw new NotValidDataException(NotValidDataErrors.DATA_FORMAT_WRONG);
+		}
+	}
+
+	private void saveAdditionalInfo(Set<MeetingAdditionalInfo> additionalInfo) throws NotValidDataException {
+		try {
+			meetingAdditionalInfoRepository.saveAll(additionalInfo);
+		} catch (DataIntegrityViolationException e) {
+			LOGGER.debug("Cannot create duplicate additional info keys on meeting.", e);
+			throw new NotValidDataException(NotValidDataErrors.ADDITIONAL_INFO_KEYS_NOT_UNIQUE_FOR_MEETING);
 		}
 	}
 
