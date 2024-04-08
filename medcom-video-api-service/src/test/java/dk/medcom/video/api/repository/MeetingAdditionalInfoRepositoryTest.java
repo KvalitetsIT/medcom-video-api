@@ -9,6 +9,7 @@ import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.annotation.Resource;
 import java.time.Instant;
@@ -51,8 +52,7 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
         result.forEach(x -> count.getAndIncrement());
         assertEquals(2, count.get());
 
-        var additionalInformation = new ArrayList<MeetingAdditionalInfo>();
-        result.forEach(additionalInformation::add);
+        var additionalInformation = new ArrayList<>(result);
 
         var meetingAdditionalInfoOne = additionalInformation.stream().filter(x -> x.getInfoKey().equals("key one")).findFirst();
         assertTrue(meetingAdditionalInfoOne.isPresent());
@@ -74,6 +74,20 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
         assertTrue(additionalInfoOne.isEmpty());
         var additionalInfoTwo = additionalInfoRepository.findById(meetingAdditionalInfoTwo.get().getId());
         assertTrue(additionalInfoTwo.isEmpty());
+    }
+
+    @Test
+    public void testSaveAllDuplicateInfoKeyThrowsException() {
+        // Given
+        var meeting = setupMeeting();
+        meeting = meetingRepository.save(meeting);
+
+        Set<MeetingAdditionalInfo> meetingAdditionalInfos = new HashSet<>();
+        meetingAdditionalInfos.add(createAdditionalInfo("key", "value one", meeting));
+        meetingAdditionalInfos.add(createAdditionalInfo("key", "value two", meeting));
+
+        // When + Then
+        assertThrows(DataIntegrityViolationException.class, () -> additionalInfoRepository.saveAll(meetingAdditionalInfos));
     }
 
     private String createShortId() {
