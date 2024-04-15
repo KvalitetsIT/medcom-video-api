@@ -2,7 +2,7 @@ package dk.medcom.video.api.organisation;
 
 import dk.medcom.video.api.organisation.model.Organisation;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 

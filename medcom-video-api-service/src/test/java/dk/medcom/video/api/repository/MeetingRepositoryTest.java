@@ -9,8 +9,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
 import java.util.*;
 
 import static org.junit.Assert.*;

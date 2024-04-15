@@ -11,8 +11,8 @@ import io.swagger.client.api.VideoSchedulingInformationApi;
 import io.swagger.client.model.*;
 import org.junit.Test;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,7 +26,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 	public SchedulingInfoIT() {
 		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
+				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
@@ -141,7 +141,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testReserveSchedulingInformation_DefaultValues() throws ApiException {
 		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
+				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
@@ -160,7 +160,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testReserveSchedulingInformation() throws ApiException {
 		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
+				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
@@ -179,7 +179,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testUseReservedSchedulingInfo() throws ApiException {
 		var apiClient = new ApiClient()
-				.setBasePath(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort))
+				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
 		var videoMeetingApi = new VideoMeetingsApi(apiClient);

@@ -1,12 +1,12 @@
 package dk.medcom.video.api.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
@@ -15,9 +15,9 @@ import dk.medcom.video.api.controller.exceptions.UnauthorizedException;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.OrganisationRepository;
 
-public class UserSecurityInterceptor extends HandlerInterceptorAdapter {
+public class UserSecurityInterceptor implements HandlerInterceptor {
 	
-	private static Logger LOGGER = LoggerFactory.getLogger(UserSecurityInterceptor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserSecurityInterceptor.class);
 	
 	@Autowired
 	UserContextService userService;

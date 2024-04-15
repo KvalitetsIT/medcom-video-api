@@ -2,7 +2,7 @@ package dk.medcom.video.api.dao.entity;
 
 import dk.medcom.video.api.api.GuestMicrophone;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +50,7 @@ public class Meeting {
 	@OneToMany(mappedBy = "meeting")
 	private Set<MeetingLabel> meetingLabels = new HashSet<>();
 
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private GuestMicrophone guestMicrophone;
 
