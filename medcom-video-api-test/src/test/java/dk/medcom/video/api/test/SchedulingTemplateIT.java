@@ -1,9 +1,9 @@
 package dk.medcom.video.api.test;
 
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.SchedulingTemplateAdministrationApi;
-import io.swagger.client.model.*;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.api.SchedulingTemplateAdministrationApi;
+import org.openapitools.client.model.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +41,8 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setCustomPortalHost("some_portal_host");
         create.setReturnUrl("return_url");
         create.setGuestView(ViewType.FIVE_MAINS_SEVEN_PIPS);
+        create.setIvrTheme("ivr_theme");
+
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -52,16 +54,16 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertNotNull(result.getHostView());
         Assert.assertNotNull(result.getGuestView());
         Assert.assertNotNull(result.getVmrQuality());
-        Assert.assertTrue(result.isEnableOverlayText());
-        Assert.assertTrue(result.isGuestsCanPresent());
-        Assert.assertTrue(result.isForcePresenterIntoMain());
-        Assert.assertFalse(result.isForceEncryption());
-        Assert.assertFalse(result.isMuteAllGuests());
+        Assert.assertTrue(result.getEnableOverlayText());
+        Assert.assertTrue(result.getGuestsCanPresent());
+        Assert.assertTrue(result.getForcePresenterIntoMain());
+        Assert.assertFalse(result.getForceEncryption());
+        Assert.assertFalse(result.getMuteAllGuests());
         assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
         assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(create.getReturnUrl(), result.getReturnUrl());
         assertEquals(create.getGuestView(), result.getGuestView());
-        assertFalse(create.isIsPoolTemplate());
+        assertFalse(create.getIsPoolTemplate());
         assertEquals(DirectMedia.NEVER, result.getDirectMedia());
     }
 
@@ -80,6 +82,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
         create.setEnableOverlayText(false);
         create.setDirectMedia(DirectMedia.BEST_EFFORT);
+        create.setIvrTheme("ivr_theme");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -89,7 +92,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         Assert.assertNotNull(result);
         assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
-        assertEquals(create.isEnableOverlayText(), result.isEnableOverlayText());
+        assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
         assertEquals(create.getDirectMedia(), result.getDirectMedia());
     }
 
@@ -104,13 +107,14 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setGuestPinRequired(true);
         create.setUriNumberRangeLow(1);
         create.setUriNumberRangeHigh(100);
+        create.setIvrTheme("ivr_theme");
 
         UpdateSchedulingTemplate updateSchedulingTemplate = new UpdateSchedulingTemplate();
         updateSchedulingTemplate.setConferencingSysId(create.getConferencingSysId());
         updateSchedulingTemplate.setUriPrefix(create.getUriPrefix());
         updateSchedulingTemplate.setUriDomain(create.getUriDomain());
-        updateSchedulingTemplate.setHostPinRequired(create.isHostPinRequired());
-        updateSchedulingTemplate.setGuestPinRequired(create.isGuestPinRequired());
+        updateSchedulingTemplate.setHostPinRequired(create.getHostPinRequired());
+        updateSchedulingTemplate.setGuestPinRequired(create.getGuestPinRequired());
         updateSchedulingTemplate.setUriNumberRangeLow(create.getUriNumberRangeLow());
         updateSchedulingTemplate.setUriNumberRangeHigh(create.getUriNumberRangeHigh());
         updateSchedulingTemplate.setVmrType(VmrType.LECTURE);
@@ -120,21 +124,22 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
         updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
         updateSchedulingTemplate.setDirectMedia(DirectMedia.BEST_EFFORT);
+        updateSchedulingTemplate.setIvrTheme("ivr_theme");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
-        schedulingTemplate.schedulingTemplatesIdPut(updateSchedulingTemplate, resultCreate.getId());
+        schedulingTemplate.schedulingTemplatesIdPut(resultCreate.getId(), updateSchedulingTemplate);
         SchedulingTemplate result = schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
         Assert.assertNotNull(result);
         assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
-        assertEquals(updateSchedulingTemplate.isEnableOverlayText(), result.isEnableOverlayText());
+        assertEquals(updateSchedulingTemplate.getEnableOverlayText(), result.getEnableOverlayText());
         assertEquals(updateSchedulingTemplate.getCustomPortalGuest(), result.getCustomPortalGuest());
         assertEquals(updateSchedulingTemplate.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
-        assertFalse(result.isIsPoolTemplate());
+        assertFalse(result.getIsPoolTemplate());
         assertEquals(DirectMedia.BEST_EFFORT, result.getDirectMedia());
     }
 
@@ -149,6 +154,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         createOne.setUriNumberRangeLow(1);
         createOne.setUriNumberRangeHigh(100);
         createOne.setIsPoolTemplate(true);
+        createOne.setIvrTheme("ivr_theme");
 
         CreateSchedulingTemplate createTwo = new CreateSchedulingTemplate();
         createTwo.setConferencingSysId(43);
@@ -159,6 +165,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         createTwo.setUriNumberRangeLow(1);
         createTwo.setUriNumberRangeHigh(100);
         createTwo.setIsPoolTemplate(true);
+        createTwo.setIvrTheme("ivr_theme");
 
         CreateSchedulingTemplate createThree = new CreateSchedulingTemplate();
         createThree.setConferencingSysId(43);
@@ -168,11 +175,12 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         createThree.setGuestPinRequired(true);
         createThree.setUriNumberRangeLow(1);
         createThree.setUriNumberRangeHigh(100);
+        createThree.setIvrTheme("ivr_theme");
 
         SchedulingTemplate resultCreateOne = schedulingTemplate.schedulingTemplatesPost(createOne);
         SchedulingTemplate resultOne = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreateOne.getId());
         assertNotNull(resultOne);
-        assertTrue(resultOne.isIsPoolTemplate());
+        assertTrue(resultOne.getIsPoolTemplate());
 
         var expectedExceptionCreate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesPost(createTwo));
         assertEquals(406, expectedExceptionCreate.getCode());
@@ -181,19 +189,19 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate resultCreateThree = schedulingTemplate.schedulingTemplatesPost(createThree);
         SchedulingTemplate resultThree = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreateThree.getId());
         assertNotNull(resultThree);
-        assertFalse(resultThree.isIsPoolTemplate());
+        assertFalse(resultThree.getIsPoolTemplate());
 
         UpdateSchedulingTemplate updateSchedulingTemplateThree = new UpdateSchedulingTemplate();
         updateSchedulingTemplateThree.setConferencingSysId(createThree.getConferencingSysId());
         updateSchedulingTemplateThree.setUriPrefix(createThree.getUriPrefix());
         updateSchedulingTemplateThree.setUriDomain(createThree.getUriDomain());
-        updateSchedulingTemplateThree.setHostPinRequired(createThree.isHostPinRequired());
-        updateSchedulingTemplateThree.setGuestPinRequired(createThree.isGuestPinRequired());
+        updateSchedulingTemplateThree.setHostPinRequired(createThree.getHostPinRequired());
+        updateSchedulingTemplateThree.setGuestPinRequired(createThree.getGuestPinRequired());
         updateSchedulingTemplateThree.setUriNumberRangeLow(createThree.getUriNumberRangeLow());
         updateSchedulingTemplateThree.setUriNumberRangeHigh(createThree.getUriNumberRangeHigh());
         updateSchedulingTemplateThree.setIsPoolTemplate(true);
 
-        var expectedExceptionUpdate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesIdPut(updateSchedulingTemplateThree, resultThree.getId()));
+        var expectedExceptionUpdate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesIdPut(resultThree.getId(), updateSchedulingTemplateThree));
         assertEquals(406, expectedExceptionUpdate.getCode());
         assertTrue(expectedExceptionUpdate.getResponseBody().contains("Create or update of pool template failed due to only one pool template allowed"));
     }

@@ -16,6 +16,8 @@
 		<dependency>
 			<groupId>dk.medcom.video.api</groupId>
 			<artifactId>documentation</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
 		</dependency>
 
 		<dependency>

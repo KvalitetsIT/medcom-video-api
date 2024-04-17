@@ -124,6 +124,10 @@ info:
     <Ul>
       <Li> Add error message for duplicate key in additional information.
     </Ul>
+    1.13.0
+    <UL>
+      <Li> Update documentation to match source code.
+    </UL>
 
   version: "1.12.3"
   contact:
@@ -1056,6 +1060,9 @@ components:
         shortLink:
           type: string
           example: https://m.vconf.dk/abcdefghijkl
+        shortlink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
         externalId:
           type: string
           maxLength: 200
@@ -1339,7 +1346,6 @@ components:
         - uriWithDomain
         - uriWithoutDomain
         - provisionStatus
-        - meetingDetails
       properties:
         uuid:
           type: string
@@ -1373,6 +1379,7 @@ components:
           type: string
           maxLength: 100
           example: 1782
+          nullable: true
         provisionStatus:
           $ref: '#/components/schemas/provisionStatus'
         provisionStatusDescription:
@@ -1468,6 +1475,14 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
+        shortLink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
+        shortlink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
     create-scheduling-info:
       type: object
       required:
@@ -1498,9 +1513,6 @@ components:
           maxLength: 50
     meetingUser:
       type: object
-      required:
-        - organisationId
-        - email
       properties:
         organisationId:
           type: string
@@ -1594,7 +1606,7 @@ components:
         - uriDomain
         - hostPinRequired
         - guestPinRequired
-        - vmrAvailableBefore
+        - vMRAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriNumberRangeLow
@@ -1644,7 +1656,7 @@ components:
           type: integer
           format: int32
           example: 9999
-        vmrAvailableBefore:
+        vMRAvailableBefore:
           type: integer
           format: int32
           example: 30

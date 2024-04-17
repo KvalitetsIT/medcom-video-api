@@ -4,11 +4,11 @@ import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.VideoMeetingsApi;
-import io.swagger.client.api.VideoSchedulingInformationApi;
-import io.swagger.client.model.*;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.api.VideoMeetingsApi;
+import org.openapitools.client.api.VideoSchedulingInformationApi;
+import org.openapitools.client.model.*;
 import org.junit.Test;
 
 import jakarta.ws.rs.client.Entity;
@@ -133,7 +133,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		updateSchedulingInfo.setProvisionStatusDescription("DET GIK GODT");
 		updateSchedulingInfo.setProvisionVmrId(UUID.randomUUID().toString());
 
-		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidPut(updateSchedulingInfo, createdSchedulingInfo.getUuid());
+		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidPut(createdSchedulingInfo.getUuid(), updateSchedulingInfo);
 
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain is null and uri_without_domain is null and uuid = '" + updatedSchedulingInfo.getUuid() + "'");
 	}
