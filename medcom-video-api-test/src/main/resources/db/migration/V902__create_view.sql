@@ -20,8 +20,8 @@ CREATE TABLE entities (
   KEY idx_provisionstatus_type (provision_status,type)
 );
 
----- * view entities meetingrooms *
---CREATE OR REPLACE view view_entities_meetingroom AS
+-- -- * view entities meetingrooms *
+-- CREATE OR REPLACE view view_entities_meetingroom AS
 --  SELECT    t1.uuid                                 AS uuid,
 --            t1.group_id                             AS group_id,
 --            t1.name                                 AS name,

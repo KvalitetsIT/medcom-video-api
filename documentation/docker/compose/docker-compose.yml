@@ -1,7 +1,6 @@
-version: '2.1'
 services:
    mysql:
-     image: mysql:5.7
+     image: mariadb:10.6
      environment:
       - MYSQL_ROOT_PASSWORD=rootroot
       - MYSQL_DATABASE=videodb
@@ -12,42 +11,22 @@ services:
       interval: 2s
       timeout: 2s
       retries: 50
-   testfrontend:
-     image: kvalitetsit/gooioidwsrest:1.1.14
-     command:
-      - "-config"
-      - "/caddy/config.json"
-     volumes:
-      - ./frontend.json:/caddy/config.json
      ports:
-      - 8080:80
+      - "3306:3306"
    videoapiservice:
+# NB: NATS/Jetstream mangler for at servicen kan starte
      image: kvalitetsit/medcom-video-api:latest
-#     image: kvalitetsit/medcom-video-api:1.5.8
      environment:
-      - jdbc_url=jdbc:mysql://mysql:3306/videodb?useSSL=false
+      - jdbc_url=jdbc:mariadb://mysql:3306/videodb?useSSL=false
       - jdbc_user=orguser
       - jdbc_pass=secret1234
-      - usercontext_header_name=X-Test-Auth
-
-      - userattributes_role_key=UserRoles
-      - userattributes_org_key=organisation
-
-      - userrole_admin_values=adminrole
-      - userrole_user_values=userrole1,userrole2
-      - userrole_monitor_values=monitorrole
-      - userrole_provisioner_values=provisionerrole
 
       - userservice_url=""
-      - userattributes.role.key="dk:medcom:video:role"
-      - userservice_token_attribute_userrole="dk:medcom:video:role"
       - userservice_token_attribute_organisation="dk:medcom:organisation_id"
       - userservice_token_attribute_username="dk:medcom:email"
-      - userservice_token_attribute_email="dk:medcom:email"
-      - mapping.role.provisioner="meeting-provision"
-      - mapping.role.admin="meeting-admin"
-      - mapping.role.user="meeting-user"
-      - mapping.role.meeting_planner="meeting-planner"
+      - userservice.token.attribute.email="dk:medcom:email"
+      - userservice.token.attribute.userrole="dk:medcom:video:role"
+      - userservice.token.attribute.auto.create.organisation=""
 
       - scheduling.template.default.conferencing.sys.id=22
       - scheduling.template.default.uri.prefix=""
@@ -65,16 +44,35 @@ services:
       - scheduling.template.default.uri.number.range.high=99990
       - scheduling.template.default.ivr.theme=10
       - scheduling.info.citizen.portal=""
+
+      - mapping.role.provisioner="meeting-provision"
+      - mapping.role.admin="meeting-admin"
+      - mapping.role.user="meeting-user"
+      - mapping.role.meeting_planner="meeting-planner"
+
+      - organisation.service.enabled=false
+      - organisation.service.endpoint=""
+      - organisationtree.service.endpoint=""
+
       - short.link.base.url=""
 
-      - organisationtree.service.endpoint=""
       - overflow.pool.organisation.id=0
 
+      - ALLOWED_ORIGINS=""
+      - audit.nats.url=""
+      - audit.nats.subject=""
       - audit.nats.disabled=true
+      - events.nats.subject.scheduling-info=""
+
+      - event.organisation.filter="some_random_org_that_does_not_exist"
+      - pool.fill.organisation.user="some@email"
+      - pool.fill.organisation="some_org"
+      - pool.fill.interval="PT1M"
+      - LOG_LEVEL=debug
      depends_on:
       mysql:
        condition: service_healthy
-   documenatation-and-test:
+   documentation-and-test:
      image: kvalitetsit/medcom-video-api-documentation:latest
      environment:
       - BASE_URL=/test

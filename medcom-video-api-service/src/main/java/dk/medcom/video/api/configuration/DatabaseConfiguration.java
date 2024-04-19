@@ -4,10 +4,11 @@ import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.EntitiesIvrThemeDaoImpl;
 import dk.medcom.video.api.dao.PoolHistoryDaoImpl;
 import dk.medcom.video.api.dao.PoolInfoRepositoryImpl;
-import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,6 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @ComponentScan("dk.medcom.video.api.dao.impl")
@@ -66,11 +66,12 @@ public class DatabaseConfiguration {
 		return dataSource;
 	}
 
-	@Bean(initMethod = "migrate")
-	public Flyway flyway(DataSource dataSource, @Value("${spring.flyway.locations:classpath:db/migration}") List<String> locations) {
-		return Flyway.configure()
-				.dataSource(dataSource)
-				.locations(locations.toArray(String[]::new))
-				.load();
+	@Bean
+	@ConditionalOnProperty(value="baseline.flyway", havingValue = "true")
+	public FlywayMigrationStrategy cleanMigrateStrategy() {
+		return flyway -> {
+			flyway.baseline();
+			throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
+		};
 	}
 }
