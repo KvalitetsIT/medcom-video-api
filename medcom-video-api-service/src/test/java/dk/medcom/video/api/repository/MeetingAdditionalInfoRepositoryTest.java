@@ -11,7 +11,7 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

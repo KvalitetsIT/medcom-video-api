@@ -1,6 +1,6 @@
 package dk.medcom.video.api.repository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 
 import org.junit.BeforeClass;
@@ -33,7 +33,7 @@ abstract public class RepositoryTest {
 	@BeforeClass
 	public static void setupMariaDbJdbcUrl() {
 		if(!initialized) {
-			MariaDBContainer mariadb = new MariaDBContainer("mariadb:10.6")
+			MariaDBContainer<?> mariadb = new MariaDBContainer<>("mariadb:10.6")
 					.withDatabaseName("videodb")
 					.withUsername("videouser")
 					.withPassword("secret1234");

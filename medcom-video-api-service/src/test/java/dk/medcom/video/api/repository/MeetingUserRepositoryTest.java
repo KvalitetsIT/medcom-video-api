@@ -7,7 +7,7 @@ import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 //import dk.medcom.video.api.context.UserContext;
 
@@ -45,7 +45,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindMeetingUserWithExistingId() {
 		// Given
-		Long id = new Long(101);
+		Long id = 101L;
 		
 		// When
 		MeetingUser meetingUser = subject.findById(id).orElse(null);
@@ -61,7 +61,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindMeetingUserWithNonExistingId() {
 		// Given
-		Long id = new Long(3);
+		Long id = 3L;
 		
 		// When
 		MeetingUser meetingUser = subject.findById(id).orElse(null);
@@ -73,7 +73,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindMeetingUserWithExistingOrganisationAndEmail() {
 		// Given
-		Long organisationId = new Long(6);
+		Long organisationId = 6L;
 		
 		String existingEmail = "me@me102.dk";
 		
@@ -84,7 +84,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		
 		// Then
 		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(new Long(102), meetingUser.getId());
+		Assert.assertEquals(102L, meetingUser.getId(), 0);
 		Assert.assertEquals(organisation.getName(), meetingUser.getOrganisation().getName());
 		Assert.assertEquals(existingEmail, meetingUser.getEmail());
 	}
@@ -92,7 +92,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindMeetingUserWithNonExistingOrganisationAndEmail() {
 		// Given
-		Long organisationId = new Long(3);
+		Long organisationId = 3L;
 		String nonExistingEmail = "xxxxx";
 		
 		Organisation organisation = subjectO.findById(organisationId).orElse(null);

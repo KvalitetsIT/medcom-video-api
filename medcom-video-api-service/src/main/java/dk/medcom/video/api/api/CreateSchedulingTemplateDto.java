@@ -2,8 +2,8 @@ package dk.medcom.video.api.api;
 
 import org.springframework.hateoas.RepresentationModel;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CreateSchedulingTemplateDto extends RepresentationModel {
 	@NotNull

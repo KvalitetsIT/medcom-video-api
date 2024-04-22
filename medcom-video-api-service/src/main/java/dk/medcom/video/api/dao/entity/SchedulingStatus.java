@@ -2,15 +2,7 @@ package dk.medcom.video.api.dao.entity;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
 import dk.medcom.video.api.api.ProvisionStatus;
 
@@ -22,6 +14,7 @@ public class SchedulingStatus {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private Date timeStamp;
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ProvisionStatus provisionStatus;
 	private String provisionStatusDescription;

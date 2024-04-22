@@ -8,7 +8,6 @@ import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
 import io.nats.client.api.StreamConfiguration;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
@@ -22,9 +21,9 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.DockerImageName;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -44,7 +43,7 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	private static MariaDBContainer mariadb;
+	private static final MariaDBContainer<?> mariadb;
 	private static GenericContainer<?> jetStreamService;
 	private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
@@ -71,7 +70,7 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mariadb = (MariaDBContainer) new MariaDBContainer("mariadb:10.6")
+		mariadb = new MariaDBContainer<>("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
@@ -86,7 +85,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withNetworkAliases("userservice");
 		userService.start();
 		attachLogger(userService, mockServerLogger);
-		MockServerClient mockServerClient = new MockServerClient(userService.getContainerIpAddress(), userService.getMappedPort(1080));
+		MockServerClient mockServerClient = new MockServerClient(userService.getHost(), userService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// Organisation mock server
@@ -95,7 +94,7 @@ public class IntegrationWithOrganisationServiceTest {
 				withNetworkAliases("organisation");
 		organisationService.start();
 		attachLogger(organisationService, organisationLogger);
-		mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
+		mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
@@ -210,8 +209,8 @@ public class IntegrationWithOrganisationServiceTest {
 		jetStreamService.start();
 		attachLogger(jetStreamService, jetStreamLogger);
 
-		jetStreamPath = "nats://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(4222);
-		var natsHttpPath = "http://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(8222);
+		jetStreamPath = "nats://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(4222);
+		var natsHttpPath = "http://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(8222);
 		logger.info("NATS path: " + jetStreamPath);
 		logger.info("NATS http path: " + natsHttpPath);
 
@@ -230,7 +229,7 @@ public class IntegrationWithOrganisationServiceTest {
 		}
 	}
 
-	protected static void attachLogger(GenericContainer container, Logger logger) {
+	protected static void attachLogger(GenericContainer<?> container, Logger logger) {
 		logger.info("Attaching logger to container: " + container.getContainerInfo().getName());
 
 		Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(logger);
@@ -245,8 +244,8 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 
-		return ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
+		return ClientBuilder.newClient().register(provider)
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getHost(), videoAdminApiPort)));
 	}
 
 	WebTarget getClient() {
@@ -257,8 +256,8 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 
-		return ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
+		return ClientBuilder.newClient().register(provider)
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)));
 	}
 
 	private static HttpResponse getResponse() {

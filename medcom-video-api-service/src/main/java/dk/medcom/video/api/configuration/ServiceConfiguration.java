@@ -35,7 +35,7 @@ import java.util.List;
 
 @Configuration
 @EnableAspectJAutoProxy
-@ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect"})
+@ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect", "dk.kvalitetsit.audit"})
 public class ServiceConfiguration implements WebMvcConfigurer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 

@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.LinkedList;
@@ -20,9 +20,9 @@ import java.util.List;
 @Component
 public class WspUserContext extends RestTemplate implements UserContextFactory {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(WspUserContext.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WspUserContext.class);
 
-	private ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+	private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	@Value("${SESSION.ID:SESSION}")
 	private String sessionId;
@@ -114,14 +114,14 @@ public class WspUserContext extends RestTemplate implements UserContextFactory {
 		if (response.getStatusCode().equals(HttpStatus.OK)) {
 			return response.getBody();
 		} else {
-			LOGGER.error("return code from getsessiondata:"+response.getStatusCodeValue());
+			LOGGER.error("return code from getsessiondata:"+response.getStatusCode().value());
 			return null;
 		}
 	}		
 
 	public SessionData parseSessionDataValue(String encoded) {
 		LOGGER.debug("Parsing session data");
-		String decoded = "";
+		String decoded;
 		try {
 			LOGGER.debug("Decoding session data.");
 			decoded = new String(Base64.getDecoder().decode(encoded));

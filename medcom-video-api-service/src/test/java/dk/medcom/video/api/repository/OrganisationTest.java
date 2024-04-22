@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import dk.medcom.video.api.dao.OrganisationRepository;
 import org.junit.Assert;
@@ -67,7 +67,7 @@ public class OrganisationTest extends RepositoryTest {
 	@Test
 	public void testFindOrganisationWithExistingId() {
 		// Given
-		Long id = new Long(1);
+		Long id = 1L;
 		
 		// When
 		Organisation organisation = subject.findById(id).orElse(null);
@@ -84,7 +84,7 @@ public class OrganisationTest extends RepositoryTest {
 	@Test
 	public void testFindOrganisationWithNonExistingId() {
 		// Given
-		Long id = new Long(1999);
+		Long id = 1999L;
 		
 		// When
 		Organisation organisation = subject.findById(id).orElse(null);

@@ -11,19 +11,16 @@
 
     <artifactId>documentation</artifactId>
     <properties>
-        <swagger-core-version>2.2.15</swagger-core-version>
-        <okhttp-version>2.7.5</okhttp-version>
+        <okhttp-version>4.12.0</okhttp-version>
         <gson-version>2.10.1</gson-version>
-        <gson-fire-version>1.8.5</gson-fire-version>
-        <threetenbp-version>1.6.8</threetenbp-version>
-        <commons-lang3-version>3.12.0</commons-lang3-version>
-        <javax-annotation-version>1.0</javax-annotation-version>
+        <gson-fire-version>1.9.0</gson-fire-version>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-core-version}</version>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -31,40 +28,37 @@
             <artifactId>jsr305</artifactId>
             <version>3.0.2</version>
         </dependency>
+
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
+            <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>${okhttp-version}</version>
         </dependency>
+
         <dependency>
-            <groupId>com.squareup.okhttp</groupId>
+            <groupId>com.squareup.okhttp3</groupId>
             <artifactId>logging-interceptor</artifactId>
             <version>${okhttp-version}</version>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson-version}</version>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.gsonfire</groupId>
             <artifactId>gson-fire</artifactId>
             <version>${gson-fire-version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.threeten</groupId>
-            <artifactId>threetenbp</artifactId>
-            <version>${threetenbp-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <version>${javax-annotation-version}</version>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -114,17 +108,11 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
-                <groupId>io.swagger.codegen.v3</groupId>
-                <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.23</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.jknack</groupId>
-                        <artifactId>handlebars</artifactId>
-                        <version>4.3.0</version>
-                    </dependency>
-                </dependencies>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.4.0</version>
                 <executions>
                     <execution>
                         <id>video-api</id>
@@ -133,53 +121,22 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/video-api.yaml</inputSpec>
-                            <language>java</language>
-                            <generateModelTests>false</generateModelTests>
-                            <generateApiTests>false</generateApiTests>
-
+                            <generatorName>java</generatorName>
                             <configOptions>
+                                <sourceFolder>src/test/java</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>organisation-service</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/organisationservice.yaml</inputSpec>
-<!--                            <output>${project.build.directory}/generated-sources/organisationservice</output>-->
-                            <language>java</language>
-                            <generateModelTests>false</generateModelTests>
+                            <output>${project.build.directory}/generated-test-sources/openapi/test</output>
                             <generateApiTests>false</generateApiTests>
-
-                            <configOptions>
-                                <dateLibrary>java8</dateLibrary>
-                            </configOptions>
+                            <generateModelTests>false</generateModelTests>
+                            <addTestCompileSourceRoot>true</addTestCompileSourceRoot>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/java/</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -199,6 +156,19 @@
                     <commitIdGenerationMode>full</commitIdGenerationMode>
                     <format>json</format>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
