@@ -133,6 +133,20 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testCanReadMeetingWithTrailingSlash() {
+		var result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc2/")
+				.request()
+				.get(MeetingDto.class);
+
+		assertNotNull(result);
+		assertEquals(12, result.getShortId().length());
+		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
+		assertEquals("external_id", result.getExternalId());
+	}
+
+	@Test
 	public void testUriWithDomain() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);

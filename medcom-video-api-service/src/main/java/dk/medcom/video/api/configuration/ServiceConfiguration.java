@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Collections;
@@ -292,5 +293,10 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {
 		return new PrometheusScrapeEndpoint(collectorRegistry);
+	}
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.setUseTrailingSlashMatch(true);
 	}
 }
