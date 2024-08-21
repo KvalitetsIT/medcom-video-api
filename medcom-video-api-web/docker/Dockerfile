@@ -20,6 +20,6 @@ ENV management_endpoints_web_base-path=/manage/actuator
 ENV spring_mvc_pathmatch_matching-strategy=ant_path_matcher
 ENV management_endpoints_web_exposure_include=*
 
-USER appuser
+USER 11001
 
 ENTRYPOINT [ "/home/appuser/entrypoint.sh" ]
