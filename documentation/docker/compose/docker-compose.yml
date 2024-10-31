@@ -74,6 +74,7 @@ services:
        condition: service_healthy
    documentation-and-test:
      image: kvalitetsit/medcom-video-api-documentation:latest
+     user: "1000:1000"
      environment:
       - BASE_URL=/test
      ports:
