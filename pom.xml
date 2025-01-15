@@ -103,13 +103,13 @@
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-core</artifactId>
-				<version>10.11.0</version>
+				<version>10.22.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-mysql</artifactId>
-				<version>10.11.0</version>
+				<version>10.22.0</version>
 			</dependency>
 
 			<!-- Request ID logger -->
@@ -165,7 +165,7 @@
 			<dependency>
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
-				<version>7.4</version>
+				<version>8.0</version>
 				<scope>runtime</scope>
 			</dependency>
 		</dependencies>
