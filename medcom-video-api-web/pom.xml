@@ -28,6 +28,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-access</artifactId>
+			<version>1.5.16</version>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -44,6 +45,7 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
+                <version>0.45.1</version>
 				<configuration>
 					<images>
 						<image>

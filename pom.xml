@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.4</version>
+		<version>3.3.7</version>
 	</parent>
 
 	<properties>
@@ -171,13 +171,13 @@
 		</dependencies>
 	</dependencyManagement>
 	<build>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
 				<version>4.9.10</version>
-				<executions>
+				<executions>	
 					<execution>
 						<goals>
 							<goal>revision</goal>

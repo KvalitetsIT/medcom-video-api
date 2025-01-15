@@ -13,8 +13,9 @@ import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
 import dk.medcom.video.api.service.*;
 import io.micrometer.core.instrument.Clock;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.prometheus.client.CollectorRegistry;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -288,11 +289,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	private Clock clock;
 
 	@Autowired
-	private CollectorRegistry collectorRegistry;
+	private PrometheusRegistry prometheusRegistry;
 
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {
-		return new PrometheusScrapeEndpoint(collectorRegistry);
+		return new PrometheusScrapeEndpoint(prometheusRegistry);
 	}
 
 	@Override
