@@ -1,20 +1,7 @@
 package dk.medcom.video.api.configuration;
 
-import dk.kvalitetsit.audit.client.AuditClient;
-import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
-import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.*;
-import dk.medcom.video.api.interceptor.OrganisationInterceptor;
-import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.OrganisationServiceClient;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
-import dk.medcom.video.api.service.*;
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.prometheusmetrics.PrometheusConfig;
-import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +10,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,8 +24,58 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Collections;
-import java.util.List;
+import dk.kvalitetsit.audit.client.AuditClient;
+import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserContextServiceImpl;
+import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
+import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
+import dk.medcom.video.api.dao.MeetingLabelRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.PoolHistoryDao;
+import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingStatusRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.interceptor.OrganisationInterceptor;
+import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
+import dk.medcom.video.api.organisation.OrganisationServiceClient;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
+import dk.medcom.video.api.service.AuditService;
+import dk.medcom.video.api.service.AuditServiceImpl;
+import dk.medcom.video.api.service.CustomUriValidator;
+import dk.medcom.video.api.service.CustomUriValidatorImpl;
+import dk.medcom.video.api.service.MeetingService;
+import dk.medcom.video.api.service.MeetingServiceImpl;
+import dk.medcom.video.api.service.MeetingUserService;
+import dk.medcom.video.api.service.MeetingUserServiceImpl;
+import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
+import dk.medcom.video.api.service.NewProvisionerOrganisationFilterImpl;
+import dk.medcom.video.api.service.OrganisationService;
+import dk.medcom.video.api.service.OrganisationServiceImpl;
+import dk.medcom.video.api.service.PoolFinderService;
+import dk.medcom.video.api.service.PoolFinderServiceImpl;
+import dk.medcom.video.api.service.PoolHistoryService;
+import dk.medcom.video.api.service.PoolHistoryServiceImpl;
+import dk.medcom.video.api.service.PoolInfoService;
+import dk.medcom.video.api.service.PoolInfoServiceImpl;
+import dk.medcom.video.api.service.PoolService;
+import dk.medcom.video.api.service.PoolServiceImpl;
+import dk.medcom.video.api.service.SchedulingInfoEventPublisher;
+import dk.medcom.video.api.service.SchedulingInfoEventPublisherImpl;
+import dk.medcom.video.api.service.SchedulingInfoService;
+import dk.medcom.video.api.service.SchedulingInfoServiceImpl;
+import dk.medcom.video.api.service.SchedulingStatusService;
+import dk.medcom.video.api.service.SchedulingStatusServiceImpl;
+import dk.medcom.video.api.service.SchedulingTemplateService;
+import dk.medcom.video.api.service.SchedulingTemplateServiceImpl;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -293,7 +335,10 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public PrometheusScrapeEndpoint prometheus() {
-		return new PrometheusScrapeEndpoint(prometheusRegistry);
+		// Previously, the constructor took only the prometheusRegistry object.
+		// The exporterProperties field is now mandatory, but if set to null,
+		// it behaves the same as the old constructor.
+		return new PrometheusScrapeEndpoint(prometheusRegistry, null);
 	}
 
 	@Override
