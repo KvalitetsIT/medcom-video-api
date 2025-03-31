@@ -67,7 +67,6 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
