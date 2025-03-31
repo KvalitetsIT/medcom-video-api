@@ -150,7 +150,7 @@ paths:
     get:
       tags:
         - Info
-      summary: gets some generel information on the API
+      summary: gets some general information on the API
       description: Use this as an initial test to see if the API is up running and replying.
       responses:
         '200':
@@ -162,6 +162,8 @@ paths:
 
   /meetings/findByUriWithDomain:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: find meeting by uri with domain.
@@ -190,6 +192,8 @@ paths:
 
   /meetings/findByUriWithoutDomain:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: find meeting by uri without domain.
@@ -218,6 +222,8 @@ paths:
 
   /meetings:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: gets a list of meetings
@@ -226,7 +232,7 @@ paths:
         - name: from-start-time
           in: query
           description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
-          required: true
+          required: false
           schema:
             type: string
             format: date
@@ -234,11 +240,55 @@ paths:
         - name: to-start-time
           in: query
           description: to start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
-          required: true
+          required: false
           schema:
             type: string
             format: date
           example: '2023-12-31T03:12:30-0100'
+        - name: short-id
+          in: query
+          description: short id of meeting, always 12 characters long
+          required: false
+          schema:
+            type: string
+            minLength: 12
+            maxLength: 12
+          example: 'abcdefghijkl'
+        - name: subject
+          in: query
+          description: the subject of a meeting
+          required: false
+          schema:
+            type: string
+          example: subject
+        - name: organizedBy
+          in: query
+          description: the organizer of a meeting
+          required: false
+          schema:
+            type: string
+          example: organizer
+        - name: search
+          in: query
+          description: common string
+          required: false
+          schema:
+            type: string
+          example: searching for this
+        - name: label
+          in: query
+          description: the label of a meeting
+          required: false
+          schema:
+            type: string
+          example: label123
+        - name: uriWithDomain
+          in: query
+          description: the uri with domain of a meeting
+          required: false
+          schema:
+            type: string
+          example: '123456@video.domain'
       responses:
         '200':
           description: Ok
@@ -255,6 +305,8 @@ paths:
         '403':
           $ref: '#/components/responses/403'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: adds a new meeting
@@ -288,6 +340,8 @@ paths:
           $ref: '#/components/responses/406'
   /meetings/{uuid}:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: gets a specific meeting
@@ -310,6 +364,8 @@ paths:
         '404':
           $ref: '#/components/responses/404'
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: updates an existing meeting
@@ -341,6 +397,8 @@ paths:
         '406':
           $ref: '#/components/responses/406'
     patch:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: Updates an existing meeting through HTTP patch
@@ -372,6 +430,8 @@ paths:
         '406':
           $ref: '#/components/responses/406'
     delete:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: deletes an existing meeting
@@ -393,6 +453,8 @@ paths:
           $ref: '#/components/responses/406'
   /scheduling-info:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations from meetings
@@ -420,6 +482,7 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/provisionStatus'
+            default: AWAITS_PROVISION
       responses:
         '200':
           description: Ok
@@ -436,6 +499,8 @@ paths:
         '403':
           $ref: '#/components/responses/403'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: adds a new scheduling info
@@ -466,6 +531,8 @@ paths:
           $ref: '#/components/responses/406'
   /scheduling-info/{uuid}:
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: updates an existing scheduling-info
@@ -497,6 +564,8 @@ paths:
         '406':
           $ref: '#/components/responses/406'
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a specific scheduling information
@@ -520,6 +589,8 @@ paths:
           $ref: '#/components/responses/404'
   /scheduling-templates:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: gets a list of scheduling templates matching own organization
@@ -540,6 +611,8 @@ paths:
         '403':
           $ref: '#/components/responses/403'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: adds a new scheduling template
@@ -550,7 +623,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/create-scheduling-template'
+              $ref: '#/components/schemas/schedulingTemplateRequest'
       responses:
         '200':
           description: Ok
@@ -566,6 +639,8 @@ paths:
           $ref: '#/components/responses/403'
   /scheduling-templates/{id}:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: gets a specific scheduling template
@@ -588,6 +663,8 @@ paths:
         '404':
           $ref: '#/components/responses/404'
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: updates an existing scheduling template
@@ -600,7 +677,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/update-scheduling-template'
+              $ref: '#/components/schemas/schedulingTemplateRequest'
       responses:
         '200':
           description: Ok
@@ -617,6 +694,8 @@ paths:
         '404':
           $ref: '#/components/responses/404'
     delete:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: deletes an existing scheduling template
@@ -636,6 +715,8 @@ paths:
           $ref: '#/components/responses/404'
   /scheduling-info-provision:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations on meetings waiting to be provisioned
@@ -655,6 +736,8 @@ paths:
           $ref: '#/components/responses/403'
   /scheduling-info-deprovision:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
@@ -675,6 +758,8 @@ paths:
 
   /scheduling-info-reserve:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
@@ -759,6 +844,8 @@ paths:
 
   /scheduling-info-reserve/{uuid}:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: Get scheduling info by reservation id.
@@ -781,6 +868,8 @@ paths:
 
   /pool:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Pool
       summary: returns a list of pool information
@@ -801,6 +890,12 @@ paths:
         '403':
           $ref: '#/components/responses/403'
 components:
+  securitySchemes:
+    userContext:
+      type: apiKey
+      in: header
+      name: X-SESSIONDATA
+
   parameters:
     uuid:
       name: uuid
@@ -818,7 +913,7 @@ components:
       required: true
       schema:
         type: integer
-        format: int32
+        format: int64
       example: 7
   responses:
     '400':
@@ -989,19 +1084,27 @@ components:
     info:
       type: object
       properties:
-        git:
-          properties:
-            commit:
-              properties:
-                time:
-                  type: string
-                  example: "10.10.2018 @ 11:52:54 CEST"
-                id:
-                  type: string
-                  example: "97fd935"
-            branch:
-              type: string
-              example: "master"
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/infoType'
+
+    infoType:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          maxLength: 100
+          description: info key
+          example: "git"
+        value:
+          type: object
+          description: info value
+          example: "{branch=master, commit={id=9fa0555, time=27.01.2025 @ 11:35:12 CET}}"
+
     meeting:
       type: object
       required:
@@ -1068,15 +1171,7 @@ components:
           maxLength: 200
           example: 87527808-147f-4c54-88be-aec56c7194a3
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
         guestPinRequired:
           type: boolean
           example: false
@@ -1107,6 +1202,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+
     create-meeting:
       type: object
       required:
@@ -1148,7 +1244,7 @@ components:
           description: When included it will override any value from the scheduling template
         schedulingTemplateId:
           type: integer
-          format: int32
+          format: int64
           example: 5
           description: when valid value included it will override the default template
         meetingType:
@@ -1162,15 +1258,7 @@ components:
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
         guestPinRequired:
           type: boolean
           example: false
@@ -1225,12 +1313,12 @@ components:
         guestPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         hostPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         additionalInformation:
           type: array
@@ -1308,15 +1396,7 @@ components:
             type: string
             description: Array of labels to attach to meeting.
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
         guestPinRequired:
           type: boolean
           example: false
@@ -1324,12 +1404,12 @@ components:
         guestPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         hostPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         additionalInformation:
           type: array
@@ -1483,6 +1563,7 @@ components:
         shortlink:
           type: string
           example: https://m.vconf.dk/abcdefghijkl
+
     create-scheduling-info:
       type: object
       required:
@@ -1494,9 +1575,10 @@ components:
           maxLength: 30
         schedulingTemplateId:
           type: integer
-          format: int32
+          format: int64
           example: 5
           description: The scheduling template to use for the scheduling info.
+
     update-scheduling-info:
       type: object
       required:
@@ -1511,6 +1593,7 @@ components:
         provisionVmrId:
           type: string
           maxLength: 50
+
     meetingUser:
       type: object
       properties:
@@ -1521,10 +1604,19 @@ components:
           type: string
           format: email
           maxLength: 45
+    guestMicrophone:
+      example: muted
+      description: Corresponds to numeric status 0, 1 and 2.
+      type: string
+      enum:
+        - 'muted'
+        - 'off'
+        - 'on'
     meetingType:
       example: NORMAL
       description: Indicates what type the meeting has.
       type: string
+      default: NORMAL
       enum:
         - NORMAL
         - POOL
@@ -1568,7 +1660,6 @@ components:
       example: hd
       description: Corresponds to numeric status 0, 1 and 2.
       type: string
-      default: hd
       enum:
         - sd
         - hd
@@ -1612,20 +1703,19 @@ components:
         - uriNumberRangeLow
         - uriNumberRangeHigh
         - ivrTheme
-        - isDefaultTemplate
         - isPoolTemplate
         - directMedia
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 9
         organisationId:
           type: string
           maxLength: 30
         conferencingSysId:
           type: integer
-          format: int32
+          format: int64
           example: 1234
         uriPrefix:
           type: string
@@ -1639,22 +1729,22 @@ components:
           example: true
         hostPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         hostPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         guestPinRequired:
           type: boolean
           example: true
         guestPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         guestPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         vMRAvailableBefore:
           type: integer
@@ -1670,11 +1760,11 @@ components:
           example: true
         uriNumberRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         uriNumberRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         ivrTheme:
           type: string
@@ -1682,6 +1772,7 @@ components:
           maxLength: 100
         isDefaultTemplate:
           type: boolean
+          default: false
           example: true
           description: only one default template per organization. Setting it will unset other default template
         isPoolTemplate:
@@ -1759,7 +1850,7 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-template/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
-    create-scheduling-template:
+    schedulingTemplateRequest:
       type: object
       required:
         - conferencingSysId
@@ -1770,11 +1861,10 @@ components:
         - uriNumberRangeLow
         - uriNumberRangeHigh
         - ivrTheme
-        - isDefaultTemplate
       properties:
         conferencingSysId:
           type: integer
-          format: int32
+          format: int64
           example: 1234
         uriPrefix:
           type: string
@@ -1789,22 +1879,22 @@ components:
           example: true
         hostPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         hostPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         guestPinRequired:
           type: boolean
           example: true
         guestPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         guestPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         vmrAvailableBefore:
           type: integer
@@ -1823,11 +1913,11 @@ components:
           default: false
         uriNumberRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         uriNumberRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         ivrTheme:
           type: string
@@ -1835,6 +1925,7 @@ components:
           maxLength: 100
         isDefaultTemplate:
           type: boolean
+          default: false
           example: true
           description: only one default template per organization. Setting it will unset other default template
         isPoolTemplate:
@@ -1891,138 +1982,7 @@ components:
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
-    update-scheduling-template:
-      type: object
-      required:
-        - conferencingSysId
-        - uriPrefix
-        - uriDomain
-        - hostPinRequired
-        - guestPinRequired
-        - uriNumberRangeLow
-        - uriNumberRangeHigh
-        - ivrTheme
-        - isDefaultTemplate
-      properties:
-        conferencingSysId:
-          type: integer
-          format: int32
-          example: 1234
-        uriPrefix:
-          type: string
-          maxLength: 100
-          example: "abc"
-        uriDomain:
-          type: string
-          maxLength: 100
-          example: "test.dk"
-        hostPinRequired:
-          type: boolean
-          example: true
-        hostPinRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        hostPinRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        guestPinRequired:
-          type: boolean
-          example: true
-        guestPinRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        guestPinRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        vmrAvailableBefore:
-          type: integer
-          format: int32
-          example: 30
-          description: the number of minutes VMR meeting must be available before start
-          default: 0
-        maxParticipants:
-          type: integer
-          format: int32
-          example: 5
-          default: 0
-        endMeetingOnEndTime:
-          type: boolean
-          example: true
-          default: false
-        uriNumberRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        uriNumberRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        ivrTheme:
-          type: string
-          example: '10'
-          maxLength: 100
-        isDefaultTemplate:
-          type: boolean
-          example: true
-          description: only one default template per organization. Setting it will unset other default template
-        isPoolTemplate:
-          type: boolean
-          default: false
-          example: true
-          description: only one pool template per organization
-        customPortalGuest:
-          type: string
-          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
-          maxLength: 200
-          description: If the scheduling template should use a custom portal for the guest portal.
-        customPortalHost:
-          type: string
-          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
-          maxLength: 200
-          description: If the scheduling template should use a custom portal for the host portal.
-        returnUrl:
-          type: string
-          example: https://some.url/xyz
-          maxLength: 200
-          description: If set this is the url that the portal should redirect the user to when the meeting ends.
-        vmrType:
-          $ref: '#/components/schemas/vmrType'
-        hostView:
-          $ref: '#/components/schemas/viewType'
-        guestView:
-          $ref: '#/components/schemas/viewType'
-        vmrQuality:
-          $ref: '#/components/schemas/vmrQuality'
-        enableOverlayText:
-          type: boolean
-          example: true
-          default: true
-          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
-        guestsCanPresent:
-          type: boolean
-          example: true
-          default: true
-          description: controls whether the Guests in the conference are allowed to present content
-        forcePresenterIntoMain:
-          type: boolean
-          example: true
-          default: true
-          description: controls whether the Host who is presenting is locked into the main video position
-        forceEncryption:
-          type: boolean
-          example: false
-          default: false
-        muteAllGuests:
-          type: boolean
-          example: false
-          default: false
-          description: controls whether to mute guests when they first join the conference
-        directMedia:
-          $ref: '#/components/schemas/directMedia'
+
     pool-info:
       type: object
       required:
@@ -2040,6 +2000,11 @@ components:
           format: int32
         schedulingTemplate:
           $ref: '#/components/schemas/scheduling-template'
+        schedulingInfoList:
+          type: array
+          items:
+            $ref: '#/components/schemas/scheduling-info'
+
     not-acceptable:
       type: integer
       format: int32

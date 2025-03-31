@@ -122,7 +122,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		// Create scheduling info.
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
 		createSchedulingInfo.setOrganizationId("company 3");
-		createSchedulingInfo.setSchedulingTemplateId(4);
+		createSchedulingInfo.setSchedulingTemplateId(4L);
 
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain = 'test.dk' and uri_without_domain is not null and uuid = '" + createdSchedulingInfo.getUuid() + "'");
@@ -207,7 +207,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void createSchedulingInfo() throws ApiException {
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
-		createSchedulingInfo.setSchedulingTemplateId(1);
+		createSchedulingInfo.setSchedulingTemplateId(1L);
 		createSchedulingInfo.setOrganizationId("company 1");
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 
