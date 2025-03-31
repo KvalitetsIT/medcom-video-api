@@ -1,4 +1,4 @@
-package dk.medcom.video.api.api;
+package dk.medcom.video.api.dao.entity;
 
 
 public enum ProvisionStatus {
@@ -12,7 +12,7 @@ public enum ProvisionStatus {
 	
 	private final int value;
 	
-	private ProvisionStatus(int value) {
+	ProvisionStatus(int value) {
 		this.value = value;
 	}
 	public int getValue() {

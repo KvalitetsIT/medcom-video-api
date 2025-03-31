@@ -2,6 +2,7 @@ package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dk.medcom.video.api.dao.entity.MeetingType;
 import org.junit.Before;
 import org.junit.Test;
 

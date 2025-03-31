@@ -2,7 +2,6 @@ package dk.medcom.video.api.service.impl;
 
 import dk.kvalitetsit.audit.client.AuditClient;
 import dk.kvalitetsit.audit.client.api.v1.AuditEvent;
-import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.service.AuditServiceImpl;
 import org.junit.Before;

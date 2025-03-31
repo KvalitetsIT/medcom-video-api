@@ -1,4 +1,4 @@
-package dk.medcom.video.api.api;
+package dk.medcom.video.api.dao.entity;
 
 public enum ViewType {
     one_main_zero_pips(0),

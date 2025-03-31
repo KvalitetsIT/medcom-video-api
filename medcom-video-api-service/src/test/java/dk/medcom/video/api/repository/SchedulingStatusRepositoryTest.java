@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.SchedulingStatus;
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 
 public class SchedulingStatusRepositoryTest extends RepositoryTest{
 	@Resource

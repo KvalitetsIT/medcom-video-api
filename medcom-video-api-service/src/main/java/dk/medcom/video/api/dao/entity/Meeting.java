@@ -1,7 +1,5 @@
 package dk.medcom.video.api.dao.entity;
 
-import dk.medcom.video.api.api.GuestMicrophone;
-
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.HashSet;

@@ -1,7 +1,7 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import org.openapitools.client.ApiClient;

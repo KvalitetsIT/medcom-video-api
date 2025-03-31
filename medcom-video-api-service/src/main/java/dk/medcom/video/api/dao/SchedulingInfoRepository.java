@@ -1,11 +1,10 @@
 package dk.medcom.video.api.dao;
 
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 

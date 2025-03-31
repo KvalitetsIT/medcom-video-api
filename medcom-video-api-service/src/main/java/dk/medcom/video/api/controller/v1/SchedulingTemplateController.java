@@ -1,4 +1,4 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.video.api.controller.v1;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;

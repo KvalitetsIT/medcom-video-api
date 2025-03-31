@@ -1,8 +1,8 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.video.api.controller.v1;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
@@ -38,7 +38,7 @@ public class SchedulingInfoController {
 	private final SchedulingInfoService schedulingInfoService;
 	private final String shortLinkBaseUrl;
 
-	SchedulingInfoController(SchedulingInfoService schedulingInfoService, @Value("${short.link.base.url}") String shortLinkBaseUrl) {
+	public SchedulingInfoController(SchedulingInfoService schedulingInfoService, @Value("${short.link.base.url}") String shortLinkBaseUrl) {
 		this.schedulingInfoService = schedulingInfoService;
 		this.shortLinkBaseUrl = shortLinkBaseUrl;
 	}
@@ -61,7 +61,7 @@ public class SchedulingInfoController {
 			@RequestParam(value = "from-start-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date fromStartTime, 
 			@RequestParam(value = "to-end-time") @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZZZ") Date toEndTime,
 			@RequestParam(value = "provision-status", required = false, defaultValue = "AWAITS_PROVISION") ProvisionStatus provisionStatus) {
-		LOGGER.debug("Entry of /scheduling-info.get fromStartTime: "+ fromStartTime.toString() + " toEndTime: " + toEndTime.toString() + " provision status: "+ provisionStatus.getValue()); 
+		LOGGER.debug("Entry of /scheduling-info.get fromStartTime: "+ fromStartTime.toString() + " toEndTime: " + toEndTime.toString() + " provision status: "+ provisionStatus.getValue());
 
 		List<SchedulingInfo> schedulingInfos = schedulingInfoService.getSchedulingInfo(fromStartTime, toEndTime, provisionStatus);
 		List<SchedulingInfoDto> schedulingInfoDtos = new LinkedList<>();

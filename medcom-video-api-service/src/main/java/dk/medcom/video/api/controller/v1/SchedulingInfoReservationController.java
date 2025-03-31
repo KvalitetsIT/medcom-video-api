@@ -1,9 +1,9 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.video.api.controller.v1;
 
 import dk.medcom.video.api.api.SchedulingInfoDto;
-import dk.medcom.video.api.api.ViewType;
-import dk.medcom.video.api.api.VmrQuality;
-import dk.medcom.video.api.api.VmrType;
+import dk.medcom.video.api.dao.entity.ViewType;
+import dk.medcom.video.api.dao.entity.VmrQuality;
+import dk.medcom.video.api.dao.entity.VmrType;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;

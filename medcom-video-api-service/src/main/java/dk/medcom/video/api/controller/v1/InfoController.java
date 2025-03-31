@@ -1,4 +1,4 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.video.api.controller.v1;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.info.Info;

@@ -1,11 +1,11 @@
 package dk.medcom.video.api.helper;
 
-import dk.medcom.video.api.api.DirectMedia;
+import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 
 import java.util.Date;
 import java.util.UUID;

@@ -1,7 +1,5 @@
 package dk.medcom.video.api.dao.entity;
 
-import dk.medcom.video.api.api.*;
-
 import jakarta.persistence.*;
 import java.util.Date;
 

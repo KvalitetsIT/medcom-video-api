@@ -1,4 +1,4 @@
-package dk.medcom.video.api.controller;
+package dk.medcom.video.api.controller.v1;
 
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;

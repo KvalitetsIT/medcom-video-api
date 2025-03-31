@@ -1,5 +1,9 @@
 package dk.medcom.video.api.api;
 
+import dk.medcom.video.api.dao.entity.DirectMedia;
+import dk.medcom.video.api.dao.entity.ViewType;
+import dk.medcom.video.api.dao.entity.VmrQuality;
+import dk.medcom.video.api.dao.entity.VmrType;
 import org.springframework.hateoas.RepresentationModel;
 
 import jakarta.validation.constraints.NotNull;
