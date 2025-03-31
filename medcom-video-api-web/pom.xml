@@ -39,13 +39,26 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<layout>ZIP</layout>
+					<classifier>exec</classifier>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+							<Class-Path>./lib/</Class-Path>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-                <version>0.45.1</version>
 				<configuration>
 					<images>
 						<image>
@@ -53,12 +66,28 @@
 							<build>
 								<tags>
 									<tag>latest</tag>
+									<tag>dev</tag>
 									<tag>${git.commit.id}</tag>
 								</tags>
 								<dockerFileDir>${basedir}/docker</dockerFileDir>
 								<assembly>
+									<inline>
+										<files>
+											<file>
+												<source>${project.build.directory}/medcom-video-api-web-exec.jar</source>
+											</file>
+										</files>
+										<fileSets>
+											<fileSet>
+												<includes>
+													<include>application.cdx.json</include>
+												</includes>
+												<directory>target/classes/META-INF/sbom/</directory>
+												<outputDirectory>/</outputDirectory>
+											</fileSet>
+										</fileSets>
+									</inline>
 									<descriptorRef>artifact</descriptorRef>
-									<targetDir>/app</targetDir>
 								</assembly>
 							</build>
 						</image>
