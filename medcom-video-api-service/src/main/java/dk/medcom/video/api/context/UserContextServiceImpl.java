@@ -16,4 +16,11 @@ public class UserContextServiceImpl implements UserContextService {
 		}
 		return userContext;
 	}
+
+	@Override
+	public void setUserContext(UserContext input) {
+		if (userContext == null) {
+			userContext = input;
+		}
+	}
 }
