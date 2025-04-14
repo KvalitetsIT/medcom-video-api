@@ -88,7 +88,10 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public List<MeetingModel> searchMeetingsV2(String search, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
         logger.debug("Search meetings, v2.");
         try {
-            return meetingService.searchMeetings(search, Date.from(fromStartTime.toInstant()), Date.from(toStartTime.toInstant()))
+            var fromStartTimeDate = fromStartTime != null ? Date.from(fromStartTime.toInstant()) : null;
+            var toStartTimeDate = fromStartTime != null ? Date.from(toStartTime.toInstant()) : null;
+
+            return meetingService.searchMeetings(search, fromStartTimeDate, toStartTimeDate)
                     .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();

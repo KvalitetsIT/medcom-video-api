@@ -74,7 +74,7 @@ public class SchedulingTemplateAdministrationControllerV2Test {
 
         var result = schedulingTemplateAdministrationControllerV2.v2SchedulingTemplatesIdDelete(id);
         assertNotNull(result);
-        assertEquals(200, result.getStatusCode().value());
+        assertEquals(204, result.getStatusCode().value());
 
         Mockito.verify(schedulingTemplateService).deleteSchedulingTemplateV2(id);
         verifyNoMoreInteractions();

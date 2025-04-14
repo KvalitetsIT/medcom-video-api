@@ -1270,8 +1270,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
-        '200':
-          description: Ok
+        '204':
+          description: No content
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1580,8 +1580,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
-        '200':
-          description: Ok
+        '204':
+          description: No content
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -2267,10 +2267,11 @@ components:
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
         guestMicrophone:
           $ref: '#/components/schemas/guestMicrophone'
+          description: Will be set to 'on' if not set in create meeting request.
         guestPinRequired:
           type: boolean
           example: false
-          description: When true shortlink will aske for pin
+          description: When true shortLink will ask for pin
         schedulingInfoReservationId:
           type: string
           format: uuid

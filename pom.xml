@@ -64,6 +64,12 @@
 
 			<dependency>
 				<groupId>dk.medcom.video.api</groupId>
+				<artifactId>integrationtest</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>dk.medcom.video.api</groupId>
 				<artifactId>medcom-video-api-qa</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -324,6 +330,7 @@
 	<modules>
 		<module>medcom-video-api-web</module>
 		<module>medcom-video-api-service</module>
+		<module>integrationtest</module>
 		<module>medcom-video-api-test</module>
 		<module>medcom-video-api-qa</module>
 		<module>medcom-video-api-interface</module>

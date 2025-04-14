@@ -59,7 +59,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
         try {
             schedulingTemplateService.deleteSchedulingTemplateV2(id);
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.noContent().build();
         } catch (PermissionDeniedExceptionV2 e) {
             throw new PermissionDeniedException(e.getMessage());
         } catch (ResourceNotFoundExceptionV2 e) {
