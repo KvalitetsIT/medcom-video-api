@@ -1,5 +1,7 @@
 package dk.medcom.video.api.configuration;
 
+import jakarta.servlet.ServletContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -12,11 +14,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
+    @Autowired
+    private ServletContext context;
+
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher(request -> request.getRequestURI().startsWith("/v2/"))
+                .securityMatcher(request -> request.getRequestURI().startsWith(context.getContextPath() + "/v2/"))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .anyRequest().authenticated() // Validates jwt token before input validation and scope validation

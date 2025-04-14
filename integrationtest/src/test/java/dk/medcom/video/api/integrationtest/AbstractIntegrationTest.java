@@ -39,7 +39,7 @@ public abstract class AbstractIntegrationTest {
         serviceStarter = new ServiceStarter();
         if(runInDocker) {
             videoApi = serviceStarter.startServicesInDocker();
-            apiBasePath = "http://" + videoApi.getHost() + ":" + videoApi.getMappedPort(8080);
+            apiBasePath = "http://" + videoApi.getHost() + ":" + videoApi.getMappedPort(8080) + "/api";
         } else if (serviceStarter.isFirstStart()) {
             serviceStarter.startServices();
             apiBasePath = "http://localhost:8080";

@@ -51,7 +51,6 @@ public class ServiceStarter {
         setupJetStream();
         setupKeycloak();
 
-        System.setProperty("CONTEXT", "/api");
         System.setProperty("jdbc.url", jdbcUrl);
         System.setProperty("jdbc.user", jdbcUser);
         System.setProperty("jdbc.pass", jdbcPass);
@@ -128,7 +127,7 @@ public class ServiceStarter {
         service = new GenericContainer<>("kvalitetsit/medcom-video-api:latest")
                 .withNetwork(dockerNetwork)
                 .withNetworkAliases("videoapi")
-                //.withEnv("CONTEXT", "/api")
+                .withEnv("CONTEXT", "/api")
                 .withEnv("jdbc_url", "jdbc:mariadb://mariadb:3306/videodb?useSSL=false&serverTimezone=UTC")
                 .withEnv("jdbc_user", jdbcUser)
                 .withEnv("jdbc_pass", jdbcPass)
@@ -192,7 +191,7 @@ public class ServiceStarter {
 
                 .withExposedPorts(8080, 8081)
                 .withStartupTimeout(Duration.ofSeconds(180))
-                .waitingFor(Wait.forHttp("/manage/actuator/health").forPort(8081).forStatusCode(200).withStartupTimeout(Duration.ofSeconds(180)));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
+                .waitingFor(Wait.forHttp("/manage/actuator/health").forPort(8081).forStatusCode(200).withStartupTimeout(Duration.ofSeconds(180)));
         service.start();
         attachLogger(service, videoApiLogger);
 
