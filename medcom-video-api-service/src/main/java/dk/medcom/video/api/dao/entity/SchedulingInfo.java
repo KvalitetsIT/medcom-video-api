@@ -2,7 +2,7 @@ package dk.medcom.video.api.dao.entity;
 
 import dk.medcom.video.api.api.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -28,12 +28,16 @@ public class SchedulingInfo {
 	private boolean poolOverflow;
 	private boolean pool;
 
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private VmrType vmrType;				//type of the virtual meeting room.
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ViewType hostView;				//the layout seen by Hosts.
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ViewType guestView;				//the layout seen by Guests
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private VmrQuality vmrQuality;			//controls the maximum call quality for participants connecting to this service.
 	private boolean enableOverlayText;		//if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
@@ -45,6 +49,7 @@ public class SchedulingInfo {
 	@ManyToOne
 	@JoinColumn(name="scheduling_template_id")
 	private SchedulingTemplate schedulingTemplate;
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ProvisionStatus provisionStatus;
 	private String provisionStatusDescription;
@@ -76,8 +81,10 @@ public class SchedulingInfo {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
+	private boolean newProvisioner;				//using the new (true) or old (false) provisioner service
 
 	public Long getId() {
 		return id;
@@ -354,5 +361,13 @@ public class SchedulingInfo {
 
 	public DirectMedia getDirectMedia() {
 		return directMedia;
+	}
+
+	public boolean isNewProvisioner() {
+		return newProvisioner;
+	}
+
+	public void setNewProvisioner(boolean newProvisioner) {
+		this.newProvisioner = newProvisioner;
 	}
 }

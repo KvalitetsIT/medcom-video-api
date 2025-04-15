@@ -2,8 +2,8 @@ package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +30,7 @@ public class UpdateMeetingDto {
 	
 	public String organizedByEmail;
 	private List<String> labels = new ArrayList<>();
+	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
 	public String getSubject() {
 		return subject;
@@ -81,5 +82,13 @@ public class UpdateMeetingDto {
 
 	public List<String> getLabels() {
 		return labels;
+	}
+
+	public List<AdditionalInformationType> getAdditionalInformation() {
+		return additionalInformation;
+	}
+
+	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+		this.additionalInformation = additionalInformation;
 	}
 }

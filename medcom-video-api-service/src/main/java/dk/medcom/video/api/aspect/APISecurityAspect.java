@@ -21,7 +21,7 @@ public class APISecurityAspect {
 	UserContextService userService;
 	
 	@Before("@annotation(aPISecurityAnnotation)")
-	public void APISecurityAnnotation(JoinPoint joinPoint, APISecurityAnnotation aPISecurityAnnotation) throws Throwable {
+	public void APISecurityAnnotation(JoinPoint ignoredJoinPoint, APISecurityAnnotation aPISecurityAnnotation) throws Throwable {
 
 		UserRole[] allowedUserRoles = aPISecurityAnnotation.value();
 		List<UserRole> allowed = Arrays.asList(allowedUserRoles);

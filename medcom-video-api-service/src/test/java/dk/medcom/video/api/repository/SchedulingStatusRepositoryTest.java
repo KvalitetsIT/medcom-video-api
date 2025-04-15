@@ -3,7 +3,7 @@ package dk.medcom.video.api.repository;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.SchedulingStatusRepository;

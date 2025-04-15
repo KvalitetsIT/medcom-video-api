@@ -369,8 +369,9 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
         assertEquals(DirectMedia.best_effort, capturedSchedulingInfo.getDirectMedia());
+        assertTrue(capturedSchedulingInfo.isNewProvisioner());
 
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishCreate(Mockito.any());
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(true));
     }
 
     @Test
@@ -389,6 +390,7 @@ public class SchedulingInfoServiceImplTest {
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
+        meeting.setOrganisation(new Organisation());
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
@@ -420,6 +422,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getCustomPortalHost(), capturedSchedulingInfo.getCustomPortalHost());
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
         assertEquals(schedulingTemplateIdOne.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
+        assertTrue(capturedSchedulingInfo.isNewProvisioner());
     }
 
     @Test
@@ -440,6 +443,7 @@ public class SchedulingInfoServiceImplTest {
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
+        meeting.setOrganisation(new Organisation());
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setUriWithoutDomain("573489");
@@ -470,6 +474,7 @@ public class SchedulingInfoServiceImplTest {
         assertTrue(capturedSchedulingInfo.getForcePresenterIntoMain());
         assertFalse(capturedSchedulingInfo.getForceEncryption());
         assertFalse(capturedSchedulingInfo.getMuteAllGuests());
+        assertTrue(capturedSchedulingInfo.isNewProvisioner());
 
         Mockito.verify(schedulingInfoRepository, times(1)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(),schedulingTemplateIdOne.getUriDomain());
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
@@ -954,61 +959,36 @@ public class SchedulingInfoServiceImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoAwaitProvisionNoFilter() {
-        var schedulingInfo1 = createSchedulingInfo("org1");
-        var schedulingInfo2 = createSchedulingInfo("org2");
-        Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
-
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
-
-        var result = schedulingInfoService.getSchedulingInfoAwaitsProvision();
-        assertEquals(0, result.size());
-    }
-
-    @Test
     public void testGetSchedulingInfoAwaitProvisionFilter() {
-        var schedulingInfo1 = createSchedulingInfo("org1");
-        var schedulingInfo2 = createSchedulingInfo("org2");
+        var schedulingInfo1 = createSchedulingInfo(true);
+        schedulingInfo1.setId(1L);
+        var schedulingInfo2 = createSchedulingInfo(false);
+        schedulingInfo2.setId(2L);
         Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.singletonList("org1")));
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl());
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsProvision();
         assertEquals(1, result.size());
         assertEquals(schedulingInfo2, result.get(0));
-    }
-
-    @Test
-    public void testGetSchedulingInfoAwaitsDeProvisionNoFilter() {
-        var schedulingInfo1 = createSchedulingInfo("org1");
-        var schedulingInfo2 = createSchedulingInfo("org2");
-        Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
-
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.emptyList()));
-
-        var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
-        assertEquals(0, result.size());
     }
 
     @Test
     public void testGetSchedulingInfoAwaitsDeProvisionFilter() {
-        var schedulingInfo1 = createSchedulingInfo("org1");
-        var schedulingInfo2 = createSchedulingInfo("org2");
+        var schedulingInfo1 = createSchedulingInfo(true);
+        var schedulingInfo2 = createSchedulingInfo(false);
         Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
 
-        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl(), new NewProvisionerOrganisationFilterImpl(Collections.singletonList("org1")));
+        var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl());
 
         var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
         assertEquals(1, result.size());
         assertEquals(schedulingInfo2, result.get(0));
     }
 
-    private SchedulingInfo createSchedulingInfo(String organisationId) {
-        var organisation = new Organisation();
-        organisation.setOrganisationId(organisationId);
-
+    private SchedulingInfo createSchedulingInfo(boolean newProvisioner) {
         var schedulingInfo = new SchedulingInfo();
-        schedulingInfo.setOrganisation(organisation);
+        schedulingInfo.setNewProvisioner(newProvisioner);
 
         return schedulingInfo;
     }
@@ -1078,6 +1058,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setSchedulingTemplate(schedulingTemplateIdOne);
         schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
+        schedulingInfo.setNewProvisioner(true);
 
         return schedulingInfo;
     }

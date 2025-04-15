@@ -7,7 +7,7 @@ public enum GuestMicrophone {
 
     private final int value;
 
-    private GuestMicrophone(int value) {
+    GuestMicrophone(int value) {
         this.value = value;
     }
     public int getValue() {

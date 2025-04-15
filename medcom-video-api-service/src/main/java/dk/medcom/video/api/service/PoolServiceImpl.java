@@ -4,6 +4,7 @@ import dk.medcom.video.api.api.CreateSchedulingInfoDto;
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
+import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
@@ -39,8 +40,8 @@ public class PoolServiceImpl implements PoolService {
 
     @Override
     @Transactional
-    public void fillPools() {
-        logger.info("Checking if pools rooms should be created!");
+    public void fillAndDeletePools() {
+        logger.info("Checking if pool rooms should be created or removed!");
         var poolInfo = poolInfoService.getPoolInfo();
 
         poolInfo.forEach( x -> {
@@ -50,9 +51,11 @@ public class PoolServiceImpl implements PoolService {
                 if(x.getDesiredPoolSize() > x.getAvailablePoolSize()) {
                     logger.info("Filling pool for {}.", x.getOrganizationId());
                     fillPool(x);
-                }
-                else {
-                    logger.info("No need for additional pool rooms for {}.", x.getOrganizationId());
+                } else if (x.getDesiredPoolSize() < x.getAvailablePoolSize()) {
+                    logger.info("Too many pool rooms for {}.", x.getOrganizationId());
+                    deleteInPool(x);
+                } else {
+                    logger.info("No need for additional or fewer pool rooms for {}.", x.getOrganizationId());
                 }
             }
             else {
@@ -77,6 +80,17 @@ public class PoolServiceImpl implements PoolService {
             schedulingInfoService.createSchedulingInfoWithCustomCreatedBy(createSchedulingInfoDto, meetingUser);
         } catch (NotValidDataException | NotAcceptableException e) {
             logger.error("Error creating scheduling info.", e);
+        }
+    }
+
+    private void deleteInPool(PoolInfoDto x) {
+
+        for (int i = x.getDesiredPoolSize(); i < x.getAvailablePoolSize(); i++) {
+            try {
+                schedulingInfoService.deleteSchedulingInfoPool(x.getSchedulingInfoList().get(i).getUuid());
+            } catch (RessourceNotFoundException e) {
+                logger.error("Error deleting scheduling info with uuid {}", x.getSchedulingInfoList().get(i).getUuid(), e);
+            }
         }
     }
 }

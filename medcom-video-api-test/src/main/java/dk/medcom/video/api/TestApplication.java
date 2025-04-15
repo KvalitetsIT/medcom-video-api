@@ -2,16 +2,13 @@ package dk.medcom.video.api;
 
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
-import com.google.common.net.MediaType;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.model.*;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
 import io.nats.client.api.StreamConfiguration;
@@ -23,12 +20,14 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MockServerContainer;
-import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
+import org.testcontainers.utility.DockerImageName;
+
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -40,7 +39,7 @@ import java.util.function.Consumer;
 @ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration","dk.medcom.vdx.organisation"})
 public class TestApplication extends SpringBootServletInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
-    private static GenericContainer testOrganisationFrontend;
+    private static GenericContainer<?> testOrganisationFrontend;
     private static GenericContainer<?> jetStreamService;
     private static final String natsSubjectSchedulingInfo = "schedulingInfo";
     private static final String natsSubjectAudit = "natsSubject";
@@ -53,14 +52,14 @@ public class TestApplication extends SpringBootServletInitializer {
 
         setupJetStream(n);
 
-		MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:5.7")
+        var mariadb = new MariaDBContainer<>("mariadb:10.6")
                 .withDatabaseName("videodb")
                 .withUsername("videouser")
                 .withPassword("secret1234")
                 .withNetwork(n);
 
-        mysql.start();
-        String jdbcUrl = mysql.getJdbcUrl();
+        mariadb.start();
+        String jdbcUrl = mariadb.getJdbcUrl();
         System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(1080)));
         System.setProperty("short.link.base.url", "http://shortlink");
@@ -77,16 +76,16 @@ public class TestApplication extends SpringBootServletInitializer {
 
         int phpMyAdminPort = 8123;
         int phpMyAdminContainerPort = 80;
-        Consumer<CreateContainerCmd> cmd = e -> e.withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort)));
+        Consumer<CreateContainerCmd> cmd = e -> e.withHostConfig(new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort))));
 
         System.out.println("------------------------");
-        System.out.println(mysql.getNetworkAliases().get(0));
+        System.out.println(mariadb.getNetworkAliases().get(0));
 
         HashMap<String, String> environmentMap = new HashMap<>();
-        environmentMap.put("PMA_HOST", (String) mysql.getNetworkAliases().get(0));
+        environmentMap.put("PMA_HOST", mariadb.getNetworkAliases().get(0));
         environmentMap.put("PMA_USER", "videouser");
         environmentMap.put("PMA_PASSWORD", "secret1234");
-        GenericContainer phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").
+        GenericContainer<?> phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").
                 withEnv(environmentMap).
                 withNetwork(n).
                 withCreateContainerCmdModifier(cmd);
@@ -120,8 +119,8 @@ public class TestApplication extends SpringBootServletInitializer {
 
         jetStreamService.start();
 
-        jetStreamPath = "nats://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(4222);
-        var natsHttpPath = "http://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(8222);
+        jetStreamPath = "nats://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(4222);
+        var natsHttpPath = "http://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(8222);
         logger.info("NATS path: " + jetStreamPath);
         logger.info("NATS http path: " + natsHttpPath);
 
@@ -142,13 +141,13 @@ public class TestApplication extends SpringBootServletInitializer {
 
     private static void createOrganisationService(Network n) {
         // Organisation mock server
-        var organisationService = new MockServerContainer().
+        var organisationService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0")).
                 withNetwork(n).
                 withNetworkAliases("organisation");
         organisationService.start();
         testOrganisationFrontend = organisationService;
 //        attachLogger(organisationService, organisationLogger);
-        var mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
+        var mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));

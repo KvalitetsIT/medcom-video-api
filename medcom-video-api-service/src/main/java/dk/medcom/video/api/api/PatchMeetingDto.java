@@ -3,7 +3,7 @@ package dk.medcom.video.api.api;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +57,10 @@ public class PatchMeetingDto {
     private Integer guestPin;
     @JsonIgnore
     private boolean guestPinSet;
+
+    private List<AdditionalInformationType> additionalInformation;
+    @JsonIgnore
+    private boolean additionalInfoSet;
 
 
     public String getSubject() {
@@ -200,5 +204,18 @@ public class PatchMeetingDto {
 
     public boolean isGuestPinSet() {
         return guestPinSet;
+    }
+
+    public List<AdditionalInformationType> getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+        this.additionalInformation = additionalInformation;
+        this.additionalInfoSet = true;
+    }
+
+    public boolean isAdditionalInfoSet() {
+        return additionalInfoSet;
     }
 }

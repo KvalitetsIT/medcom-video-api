@@ -9,6 +9,5 @@ import java.util.List;
 public interface OrganisationRepository extends CrudRepository<Organisation, Long> {
 	
 	Organisation findByOrganisationId(String organisationId);
-
 	List<Organisation> findByPoolSizeNotNull();
 }

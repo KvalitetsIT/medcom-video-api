@@ -119,6 +119,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 			add(selfLink);
 			
 		} catch (RessourceNotFoundException e) {
+			// Empty
 		}
 	}
 	

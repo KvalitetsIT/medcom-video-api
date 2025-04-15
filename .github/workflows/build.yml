@@ -18,11 +18,11 @@ jobs:
         echo "DOCKER_DOCUMENTATION=kvalitetsit/medcom-video-api-documentation" >> $GITHUB_ENV
 
 # Checkout source code
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
 # Cache maven stuff
     - name: Cache local Maven repository
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -37,7 +37,7 @@ jobs:
 
 # Login to docker hub using secrets in GitHub.
     - name: Login to docker
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -48,7 +48,7 @@ jobs:
 
     - name: Generate Jacoco Badge
       id: jacoco
-      uses: cicirello/jacoco-badge-generator@v2.9.0
+      uses: cicirello/jacoco-badge-generator@v2.11.0
       with:
         jacoco-csv-file: medcom-video-api-qa/target/site/jacoco-aggregate/jacoco.csv
 
@@ -57,7 +57,7 @@ jobs:
         echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
 
     - name: Upload Jacoco coverage report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jacoco-report
         path: medcom-video-api-qa/target/site/jacoco-aggregate/

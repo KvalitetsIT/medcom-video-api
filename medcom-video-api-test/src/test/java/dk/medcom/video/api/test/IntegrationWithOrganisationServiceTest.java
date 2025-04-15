@@ -3,20 +3,15 @@ package dk.medcom.video.api.test;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.net.MediaType;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
 import io.nats.client.api.StreamConfiguration;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
 import org.mockserver.matchers.Times;
-import org.mockserver.model.Header;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
-import org.mockserver.model.JsonBody;
+import org.mockserver.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.*;
@@ -24,17 +19,18 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.DockerImageName;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 
 public class IntegrationWithOrganisationServiceTest {
-	private static final Logger mysqlLogger = LoggerFactory.getLogger("mysql");
+	private static final Logger mariadbLogger = LoggerFactory.getLogger("mariadb");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
@@ -47,12 +43,11 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	protected static GenericContainer testOrganisationFrontend;
+	private static final MariaDBContainer<?> mariadb;
 	private static GenericContainer<?> jetStreamService;
 	private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
 	private static final String natsSubjectAudit = "natsSubject";
-	private static final MySQLContainer<?> mysql;
 
 	private static final String DB_USER = "videouser";
 	private static final String DB_PASSWORD = "secret1234";
@@ -75,31 +70,31 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mysql = new MySQLContainer<>("mysql:5.7")
+		mariadb = new MariaDBContainer<>("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
 				.withNetwork(dockerNetwork)
-				.withNetworkAliases("mysql");
-		mysql.start();
-		attachLogger(mysql, mysqlLogger);
+				.withNetworkAliases("mariadb");
+		mariadb.start();
+		attachLogger(mariadb, mariadbLogger);
 
 		// Mock server
-		MockServerContainer userService = new MockServerContainer()
+		MockServerContainer userService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("userservice");
 		userService.start();
 		attachLogger(userService, mockServerLogger);
-		MockServerClient mockServerClient = new MockServerClient(userService.getContainerIpAddress(), userService.getMappedPort(1080));
+		MockServerClient mockServerClient = new MockServerClient(userService.getHost(), userService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// Organisation mock server
-		var organisationService = new MockServerContainer().
+		var organisationService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0")).
 				withNetwork(dockerNetwork).
 				withNetworkAliases("organisation");
 		organisationService.start();
 		attachLogger(organisationService, organisationLogger);
-		mockServerClient = new MockServerClient(organisationService.getContainerIpAddress(), organisationService.getMappedPort(1080));
+		mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
@@ -116,7 +111,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("videoapi")
 				.withEnv("CONTEXT", "/api")
-				.withEnv("jdbc_url", "jdbc:mysql://mysql:3306/videodb?useSSL=false&serverTimezone=UTC")
+				.withEnv("jdbc_url", "jdbc:mariadb://mariadb:3306/videodb?useSSL=false&serverTimezone=UTC")
 				.withEnv("jdbc_user", DB_USER)
 				.withEnv("jdbc_pass", DB_PASSWORD)
 				.withEnv("userservice_url", "http://userservice:1080")
@@ -162,7 +157,7 @@ public class IntegrationWithOrganisationServiceTest {
 
 				.withEnv("events.nats.subject.scheduling-info", "schedulingInfo")
 
-				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist")
+				.withEnv("event.organisation.filter", "some_random_org_that_does_not_exist,new provisioner company")
 				.withEnv("pool.fill.organisation.user", "some@email")
 				.withEnv("pool.fill.organisation", "some_org")
 				.withEnv("pool.fill.interval", "PT1M")
@@ -170,7 +165,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
-				.waitingFor(Wait.forListeningPort()).withStartupTimeout(Duration.ofSeconds(180));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
+				.waitingFor(Wait.forHttp("/manage/actuator/health").forPort(8081).forStatusCode(200).withStartupTimeout(Duration.ofSeconds(180)));//(Wait.forHttp("/api/actuator/info").forStatusCode(200));
 		videoApi.start();
 		videoApiPort = videoApi.getMappedPort(8080);
 		videoAdminApiPort = videoApi.getMappedPort(8081);
@@ -196,7 +191,7 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	String getJdbcUrl() {
-		return mysql.getJdbcUrl();
+		return mariadb.getJdbcUrl();
 	}
 
 	public static void setupJetStream() throws JetStreamApiException, IOException, InterruptedException {
@@ -214,8 +209,8 @@ public class IntegrationWithOrganisationServiceTest {
 		jetStreamService.start();
 		attachLogger(jetStreamService, jetStreamLogger);
 
-		jetStreamPath = "nats://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(4222);
-		var natsHttpPath = "http://" + jetStreamService.getContainerIpAddress() + ":" + jetStreamService.getMappedPort(8222);
+		jetStreamPath = "nats://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(4222);
+		var natsHttpPath = "http://" + jetStreamService.getHost() + ":" + jetStreamService.getMappedPort(8222);
 		logger.info("NATS path: " + jetStreamPath);
 		logger.info("NATS http path: " + natsHttpPath);
 
@@ -234,7 +229,7 @@ public class IntegrationWithOrganisationServiceTest {
 		}
 	}
 
-	protected static void attachLogger(GenericContainer container, Logger logger) {
+	protected static void attachLogger(GenericContainer<?> container, Logger logger) {
 		logger.info("Attaching logger to container: " + container.getContainerInfo().getName());
 
 		Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(logger);
@@ -249,8 +244,8 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 
-		return ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getContainerIpAddress(), videoAdminApiPort)));
+		return ClientBuilder.newClient().register(provider)
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/manage", videoApi.getHost(), videoAdminApiPort)));
 	}
 
 	WebTarget getClient() {
@@ -261,8 +256,8 @@ public class IntegrationWithOrganisationServiceTest {
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		provider.setMapper(objectMapper);
 
-		return ClientBuilder.newClient(new ClientConfig(provider))
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getContainerIpAddress(), videoApiPort)));
+		return ClientBuilder.newClient().register(provider)
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)));
 	}
 
 	private static HttpResponse getResponse() {
@@ -270,7 +265,7 @@ public class IntegrationWithOrganisationServiceTest {
 	}
 
 	void verifyRowExistsInDatabase(String sql) throws SQLException {
-		Connection conn = DriverManager.getConnection(mysql.getJdbcUrl(), DB_USER, DB_PASSWORD);
+		Connection conn = DriverManager.getConnection(mariadb.getJdbcUrl(), DB_USER, DB_PASSWORD);
 
 		Statement st = conn.createStatement();
 

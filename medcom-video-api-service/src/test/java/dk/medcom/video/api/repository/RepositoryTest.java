@@ -1,6 +1,6 @@
 package dk.medcom.video.api.repository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 
 import org.junit.BeforeClass;
@@ -9,10 +9,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import org.testcontainers.containers.MySQLContainer;
 
 import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
+import org.testcontainers.containers.MariaDBContainer;
 
 import java.util.TimeZone;
 
@@ -31,15 +31,15 @@ abstract public class RepositoryTest {
 	}
 
 	@BeforeClass
-	public static void setupMySqlJdbcUrl() {
+	public static void setupMariaDbJdbcUrl() {
 		if(!initialized) {
-			MySQLContainer mysql = new MySQLContainer("mysql:5.7")
+			MariaDBContainer<?> mariadb = new MariaDBContainer<>("mariadb:10.6")
 					.withDatabaseName("videodb")
 					.withUsername("videouser")
 					.withPassword("secret1234");
-			mysql.start();
+			mariadb.start();
 
-			String jdbcUrl = mysql.getJdbcUrl() + "?useSSL=false&serverTimeZone=UTC";
+			String jdbcUrl = mariadb.getJdbcUrl() + "?useSSL=false&serverTimeZone=UTC";
 			System.setProperty("jdbc.url", jdbcUrl);
 
 			initialized = true;

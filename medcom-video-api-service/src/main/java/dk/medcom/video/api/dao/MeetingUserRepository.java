@@ -6,7 +6,5 @@ import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 
 public interface MeetingUserRepository extends CrudRepository<MeetingUser, Long> {
-
-	public MeetingUser findOneByOrganisationAndEmail(Organisation organisation, String email);
-
+	MeetingUser findOneByOrganisationAndEmail(Organisation organisation, String email);
 }

@@ -4,16 +4,16 @@ import dk.medcom.video.api.organisation.model.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.UriBuilder;
 import java.util.List;
 
 public class OrganisationServiceClientImpl implements OrganisationServiceClient {
     private static final Logger logger = LoggerFactory.getLogger(OrganisationServiceClientImpl.class);
-    private String endpoint;
+    private final String endpoint;
 
     public OrganisationServiceClientImpl(String endpoint) {
         this.endpoint = endpoint;
@@ -50,6 +50,7 @@ public class OrganisationServiceClientImpl implements OrganisationServiceClient 
                 .target(UriBuilder.fromPath(endpoint))
                 .path("organisation")
                 .request()
-                .get(new GenericType<List<Organisation>>(){});
+                .get(new GenericType<>() {
+                });
     }
 }

@@ -14,6 +14,7 @@ import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,9 @@ public class PoolInfoServiceImpl implements PoolInfoService {
             poolInfo.setAvailablePoolSize((int) schedulingInfos.stream().filter(x -> x.getOrganisation().getOrganisationId().equals(o.getCode())).count());
 
             poolInfo.setSchedulingTemplate(getSchedulingTemplate(o));
-            
+
+            poolInfo.setSchedulingInfoList(schedulingInfos.stream().filter(x -> x.getOrganisation().getOrganisationId().equals(o.getCode())).sorted(Comparator.comparing(SchedulingInfo::getCreatedTime).reversed()).toList());
+
             return poolInfo;
         }).collect(Collectors.toList());
     }

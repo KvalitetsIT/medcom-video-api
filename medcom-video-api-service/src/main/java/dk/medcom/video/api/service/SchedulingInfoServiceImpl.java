@@ -13,6 +13,7 @@ import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
+import dk.medcom.video.api.service.mapper.SchedulingInfoEventMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,14 +92,16 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public List<SchedulingInfo> getSchedulingInfoAwaitsProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(new Date(), ProvisionStatus.AWAITS_PROVISION);
 
-		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		LOGGER.debug("getSchedulingInfoAwaitsProvision found following ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
+
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
 
-		return schedulingInfos.stream().filter(x -> !newProvisionerOrganisationFilter.newProvisioner(x.getOrganisation().getOrganisationId())).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -194,7 +197,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
-		//Overwrite template value with input parameters 
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+
+		//Overwrite template value with input parameters
 		if (createMeetingDto.getMaxParticipants() > 0) { 
 			schedulingInfo.setMaxParticipants(createMeetingDto.getMaxParticipants());
 			LOGGER.debug("MaxParticipants is taken from input: " + createMeetingDto.getMaxParticipants());
@@ -280,7 +285,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
-		schedulingInfoEventPublisher.publishCreate(schedulingInfoEvent);
+		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent, schedulingInfo.isNewProvisioner());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
@@ -406,7 +411,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner());
 
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 		
@@ -421,9 +426,21 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE), schedulingInfo.isNewProvisioner());
 
-		LOGGER.debug("Exit deleteeSchedulingInfo");
+		LOGGER.debug("Exit deleteSchedulingInfo");
+	}
+
+	@Transactional(rollbackFor = Throwable.class)
+	@Override
+	public void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException {
+		LOGGER.debug("Entry deleteSchedulingInfoPool. uuid=" + uuid);
+
+		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+		schedulingInfoRepository.delete(schedulingInfo);
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner());
+
+		LOGGER.debug("Exit deleteSchedulingInfoPool");
 	}
 
 	private String createPortalLink(Date startTime, SchedulingInfo schedulingInfo) {
@@ -547,8 +564,10 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE), schedulingInfo.isNewProvisioner());
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
@@ -600,7 +619,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
-		if(!meeting.getOrganisation().getOrganisationId().equals(schedulingInfo.getOrganisation().getOrganisationId())) {
+		if(!meeting.getOrganisation().getOrganisationId().equals(organisationFromSchedulingInfo)) {
 			schedulingInfo.setOrganisation(meeting.getOrganisation());
 		}
 		if(fromOverflow) {
@@ -608,7 +627,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishCreate(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE));
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");

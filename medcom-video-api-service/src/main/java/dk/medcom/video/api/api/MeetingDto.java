@@ -45,6 +45,7 @@ public class MeetingDto extends RepresentationModel {
 	private String shortlink;
 	private GuestMicrophone guestMicrophone;
 	private boolean guestPinRequired;
+	private List<AdditionalInformationType> additionalInformation;
 
 	public MeetingDto() {
 		// Empty constructor
@@ -81,6 +82,7 @@ public class MeetingDto extends RepresentationModel {
 		guestPinRequired = meeting.getGuestPinRequired();
 
 		labels = meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList());
+		additionalInformation = meeting.getMeetingAdditionalInfo().stream().map(x -> new AdditionalInformationType(x.getInfoKey(), x.getInfoValue())).collect(Collectors.toList());
 
 		try { 
 			Link selfLink = linkTo(methodOn(MeetingSearchController.class).getMeetingByUUID(uuid)).withRel("self");
@@ -200,5 +202,13 @@ public class MeetingDto extends RepresentationModel {
 
 	public void setGuestPinRequired(boolean guestPinRequired) {
 		this.guestPinRequired = guestPinRequired;
+	}
+
+	public List<AdditionalInformationType> getAdditionalInformation() {
+		return additionalInformation;
+	}
+
+	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+		this.additionalInformation = additionalInformation;
 	}
 }

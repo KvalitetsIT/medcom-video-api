@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.mapper;
 
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
@@ -7,15 +7,18 @@ import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.service.domain.AdditionalInformationType;
 import dk.medcom.video.api.service.domain.GuestMicrophone;
 import dk.medcom.video.api.service.domain.UpdateMeeting;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 
 public class DomainMapper {
     public UpdateMeeting mapToUpdateMeeting(UpdateMeetingDto updateMeetingDto, Meeting meeting, SchedulingInfo schedulingInfo) {
         var updateMeeting = new UpdateMeeting();
+        updateMeeting.setMeetingAdditionalInfo(mapAdditionalInformationType(updateMeetingDto.getAdditionalInformation()));
         updateMeeting.setLabels(updateMeetingDto.getLabels());
         updateMeeting.setSubject(updateMeetingDto.getSubject());
         updateMeeting.setEndTime(updateMeetingDto.getEndTime());
@@ -49,6 +52,7 @@ public class DomainMapper {
         updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).toList());
         updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
+        updateMeetingDto.setMeetingAdditionalInfo(meeting.getMeetingAdditionalInfo().stream().map(x -> new AdditionalInformationType(x.getInfoKey(), x.getInfoValue())).toList());
         if(schedulingInfo.getHostPin() != null) {
             updateMeetingDto.setHostPin(new BigDecimal(schedulingInfo.getHostPin()));
         }
@@ -117,7 +121,18 @@ public class DomainMapper {
                 updateMeetingDto.setHostPin(new BigDecimal(patchMeetingDto.getHostPin()));
             }
         }
+        if (patchMeetingDto.isAdditionalInfoSet()) {
+            if (patchMeetingDto.getAdditionalInformation() == null) {
+                updateMeetingDto.setMeetingAdditionalInfo(Collections.emptyList());
+            } else {
+                updateMeetingDto.setMeetingAdditionalInfo(mapAdditionalInformationType(patchMeetingDto.getAdditionalInformation()));
+            }
+        }
 
         return updateMeetingDto;
+    }
+
+    private List<AdditionalInformationType> mapAdditionalInformationType(List<dk.medcom.video.api.api.AdditionalInformationType> additionalInformationType) {
+        return additionalInformationType.stream().map(x -> new AdditionalInformationType(x.key(), x.value())).toList();
     }
 }

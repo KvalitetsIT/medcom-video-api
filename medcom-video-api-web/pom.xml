@@ -12,12 +12,11 @@
 		<dependency>
 			<groupId>dk.medcom.video.api</groupId>
 			<artifactId>medcom-video-api-interface</artifactId>
-			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>dk.medcom.video.api</groupId>
 			<artifactId>medcom-video-api-service</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
@@ -25,18 +24,14 @@
 			<artifactId>logstash-logback-encoder</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-access</artifactId>
+			<version>1.5.16</version>
 			<scope>runtime</scope>
 		</dependency>
 
-<!--		&lt;!&ndash; Test dependencies &ndash;&gt;-->
-<!--		<dependency>-->
-<!--			<groupId>junit</groupId>-->
-<!--			<artifactId>junit</artifactId>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
 	</dependencies>
 	<build>
 		<plugins>
@@ -50,6 +45,7 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
+                <version>0.45.1</version>
 				<configuration>
 					<images>
 						<image>

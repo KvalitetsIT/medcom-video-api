@@ -1,4 +1,4 @@
-package dk.medcom.video.api.service;
+package dk.medcom.video.api.service.mapper;
 
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.domain.MessageType;
@@ -56,6 +56,7 @@ public class SchedulingInfoEventMapper {
             schedulingInfoEvent.setvMRStartTime(schedulingInfo.getvMRStartTime().toInstant());
         }
         schedulingInfoEvent.setDirectMedia(schedulingInfo.getDirectMedia().toString());
+        schedulingInfoEvent.setProvisionVMRId(schedulingInfo.getProvisionVMRId());
 
         return schedulingInfoEvent;
     }

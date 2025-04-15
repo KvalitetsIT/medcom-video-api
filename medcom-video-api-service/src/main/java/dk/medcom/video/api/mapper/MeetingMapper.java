@@ -1,5 +1,6 @@
 package dk.medcom.video.api.mapper;
 
+import dk.medcom.video.api.api.AdditionalInformationType;
 import dk.medcom.video.api.controller.MeetingSearchController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
@@ -47,6 +48,7 @@ public class MeetingMapper {
         meetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
 
         meetingDto.setLabels(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).collect(Collectors.toList()));
+        meetingDto.setAdditionalInformation(meeting.getMeetingAdditionalInfo().stream().map(x -> new AdditionalInformationType(x.getInfoKey(), x.getInfoValue())).toList());
 
         try {
             Link selfLink = linkTo(methodOn(MeetingSearchController.class).getMeetingByUUID(meetingDto.uuid)).withRel("self");

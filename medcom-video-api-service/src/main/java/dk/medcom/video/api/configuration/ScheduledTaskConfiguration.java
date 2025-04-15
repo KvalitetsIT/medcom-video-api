@@ -7,6 +7,8 @@ import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +23,8 @@ import javax.sql.DataSource;
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "PT1M", defaultLockAtLeastFor = "PT1M")
 public class ScheduledTaskConfiguration {
+    private static final Logger logger = LoggerFactory.getLogger(ScheduledTaskConfiguration.class);
+
     @Autowired
     private PoolHistoryService poolHistoryService;
 
@@ -30,22 +34,27 @@ public class ScheduledTaskConfiguration {
     @Value("${pool.fill.disabled:false}")
     private boolean poolFillDisabled;
 
-    @SchedulerLock(name = "cleanup")
+    @SchedulerLock(name = "history")
     @Scheduled(fixedDelayString = "PT1M" )
-    public void cleanupService() {
+    public void calculateHistoryService() {
         LockAssert.assertLocked();
 
         poolHistoryService.calculateHistory();
     }
 
-    @SchedulerLock(name = "fillPools", lockAtLeastFor = "PT0S")
+    @SchedulerLock(name = "fillPools", lockAtLeastFor = "PT20S")
     @Scheduled(fixedDelayString = "${pool.fill.interval}")
     public void fillPools() {
+        var start = System.currentTimeMillis();
+        logger.debug("fillPools before assertLocked.");
         LockAssert.assertLocked();
+        logger.debug("fillPools after assertLocked.");
 
         if(!poolFillDisabled) {
-            poolService.fillPools();
+            poolService.fillAndDeletePools();
         }
+
+        logger.debug("fillPools took {} ms.", System.currentTimeMillis() - start);
     }
 
     @Bean

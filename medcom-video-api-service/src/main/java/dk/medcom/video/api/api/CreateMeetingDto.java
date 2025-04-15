@@ -2,10 +2,10 @@ package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +75,8 @@ public class CreateMeetingDto {
 	@Max(value = 999999999, message = "guestPin should not be larger than 999999999.")
 	@Min(value = 1000, message = "guestPin should not be less than 1000.")
 	private Integer guestPin;
+
+	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
 	public List<String> getLabels() {
 		return labels;
@@ -300,5 +302,13 @@ public class CreateMeetingDto {
 
 	public void setHostPin(Integer hostPin) {
 		this.hostPin = hostPin;
+	}
+
+	public List<AdditionalInformationType> getAdditionalInformation() {
+		return additionalInformation;
+	}
+
+	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
+		this.additionalInformation = additionalInformation;
 	}
 }

@@ -114,10 +114,22 @@ info:
     </Ul>
     1.10.0
     <Ul>
-    <Li> Add direct_media to scheduling info and scheduling template.
+      <Li> Add direct_media to scheduling info and scheduling template.
     </Ul>
+    1.12.0
+    <Ul>
+      <Li> Add additional_information to meeting and create-meeting.
+    </Ul>
+    1.12.3
+    <Ul>
+      <Li> Add error message for duplicate key in additional information.
+    </Ul>
+    1.13.0
+    <UL>
+      <Li> Update documentation to match source code.
+    </UL>
 
-  version: "1.7.12"
+  version: "1.12.3"
   contact:
     email: development@kvalitetitsit.dk
 tags:
@@ -1048,6 +1060,9 @@ components:
         shortLink:
           type: string
           example: https://m.vconf.dk/abcdefghijkl
+        shortlink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
         externalId:
           type: string
           maxLength: 200
@@ -1088,6 +1103,10 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
     create-meeting:
       type: object
       required:
@@ -1213,6 +1232,10 @@ components:
           format: int32
           minimum: 10000
           maximum: 999999999
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
 
     update-meeting:
       type: object
@@ -1249,6 +1272,10 @@ components:
           items:
             type: string
             description: Array of labels to attach to meeting.
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
     patch-meeting:
       type: object
       properties:
@@ -1304,6 +1331,10 @@ components:
           format: int32
           minimum: 10000
           maximum: 999999999
+        additionalInformation:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalInformationType'
 
     scheduling-info:
       type: object
@@ -1315,7 +1346,6 @@ components:
         - uriWithDomain
         - uriWithoutDomain
         - provisionStatus
-        - meetingDetails
       properties:
         uuid:
           type: string
@@ -1349,6 +1379,7 @@ components:
           type: string
           maxLength: 100
           example: 1782
+          nullable: true
         provisionStatus:
           $ref: '#/components/schemas/provisionStatus'
         provisionStatusDescription:
@@ -1444,6 +1475,14 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-info/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        directMedia:
+          $ref: '#/components/schemas/directMedia'
+        shortLink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
+        shortlink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
     create-scheduling-info:
       type: object
       required:
@@ -1474,9 +1513,6 @@ components:
           maxLength: 50
     meetingUser:
       type: object
-      required:
-        - organisationId
-        - email
       properties:
         organisationId:
           type: string
@@ -1545,6 +1581,20 @@ components:
       enum:
         - never
         - best_effort
+    additionalInformationType:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          maxLength: 100
+          description: additional information key
+        value:
+          type: string
+          maxLength: 100
+          description: additional information value
 
     scheduling-template:
       type: object
@@ -1556,7 +1606,7 @@ components:
         - uriDomain
         - hostPinRequired
         - guestPinRequired
-        - vmrAvailableBefore
+        - vMRAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriNumberRangeLow
@@ -1606,7 +1656,7 @@ components:
           type: integer
           format: int32
           example: 9999
-        vmrAvailableBefore:
+        vMRAvailableBefore:
           type: integer
           format: int32
           example: 30
@@ -2043,3 +2093,5 @@ components:
           errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'
         - errorCode: 110
           errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.'
+        - errorCode: 120
+          errorText: "Additional info keys not unique for meeting."

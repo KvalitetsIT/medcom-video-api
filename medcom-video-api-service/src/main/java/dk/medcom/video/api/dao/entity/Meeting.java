@@ -2,7 +2,7 @@ package dk.medcom.video.api.dao.entity;
 
 import dk.medcom.video.api.api.GuestMicrophone;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,10 +50,14 @@ public class Meeting {
 	@OneToMany(mappedBy = "meeting")
 	private Set<MeetingLabel> meetingLabels = new HashSet<>();
 
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private GuestMicrophone guestMicrophone;
 
 	private boolean guestPinRequired;
+
+	@OneToMany(mappedBy = "meeting")
+	private Set<MeetingAdditionalInfo> meetingAdditionalInfo = new HashSet<>();
 
 	public Long getId() {
 		return id;
@@ -193,5 +197,18 @@ public class Meeting {
 
 	public void setGuestPinRequired(boolean guestPinRequired) {
 		this.guestPinRequired = guestPinRequired;
+	}
+
+	public Set<MeetingAdditionalInfo> getMeetingAdditionalInfo() {
+		return meetingAdditionalInfo;
+	}
+
+	public void setMeetingAdditionalInfo(Set<MeetingAdditionalInfo> meetingAdditionalInformation) {
+		this.meetingAdditionalInfo = meetingAdditionalInformation;
+	}
+
+	public void addMeetingAdditionalInformation(MeetingAdditionalInfo meetingAdditionalInformation) {
+		meetingAdditionalInformation.setMeeting(this);
+		meetingAdditionalInfo.add(meetingAdditionalInformation);
 	}
 }

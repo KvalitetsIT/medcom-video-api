@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import dk.medcom.video.api.dao.entity.SchedulingStatus;
 
 public interface SchedulingStatusRepository extends CrudRepository<SchedulingStatus, Long> {
-
 	@Modifying
 	@Transactional
 	Long deleteByMeetingId(Long meetingId);

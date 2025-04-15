@@ -1,7 +1,6 @@
 package dk.medcom.video.api.service.domain;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class SchedulingInfoEvent {
 
@@ -38,6 +37,7 @@ public class SchedulingInfoEvent {
     private String ivrThemeProvisionId;
     private Instant meetingEndTime;
     private String directMedia;
+    private String provisionVMRId;
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
@@ -293,5 +293,13 @@ public class SchedulingInfoEvent {
 
     public void setDirectMedia(String directMedia) {
         this.directMedia = directMedia;
+    }
+
+    public String getProvisionVMRId() {
+        return provisionVMRId;
+    }
+
+    public void setProvisionVMRId(String provisionVMRId) {
+        this.provisionVMRId = provisionVMRId;
     }
 }
