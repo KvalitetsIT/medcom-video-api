@@ -16,7 +16,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<testcontainers.version>1.19.7</testcontainers.version>
 		<spring-prometheus-app-info-version>2.0.3</spring-prometheus-app-info-version>
-		<spring-request-id-logger-version>2.0.0</spring-request-id-logger-version>
+		<spring-request-id-logger-version>2.0.1</spring-request-id-logger-version>
 		<shed-lock-version>5.11.0</shed-lock-version>
 	</properties>
 	<dependencies>
@@ -103,7 +103,7 @@
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-core</artifactId>
-				<version>10.22.0</version>
+				<version>11.7.1</version>
 			</dependency>
 
 			<dependency>
@@ -129,7 +129,7 @@
 			<dependency>
 				<groupId>org.glassfish.jersey</groupId>
 				<artifactId>jersey-bom</artifactId>
-				<version>3.1.2</version>
+				<version>3.1.10</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
