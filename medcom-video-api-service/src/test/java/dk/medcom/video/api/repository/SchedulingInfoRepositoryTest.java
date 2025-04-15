@@ -8,7 +8,7 @@ import dk.medcom.video.api.helper.TestDataHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;

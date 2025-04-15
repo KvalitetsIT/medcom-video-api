@@ -5,7 +5,7 @@ import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;

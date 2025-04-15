@@ -7,13 +7,13 @@ import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class OrganisationInterceptor extends HandlerInterceptorAdapter {
+public class OrganisationInterceptor implements HandlerInterceptor {
     private final OrganisationStrategy organisationFacade;
     private final OrganisationRepository organisationRepository;
     private final OrganisationServiceClient organisationServiceClient;

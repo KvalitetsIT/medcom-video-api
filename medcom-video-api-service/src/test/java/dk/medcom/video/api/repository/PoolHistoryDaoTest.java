@@ -5,7 +5,7 @@ import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.entity.PoolHistory;
 import org.junit.Test;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.time.Instant;
 
 public class PoolHistoryDaoTest extends RepositoryTest {

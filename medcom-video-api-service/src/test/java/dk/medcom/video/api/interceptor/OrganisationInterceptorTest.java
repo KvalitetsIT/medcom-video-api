@@ -36,7 +36,7 @@ public class OrganisationInterceptorTest {
 
        organisationInterceptor = new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
 
-       MockitoAnnotations.initMocks(this);
+       MockitoAnnotations.openMocks(this);
     }
 
     @Test
