@@ -1,6 +1,6 @@
 package dk.medcom.video.api.dao.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "meeting_labels")

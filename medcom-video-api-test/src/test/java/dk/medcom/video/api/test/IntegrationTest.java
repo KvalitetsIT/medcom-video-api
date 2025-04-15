@@ -15,13 +15,14 @@ import org.testcontainers.containers.*;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.DockerImageName;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,11 +44,9 @@ public class IntegrationTest {
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
 	private static final Logger newmanLogger = LoggerFactory.getLogger("newman");
 
-	private static boolean commandLine;
-
 	private static Network dockerNetwork;
-	private static GenericContainer resourceContainer;
-	private static GenericContainer videoApi;
+	private static GenericContainer<?> resourceContainer;
+	private static GenericContainer<?> videoApi;
 	private static Integer videoApiPort;
 
 	@BeforeClass
@@ -69,7 +68,7 @@ public class IntegrationTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		MariaDBContainer mariadb = (MariaDBContainer) new MariaDBContainer("mariadb:10.6")
+		var mariadb = new MariaDBContainer<>("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername("videouser")
 				.withPassword("secret1234")
@@ -79,12 +78,12 @@ public class IntegrationTest {
 		attachLogger(mariadb, mariaDbLogger);
 
 		// Mock server
-		MockServerContainer userService = new MockServerContainer()
+		MockServerContainer userService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))
 				.withNetwork(dockerNetwork)
 				.withNetworkAliases("userservice");
 		userService.start();
 		attachLogger(userService, mockServerLogger);
-		MockServerClient mockServerClient = new MockServerClient(userService.getContainerIpAddress(), userService.getMappedPort(1080));
+		MockServerClient mockServerClient = new MockServerClient(userService.getHost(), userService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET"), Times.unlimited()).respond(getResponse());
 
 		// VideoAPI
@@ -133,7 +132,7 @@ public class IntegrationTest {
 		attachLogger(videoApi, videoApiLogger);
 	}
 
-	private static void attachLogger(GenericContainer container, Logger logger) {
+	private static void attachLogger(GenericContainer<?> container, Logger logger) {
 		logger.info("Attaching logger to container: " + container.getContainerInfo().getName());
 		Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(logger);
 		container.followOutput(logConsumer);
@@ -145,7 +144,7 @@ public class IntegrationTest {
 		TemporaryFolder folder = new TemporaryFolder();
 		folder.create();
 
-		GenericContainer newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
+		GenericContainer<?> newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
 					.withNetwork(dockerNetwork)
 					.withVolumesFrom(resourceContainer, BindMode.READ_WRITE)
 					.withCommand("run /collections/medcom-video-api.postman_collection.json -r cli,junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi --global-var port=8080");
@@ -204,10 +203,9 @@ public class IntegrationTest {
 	}
 
 	WebTarget getClient() {
-		WebTarget target =  ClientBuilder.newClient()
-				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getContainerIpAddress(), videoApiPort)));
 
-		return target;
+		return ClientBuilder.newClient()
+				.target(UriBuilder.fromUri(String.format("http://%s:%s/api/", videoApi.getHost(), videoApiPort)));
 	}
 
 	private static HttpResponse getResponse() {

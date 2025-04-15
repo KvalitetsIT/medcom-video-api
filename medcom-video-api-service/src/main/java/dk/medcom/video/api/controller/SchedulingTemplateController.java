@@ -6,7 +6,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.service.SchedulingTemplateService;

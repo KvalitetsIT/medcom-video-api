@@ -3,12 +3,12 @@ package dk.medcom.video.api.test;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.api.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.InfoApi;
-import io.swagger.client.api.VideoMeetingsApi;
-import io.swagger.client.api.VideoSchedulingInformationApi;
-import io.swagger.client.model.*;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.api.InfoApi;
+import org.openapitools.client.api.VideoMeetingsApi;
+import org.openapitools.client.api.VideoSchedulingInformationApi;
+import org.openapitools.client.model.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,9 +18,9 @@ import org.testcontainers.containers.GenericContainer;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -133,6 +133,20 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
+	public void testCanReadMeetingWithTrailingSlash() {
+		var result = getClient()
+				.path("meetings")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc2/")
+				.request()
+				.get(MeetingDto.class);
+
+		assertNotNull(result);
+		assertEquals(12, result.getShortId().length());
+		assertEquals("https://video.link/" + result.getShortId(), result.getShortLink());
+		assertEquals("external_id", result.getExternalId());
+	}
+
+	@Test
 	public void testUriWithDomain() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
 		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
@@ -201,7 +215,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		updateMeeting.setLabels(new ArrayList<>());
 		updateMeeting.getLabels().add("Another Label");
 
-		var updatedMeeting = videoMeetings.meetingsUuidPut(updateMeeting, createdMeeting.getUuid());
+		var updatedMeeting = videoMeetings.meetingsUuidPut(createdMeeting.getUuid(), updateMeeting);
 		assertNotNull(updatedMeeting);
 		assertEquals(createMeeting.getExternalId(), updatedMeeting.getExternalId());
 		assertEquals(1, updatedMeeting.getLabels().size());
@@ -253,7 +267,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertFalse(meeting.isGuestPinRequired());
+		assertFalse(meeting.getGuestPinRequired());
 	}
 
 	@Test
@@ -264,7 +278,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertFalse(meeting.isGuestPinRequired());
+		assertFalse(meeting.getGuestPinRequired());
 	}
 
 	@Test
@@ -275,7 +289,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertTrue(meeting.isGuestPinRequired());
+		assertTrue(meeting.getGuestPinRequired());
 	}
 
 	@Test
@@ -283,7 +297,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting("external_id");
 
 		try {
-			videoMeetings.meetingsPostWithHttpInfo(createMeeting);
+			videoMeetings.meetingsPost(createMeeting);
 			fail();
 		}
 		catch(ApiException e) {
@@ -401,7 +415,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		request.setDescription("SOME DESCRIPTION");
 		request.setGuestPinRequired(true);
 		request.setAdditionalInformation(List.of(createAdditionalInformationType("new key", "new value"), createAdditionalInformationType("another key", "another value")));
-		var response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
+		var response = videoMeetings.meetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
 		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
 		// Then
@@ -413,7 +427,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
 		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
-		assertEquals(true, getResponse.isGuestPinRequired());
+		assertEquals(true, getResponse.getGuestPinRequired());
 		assertEquals(2, getResponse.getAdditionalInformation().size());
 		assertTrue(getResponse.getAdditionalInformation().containsAll(request.getAdditionalInformation()));
 		assertEquals(originalSchedulingInfo.getHostPin(), updatedSchedulingInfo.getHostPin());
@@ -423,7 +437,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		request = new PatchMeeting();
 		request.setHostPin(4321);
 		request.setGuestPin(1234);
-		response = videoMeetings.meetingsUuidPatch(request, UUID.fromString(createResponse.getUuid()));
+		response = videoMeetings.meetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
 
 		// Then
 		assertNotNull(response);

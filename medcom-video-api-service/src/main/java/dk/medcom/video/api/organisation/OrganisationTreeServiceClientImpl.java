@@ -2,9 +2,9 @@ package dk.medcom.video.api.organisation;
 
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.UriBuilder;
 
 public class OrganisationTreeServiceClientImpl implements OrganisationTreeServiceClient {
     private final String endpoint;
@@ -21,6 +21,7 @@ public class OrganisationTreeServiceClientImpl implements OrganisationTreeServic
                 .path("organisationtree")
                 .queryParam("organisationCode", organisationCode)
                 .request()
-                .get(new GenericType<OrganisationTree>(){});
+                .get(new GenericType<>() {
+                });
     }
 }
