@@ -22,7 +22,7 @@ set organized_by = created_by;
 ALTER TABLE meetings
 MODIFY COLUMN organized_by bigint(20) NOT NULL;
 
----
+--
 
 ALTER TABLE meetings
 ADD COLUMN updated_by bigint(20),

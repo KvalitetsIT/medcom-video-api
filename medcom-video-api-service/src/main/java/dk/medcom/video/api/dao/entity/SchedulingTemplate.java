@@ -5,7 +5,7 @@ import dk.medcom.video.api.api.ViewType;
 import dk.medcom.video.api.api.VmrQuality;
 import dk.medcom.video.api.api.VmrType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -37,12 +37,16 @@ public class SchedulingTemplate {
 	private String ivrTheme;  				//theme to use in Pexip
 	private boolean isDefaultTemplate;		//an organisation can have one default template
 	private boolean isPoolTemplate;				//an organisation can have one or zero pool templates
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private VmrType vmrType;				//type of the virtual meeting room.
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ViewType hostView;				//the layout seen by Hosts.
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private ViewType guestView;				//the layout seen by Guests
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private VmrQuality vmrQuality;			//controls the maximum call quality for participants connecting to this service.
 	private boolean enableOverlayText;		//if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
@@ -50,6 +54,7 @@ public class SchedulingTemplate {
 	private boolean forcePresenterIntoMain;	//controls whether the Host who is presenting is locked into the main video position
 	private boolean forceEncryption;
 	private boolean muteAllGuests;			//controls whether to mute guests when they first join the conference
+	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
 	@ManyToOne
