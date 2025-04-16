@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.domain;
 
 import dk.medcom.video.api.api.AdditionalInformationType;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
@@ -51,8 +51,8 @@ public class DomainMapperTest {
         assertEquals(input.getSubject(), result.getSubject());
         assertEquals(input.getLabels(), result.getLabels());
         assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
-        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
-        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
+        assertEquals(input.getAdditionalInformation().getFirst().key(), result.getMeetingAdditionalInfo().getFirst().key());
+        assertEquals(input.getAdditionalInformation().getFirst().value(), result.getMeetingAdditionalInfo().getFirst().value());
         assertEquals(meeting.getGuestMicrophone().toString(), result.getGuestMicrophone().toString());
         assertEquals(meeting.getGuestPinRequired(), result.isGuestPinRequired());
         assertEquals(schedulingInfo.getHostPin().longValue(), result.getHostPin().longValue());
@@ -103,8 +103,8 @@ public class DomainMapperTest {
         assertEquals(input.getHostPin().intValue(), result.getHostPin().intValue());
         assertEquals(input.getGuestPin().intValue(), result.getGuestPin().intValue());
         assertEquals(input.getAdditionalInformation().size(), result.getMeetingAdditionalInfo().size());
-        assertEquals(input.getAdditionalInformation().get(0).key(), result.getMeetingAdditionalInfo().get(0).key());
-        assertEquals(input.getAdditionalInformation().get(0).value(), result.getMeetingAdditionalInfo().get(0).value());
+        assertEquals(input.getAdditionalInformation().getFirst().key(), result.getMeetingAdditionalInfo().getFirst().key());
+        assertEquals(input.getAdditionalInformation().getFirst().value(), result.getMeetingAdditionalInfo().getFirst().value());
     }
 
     @Test

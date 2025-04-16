@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.PoolInfoDto;
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.OrganisationRepository;
@@ -66,14 +66,14 @@ public class PoolInfoServiceImpl implements PoolInfoService {
         dk.medcom.video.api.dao.entity.Organisation org = organisationRepository.findByOrganisationId(o.getCode());
         if(org != null) {
             List<SchedulingTemplate> schedulingTemplatesPool = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(org, true);
-            if (schedulingTemplatesPool != null && schedulingTemplatesPool.size() > 0) {
-                return mapSchedulingTemplate(schedulingTemplatesPool.get(0));
+            if (schedulingTemplatesPool != null && !schedulingTemplatesPool.isEmpty()) {
+                return mapSchedulingTemplate(schedulingTemplatesPool.getFirst());
             }
 
             List<SchedulingTemplate> schedulingTemplatesDefault = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(org, true);
 
-            if(schedulingTemplatesDefault != null && schedulingTemplatesDefault.size() > 0) {
-                return mapSchedulingTemplate(schedulingTemplatesDefault.get(0));
+            if(schedulingTemplatesDefault != null && !schedulingTemplatesDefault.isEmpty()) {
+                return mapSchedulingTemplate(schedulingTemplatesDefault.getFirst());
             }
         }
 

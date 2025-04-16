@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.PoolInfoDto;
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
@@ -74,9 +74,9 @@ public class PoolInfoServiceTest {
         assertNotNull(response);
         assertEquals(2, response.size());
 
-        PoolInfoDto firstPoolInfo = response.get(0);
-        assertEquals(organisations.get(0).getOrganisationId(), firstPoolInfo.getOrganizationId());
-        assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
+        PoolInfoDto firstPoolInfo = response.getFirst();
+        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNotNull(firstPoolInfo.getSchedulingTemplate());
@@ -107,9 +107,9 @@ public class PoolInfoServiceTest {
         assertNotNull(response);
         assertEquals(2, response.size());
 
-        PoolInfoDto firstPoolInfo = response.get(0);
-        assertEquals(organisations.get(0).getOrganisationId(), firstPoolInfo.getOrganizationId());
-        assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
+        PoolInfoDto firstPoolInfo = response.getFirst();
+        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNotNull(firstPoolInfo.getSchedulingTemplate());
@@ -138,9 +138,9 @@ public class PoolInfoServiceTest {
         assertNotNull(response);
         assertEquals(2, response.size());
 
-        PoolInfoDto firstPoolInfo = response.get(0);
-        assertEquals(organisations.get(0).getOrganisationId(), firstPoolInfo.getOrganizationId());
-        assertEquals(organisations.get(0).getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
+        PoolInfoDto firstPoolInfo = response.getFirst();
+        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNull(firstPoolInfo.getSchedulingTemplate());
@@ -187,8 +187,8 @@ public class PoolInfoServiceTest {
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        assertNotNull(result.get(0));
-        var org1 = result.get(0);
+        assertNotNull(result.getFirst());
+        var org1 = result.getFirst();
         assertEquals(3, org1.getSchedulingInfoList().size());
         assertEquals(now, org1.getSchedulingInfoList().get(0).getCreatedTime());
         assertEquals(someTimeAgo, org1.getSchedulingInfoList().get(1).getCreatedTime());
@@ -197,7 +197,7 @@ public class PoolInfoServiceTest {
         assertNotNull(result.get(1));
         var org2 = result.get(1);
         assertEquals(1, org2.getSchedulingInfoList().size());
-        assertEquals(someTimeAgo, org2.getSchedulingInfoList().get(0).getCreatedTime());
+        assertEquals(someTimeAgo, org2.getSchedulingInfoList().getFirst().getCreatedTime());
     }
 
     private List<SchedulingInfo> createSchedulingInfo() {
