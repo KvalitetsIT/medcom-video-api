@@ -8,17 +8,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.7</version>
+		<version>3.3.10</version>
 	</parent>
 
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<testcontainers.version>1.19.7</testcontainers.version>
+		<testcontainers.version>1.20.6</testcontainers.version>
 		<spring-prometheus-app-info-version>2.0.3</spring-prometheus-app-info-version>
-		<spring-request-id-logger-version>2.0.0</spring-request-id-logger-version>
+		<spring-request-id-logger-version>2.0.1</spring-request-id-logger-version>
 		<jacoco-version>0.8.12</jacoco-version>
-		<shed-lock-version>5.5.0</shed-lock-version>
+		<shed-lock-version>6.3.1</shed-lock-version>
 	</properties>
 	<dependencies>
 		<!-- Test -->
@@ -181,26 +181,26 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.16.1</version>
+				<version>1.18.0</version>
 			</dependency>
 
 			<!-- Flyway -->
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-core</artifactId>
-				<version>10.22.0</version>
+				<version>11.7.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.flywaydb</groupId>
 				<artifactId>flyway-mysql</artifactId>
-				<version>10.22.0</version>
+				<version>11.7.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.glassfish.jersey</groupId>
 				<artifactId>jersey-bom</artifactId>
-				<version>3.1.2</version>
+				<version>3.1.10</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -216,7 +216,7 @@
 			<dependency>
 				<groupId>io.nats</groupId>
 				<artifactId>jnats</artifactId>
-				<version>2.17.3</version>
+				<version>2.21.1</version>
 			</dependency>
 
 			<!-- Task locking -->
