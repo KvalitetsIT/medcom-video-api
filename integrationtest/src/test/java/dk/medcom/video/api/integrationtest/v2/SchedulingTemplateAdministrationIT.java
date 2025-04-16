@@ -18,12 +18,12 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2Api;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoHeader;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidJwt;
-    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoScope;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoRoleAtt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNotAdmin;
 
     public SchedulingTemplateAdministrationIT() {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
 
         schedulingTemplateAdministrationV2Api = new SchedulingTemplateAdministrationV2Api(apiClient);
@@ -37,14 +37,14 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
         apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
         schedulingTemplateAdministrationV2ApiInvalidJwt = new SchedulingTemplateAdministrationV2Api(apiClientInvalidJwt);
 
-        var apiClientNoScope = new ApiClient();
-        apiClientNoScope.setBasePath(getApiBasePath());
-        apiClientNoScope.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoScope(getKeycloakUrl()));
-        schedulingTemplateAdministrationV2ApiNoScope = new SchedulingTemplateAdministrationV2Api(apiClientNoScope);
+        var apiClientNoRoleAtt = new ApiClient();
+        apiClientNoRoleAtt.setBasePath(getApiBasePath());
+        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
+        schedulingTemplateAdministrationV2ApiNoRoleAtt = new SchedulingTemplateAdministrationV2Api(apiClientNoRoleAtt);
 
         var apiClientNotAdmin = new ApiClient();
         apiClientNotAdmin.setBasePath(getApiBasePath());
-        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdminScope(getKeycloakUrl()));
+        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdmin(getKeycloakUrl()));
         schedulingTemplateAdministrationV2ApiNotAdmin = new SchedulingTemplateAdministrationV2Api(apiClientNotAdmin);
     }
 
@@ -62,8 +62,8 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2SchedulingTemplatesGet() {
-        var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoScope::v2SchedulingTemplatesGet);
+    public void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
+        var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
         assertEquals(401, expectedException.getCode());
     }
 
@@ -98,8 +98,8 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2SchedulingTemplatesIdGet() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoScope.v2SchedulingTemplatesIdGet(201L));
+    public void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
+        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
         assertEquals(401, expectedException.getCode());
     }
 

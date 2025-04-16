@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 public class VideoSchedulingInformationControllerV2 implements VideoSchedulingInformationV2Api {
     private final static Logger logger = LoggerFactory.getLogger(VideoSchedulingInformationControllerV2.class);
 
-    private final String anyScope = "hasAnyAuthority('SCOPE_meeting-user','SCOPE_meeting-admin','SCOPE_meeting-provisioner','SCOPE_meeting-provisioner-user','SCOPE_meeting-planner','SCOPE_undefined')";
-    private final String adminScope = "hasAuthority('SCOPE_meeting-admin')";
-    private final String provisionerUserScope = "hasAuthority('SCOPE_meeting-provisioner-user')";
+    private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
+    private final String adminRoleAtt = "hasAuthority('ROLE_ATT_meeting-admin')";
+    private final String provisionerUserRoleAtt = "hasAuthority('ROLE_ATT_meeting-provisioner-user')";
 
     private final SchedulingInfoServiceV2 schedulingInfoService;
 
@@ -39,7 +39,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(provisionerUserScope)
+    @PreAuthorize(provisionerUserRoleAtt)
     public ResponseEntity<List<SchedulingInfo>> v2SchedulingInfoDeprovisionGet() {
         logger.debug("Enter GET scheduling info deprovision, v2.");
         try {
@@ -55,7 +55,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<List<SchedulingInfo>> v2SchedulingInfoGet(OffsetDateTime fromStartTime, OffsetDateTime toEndTime, ProvisionStatus provisionStatus) {
         logger.debug("Enter GET scheduling info with fromStartTime: {} toEndTime: {} provision status: {}, v2.", fromStartTime, toEndTime, provisionStatus);
         try {
@@ -70,7 +70,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(provisionerUserScope)
+    @PreAuthorize(provisionerUserRoleAtt)
     public ResponseEntity<SchedulingInfo> v2SchedulingInfoPost(CreateSchedulingInfo createSchedulingInfo) {
         logger.debug("Enter POST scheduling info, v2.");
         try {
@@ -92,7 +92,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(provisionerUserScope)
+    @PreAuthorize(provisionerUserRoleAtt)
     public ResponseEntity<List<SchedulingInfo>> v2SchedulingInfoProvisionGet() {
         logger.debug("Enter GET scheduling info provision, v2.");
         try {
@@ -108,7 +108,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(adminScope)
+    @PreAuthorize(adminRoleAtt)
     public ResponseEntity<SchedulingInfo> v2SchedulingInfoReserveGet(VmrType vmrType, ViewType hostView, ViewType guestView, VmrQuality vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests) {
         logger.debug("Enter GET scheduling info reserve, v2.");
         try {
@@ -128,7 +128,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(adminScope)
+    @PreAuthorize(adminRoleAtt)
     public ResponseEntity<SchedulingInfo> v2SchedulingInfoReserveUuidGet(UUID uuid) {
         logger.debug("Enter GET scheduling info reserve with reservation id: {}, v2.", uuid);
         try {
@@ -145,7 +145,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<SchedulingInfo> v2SchedulingInfoUuidGet(UUID uuid) {
         logger.debug("Enter GET scheduling info with uuid: {}, v2.", uuid);
         var performanceLogger = new PerformanceLogger("get scheduling info");
@@ -165,7 +165,7 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
 
     @Oauth
     @Override
-    @PreAuthorize(provisionerUserScope)
+    @PreAuthorize(provisionerUserRoleAtt)
     public ResponseEntity<SchedulingInfo> v2SchedulingInfoUuidPut(UUID uuid, UpdateSchedulingInfo updateSchedulingInfo) {
         logger.debug("Enter PUT scheduling info with uuid: {}, vmr id: {}, status: {}, status description: {}, v2.", uuid, updateSchedulingInfo.getProvisionVmrId(), updateSchedulingInfo.getProvisionStatus(), updateSchedulingInfo.getProvisionStatusDescription());
         try {

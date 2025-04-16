@@ -25,8 +25,8 @@ import java.util.List;
 public class SchedulingTemplateAdministrationControllerV2 implements SchedulingTemplateAdministrationV2Api {
     private static final Logger logger = LoggerFactory.getLogger(SchedulingTemplateAdministrationControllerV2.class);
 
-    private final String anyScope = "hasAnyAuthority('SCOPE_meeting-user','SCOPE_meeting-admin','SCOPE_meeting-provisioner','SCOPE_meeting-provisioner-user','SCOPE_meeting-planner','SCOPE_undefined')";
-    private final String adminScope = "hasAuthority('SCOPE_meeting-admin')";
+    private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
+    private final String adminRoleAtt = "hasAuthority('ROLE_ATT_meeting-admin')";
 
     private final SchedulingTemplateServiceV2 schedulingTemplateService;
 
@@ -36,7 +36,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<List<SchedulingTemplate>> v2SchedulingTemplatesGet() {
         logger.debug("Enter GET scheduling templates, v2.");
         try {
@@ -53,7 +53,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
 
     @Oauth
     @Override
-    @PreAuthorize(adminScope)
+    @PreAuthorize(adminRoleAtt)
     public ResponseEntity<Void> v2SchedulingTemplatesIdDelete(Long id) {
         logger.debug("Enter DELETE scheduling template with id: {}, v2.", id);
         try {
@@ -72,7 +72,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<SchedulingTemplate> v2SchedulingTemplatesIdGet(Long id) {
         logger.debug("Enter GET scheduling templates with id: {}, v2.", id);
         try {
@@ -91,7 +91,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
 
     @Oauth
     @Override
-    @PreAuthorize(adminScope)
+    @PreAuthorize(adminRoleAtt)
     public ResponseEntity<SchedulingTemplate> v2SchedulingTemplatesIdPut(Long id, SchedulingTemplateRequest updateSchedulingTemplate) {
         logger.debug("Enter PUT scheduling template with id: {}, v2.", id);
         try {
@@ -112,7 +112,7 @@ public class SchedulingTemplateAdministrationControllerV2 implements SchedulingT
 
     @Oauth
     @Override
-    @PreAuthorize(adminScope)
+    @PreAuthorize(adminRoleAtt)
     public ResponseEntity<SchedulingTemplate> v2SchedulingTemplatesPost(SchedulingTemplateRequest createSchedulingTemplate) {
         logger.debug("Enter POST scheduling template, v2.");
         try {

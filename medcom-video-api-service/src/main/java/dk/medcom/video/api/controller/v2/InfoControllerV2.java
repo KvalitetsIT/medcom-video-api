@@ -20,7 +20,7 @@ import java.util.List;
 public class InfoControllerV2 implements InfoV2Api {
     private static final Logger logger = LoggerFactory.getLogger(InfoControllerV2.class);
 
-    private final String anyScope = "hasAnyAuthority('SCOPE_meeting-user','SCOPE_meeting-admin','SCOPE_meeting-provisioner','SCOPE_meeting-provisioner-user','SCOPE_meeting-planner','SCOPE_undefined')";
+    private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
 
     private final List<InfoContributor> infoContributors;
 
@@ -30,7 +30,7 @@ public class InfoControllerV2 implements InfoV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<Info> v2InfoGet() {
         logger.debug("Enter GET info, v2");
         try {

@@ -28,14 +28,14 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     private final VideoMeetingsV2Api videoMeetingsV2Api;
     private final VideoMeetingsV2Api videoMeetingsV2ApiNoHeader;
     private final VideoMeetingsV2Api videoMeetingsV2ApiInvalidJwt;
-    private final VideoMeetingsV2Api videoMeetingsV2ApiNoScope;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiNoRoleAtt;
     private final VideoMeetingsV2Api videoMeetingsV2ApiOnlyProvisioner;
 
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
 
     public VideoMeetingsIT() {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
 
         videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
@@ -50,15 +50,15 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
         apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
         videoMeetingsV2ApiInvalidJwt = new VideoMeetingsV2Api(apiClientInvalidJwt);
 
-        var apiClientNoScope = new ApiClient();
-        apiClientNoScope.setBasePath(getApiBasePath());
-        apiClientNoScope.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoScope(getKeycloakUrl()));
-        videoMeetingsV2ApiNoScope = new VideoMeetingsV2Api(apiClientNoScope);
+        var apiClientNoRoleAtt = new ApiClient();
+        apiClientNoRoleAtt.setBasePath(getApiBasePath());
+        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
+        videoMeetingsV2ApiNoRoleAtt = new VideoMeetingsV2Api(apiClientNoRoleAtt);
 
-        var apiClientOnlyProvisionerScope = new ApiClient();
-        apiClientOnlyProvisionerScope.setBasePath(getApiBasePath());
-        apiClientOnlyProvisionerScope.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtOnlyProvisionerScope(getKeycloakUrl()));
-        videoMeetingsV2ApiOnlyProvisioner = new VideoMeetingsV2Api(apiClientOnlyProvisionerScope);
+        var apiClientOnlyProvisionerRoleAtt = new ApiClient();
+        apiClientOnlyProvisionerRoleAtt.setBasePath(getApiBasePath());
+        apiClientOnlyProvisionerRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtOnlyProvisioner(getKeycloakUrl()));
+        videoMeetingsV2ApiOnlyProvisioner = new VideoMeetingsV2Api(apiClientOnlyProvisionerRoleAtt);
     }
 
 // ------ JWT errors -------
@@ -70,8 +70,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsFindByUriWithDomainGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
+    public void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithDomainGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -88,8 +88,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsFindByUriWithoutDomainGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
+    public void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithoutDomainGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -107,8 +107,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsGet(OffsetDateTime.now(), OffsetDateTime.now(), UUID.randomUUID().toString(),
+    public void errorIfNoRoleAttInToken_v2MeetingsGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsGet(OffsetDateTime.now(), OffsetDateTime.now(), UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
@@ -127,8 +127,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsPost() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsPost(randomCreateMeeting()));
+    public void errorIfNoRoleAttInToken_v2MeetingsPost() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -139,7 +139,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfOnlyProvisionerScope_v2MeetingsPost() {
+    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsPost() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(403, expectedException.getCode());
     }
@@ -151,8 +151,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsUuidDelete() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsUuidDelete(meeting301Uuid()));
+    public void errorIfNoRoleAttInToken_v2MeetingsUuidDelete() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -163,7 +163,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfOnlyProvisionerScope_v2MeetingsUuidDelete() {
+    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidDelete() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(403, expectedException.getCode());
     }
@@ -175,8 +175,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsUuidGet(meeting301Uuid()));
+    public void errorIfNoRoleAttInToken_v2MeetingsUuidGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidGet(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -193,8 +193,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsUuidPatch() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    public void errorIfNoRoleAttInToken_v2MeetingsUuidPatch() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -205,7 +205,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfOnlyProvisionerScope_v2MeetingsUuidPatch() {
+    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPatch() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(403, expectedException.getCode());
     }
@@ -217,8 +217,8 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2MeetingsUuidPut() {
-        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoScope.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    public void errorIfNoRoleAttInToken_v2MeetingsUuidPut() {
+        var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -229,7 +229,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfOnlyProvisionerScope_v2MeetingsUuidPut() {
+    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPut() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(403, expectedException.getCode());
     }
@@ -718,7 +718,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://allowed:4100")
                 .header("Access-Control-Request-Method", "POST")
-                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()))
+                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
                 .build();
 
         var client = HttpClient.newBuilder().build();
@@ -732,7 +732,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://denied:4200")
                 .header("Access-Control-Request-Method", "POST")
-                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()))
+                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
                 .build();
 
         var client = HttpClient.newBuilder().build();

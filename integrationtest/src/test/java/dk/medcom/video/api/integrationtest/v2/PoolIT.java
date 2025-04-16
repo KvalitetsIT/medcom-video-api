@@ -15,25 +15,28 @@ public class PoolIT extends AbstractIntegrationTest {
     private final PoolV2Api poolV2Api;
     private final PoolV2Api poolV2ApiNoHeader;
     private final PoolV2Api poolV2ApiInvalidToken;
+    private final PoolV2Api poolV2ApiNoRoleAtt;
 
     public PoolIT() {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
-
         poolV2Api = new PoolV2Api(apiClient);
 
         var apiClientNoHeader = new ApiClient();
         apiClientNoHeader.setBasePath(getApiBasePath());
-
         poolV2ApiNoHeader = new PoolV2Api(apiClientNoHeader);
 
         var apiClientInvalidToken = new ApiClient();
         apiClientInvalidToken.setBasePath(getApiBasePath());
         apiClientInvalidToken.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
         apiClientInvalidToken.setBasePath(getApiBasePath());
-
         poolV2ApiInvalidToken = new PoolV2Api(apiClientInvalidToken);
+
+        var apiClientNoRoleAtt = new ApiClient();
+        apiClientNoRoleAtt.setBasePath(getApiBasePath());
+        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
+        poolV2ApiNoRoleAtt = new PoolV2Api(apiClientNoRoleAtt);
     }
 
     @Test
@@ -45,6 +48,12 @@ public class PoolIT extends AbstractIntegrationTest {
     @Test
     public void errorIfInvalidJwtToken_v2PoolGetWithHttpInfo() {
         var expectedException = assertThrows(ApiException.class, poolV2ApiInvalidToken::v2PoolGetWithHttpInfo);
+        assertEquals(401, expectedException.getCode());
+    }
+
+    @Test
+    public void errorIfNoRoleAttInToken_v2PoolGetWithHttpInfo() {
+        var expectedException = assertThrows(ApiException.class, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
         assertEquals(401, expectedException.getCode());
     }
 

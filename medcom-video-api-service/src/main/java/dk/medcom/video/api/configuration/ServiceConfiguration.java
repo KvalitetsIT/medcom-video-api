@@ -3,8 +3,14 @@ package dk.medcom.video.api.configuration;
 import java.util.Collections;
 import java.util.List;
 
+import dk.medcom.video.api.converter.StringToViewTypeConverter;
+import dk.medcom.video.api.converter.StringToVmrQualityConverter;
+import dk.medcom.video.api.converter.StringToVmrTypeConverter;
 import dk.medcom.video.api.interceptor.OauthInterceptor;
 import dk.medcom.video.api.service.*;
+import org.openapitools.model.ViewType;
+import org.openapitools.model.VmrQuality;
+import org.openapitools.model.VmrType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -347,5 +354,20 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer.setUseTrailingSlashMatch(true);
+	}
+
+	@Bean
+	public Converter<String, ViewType> stringViewTypeConverter() {
+		return new StringToViewTypeConverter();
+	}
+
+	@Bean
+	public Converter<String, VmrQuality> stringVmrQualityConverter() {
+		return new StringToVmrQualityConverter();
+	}
+
+	@Bean
+	public Converter<String, VmrType> stringVmrTypeConverter() {
+		return new StringToVmrTypeConverter();
 	}
 }

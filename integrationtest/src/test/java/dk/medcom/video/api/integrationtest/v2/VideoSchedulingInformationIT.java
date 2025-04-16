@@ -22,7 +22,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoHeader;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiInvalidJwt;
-    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoScopes;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoRoleAtt;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotAdmin;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotProvisionUser;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
@@ -30,7 +30,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     public VideoSchedulingInformationIT() {
         var apiClient = new ApiClient();
         apiClient.setBasePath(getApiBasePath());
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllScopes(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
 
         videoSchedulingInformationV2Api = new VideoSchedulingInformationV2Api(apiClient);
         videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
@@ -44,19 +44,19 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
         videoSchedulingInformationV2ApiInvalidJwt = new VideoSchedulingInformationV2Api(apiClientInvalidJwt);
 
-        var apiClientNoScopes = new ApiClient();
-        apiClientNoScopes.setBasePath(getApiBasePath());
-        apiClientNoScopes.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoScope(getKeycloakUrl()));
-        videoSchedulingInformationV2ApiNoScopes = new VideoSchedulingInformationV2Api(apiClientNoScopes);
+        var apiClientNoRoleAtt = new ApiClient();
+        apiClientNoRoleAtt.setBasePath(getApiBasePath());
+        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
+        videoSchedulingInformationV2ApiNoRoleAtt = new VideoSchedulingInformationV2Api(apiClientNoRoleAtt);
 
         var apiClientNotAdmin = new ApiClient();
         apiClientNotAdmin.setBasePath(getApiBasePath());
-        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdminScope(getKeycloakUrl()));
+        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdmin(getKeycloakUrl()));
         videoSchedulingInformationV2ApiNotAdmin = new VideoSchedulingInformationV2Api(apiClientNotAdmin);
 
         var apiClientNotProvisionUser = new ApiClient();
         apiClientNotProvisionUser.setBasePath(getApiBasePath());
-        apiClientNotProvisionUser.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotProvisionUserScope(getKeycloakUrl()));
+        apiClientNotProvisionUser.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotProvisionUser(getKeycloakUrl()));
         videoSchedulingInformationV2ApiNotProvisionUser = new VideoSchedulingInformationV2Api(apiClientNotProvisionUser);
     }
 
@@ -92,8 +92,8 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2SchedulingInfoGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoScopes.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
+    public void errorIfNoRoleAttInToken_v2SchedulingInfoGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
         assertEquals(401, expectedException.getCode());
     }
 
@@ -200,8 +200,8 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoScopesInToken_v2SchedulingInfoUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoScopes.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    public void errorIfNoRoleAttInToken_v2SchedulingInfoUuidGet() {
+        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 

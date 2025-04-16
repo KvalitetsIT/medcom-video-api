@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class PoolControllerV2 implements PoolV2Api {
     private static final Logger logger = LoggerFactory.getLogger(PoolControllerV2.class);
 
-    private final String anyScope = "hasAnyAuthority('SCOPE_meeting-user','SCOPE_meeting-admin','SCOPE_meeting-provisioner','SCOPE_meeting-provisioner-user','SCOPE_meeting-planner','SCOPE_undefined')";
+    private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
 
     private final PoolInfoServiceV2 poolInfoService;
     private final NewProvisionerOrganisationFilter provisionExcludeOrganisations;
@@ -32,7 +32,7 @@ public class PoolControllerV2 implements PoolV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<List<PoolInfo>> v2PoolGet() {
         logger.debug("Enter GET pool, v2.");
         try {

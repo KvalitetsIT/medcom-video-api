@@ -28,8 +28,8 @@ import java.util.UUID;
 public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     private static final Logger logger = LoggerFactory.getLogger(VideoMeetingsControllerV2.class);
 
-    private final String anyScope = "hasAnyAuthority('SCOPE_meeting-user','SCOPE_meeting-admin','SCOPE_meeting-provisioner','SCOPE_meeting-provisioner-user','SCOPE_meeting-planner','SCOPE_undefined')";
-    private final String plannerProvisionerUserAdminUserScope = "hasAnyAuthority('SCOPE_meeting-planner','SCOPE_meeting-provisioner-user','SCOPE_meeting-admin','SCOPE_meeting-user')";
+    private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
+    private final String plannerProvisionerUserAdminUserRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-planner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-user')";
 
     private final MeetingServiceV2 meetingService;
 
@@ -39,7 +39,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsFindByUriWithDomainGet(String uri) {
         logger.debug("Enter GET meetings by uri with domain: {}, v2.", uri);
         try {
@@ -57,7 +57,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsFindByUriWithoutDomainGet(String uri) {
         logger.debug("Enter GET meetings by uri without domain: {}, v2.", uri);
         try {
@@ -75,7 +75,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<List<Meeting>> v2MeetingsGet(OffsetDateTime fromStartTime, OffsetDateTime toStartTime, String shortId, String subject, String organizedBy, String search, String label, String uriWithDomain) {
         logger.debug("Enter GET meetings, v2.");
         try {
@@ -164,7 +164,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(plannerProvisionerUserAdminUserScope)
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsPost(CreateMeeting createMeeting) {
         logger.debug("Enter POST meetings, v2.");
 
@@ -192,7 +192,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(plannerProvisionerUserAdminUserScope)
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Void> v2MeetingsUuidDelete(UUID uuid) {
         logger.debug("Enter DELETE meetings with uuid: {}, v2.", uuid);
         try {
@@ -213,7 +213,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyScope)
+    @PreAuthorize(anyRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsUuidGet(UUID uuid) {
         logger.debug("Enter GET meetings with uuid: {}, v2.", uuid);
         try {
@@ -231,7 +231,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(plannerProvisionerUserAdminUserScope)
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsUuidPatch(UUID uuid, PatchMeeting patchMeeting) {
         logger.debug("Enter PATCH meetings with uuid: {}, v2.", uuid);
         try {
@@ -254,7 +254,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(plannerProvisionerUserAdminUserScope)
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Meeting> v2MeetingsUuidPut(UUID uuid, UpdateMeeting updateMeeting) {
         logger.debug("Enter PUT meetings with uuid: {}, v2.", uuid);
         try {

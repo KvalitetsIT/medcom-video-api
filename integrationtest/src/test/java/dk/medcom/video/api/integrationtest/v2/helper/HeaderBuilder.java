@@ -11,23 +11,23 @@ import java.util.List;
 
 public class HeaderBuilder {
 
-    public static String getJwtAllScopes(String keycloakUrl) {
-        return getJwt(keycloakUrl, "videoapi-all-scopes", "all-scopes-pass");
+    public static String getJwtAllRoleAtt(String keycloakUrl) {
+        return getJwt(keycloakUrl, "videoapi-all-role-att", "all-role-att-pass");
     }
 
-    public static String getJwtNoScope(String keycloakUrl) {
-        return getJwt(keycloakUrl, "videoapi-no-scopes", "no-scopes-pass");
+    public static String getJwtNoRoleAtt(String keycloakUrl) {
+        return getJwt(keycloakUrl, "videoapi-no-role-att", "no-role-att-pass");
     }
 
-    public static String getJwtNotAdminScope(String keycloakUrl) {
+    public static String getJwtNotAdmin(String keycloakUrl) {
         return getJwt(keycloakUrl, "videoapi-not-admin", "not-admin-pass");
     }
 
-    public static String getJwtOnlyProvisionerScope(String keycloakUrl) {
+    public static String getJwtOnlyProvisioner(String keycloakUrl) {
         return getJwt(keycloakUrl, "videoapi-only-provisioner", "only-provisioner-pass");
     }
 
-    public static String getJwtNotProvisionUserScope(String keycloakUrl) {
+    public static String getJwtNotProvisionUser(String keycloakUrl) {
         return getJwt(keycloakUrl, "videoapi-not-provisioneruser", "not-provisioneruser-pass");
     }
 

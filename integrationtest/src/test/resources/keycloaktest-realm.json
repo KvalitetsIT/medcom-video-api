@@ -3,8 +3,8 @@
   "enabled": true,
   "roles": {
     "client": {
-      "videoapi-all-scopes": [],
-      "videoapi-no-scopes": [],
+      "videoapi-all-role-att": [],
+      "videoapi-no-role-att": [],
       "videoapi-not-admin": [],
       "videoapi-not-provisioneruser": [],
       "videoapi-only-provisioner": []
@@ -12,17 +12,17 @@
   },
   "users": [
     {
-      "username": "service-account-videoapi-all-scopes",
+      "username": "service-account-videoapi-all-role-att",
       "enabled": true,
-      "serviceAccountClientId": "videoapi-all-scopes",
+      "serviceAccountClientId": "videoapi-all-role-att",
       "realmRoles": [
         "default-roles-keycloaktest"
       ]
     },
     {
-      "username": "service-account-videoapi-no-scopes",
+      "username": "service-account-videoapi-no-role-att",
       "enabled": true,
-      "serviceAccountClientId": "videoapi-no-scopes",
+      "serviceAccountClientId": "videoapi-no-role-att",
       "realmRoles": [
         "default-roles-keycloaktest"
       ]
@@ -54,26 +54,40 @@
   ],
   "clients": [
     {
-      "clientId": "videoapi-all-scopes",
+      "clientId": "videoapi-all-role-att",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "all-scopes-pass",
+      "secret": "all-role-att-pass",
       "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "userrole",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
       "defaultClientScopes": [
-        "videoapi-clientscope",
-        "meeting-user",
-        "meeting-admin",
-        "meeting-provisioner",
-        "meeting-provisioner-user",
-        "meeting-planner"
+        "videoapi-clientscope"
       ],
       "optionalClientScopes": []
     },
     {
-      "clientId": "videoapi-no-scopes",
+      "clientId": "videoapi-no-role-att",
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
-      "secret": "no-scopes-pass",
+      "secret": "no-role-att-pass",
       "serviceAccountsEnabled": true,
       "defaultClientScopes": [
         "videoapi-clientscope"
@@ -86,12 +100,27 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "not-admin-pass",
       "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "userrole",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
       "defaultClientScopes": [
-        "videoapi-clientscope",
-        "meeting-user",
-        "meeting-provisioner",
-        "meeting-provisioner-user",
-        "meeting-planner"
+        "videoapi-clientscope"
       ],
       "optionalClientScopes": []
     },
@@ -101,12 +130,27 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "not-provisioneruser-pass",
       "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "userrole",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
       "defaultClientScopes": [
-        "videoapi-clientscope",
-        "meeting-user",
-        "meeting-admin",
-        "meeting-provisioner",
-        "meeting-planner"
+        "videoapi-clientscope"
       ],
       "optionalClientScopes": []
     },
@@ -116,70 +160,33 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "only-provisioner-pass",
       "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-provisioner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "userrole",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
       "defaultClientScopes": [
-        "videoapi-clientscope",
-        "meeting-provisioner"
+        "videoapi-clientscope"
       ],
       "optionalClientScopes": []
     }
 
   ],
   "clientScopes": [
-    {
-      "name": "meeting-user",
-      "description": "",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "false",
-        "gui.order": "",
-        "consent.screen.text": ""
-      }
-    },
-    {
-      "name": "meeting-admin",
-      "description": "",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "false",
-        "gui.order": "",
-        "consent.screen.text": ""
-      }
-    },
-    {
-      "name": "meeting-provisioner",
-      "description": "",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "false",
-        "gui.order": "",
-        "consent.screen.text": ""
-      }
-    },
-    {
-      "name": "meeting-provisioner-user",
-      "description": "",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "false",
-        "gui.order": "",
-        "consent.screen.text": ""
-      }
-    },
-    {
-      "name": "meeting-planner",
-      "description": "",
-      "protocol": "openid-connect",
-      "attributes": {
-        "include.in.token.scope": "true",
-        "display.on.consent.screen": "false",
-        "gui.order": "",
-        "consent.screen.text": ""
-      }
-    },
     {
       "name": "videoapi-clientscope",
       "description": "",
