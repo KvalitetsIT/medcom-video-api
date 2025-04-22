@@ -903,16 +903,18 @@ paths:
   /v2/info:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Info V2
       summary: gets some general information on the API
-      description: Use this as an initial test to see if the API is up running and replying.
+      description: >-
+        Use this as an initial test to see if the API is up running and replying. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -930,16 +932,18 @@ paths:
   /v2/meetings/findByUriWithDomain:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: find meeting by uri with domain.
-      description: find meeting by uri with domain.
+      description: >-
+        Find meeting by uri with domain. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - name: uri
           in: query
@@ -967,16 +971,18 @@ paths:
   /v2/meetings/findByUriWithoutDomain:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: find meeting by uri without domain.
-      description: find meeting by uri without domain.
+      description: >-
+        Find meeting by uri without domain. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - name: uri
           in: query
@@ -1004,12 +1010,7 @@ paths:
   /v2/meetings:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: gets a list of meetings
@@ -1026,7 +1027,13 @@ paths:
         * uri-with-domain <br>
         
         Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
-        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response.
+        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - name: from-start-time
           in: query
@@ -1107,20 +1114,22 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: adds a new meeting
-      description: Adds a new meeting based on the given input data. <br> <br>
+      description: >-
+        Adds a new meeting based on the given input data. <br> <br>
         Selecting a template for the meeting is done using the following rules, using the one first matching  <Ul>
         <li> when schedulingTemplateId is is given and valid, this template is used
         <li> organization default template
         <li> shared default template (organization not given)
-        </Ul>
+        </Ul> <br> <br>
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       requestBody:
         description: meeting details to use while adding
         required: true
@@ -1149,16 +1158,18 @@ paths:
   /v2/meetings/{uuid}:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: gets a specific meeting
-      description: Gets a specific meeting based on the given uuid
+      description: >-
+        Gets a specific meeting based on the given uuid. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -1180,15 +1191,18 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: updates an existing meeting
-      description: Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). In the later case only endTime will be updated
+      description: >-
+        Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). 
+        In the later case only endTime will be updated. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -1219,15 +1233,18 @@ paths:
           $ref: '#/components/responses/500'
     patch:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: Updates an existing meeting through HTTP patch
-      description: Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). In the later case only endTime can be updated.
+      description: >-
+        Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). 
+        In the later case only endTime can be updated. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -1258,15 +1275,17 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Meetings V2
       summary: deletes an existing meeting
-      description: Deletes a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0)
+      description: >-
+        Deletes a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0). <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -1288,16 +1307,22 @@ paths:
   /v2/scheduling-info:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations from meetings
-      description: Gets a a list of scheduling informations based on date interval and provision status. The start (minus VMR available before) or end time of the meeting must be within the date interval in order to be included in the response. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to provision. <br> NB! using + in timezone should be encoded as %2B. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info??from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION"
+      description: >-
+        Gets a a list of scheduling informations based on date interval and provision status. The start 
+        (minus VMR available before) or end time of the meeting must be within the date interval in order to be included 
+        in the response. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to 
+        retrieve in order to determine what meetings to provision. <br> NB! using + in timezone should be encoded as %2B. <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info??from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION" <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - name: from-start-time
           in: query
@@ -1341,14 +1366,15 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth:
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: adds a new scheduling info
-      description: Adds a new scheduling information based on the given input data. <br> <br>
-        Selecting a template is done as when adding (post) a meeting
-        </Ul>
+      description: >-
+        Adds a new scheduling information based on the given input data. <br> <br>
+        Selecting a template is done as when adding (post) a meeting. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
       requestBody:
         description: scheduling info details to use while adding
         required: true
@@ -1377,12 +1403,14 @@ paths:
   /v2/scheduling-info/{uuid}:
     put:
       security:
-        - oauth:
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: updates an existing scheduling-info
-      description: Updates a specific scheduling information. Scheduling information is the "technically" part of a meeting
+      description: >-
+        Updates a specific scheduling information. Scheduling information is the "technically" part of a meeting. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -1413,16 +1441,18 @@ paths:
           $ref: '#/components/responses/500'
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: gets a specific scheduling information
-      description: Gets a specific scheduling information based on the given uuid
+      description: >-
+        Gets a specific scheduling information based on the given uuid. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -1446,16 +1476,19 @@ paths:
   /v2/scheduling-templates:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Scheduling Template Administration V2
       summary: gets a list of scheduling templates matching own organization
-      description: Gets a list of scheduling templates matching the organization of the user requesting.  <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-templates/7".
+      description: >-
+        Gets a list of scheduling templates matching the organization of the user requesting.  <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-templates/7". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -1475,12 +1508,15 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth:
-            - meeting-admin
+        - oauth: []
       tags:
         - Scheduling Template Administration V2
       summary: adds a new scheduling template
-      description: Adds a new scheduling template based on the given input data. If template is indicated as default, any other default template for same organization will be made non-default
+      description: >-
+        Adds a new scheduling template based on the given input data. If template is indicated as default, any other 
+        default template for same organization will be made non-default. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       requestBody:
         description: scheduling template details to use while adding
         required: true
@@ -1506,16 +1542,18 @@ paths:
   /v2/scheduling-templates/{id}:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Scheduling Template Administration V2
       summary: gets a specific scheduling template
-      description: Gets a specific scheduling template based on the given id
+      description: >-
+        Gets a specific scheduling template based on the given id. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -1537,12 +1575,15 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - oauth:
-            - meeting-admin
+        - oauth: []
       tags:
         - Scheduling Template Administration V2
       summary: updates an existing scheduling template
-      description: Updates a specific scheduling template. If template is indicated as default, any other default template for same organization will be made non-default
+      description: >-
+        Updates a specific scheduling template. If template is indicated as default, any other default template for same 
+        organization will be made non-default. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
@@ -1571,12 +1612,14 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - oauth:
-            - meeting-admin
+        - oauth: []
       tags:
         - Scheduling Template Administration V2
       summary: deletes an existing scheduling template
-      description: Deletes a specific scheduling template.
+      description: >-
+        Deletes a specific scheduling template. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -1596,12 +1639,17 @@ paths:
   /v2/scheduling-info-provision:
     get:
       security:
-        - oauth:
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be provisioned
-      description: Gets a a list of scheduling informations to provision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to provision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-provision/".
+      description: >-
+        Gets a a list of scheduling informations to provision based on date and provision status. Scheduling information 
+        is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what 
+        meetings to provision." <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-provision/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -1621,12 +1669,17 @@ paths:
   /v2/scheduling-info-deprovision:
     get:
       security:
-        - oauth:
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
-      description: Gets a a list of scheduling informations to deprovision based on date and provision status. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what meetings to deprovision." <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-deprovision/".
+      description: >-
+        Gets a a list of scheduling informations to deprovision based on date and provision status. Scheduling 
+        information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to 
+        determine what meetings to deprovision." <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-deprovision/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -1646,12 +1699,14 @@ paths:
   /v2/scheduling-info-reserve:
     get:
       security:
-        - oauth:
-            - meeting-admin
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
-      description: Reserve a single scheduling info from the organisations pool.".
+      description: >-
+        Reserve a single scheduling info from the organisations pool.". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       parameters:
         - name: vmrType
           in: query
@@ -1744,12 +1799,14 @@ paths:
   /v2/scheduling-info-reserve/{uuid}:
     get:
       security:
-        - oauth:
-            - meeting-admin
+        - oauth: []
       tags:
         - Video Scheduling Information V2
       summary: Get scheduling info by reservation id.
-      description: Read a single scheduling info by id.
+      description: >- 
+        Read a single scheduling info by id. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -1771,16 +1828,21 @@ paths:
   /v2/pool:
     get:
       security:
-        - oauth:
-            - meeting-admin
-            - meeting-user
-            - meeting-planner
-            - meeting-provisioner
-            - meeting-provisioner-user
+        - oauth: []
       tags:
         - Pool V2
       summary: returns a list of pool information
-      description: Gets the pool information per organization including the default scheduling template for the organization. If this schedulingTemplate is null it is because the organisation in question do not have a default template. A default template must be created before it is possible to create scheduling info. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/pool/".
+      description: >- 
+        Gets the pool information per organization including the default scheduling template for the organization. 
+        If this schedulingTemplate is null it is because the organisation in question do not have a default template.
+        A default template must be created before it is possible to create scheduling info. <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/pool/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -1808,25 +1870,22 @@ components:
 
     oauth:
       type: oauth2
-      description: OAuth2 flow
+      description: >- 
+        OAuth2 flow, the token should contain a user role claim with at least one of the following values: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user <br> <br>
+        It is specified in the description of the endpoint which values grants access.
       flows:
         authorizationCode:
           authorizationUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/auth
           tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
-          scopes:
-            meeting-admin: Admin scope
-            meeting-user: User scope
-            meeting-planner: Meeting Planner scope
-            meeting-provisioner: Provisioner scope
-            meeting-provisioner-user: Provisioner User scope
+          scopes: {}
         clientCredentials:
           tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
-          scopes:
-            meeting-admin: Admin scope
-            meeting-user: User scope
-            meeting-planner: Meeting Planner scope
-            meeting-provisioner: Provisioner scope
-            meeting-provisioner-user: Provisioner User scope
+          scopes: {}
 
   parameters:
     uuid:
