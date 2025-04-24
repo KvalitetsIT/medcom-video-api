@@ -1,6 +1,6 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.api.DirectMedia;
+import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
@@ -294,7 +294,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		assertNotNull(schedulingTemplates);
 		assertEquals(1, schedulingTemplates.size());
 
-		var schedulingTemplate = schedulingTemplates.get(0);
+		var schedulingTemplate = schedulingTemplates.getFirst();
 		assertNotNull(schedulingTemplate);
 		assertEquals(7L, schedulingTemplate.getId().longValue());
 		assertEquals(8L, schedulingTemplate.getOrganisation().getId().longValue());

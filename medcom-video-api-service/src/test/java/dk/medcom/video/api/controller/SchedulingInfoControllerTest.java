@@ -3,6 +3,7 @@ package dk.medcom.video.api.controller;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
+import dk.medcom.video.api.controller.v1.SchedulingInfoController;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;

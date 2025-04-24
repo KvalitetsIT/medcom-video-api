@@ -1,17 +1,20 @@
 FROM ibm-semeru-runtimes:open-21-jre-jammy
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y gettext-base tzdata inetutils-telnet
 
-RUN addgroup --system --gid 11000 appuser
-RUN adduser --system --uid 11001 --group appuser
+RUN groupadd --gid 11000 appuser && \
+    useradd --gid 11000 --uid 11001 -m appuser
 
-COPY   entrypoint.sh /home/appuser
+COPY entrypoint.sh /home/appuser
 RUN chmod +x /home/appuser/entrypoint.sh
-COPY configtemplates  /home/appuser/configtemplates
 
-ADD /maven/medcom-video-api-web.jar /home/appuser/medcom-video-api-web.jar
+WORKDIR /opt/kvalitetsit
+COPY /maven/application.cdx.json ./
+
 WORKDIR /home/appuser
+
+COPY config/logback.xml logback-spring.xml
+COPY /maven/medcom-video-api-web-exec.jar web.jar
 
 ## Default ENV
 

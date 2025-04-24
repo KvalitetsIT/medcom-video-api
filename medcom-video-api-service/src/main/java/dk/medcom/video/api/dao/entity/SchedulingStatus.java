@@ -4,8 +4,6 @@ import java.util.Date;
 
 import jakarta.persistence.*;
 
-import dk.medcom.video.api.api.ProvisionStatus;
-
 @Entity
 @Table(name = "scheduling_status")
 public class SchedulingStatus {
