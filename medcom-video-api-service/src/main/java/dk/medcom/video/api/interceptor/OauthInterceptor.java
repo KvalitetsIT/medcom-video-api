@@ -35,13 +35,13 @@ public class OauthInterceptor implements HandlerInterceptor {
     @Value("${userservice.token.attribute.auto.create.organisation}")
     private String userServiceTokenAttributeAutoCreateOrganisation;
 
-    private static final Map<String, UserRole> scopeToRole = new HashMap<>();
+    private static final Map<String, UserRole> roleAttToUserRole = new HashMap<>();
     static {
-        scopeToRole.put("SCOPE_meeting-user", UserRole.USER);
-        scopeToRole.put("SCOPE_meeting-admin", UserRole.ADMIN);
-        scopeToRole.put("SCOPE_meeting-planner", UserRole.MEETING_PLANNER);
-        scopeToRole.put("SCOPE_meeting-provisioner", UserRole.PROVISIONER);
-        scopeToRole.put("SCOPE_meeting-provisioner-user", UserRole.PROVISIONER_USER);
+        roleAttToUserRole.put("ROLE_ATT_meeting-user", UserRole.USER);
+        roleAttToUserRole.put("ROLE_ATT_meeting-admin", UserRole.ADMIN);
+        roleAttToUserRole.put("ROLE_ATT_meeting-planner", UserRole.MEETING_PLANNER);
+        roleAttToUserRole.put("ROLE_ATT_meeting-provisioner", UserRole.PROVISIONER);
+        roleAttToUserRole.put("ROLE_ATT_meeting-provisioner-user", UserRole.PROVISIONER_USER);
     }
 
 
@@ -69,20 +69,20 @@ public class OauthInterceptor implements HandlerInterceptor {
         var organisationId = (String) cred.getClaim(userServiceTokenAttributeOrganisation);
         var createOrganisation = (String) cred.getClaim(userServiceTokenAttributeAutoCreateOrganisation);
 
-        var userRoles = handleScopeRoleAuthParsing();
+        var userRoles = handleRoleAttUserRoleAuthParsing();
 
         var userContext = new UserContextImpl(organisationId, email, userRoles, createOrganisation);
         userService.setUserContext(userContext);
     }
 
-    private List<UserRole> handleScopeRoleAuthParsing() {
-        logger.debug("Handle scope to role parsing.");
+    private List<UserRole> handleRoleAttUserRoleAuthParsing() {
+        logger.debug("Handle role attribute to user role parsing.");
         var res = new ArrayList<UserRole>();
 
         var auth = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         var asList = auth.stream().toList();
         for (var i : asList) {
-            var role = scopeToRole.get(i.getAuthority());
+            var role = roleAttToUserRole.get(i.getAuthority());
 
             res.add(role);
         }
