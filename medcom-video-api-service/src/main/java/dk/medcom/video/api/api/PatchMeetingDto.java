@@ -3,6 +3,7 @@ package dk.medcom.video.api.api;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import jakarta.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +47,7 @@ public class PatchMeetingDto {
     @JsonIgnore
     private boolean guestMicrophoneSet;
 
-    private boolean guestPinRequired;
+    private Boolean guestPinRequired;
     @JsonIgnore
     private boolean guestPinRequiredSet;
 
@@ -167,7 +168,7 @@ public class PatchMeetingDto {
         return guestMicrophoneSet;
     }
 
-    public boolean isGuestPinRequired() {
+    public Boolean isGuestPinRequired() {
         return guestPinRequired;
     }
 

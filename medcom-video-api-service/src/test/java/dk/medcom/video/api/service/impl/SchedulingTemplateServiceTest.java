@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
-import dk.medcom.video.api.api.DirectMedia;
+import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -171,10 +171,10 @@ public class SchedulingTemplateServiceTest {
 		// Then
 		assertNotNull(schedulingTemplate);
 		assertNotNull(schedulingTemplate.getOrganisation());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
-		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
-		assertEquals(schedulingTemplatesInService.get(0).getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
+		assertEquals(schedulingTemplatesInService.getFirst().getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
 		Mockito.verify(organisationTreeServiceClient, times(0)).getOrganisationTree("org");
 	}
 
@@ -230,10 +230,10 @@ public class SchedulingTemplateServiceTest {
 		// Then
 		assertNotNull(schedulingTemplate);
 		Assert.assertNull(schedulingTemplate.getOrganisation());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
-		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
-		assertEquals(schedulingTemplatesInService.get(0).getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
+		assertEquals(schedulingTemplatesInService.getFirst().getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 

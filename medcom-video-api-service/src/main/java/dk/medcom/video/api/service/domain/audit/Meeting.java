@@ -1,6 +1,6 @@
 package dk.medcom.video.api.service.domain.audit;
 
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.dao.entity.MeetingAdditionalInfo;
 
 import java.time.OffsetDateTime;
