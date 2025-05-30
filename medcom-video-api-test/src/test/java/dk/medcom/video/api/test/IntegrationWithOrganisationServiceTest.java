@@ -162,6 +162,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("pool.fill.organisation", "some_org")
 				.withEnv("pool.fill.interval", "PT1M")
 
+				.withEnv("spring.security.oauth2.resourceserver.jwt.issuer-uri", "http://localhost") //Irrelevant for v1
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))

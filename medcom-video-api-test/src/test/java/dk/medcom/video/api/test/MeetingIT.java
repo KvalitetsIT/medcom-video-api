@@ -1,7 +1,7 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
@@ -242,12 +242,12 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testCanCreateWithMicIsMuted() throws ApiException {
 		var createMeeting = createMeeting("another_external_id3");
-		createMeeting.setGuestMicrophone(CreateMeeting.GuestMicrophoneEnum.MUTED);
+		createMeeting.setGuestMicrophone(org.openapitools.client.model.GuestMicrophone.MUTED);
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, meeting.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, meeting.getGuestMicrophone());
 	}
 
 	@Test
@@ -257,7 +257,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertNull(meeting.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.ON, meeting.getGuestMicrophone());
 	}
 
 	@Test
@@ -426,7 +426,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
-		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, getResponse.getGuestMicrophone());
 		assertEquals(true, getResponse.getGuestPinRequired());
 		assertEquals(2, getResponse.getAdditionalInformation().size());
 		assertTrue(getResponse.getAdditionalInformation().containsAll(request.getAdditionalInformation()));

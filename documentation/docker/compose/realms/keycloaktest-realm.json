@@ -1,0 +1,262 @@
+{
+  "realm": "keycloaktest",
+  "enabled": true,
+  "roles": {
+    "client": {
+      "videoapi-all-role-att": [],
+      "videoapi-no-role-att": [],
+      "videoapi-not-admin": [],
+      "videoapi-not-provisioneruser": [],
+      "videoapi-only-provisioner": []
+    }
+  },
+  "users": [
+    {
+      "username": "service-account-videoapi-all-role-att",
+      "enabled": true,
+      "serviceAccountClientId": "videoapi-all-role-att",
+      "realmRoles": [
+        "default-roles-keycloaktest"
+      ]
+    },
+    {
+      "username": "service-account-videoapi-no-role-att",
+      "enabled": true,
+      "serviceAccountClientId": "videoapi-no-role-att",
+      "realmRoles": [
+        "default-roles-keycloaktest"
+      ]
+    },
+    {
+      "username": "service-account-videoapi-not-admin",
+      "enabled": true,
+      "serviceAccountClientId": "videoapi-not-admin",
+      "realmRoles": [
+        "default-roles-keycloaktest"
+      ]
+    },
+    {
+      "username": "service-account-videoapi-not-provisioneruser",
+      "enabled": true,
+      "serviceAccountClientId": "videoapi-not-provisioneruser",
+      "realmRoles": [
+        "default-roles-keycloaktest"
+      ]
+    },
+    {
+      "username": "service-account-videoapi-only-provisioner",
+      "enabled": true,
+      "serviceAccountClientId": "videoapi-only-provisioner",
+      "realmRoles": [
+        "default-roles-keycloaktest"
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "videoapi-all-role-att",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "all-role-att-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:video:role",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "videoapi-no-role-att",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "no-role-att-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "videoapi-not-admin",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "not-admin-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:video:role",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "videoapi-not-provisioneruser",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "not-provisioneruser-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-planner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:video:role",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "videoapi-only-provisioner",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "only-provisioner-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-provisioner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:video:role",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    }
+
+  ],
+  "clientScopes": [
+    {
+      "name": "videoapi-clientscope",
+      "description": "",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false",
+        "gui.order": "",
+        "consent.screen.text": "asdf"
+      },
+      "protocolMappers": [
+        {
+          "name": "organisation:id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "user-org-pool",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:organisation_id",
+            "jsonType.label": "String",
+            "access.tokenResponse.claim": "false"
+          }
+        },
+        {
+          "name": "email:value",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "eva@klak.dk",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:email",
+            "jsonType.label": "String",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "roles",
+    "web-origins",
+    "acr",
+    "basic",
+    "videoapi-clientscope"
+  ],
+  "keycloakVersion": "26.0.0"
+}
