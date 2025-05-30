@@ -13,8 +13,48 @@ services:
       retries: 50
      ports:
       - "3306:3306"
+
+   jetstream:
+     image: nats:2.9-alpine
+     command: -js
+     ports:
+       - 4222:4222
+       - 8222:8222
+
+   jetstream-init:
+     image: synadia/nats-box:latest
+     depends_on:
+       - jetstream
+     entrypoint: ["/bin/sh", "-c"]
+     command:
+       - |
+         nats stream add audit-stream -s jetstream:4222 --subjects 'audit.*' --storage file --max-age 168h --retention limits --discard old --max-msgs 1000 --max-bytes 104857600 --max-msg-size 1048576 --dupe-window 60s --replicas 1 || echo 'Failed to add audit stream'
+         nats stream add provision-stream -s jetstream:4222 --subjects 'provisioner.*' --storage file --max-age 168h --retention limits --discard old --max-msgs 1000 --max-bytes 104857600 --max-msg-size 1048576 --dupe-window 60s --replicas 1 || echo 'Failed to add provisioner stream'
+
+   organisation:
+     image: mockserver/mockserver:5.15.0
+     ports:
+       - 1080:1080
+     environment:
+       MOCKSERVER_INITIALIZATION_JSON_PATH: /config/organisation-mock.json
+     volumes:
+       - ./config/organisation-mock.json:/config/organisation-mock.json
+
+   keycloak:
+     image: quay.io/keycloak/keycloak:24.0.4
+     volumes:
+       - ./realms/keycloaktest-realm.json:/opt/keycloak/data/import/keycloaktest-realm.json
+     command: start-dev --http-relative-path /auth --import-realm --features=token-exchange,admin-fine-grained-authz
+     environment:
+       - KEYCLOAK_ADMIN=admin
+       - KEYCLOAK_ADMIN_PASSWORD=Test1234
+       - KEYCLOAK_LOGLEVEL=DEBUG
+       - KC_HTTP_PORT=9000
+       - KC_HOSTNAME=localhost
+     ports:
+       - 9000:9000
+
    videoapiservice:
-# NB: NATS/Jetstream mangler for at servicen kan starte
      image: kvalitetsit/medcom-video-api:latest
      environment:
       - jdbc_url=jdbc:mariadb://mysql:3306/videodb?useSSL=false
@@ -22,15 +62,15 @@ services:
       - jdbc_pass=secret1234
 
       - userservice_url=""
-      - userservice_token_attribute_organisation="dk:medcom:organisation_id"
-      - userservice_token_attribute_username="dk:medcom:email"
-      - userservice.token.attribute.email="dk:medcom:email"
-      - userservice.token.attribute.userrole="dk:medcom:video:role"
-      - userservice.token.attribute.auto.create.organisation=""
+      - userservice_token_attribute_organisation=dk:medcom:organisation_id
+      - userservice_token_attribute_username=dk:medcom:email
+      - userservice_token_attribute_email=dk:medcom:email
+      - userservice_token_attribute_userrole=dk:medcom:video:role
+      - userservice_token_attribute_auto_create_organisation=dk:medcom:auto:organisation_id
 
       - scheduling.template.default.conferencing.sys.id=22
       - scheduling.template.default.uri.prefix=""
-      - scheduling.template.default.uri.domain="vconf-test.dk"
+      - scheduling.template.default.uri.domain=testuri
       - scheduling.template.default.host.pin.required=true
       - scheduling.template.default.host.pin.range.low=10000
       - scheduling.template.default.host.pin.range.high=99999
@@ -43,39 +83,50 @@ services:
       - scheduling.template.default.uri.number.range.low=10000
       - scheduling.template.default.uri.number.range.high=99990
       - scheduling.template.default.ivr.theme=10
-      - scheduling.info.citizen.portal=""
 
-      - mapping.role.provisioner="meeting-provision"
-      - mapping.role.admin="meeting-admin"
-      - mapping.role.user="meeting-user"
-      - mapping.role.meeting_planner="meeting-planner"
+      - scheduling.info.citizen.portal=testuri
 
-      - organisation.service.enabled=false
-      - organisation.service.endpoint=""
-      - organisationtree.service.endpoint=""
+      - mapping.role.provisioner=meeting-provision
+      - mapping.role.admin=meeting-admin
+      - mapping.role.user=meeting-user
+      - mapping.role.meeting_planner=meeting-planner
+
+      - LOG_LEVEL=debug
+
+      - organisation.service.enabled=true
+      - organisation.service.endpoint=http://organisation:1080/services
+      - organisationtree.service.endpoint=http://organisation:1080
 
       - short.link.base.url=""
 
       - overflow.pool.organisation.id=0
 
-      - ALLOWED_ORIGINS=""
-      - audit.nats.url=""
-      - audit.nats.subject=""
-      - audit.nats.disabled=true
-      - events.nats.subject.scheduling-info=""
+      - ALLOWED_ORIGINS=http://localhost
 
+      - audit.nats.url=nats://jetstream:4222
+      - audit.nats.subject=audit.event
+      - events.nats.subject.scheduling-info=provisioner.scheduling-info
       - event.organisation.filter="some_random_org_that_does_not_exist"
       - pool.fill.organisation.user="some@email"
       - pool.fill.organisation="some_org"
-      - pool.fill.interval="PT1M"
-      - LOG_LEVEL=debug
+      - pool.fill.interval=PT1M
+
+      - spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:9000/auth/realms/keycloaktest
+      - spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://keycloak:9000/auth/realms/keycloaktest/protocol/openid-connect/certs
      depends_on:
       mysql:
        condition: service_healthy
+     ports:
+      - 8080:8080
+
    documentation-and-test:
      image: kvalitetsit/medcom-video-api-documentation:latest
      user: "1000:1000"
      environment:
       - BASE_URL=/test
+      - 'SERVER_URLS=[{"url": "http://localhost:8080", "name": "VDX Video API"}]'
+      - OAUTH_USE_PKCE=true
+      - AUTH_URL=http://localhost:9000/auth/realms/keycloaktest/protocol/openid-connect/auth
+      - TOKEN_URL=http://localhost:9000/auth/realms/keycloaktest/protocol/openid-connect/token
      ports:
       - 80:8080

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -88,8 +87,9 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public FilterRegistrationBean<CorsFilter> corsFilter() {
+	CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
+
 		config.setAllowCredentials(true);
 		allowedOrigins.forEach(config::addAllowedOrigin);
 		config.addAllowedHeader("*");
@@ -98,10 +98,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
 
-		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-		bean.setOrder(0);
-
-		return bean;
+		return new CorsFilter(source);
 	}
 
 	@Bean

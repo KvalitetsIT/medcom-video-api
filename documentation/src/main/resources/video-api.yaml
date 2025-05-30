@@ -903,7 +903,7 @@ paths:
   /v2/info:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Info V2
       summary: gets some general information on the API
@@ -932,7 +932,7 @@ paths:
   /v2/meetings/findByUriWithDomain:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: find meeting by uri with domain.
@@ -971,7 +971,7 @@ paths:
   /v2/meetings/findByUriWithoutDomain:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: find meeting by uri without domain.
@@ -1010,7 +1010,7 @@ paths:
   /v2/meetings:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: gets a list of meetings
@@ -1114,7 +1114,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: adds a new meeting
@@ -1158,7 +1158,7 @@ paths:
   /v2/meetings/{uuid}:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: gets a specific meeting
@@ -1191,7 +1191,7 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: updates an existing meeting
@@ -1233,7 +1233,7 @@ paths:
           $ref: '#/components/responses/500'
     patch:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: Updates an existing meeting through HTTP patch
@@ -1275,7 +1275,7 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Meetings V2
       summary: deletes an existing meeting
@@ -1307,7 +1307,7 @@ paths:
   /v2/scheduling-info:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations from meetings
@@ -1366,7 +1366,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: adds a new scheduling info
@@ -1403,7 +1403,7 @@ paths:
   /v2/scheduling-info/{uuid}:
     put:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: updates an existing scheduling-info
@@ -1441,7 +1441,7 @@ paths:
           $ref: '#/components/responses/500'
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: gets a specific scheduling information
@@ -1476,7 +1476,7 @@ paths:
   /v2/scheduling-templates:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Scheduling Template Administration V2
       summary: gets a list of scheduling templates matching own organization
@@ -1508,7 +1508,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Scheduling Template Administration V2
       summary: adds a new scheduling template
@@ -1542,7 +1542,7 @@ paths:
   /v2/scheduling-templates/{id}:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Scheduling Template Administration V2
       summary: gets a specific scheduling template
@@ -1575,7 +1575,7 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Scheduling Template Administration V2
       summary: updates an existing scheduling template
@@ -1612,7 +1612,7 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Scheduling Template Administration V2
       summary: deletes an existing scheduling template
@@ -1639,7 +1639,7 @@ paths:
   /v2/scheduling-info-provision:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be provisioned
@@ -1669,7 +1669,7 @@ paths:
   /v2/scheduling-info-deprovision:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
@@ -1699,7 +1699,7 @@ paths:
   /v2/scheduling-info-reserve:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
@@ -1799,7 +1799,7 @@ paths:
   /v2/scheduling-info-reserve/{uuid}:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Video Scheduling Information V2
       summary: Get scheduling info by reservation id.
@@ -1828,7 +1828,7 @@ paths:
   /v2/pool:
     get:
       security:
-        - oauth: []
+        - keycloakOIDC: []
       tags:
         - Pool V2
       summary: returns a list of pool information
@@ -1868,10 +1868,10 @@ components:
       in: header
       name: X-SESSIONDATA
 
-    oauth:
+    keycloakOIDC:
       type: oauth2
-      description: >- 
-        OAuth2 flow, the token should contain a user role claim with at least one of the following values: <br>
+      description: >-
+        OIDC security implemented by Keycloak. The token should contain a user role claim with at least one of the following values: <br>
         * meeting-admin <br>
         * meeting-user <br>
         * meeting-planner <br>

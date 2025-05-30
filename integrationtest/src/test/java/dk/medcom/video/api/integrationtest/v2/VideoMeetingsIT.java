@@ -718,7 +718,6 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://allowed:4100")
                 .header("Access-Control-Request-Method", "POST")
-                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
                 .build();
 
         var client = HttpClient.newBuilder().build();
@@ -732,7 +731,6 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://denied:4200")
                 .header("Access-Control-Request-Method", "POST")
-                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
                 .build();
 
         var client = HttpClient.newBuilder().build();

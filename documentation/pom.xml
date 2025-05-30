@@ -67,6 +67,24 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>Get old doc versions</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>docker/getOldDoc.sh</executable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
@@ -85,13 +103,19 @@
                                         <files>
                                             <file>
                                                 <source>${project.basedir}/src/main/resources/video-api.yaml</source>
-                                                <destName>${git.tags}.yaml</destName>
+                                                <destName>${git.commit.id.describe}.yaml</destName>
                                             </file>
                                             <file>
                                                 <source>${project.build.outputDirectory}/git.properties</source>
                                                 <destName>runningVersion.json</destName>
                                             </file>
                                         </files>
+                                        <fileSets>
+                                            <fileSet>
+                                                <directory>target/old</directory>
+                                                <outputDirectory>/</outputDirectory>
+                                            </fileSet>
+                                        </fileSets>
                                     </inline>
                                     <descriptorRef>artifact</descriptorRef>
                                     <targetDir>/app</targetDir>
@@ -111,14 +135,12 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.4.0</version>
+                <version>7.13.0</version>
                 <executions>
                     <execution>
-                        <id>video-api</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -128,7 +150,9 @@
                             <configOptions>
                                 <sourceFolder>src/test/java</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
+                                <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>
                             <output>${project.build.directory}/generated-test-sources/openapi/test</output>
                             <generateApiTests>false</generateApiTests>
@@ -154,6 +178,7 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
                                 <useTags>true</useTags>
+                                <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>
                             <output>${project.build.directory}/generated-sources/openapi/main</output>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -163,11 +188,9 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.9.10</version>
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
@@ -180,11 +203,16 @@
                 <configuration>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>git.commit.id.describe</includeOnlyProperty>
+                    </includeOnlyProperties>
                     <commitIdGenerationMode>full</commitIdGenerationMode>
+                    <gitDescribe>
+                        <tags>true</tags>
+                    </gitDescribe>
                     <format>json</format>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
