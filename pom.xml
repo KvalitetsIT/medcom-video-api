@@ -79,7 +79,7 @@
 			<dependency>
 				<groupId>net.logstash.logback</groupId>
 				<artifactId>logstash-logback-encoder</artifactId>
-				<version>8.0</version>
+				<version>8.1</version>
 				<scope>runtime</scope>
 			</dependency>
 
@@ -160,9 +160,16 @@
 			<dependency>
 				<groupId>com.squareup.okhttp3</groupId>
 				<artifactId>okhttp</artifactId>
-				<version>4.12.0</version>
+                <version>${okhttp-version}</version>
 				<scope>test</scope>
 			</dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>logging-interceptor</artifactId>
+                <version>${okhttp-version}</version>
+                <scope>test</scope>
+            </dependency>
 
 			<dependency>
 				<groupId>io.gsonfire</groupId>
@@ -231,28 +238,6 @@
 				<groupId>net.javacrumbs.shedlock</groupId>
 				<artifactId>shedlock-provider-jdbc-template</artifactId>
 				<version>${shed-lock-version}</version>
-			</dependency>
-
-			<!-- Logback -->
-			<dependency>
-				<groupId>net.logstash.logback</groupId>
-				<artifactId>logstash-logback-encoder</artifactId>
-				<version>8.1</version>
-				<scope>runtime</scope>
-			</dependency>
-
-			<!-- okhttp3 -->
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp</artifactId>
-				<version>${okhttp-version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>logging-interceptor</artifactId>
-				<version>${okhttp-version}</version>
-				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
