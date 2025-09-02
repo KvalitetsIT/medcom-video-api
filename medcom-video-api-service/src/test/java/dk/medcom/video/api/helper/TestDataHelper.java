@@ -45,7 +45,6 @@ public class TestDataHelper {
         schedulingInfo.setUriWithDomain("uri with domain");
         schedulingInfo.setUriWithoutDomain("uri without domain");
         schedulingInfo.setDirectMedia(DirectMedia.never);
-        schedulingInfo.setId(1L);
 
         return schedulingInfo;
     }
