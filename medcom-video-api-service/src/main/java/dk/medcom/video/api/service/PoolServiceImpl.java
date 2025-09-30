@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class PoolServiceImpl implements PoolService {
     private final Logger logger = LoggerFactory.getLogger(PoolServiceImpl.class);
-    private final PoolInfoService poolInfoService;
     private final SchedulingInfoService schedulingInfoService;
     private final MeetingUserRepository meetingUserRepository;
     private final OrganisationRepository organisationRepository;
@@ -22,14 +21,12 @@ public class PoolServiceImpl implements PoolService {
     private final String poolOrganisation;
     private final String poolOrganisationUser;
 
-    public PoolServiceImpl(PoolInfoService poolInfoService,
-                           SchedulingInfoService schedulingInfoService,
+    public PoolServiceImpl(SchedulingInfoService schedulingInfoService,
                            MeetingUserRepository meetingUserRepository,
                            OrganisationRepository organisationRepository,
                            NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
                            String poolOrganisation,
                            String poolOrganisationUser) {
-        this.poolInfoService = poolInfoService;
         this.schedulingInfoService = schedulingInfoService;
         this.meetingUserRepository = meetingUserRepository;
         this.organisationRepository = organisationRepository;
@@ -40,28 +37,22 @@ public class PoolServiceImpl implements PoolService {
 
     @Override
     @Transactional
-    public void fillAndDeletePools() {
-        logger.info("Checking if pool rooms should be created or removed!");
-        var poolInfo = poolInfoService.getPoolInfo();
-
-        poolInfo.forEach( x -> {
-            logger.info("Handling pool for organisation {}. Ignoring? {}.", x.getOrganizationId(), !newProvisionerOrganisationFilter.newProvisioner(x.getOrganizationId()));
-            if(newProvisionerOrganisationFilter.newProvisioner(x.getOrganizationId())) {
-                logger.info("Organisation wants {} pool rooms and {} is available.", x.getDesiredPoolSize(), x.getAvailablePoolSize());
-                if(x.getDesiredPoolSize() > x.getAvailablePoolSize()) {
-                    logger.info("Filling pool for {}.", x.getOrganizationId());
-                    fillPool(x);
-                } else if (x.getDesiredPoolSize() < x.getAvailablePoolSize()) {
-                    logger.info("Too many pool rooms for {}.", x.getOrganizationId());
-                    deleteInPool(x);
-                } else {
-                    logger.info("No need for additional or fewer pool rooms for {}.", x.getOrganizationId());
-                }
+    public void fillOrDeletePool(PoolInfoDto poolInfo) {
+        logger.info("Handling pool for organisation {}. Ignoring? {}.", poolInfo.getOrganizationId(), !newProvisionerOrganisationFilter.newProvisioner(poolInfo.getOrganizationId()));
+        if (newProvisionerOrganisationFilter.newProvisioner(poolInfo.getOrganizationId())) {
+            logger.info("Organisation wants {} pool rooms and {} is available.", poolInfo.getDesiredPoolSize(), poolInfo.getAvailablePoolSize());
+            if (poolInfo.getDesiredPoolSize() > poolInfo.getAvailablePoolSize()) {
+                logger.info("Filling pool for {}.", poolInfo.getOrganizationId());
+                fillPool(poolInfo);
+            } else if (poolInfo.getDesiredPoolSize() < poolInfo.getAvailablePoolSize()) {
+                logger.info("Too many pool rooms for {}.", poolInfo.getOrganizationId());
+                deleteInPool(poolInfo);
+            } else {
+                logger.info("No need for additional or fewer pool rooms for {}.", poolInfo.getOrganizationId());
             }
-            else {
-                logger.debug("Not filling pool for as organisation is filtered out.");
-            }
-        });
+        } else {
+            logger.debug("Not filling pool for as organisation is filtered out.");
+        }
     }
 
     private void fillPool(PoolInfoDto poolInfoDto) {
