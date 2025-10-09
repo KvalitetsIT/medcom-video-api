@@ -264,14 +264,13 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PoolService poolService(PoolInfoService poolInfoService,
-								   SchedulingInfoService schedulingInfoService,
+	public PoolService poolService(SchedulingInfoService schedulingInfoService,
 								   MeetingUserRepository meetingUserRepository,
 								   OrganisationRepository organisationRepository,
 								   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
 								   @Value("${pool.fill.organisation}") String poolOrganisation,
 								   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
-		return new PoolServiceImpl(poolInfoService, schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
+		return new PoolServiceImpl(schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
 	}
 
 	@Bean

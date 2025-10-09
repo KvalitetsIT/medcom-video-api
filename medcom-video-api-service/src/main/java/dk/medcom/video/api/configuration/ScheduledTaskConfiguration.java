@@ -1,6 +1,7 @@
 package dk.medcom.video.api.configuration;
 
 import dk.medcom.video.api.service.PoolHistoryService;
+import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.PoolService;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.core.LockProvider;
@@ -31,6 +32,9 @@ public class ScheduledTaskConfiguration {
     @Autowired
     private PoolService poolService;
 
+    @Autowired
+    private PoolInfoService poolInfoService;
+
     @Value("${pool.fill.disabled:false}")
     private boolean poolFillDisabled;
 
@@ -51,7 +55,8 @@ public class ScheduledTaskConfiguration {
         logger.debug("fillPools after assertLocked.");
 
         if(!poolFillDisabled) {
-            poolService.fillAndDeletePools();
+            logger.info("Filling and deleting pools!");
+            poolInfoService.getPoolInfo().forEach(poolInfo -> poolService.fillOrDeletePool(poolInfo));
         }
 
         logger.debug("fillPools took {} ms.", System.currentTimeMillis() - start);
