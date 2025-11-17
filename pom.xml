@@ -18,7 +18,7 @@
 		<spring-prometheus-app-info-version>2.0.3</spring-prometheus-app-info-version>
 		<spring-request-id-logger-version>2.0.1</spring-request-id-logger-version>
 		<shed-lock-version>6.9.2</shed-lock-version>
-		<okhttp-version>5.1.0</okhttp-version>
+		<okhttp-version>5.3.1</okhttp-version>
 	</properties>
 	<dependencies>
 		<!-- Test -->
