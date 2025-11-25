@@ -8,11 +8,11 @@ import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationServiceClient;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.dao.OrganisationRepository;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrganisationInterceptorTest {
     private OrganisationStrategy organisationStrategy;
@@ -28,7 +28,7 @@ public class OrganisationInterceptorTest {
     private static final String ORG = "ORG";
     private OrganisationServiceClient organisationServiceClient;
 
-    @Before
+    @BeforeEach
     public void setup() {
        organisationRepository = Mockito.mock(OrganisationRepository.class);
        organisationStrategy = Mockito.mock(OrganisationStrategy.class);

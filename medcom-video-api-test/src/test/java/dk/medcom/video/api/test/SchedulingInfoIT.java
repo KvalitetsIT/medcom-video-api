@@ -1,7 +1,7 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import org.openapitools.client.ApiClient;
@@ -9,7 +9,7 @@ import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsApi;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	private final VideoSchedulingInformationApi schedulingInfoApi;
@@ -122,7 +122,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		// Create scheduling info.
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
 		createSchedulingInfo.setOrganizationId("company 3");
-		createSchedulingInfo.setSchedulingTemplateId(4);
+		createSchedulingInfo.setSchedulingTemplateId(4L);
 
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain = 'test.dk' and uri_without_domain is not null and uuid = '" + createdSchedulingInfo.getUuid() + "'");
@@ -207,7 +207,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void createSchedulingInfo() throws ApiException {
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
-		createSchedulingInfo.setSchedulingTemplateId(1);
+		createSchedulingInfo.setSchedulingTemplateId(1L);
 		createSchedulingInfo.setOrganizationId("company 1");
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 

@@ -50,7 +50,6 @@ public class DomainMapper {
         updateMeetingDto.setEndTime(meeting.getEndTime());
         updateMeetingDto.setStartTime(meeting.getStartTime());
         updateMeetingDto.getLabels().addAll(meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).toList());
-        updateMeetingDto.setGuestMicrophone(GuestMicrophone.valueOf(meeting.getGuestMicrophone().name()));
         updateMeetingDto.setGuestPinRequired(meeting.getGuestPinRequired());
         updateMeetingDto.setMeetingAdditionalInfo(meeting.getMeetingAdditionalInfo().stream().map(x -> new AdditionalInformationType(x.getInfoKey(), x.getInfoValue())).toList());
         if(schedulingInfo.getHostPin() != null) {
