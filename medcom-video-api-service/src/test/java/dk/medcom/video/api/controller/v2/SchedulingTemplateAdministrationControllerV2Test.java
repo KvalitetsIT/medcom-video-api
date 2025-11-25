@@ -7,22 +7,22 @@ import dk.medcom.video.api.service.SchedulingTemplateServiceV2;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.model.*;
 
 import java.util.List;
 
 import static dk.medcom.video.api.controller.v2.HelperMethods.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingTemplateAdministrationControllerV2Test {
 
     private SchedulingTemplateAdministrationControllerV2 schedulingTemplateAdministrationControllerV2;
     private SchedulingTemplateServiceV2 schedulingTemplateService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         schedulingTemplateService = Mockito.mock(SchedulingTemplateServiceV2.class);
 

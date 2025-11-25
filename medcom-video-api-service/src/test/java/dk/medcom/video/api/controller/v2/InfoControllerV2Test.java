@@ -1,19 +1,19 @@
 package dk.medcom.video.api.controller.v2;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.info.InfoContributor;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InfoControllerV2Test {
 
     private InfoControllerV2 infoControllerV2;
 
-    @Before
+    @BeforeEach
     public void setup() {
         var infoContributor = Mockito.mock(InfoContributor.class);
         var infoContributors = List.of(infoContributor);

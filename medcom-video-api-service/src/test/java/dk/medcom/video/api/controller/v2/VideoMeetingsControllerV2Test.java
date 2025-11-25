@@ -9,8 +9,8 @@ import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.model.*;
 
@@ -19,14 +19,14 @@ import java.util.List;
 import java.util.UUID;
 
 import static dk.medcom.video.api.controller.v2.HelperMethods.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VideoMeetingsControllerV2Test {
 
     private VideoMeetingsControllerV2 videoMeetingsControllerV2;
     private MeetingServiceV2 meetingService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingServiceV2.class);
 

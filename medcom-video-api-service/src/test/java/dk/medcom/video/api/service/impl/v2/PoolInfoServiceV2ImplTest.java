@@ -4,14 +4,14 @@ import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.PoolInfoServiceV2;
 import dk.medcom.video.api.service.PoolInfoServiceV2Impl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
 
 import static dk.medcom.video.api.service.impl.v2.HelperMethods.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolInfoServiceV2ImplTest {
     private PoolInfoServiceV2 poolInfoServiceV2;
@@ -19,7 +19,7 @@ public class PoolInfoServiceV2ImplTest {
     private PoolInfoService poolInfoService;
     private final String shortLinkBaseUrl = "base.url";
 
-    @Before
+    @BeforeEach
     public void setup() {
         poolInfoService = Mockito.mock(PoolInfoService.class);
 

@@ -1,14 +1,15 @@
 package dk.medcom.video.api.controller.exceptions;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PermissionDeniedExceptionTest {
 	
 	PermissionDeniedException subject;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		subject = new PermissionDeniedException();
 	}
@@ -20,8 +21,8 @@ public class PermissionDeniedExceptionTest {
 		// When
 		
 		// Then
-		Assert.assertNotNull(subject);
-		Assert.assertEquals(null, subject.getMessage());
+		assertNotNull(subject);
+        assertNull(subject.getMessage());
 
 	}
 

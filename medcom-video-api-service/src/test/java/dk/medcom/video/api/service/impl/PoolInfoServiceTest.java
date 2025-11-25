@@ -12,8 +12,8 @@ import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.PoolInfoServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -27,9 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolInfoServiceTest {
 	@Mock
@@ -42,7 +40,7 @@ public class PoolInfoServiceTest {
 
     private PoolInfoService poolInfoService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));

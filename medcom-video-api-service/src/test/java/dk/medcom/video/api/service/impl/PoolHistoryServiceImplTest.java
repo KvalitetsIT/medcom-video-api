@@ -5,8 +5,8 @@ import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.entity.PoolHistory;
 import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.service.PoolHistoryServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 
 public class PoolHistoryServiceImplTest {
@@ -23,7 +23,7 @@ public class PoolHistoryServiceImplTest {
     private PoolInfoRepository poolInfoRepository;
     private PoolHistoryDao poolHistoryDao;
 
-    @Before
+    @BeforeEach
     public void setup() {
         poolInfoRepository = Mockito.mock(PoolInfoRepository.class);
         poolHistoryDao = Mockito.mock(PoolHistoryDao.class);
@@ -64,7 +64,7 @@ public class PoolHistoryServiceImplTest {
         var allValues = poolHistoryArgumentCaptor.getAllValues();
         assertEquals(2, allValues.size());
 
-        var firstEntry = allValues.get(0);
+        var firstEntry = allValues.getFirst();
         assertEquals(poolInfoEntityOne.getOrganisationCode(), firstEntry.getOrganisationCode());
         assertEquals(poolInfoEntityOne.getAvailablePoolSize(), firstEntry.getAvailablePoolRooms().intValue());
         assertEquals(poolInfoEntityOne.getWantedPoolSize(), firstEntry.getDesiredPoolSize().intValue());

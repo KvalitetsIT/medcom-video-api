@@ -10,20 +10,20 @@ import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
 import dk.medcom.video.api.service.MeetingService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MeetingUpdateControllerTest {
     private MeetingUpdateController meetingUpdateController;
     private MeetingService meetingService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
         meetingUpdateController = new MeetingUpdateController(meetingService, "short_link_base_url");

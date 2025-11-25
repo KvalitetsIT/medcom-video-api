@@ -9,7 +9,7 @@ import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsApi;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	private final VideoSchedulingInformationApi schedulingInfoApi;

@@ -2,20 +2,20 @@ package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.OrganisationFinder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class OrganisationFinderTest {
     private OrganisationFinder organisationFinder;
 
-    @Before
+    @BeforeEach
     public void setup() {
         organisationFinder = new OrganisationFinder();
     }

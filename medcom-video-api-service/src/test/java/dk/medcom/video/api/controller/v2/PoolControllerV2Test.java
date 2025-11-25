@@ -2,14 +2,14 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
 import dk.medcom.video.api.service.PoolInfoServiceV2;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
 
 import static dk.medcom.video.api.controller.v2.HelperMethods.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolControllerV2Test {
 
@@ -17,7 +17,7 @@ public class PoolControllerV2Test {
     private PoolInfoServiceV2 poolInfoService;
     private NewProvisionerOrganisationFilter provisionerOrganisationFilter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         poolInfoService = Mockito.mock(PoolInfoServiceV2.class);
         provisionerOrganisationFilter = Mockito.mock(NewProvisionerOrganisationFilter.class);

@@ -2,7 +2,7 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsV2Api;
@@ -21,9 +21,9 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class VideoMeetingsIT extends AbstractIntegrationTest {
+class VideoMeetingsIT extends AbstractIntegrationTest {
 
     private final VideoMeetingsV2Api videoMeetingsV2Api;
     private final VideoMeetingsV2Api videoMeetingsV2ApiNoHeader;
@@ -33,7 +33,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
 
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
 
-    public VideoMeetingsIT() {
+    VideoMeetingsIT() {
         var apiClient = new ApiClient();
         apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
@@ -64,172 +64,172 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
 // ------ JWT errors -------
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsFindByUriWithDomainGet() {
+    void errorIfNoJwtToken_v2MeetingsFindByUriWithDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithDomainGet() {
+    void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsFindByUriWithDomainGet() {
+    void errorIfInvalidJwtToken_v2MeetingsFindByUriWithDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+    void errorIfNoJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithoutDomainGet() {
+    void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithoutDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+    void errorIfInvalidJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsGet() {
+    void errorIfNoJwtToken_v2MeetingsGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsGet(OffsetDateTime.now(), OffsetDateTime.now(), UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsGet() {
+    void errorIfNoRoleAttInToken_v2MeetingsGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsGet(OffsetDateTime.now(), OffsetDateTime.now(), UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsGet() {
+    void errorIfInvalidJwtToken_v2MeetingsGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsGet(OffsetDateTime.now(), OffsetDateTime.now(), UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsPost() {
+    void errorIfNoJwtToken_v2MeetingsPost() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsPost() {
+    void errorIfNoRoleAttInToken_v2MeetingsPost() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsPost() {
+    void errorIfInvalidJwtToken_v2MeetingsPost() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsPost() {
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsPost() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsPost(randomCreateMeeting()));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsUuidDelete() {
+    void errorIfNoJwtToken_v2MeetingsUuidDelete() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsUuidDelete() {
+    void errorIfNoRoleAttInToken_v2MeetingsUuidDelete() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsUuidDelete() {
+    void errorIfInvalidJwtToken_v2MeetingsUuidDelete() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidDelete() {
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidDelete() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidDelete(meeting301Uuid()));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsUuidGet() {
+    void errorIfNoJwtToken_v2MeetingsUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidGet(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsUuidGet() {
+    void errorIfNoRoleAttInToken_v2MeetingsUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidGet(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsUuidGet() {
+    void errorIfInvalidJwtToken_v2MeetingsUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidGet(meeting301Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsUuidPatch() {
+    void errorIfNoJwtToken_v2MeetingsUuidPatch() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsUuidPatch() {
+    void errorIfNoRoleAttInToken_v2MeetingsUuidPatch() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsUuidPatch() {
+    void errorIfInvalidJwtToken_v2MeetingsUuidPatch() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPatch() {
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPatch() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2MeetingsUuidPut() {
+    void errorIfNoJwtToken_v2MeetingsUuidPut() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2MeetingsUuidPut() {
+    void errorIfNoRoleAttInToken_v2MeetingsUuidPut() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2MeetingsUuidPut() {
+    void errorIfInvalidJwtToken_v2MeetingsUuidPut() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPut() {
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPut() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
         assertEquals(403, expectedException.getCode());
     }
@@ -238,7 +238,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
 // -------- No JWT errors ----------
 
     @Test
-    public void testV2MeetingsFindByUriWithDomainGet() throws ApiException {
+    void testV2MeetingsFindByUriWithDomainGet() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsFindByUriWithDomainGetWithHttpInfo("4005@test.dk");
         assertEquals(200, result.getStatusCode());
         assertNotNull(result.getData());
@@ -249,7 +249,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostThenV2MeetingsFindByUriWithDomain() throws ApiException {
+    void testV2MeetingsPostThenV2MeetingsFindByUriWithDomain() throws ApiException {
         var createMeeting = randomCreateMeeting();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
@@ -263,7 +263,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsFindByUriWithoutDomainGet() throws ApiException {
+    void testV2MeetingsFindByUriWithoutDomainGet() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsFindByUriWithoutDomainGetWithHttpInfo("4005");
         assertEquals(200, result.getStatusCode());
         assertNotNull(result.getData());
@@ -274,7 +274,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostThenV2MeetingsFindByUriWithoutDomainGet() throws ApiException {
+    void testV2MeetingsPostThenV2MeetingsFindByUriWithoutDomainGet() throws ApiException {
         var createMeeting = randomCreateMeeting();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
@@ -288,7 +288,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetByStartTime() throws ApiException {
+    void testV2MeetingsGetByStartTime() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 OffsetDateTime.of(2024, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                 OffsetDateTime.of(2024, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC),
@@ -302,7 +302,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetBySubject() throws ApiException {
+    void testV2MeetingsGetBySubject() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 null, null,null, "Get this meeting", null, null, null, null);
         assertEquals(200, result.getStatusCode());
@@ -317,7 +317,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetByOrganizedBy() throws ApiException {
+    void testV2MeetingsGetByOrganizedBy() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 null, null,null, null, "in-user-org@user102.dk", null, null, null);
         assertEquals(200, result.getStatusCode());
@@ -330,7 +330,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetBySearch() throws ApiException {
+    void testV2MeetingsGetBySearch() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 null, null,null, null, null, "Mødebeskrivelse", null, null);
         assertEquals(200, result.getStatusCode());
@@ -350,7 +350,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetByLabel() throws ApiException {
+    void testV2MeetingsGetByLabel() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 null, null,null, null, null, null, "this is a label", null);
         assertEquals(200, result.getStatusCode());
@@ -363,7 +363,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsGetByUriWithDomain() throws ApiException {
+    void testV2MeetingsGetByUriWithDomain() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsGetWithHttpInfo(
                 null, null,null, null, null, null, null, "4005@test.dk");
         assertEquals(200, result.getStatusCode());
@@ -375,7 +375,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostThenV2MeetingsGetByShortId() throws ApiException {
+    void testV2MeetingsPostThenV2MeetingsGetByShortId() throws ApiException {
         var createMeeting = new CreateMeeting()
                 .description("This is a description")
                 .startTime(OffsetDateTime.now().plusHours(1))
@@ -395,7 +395,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPost() throws ApiException {
+    void testV2MeetingsPost() throws ApiException {
         var input = randomCreateMeeting();
         var result = videoMeetingsV2Api.v2MeetingsPostWithHttpInfo(input);
         assertEquals(200, result.getStatusCode());
@@ -407,7 +407,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostPoolMeeting() throws ApiException {
+    void testV2MeetingsPostPoolMeeting() throws ApiException {
         var input = randomCreateMeeting();
         input.meetingType(MeetingType.POOL);
 
@@ -420,7 +420,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostOnlyRequiredCreateMeetingValues() throws ApiException {
+    void testV2MeetingsPostOnlyRequiredCreateMeetingValues() throws ApiException {
         var input = new CreateMeeting()
                 .subject(UUID.randomUUID().toString())
                 .startTime(OffsetDateTime.now().plusHours(1))
@@ -466,7 +466,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostWhereMicIsMuted() throws ApiException {
+    void testV2MeetingsPostWhereMicIsMuted() throws ApiException {
         var input = randomCreateMeeting();
         input.setGuestMicrophone(org.openapitools.client.model.GuestMicrophone.MUTED);
 
@@ -481,7 +481,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostWhereGuestPinRequiredSetFalse() throws ApiException {
+    void testV2MeetingsPostWhereGuestPinRequiredSetFalse() throws ApiException {
         var input = randomCreateMeeting();
         input.setGuestPinRequired(false);
 
@@ -496,7 +496,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostWhereGuestPinRequiredSetTrue() throws ApiException {
+    void testV2MeetingsPostWhereGuestPinRequiredSetTrue() throws ApiException {
         var input = randomCreateMeeting();
         input.setGuestPinRequired(true);
 
@@ -511,7 +511,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostDuplicateOrganisationExternalId() {
+    void testV2MeetingsPostDuplicateOrganisationExternalId() {
         var createMeeting = randomCreateMeeting();
         createMeeting.setExternalId("external_id");
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2Api.v2MeetingsPost(createMeeting));
@@ -521,13 +521,13 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidDelete() throws ApiException {
+    void testV2MeetingsUuidDelete() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsUuidDeleteWithHttpInfo(deleteMeetingUuid());
         assertEquals(204, result.getStatusCode());
     }
 
     @Test
-    public void testV2MeetingsUuidDeleteNotAcceptableException() {
+    void testV2MeetingsUuidDeleteNotAcceptableException() {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2Api.v2MeetingsUuidDelete(provisionedOkMeetingUuid()));
         assertEquals(406, expectedException.getCode());
         assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"13\""));
@@ -535,7 +535,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidGet() throws ApiException {
+    void testV2MeetingsUuidGet() throws ApiException {
         var meetingUuid = meeting301Uuid();
         var result = videoMeetingsV2Api.v2MeetingsUuidGetWithHttpInfo(meetingUuid);
         assertEquals(200, result.getStatusCode());
@@ -550,14 +550,14 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidGetCanNotReadOtherOrganisation()  {
+    void testV2MeetingsUuidGetCanNotReadOtherOrganisation()  {
         var expectedException = assertThrows(ApiException.class, () -> videoMeetingsV2Api.v2MeetingsUuidGet(otherOrgMeetingUuid()));
         assertEquals(403, expectedException.getCode());
         assertTrue(expectedException.getMessage().contains("\"error\":\"Forbidden\""));
     }
 
     @Test
-    public void testV2MeetingsUuidGetWhereGuestMicIsMuted() throws ApiException {
+    void testV2MeetingsUuidGetWhereGuestMicIsMuted() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsUuidGet(meetingMicMuted304Uuid());
 
         assertNotNull(result);
@@ -566,7 +566,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidGetWhereGuestMicIsNull() throws ApiException {
+    void testV2MeetingsUuidGetWhereGuestMicIsNull() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsUuidGet(meetingMicNullUuid());
 
         assertNotNull(result);
@@ -575,7 +575,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidPatch() throws ApiException {
+    void testV2MeetingsUuidPatch() throws ApiException {
         var input = randomPatchMeeting();
         var meetingUuid = patchMeetingUuid();
         var result = videoMeetingsV2Api.v2MeetingsUuidPatchWithHttpInfo(meetingUuid, input);
@@ -588,7 +588,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidPatchTwiceWithSchedulingInfo() throws ApiException {
+    void testV2MeetingsUuidPatchTwiceWithSchedulingInfo() throws ApiException {
         // POST
         var inputPost = new CreateMeeting()
                 .description("This is a description")
@@ -647,7 +647,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsUuidPut() throws ApiException {
+    void testV2MeetingsUuidPut() throws ApiException {
         var input = randomUpdateMeeting();
         var meetingUuid = updateMeetingUuid();
         var result = videoMeetingsV2Api.v2MeetingsUuidPutWithHttpInfo(meetingUuid, input);
@@ -660,7 +660,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2MeetingsPostThenV2MeetingsUuidPutThenV2MeetingsUuidGet() throws ApiException {
+    void testV2MeetingsPostThenV2MeetingsUuidPutThenV2MeetingsUuidGet() throws ApiException {
         var inputPost = randomCreateMeeting();
         var labels = List.of("Label One", "Label Two");
         inputPost.setLabels(labels);
@@ -713,7 +713,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
 
     //----------- From v1 -----------
     @Test
-    public void testCorsAllowed() throws IOException, InterruptedException {
+    void testCorsAllowed() throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://allowed:4100")
@@ -726,7 +726,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testCorsDenied() throws IOException, InterruptedException {
+    void testCorsDenied() throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://denied:4200")
@@ -739,7 +739,7 @@ public class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testViewIsHealthy() throws SQLException {
+    void testViewIsHealthy() throws SQLException {
         // Only test that we can select from the view and it contains data.
         try(var connection = DriverManager.getConnection(getJdbcUrl(), "videouser", "secret1234");
             var result = connection.createStatement().executeQuery("select * from view_pool_history")) {

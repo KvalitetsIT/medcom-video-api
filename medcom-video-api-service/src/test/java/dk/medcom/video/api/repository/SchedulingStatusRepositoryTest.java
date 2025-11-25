@@ -7,12 +7,13 @@ import jakarta.annotation.Resource;
 
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.SchedulingStatusRepository;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.SchedulingStatus;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingStatusRepositoryTest extends RepositoryTest{
 	@Resource
@@ -40,13 +41,13 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		schedulingStatus = subject.save(schedulingStatus);
 
 		// Then
-		Assert.assertNotNull(schedulingStatus);
-		Assert.assertNotNull(schedulingStatus.getId());
-		Assert.assertEquals(provisionStatus, schedulingStatus.getProvisionStatus());
-		Assert.assertEquals(provisionStatusDescription, schedulingStatus.getProvisionStatusDescription());
-		Assert.assertEquals(meetingId, schedulingStatus.getMeeting().getId());
+		assertNotNull(schedulingStatus);
+		assertNotNull(schedulingStatus.getId());
+		assertEquals(provisionStatus, schedulingStatus.getProvisionStatus());
+		assertEquals(provisionStatusDescription, schedulingStatus.getProvisionStatusDescription());
+		assertEquals(meetingId, schedulingStatus.getMeeting().getId());
 		
-		Assert.assertEquals(calendar.getTime(), schedulingStatus.getTimeStamp());
+		assertEquals(calendar.getTime(), schedulingStatus.getTimeStamp());
 	}
 	
 	@Test
@@ -58,10 +59,10 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		SchedulingStatus schedulingStatus = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNotNull(schedulingStatus);
-		Assert.assertEquals(id, schedulingStatus.getId());
-		Assert.assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingStatus.getProvisionStatus());
-		Assert.assertEquals("all ok", schedulingStatus.getProvisionStatusDescription());
+		assertNotNull(schedulingStatus);
+		assertEquals(id, schedulingStatus.getId());
+		assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingStatus.getProvisionStatus());
+		assertEquals("all ok", schedulingStatus.getProvisionStatusDescription());
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		SchedulingStatus schedulingStatus = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNull(schedulingStatus);
+		assertNull(schedulingStatus);
 	}
 	
 	@Test
@@ -87,8 +88,8 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 		SchedulingStatus schedulingStatus = subject.findById(schedulingStatusId).orElse(null);
 			
 		// Then
-		Assert.assertNotNull(schedulingStatus);
-		Assert.assertEquals(meetingId, schedulingStatus.getMeeting().getId());
+		assertNotNull(schedulingStatus);
+		assertEquals(meetingId, schedulingStatus.getMeeting().getId());
 	}
 
 	@Test
@@ -100,13 +101,14 @@ public class SchedulingStatusRepositoryTest extends RepositoryTest{
 			
 		// When
 		SchedulingStatus schedulingStatus = subject.findById(schedulingStatusId).orElse(null);
-	    Meeting meeting = subjectM.findById(meetingId).orElse(null);
+        assertNotNull(schedulingStatus);
+        Meeting meeting = subjectM.findById(meetingId).orElse(null);
 	    schedulingStatus.setMeeting(meeting);
 			
 		// Then
-		Assert.assertNotNull(schedulingStatus);
-		Assert.assertNotNull(meeting);
-		Assert.assertEquals(meetingId, schedulingStatus.getMeeting().getId());
+		assertNotNull(schedulingStatus);
+		assertNotNull(meeting);
+		assertEquals(meetingId, schedulingStatus.getMeeting().getId());
 	}
 
 }

@@ -27,7 +27,7 @@
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mockserver</artifactId>
+			<artifactId>testcontainers-mockserver</artifactId>
 		</dependency>
 
 		<dependency>
@@ -46,7 +46,7 @@
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mariadb</artifactId>
+			<artifactId>testcontainers-mariadb</artifactId>
 			<scope>compile</scope>
 		</dependency>
 
@@ -56,11 +56,17 @@
 			<scope>test</scope>
 		</dependency>
   
-  <dependency>
+        <dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>logging-interceptor</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>

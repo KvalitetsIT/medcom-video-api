@@ -7,8 +7,8 @@ import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
 import dk.medcom.video.api.service.model.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.model.DetailedError;
 
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static dk.medcom.video.api.service.impl.v2.HelperMethods.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingServiceV2ImplTest {
 
@@ -26,7 +26,7 @@ public class MeetingServiceV2ImplTest {
     private MeetingService meetingService;
     private final String shortLinkBaseUrl = "base.url";
     
-    @Before
+    @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
         meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl);

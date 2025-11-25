@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HelperMethods {
     private static long count = 0;

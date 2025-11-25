@@ -7,8 +7,8 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.PoolFinderServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
@@ -17,13 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolFinderServiceTest {
     private PoolFinderServiceImpl poolFinderService;
-    private int minimumAgeSeconds;
     private SchedulingInfoRepository schedulingInfoRepository;
 
-    @Before
+    @BeforeEach
     public void setup() {
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
-        minimumAgeSeconds = 120;
+        int minimumAgeSeconds = 120;
         poolFinderService = new PoolFinderServiceImpl(schedulingInfoRepository, minimumAgeSeconds);
     }
 

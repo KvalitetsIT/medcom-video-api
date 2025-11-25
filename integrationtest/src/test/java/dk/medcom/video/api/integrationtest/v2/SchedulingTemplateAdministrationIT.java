@@ -2,7 +2,7 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.SchedulingTemplateAdministrationV2Api;
@@ -11,9 +11,9 @@ import org.openapitools.client.model.*;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
+class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
 
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2Api;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoHeader;
@@ -21,7 +21,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoRoleAtt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNotAdmin;
 
-    public SchedulingTemplateAdministrationIT() {
+    SchedulingTemplateAdministrationIT() {
         var apiClient = new ApiClient();
         apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
@@ -50,91 +50,91 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
 
     // ----------- JWT error ----------
     @Test
-    public void errorIfNoJwtToken_v2SchedulingTemplatesGet() {
+    void errorIfNoJwtToken_v2SchedulingTemplatesGet() {
         var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoHeader::v2SchedulingTemplatesGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingTemplatesGet() {
+    void errorIfInvalidJwtToken_v2SchedulingTemplatesGet() {
         var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiInvalidJwt::v2SchedulingTemplatesGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
+    void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
         var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingTemplatesIdDelete() {
+    void errorIfNoJwtToken_v2SchedulingTemplatesIdDelete() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdDelete(201L));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingTemplatesIdDelete() {
+    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdDelete() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdDelete(201L));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotAdmin_v2SchedulingTemplatesIdDelete() {
+    void errorIfNotAdmin_v2SchedulingTemplatesIdDelete() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdDelete(201L));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingTemplatesIdGet() {
+    void errorIfNoJwtToken_v2SchedulingTemplatesIdGet() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdGet(201L));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingTemplatesIdGet() {
+    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdGet() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdGet(201L));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
+    void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingTemplatesIdPut() {
+    void errorIfNoJwtToken_v2SchedulingTemplatesIdPut() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingTemplatesIdPut() {
+    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdPut() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotAdmin_v2SchedulingTemplatesIdPut() {
+    void errorIfNotAdmin_v2SchedulingTemplatesIdPut() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingTemplatesPost() {
+    void errorIfNoJwtToken_v2SchedulingTemplatesPost() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingTemplatesPost() {
+    void errorIfInvalidJwtToken_v2SchedulingTemplatesPost() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotAdmin_v2SchedulingTemplatesPost() {
+    void errorIfNotAdmin_v2SchedulingTemplatesPost() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
         assertEquals(403, expectedException.getCode());
     }
@@ -143,7 +143,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     //----- No JWT errors -------
 
     @Test
-    public void testV2SchedulingTemplatesGet() throws ApiException {
+    void testV2SchedulingTemplatesGet() throws ApiException {
         var result = schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesGetWithHttpInfo();
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -160,14 +160,14 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesIdDelete() throws ApiException {
+    void testV2SchedulingTemplatesIdDelete() throws ApiException {
         var result = schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesIdDeleteWithHttpInfo(203L);
         assertNotNull(result);
         assertEquals(204, result.getStatusCode());
     }
 
     @Test
-    public void testV2SchedulingTemplatesIdGet() throws ApiException {
+    void testV2SchedulingTemplatesIdGet() throws ApiException {
         var result = schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesIdGetWithHttpInfo(201L);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -181,7 +181,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesIdGetFromOtherOrg() {
+    void testV2SchedulingTemplatesIdGetFromOtherOrg() {
         var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesIdGetWithHttpInfo(202L));
         assertNotNull(expectedException);
         assertEquals(404, expectedException.getCode());
@@ -189,7 +189,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesIdPut() throws ApiException {
+    void testV2SchedulingTemplatesIdPut() throws ApiException {
         var input = randomSchedulingTemplateRequest();
 
         var result = schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesIdPutWithHttpInfo(204L, input);
@@ -212,7 +212,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesPostV2ThenSchedulingTemplatesIdPutThenV2SchedulingTemplatesIdGet() throws ApiException {
+    void testV2SchedulingTemplatesPostV2ThenSchedulingTemplatesIdPutThenV2SchedulingTemplatesIdGet() throws ApiException {
         //Given
         var inputPost = randomSchedulingTemplateRequest();
 
@@ -271,7 +271,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesPost() throws ApiException {
+    void testV2SchedulingTemplatesPost() throws ApiException {
         var input = randomSchedulingTemplateRequest();
 
         var result = schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesPostWithHttpInfo(input);
@@ -302,7 +302,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesPostWithDefaultValues() throws ApiException {
+    void testV2SchedulingTemplatesPostWithDefaultValues() throws ApiException {
         //Given only required parameters
         SchedulingTemplateRequest input = new SchedulingTemplateRequest();
         input.setConferencingSysId(43L);
@@ -368,7 +368,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
     }
 
     @Test
-    public void testV2SchedulingTemplatesPostV2SchedulingTemplatesIdPutOnlyOnePoolTemplateAllowed() throws ApiException {
+    void testV2SchedulingTemplatesPostV2SchedulingTemplatesIdPutOnlyOnePoolTemplateAllowed() throws ApiException {
         var inputOne = randomSchedulingTemplateRequest();
         inputOne.setIsPoolTemplate(true);
 
@@ -441,7 +441,7 @@ public class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest 
                 .directMedia(DirectMedia.BEST_EFFORT);
     }
 
-    public static String randomString() {
+    static String randomString() {
         return UUID.randomUUID().toString();
     }
 

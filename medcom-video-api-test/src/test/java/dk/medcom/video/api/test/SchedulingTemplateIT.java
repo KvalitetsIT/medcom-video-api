@@ -4,20 +4,18 @@ import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.SchedulingTemplateAdministrationApi;
 import org.openapitools.client.model.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest {
     private SchedulingTemplateAdministrationApi schedulingTemplate;
 
-    @Before
+    @BeforeEach
     public void setupApiClient() {
         var apiClient = new ApiClient()
                 .setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
@@ -49,16 +47,16 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
-        Assert.assertNotNull(result.getVmrType());
-        Assert.assertNotNull(result.getHostView());
-        Assert.assertNotNull(result.getGuestView());
-        Assert.assertNotNull(result.getVmrQuality());
-        Assert.assertTrue(result.getEnableOverlayText());
-        Assert.assertTrue(result.getGuestsCanPresent());
-        Assert.assertTrue(result.getForcePresenterIntoMain());
-        Assert.assertFalse(result.getForceEncryption());
-        Assert.assertFalse(result.getMuteAllGuests());
+        assertNotNull(result);
+        assertNotNull(result.getVmrType());
+        assertNotNull(result.getHostView());
+        assertNotNull(result.getGuestView());
+        assertNotNull(result.getVmrQuality());
+        assertTrue(result.getEnableOverlayText());
+        assertTrue(result.getGuestsCanPresent());
+        assertTrue(result.getForcePresenterIntoMain());
+        assertFalse(result.getForceEncryption());
+        assertFalse(result.getMuteAllGuests());
         assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
         assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(create.getReturnUrl(), result.getReturnUrl());
@@ -89,7 +87,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
         assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
@@ -132,7 +130,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
         assertEquals(updateSchedulingTemplate.getEnableOverlayText(), result.getEnableOverlayText());

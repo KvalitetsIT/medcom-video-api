@@ -2,7 +2,7 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsV2Api;
@@ -14,10 +14,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
+class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoHeader;
@@ -27,7 +26,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotProvisionUser;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
 
-    public VideoSchedulingInformationIT() {
+    VideoSchedulingInformationIT() {
         var apiClient = new ApiClient();
         apiClient.setBasePath(getApiBasePath());
         apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
@@ -62,43 +61,43 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     //---------- JWT errors --------
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoDeprovisionGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoDeprovisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoDeprovisionGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoDeprovisionGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoDeprovisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiInvalidJwt::v2SchedulingInfoDeprovisionGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotProvisionUser_v2SchedulingInfoDeprovisionGet() {
+    void errorIfNotProvisionUser_v2SchedulingInfoDeprovisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoDeprovisionGet);
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2SchedulingInfoGet() {
+    void errorIfNoRoleAttInToken_v2SchedulingInfoGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoPost() {
+    void errorIfNoJwtToken_v2SchedulingInfoPost() {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
@@ -107,7 +106,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoPost() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoPost() {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
@@ -116,7 +115,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNotProvisionUser_v2SchedulingInfoPost() {
+    void errorIfNotProvisionUser_v2SchedulingInfoPost() {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
@@ -125,25 +124,25 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoProvisionGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoProvisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoProvisionGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoProvisionGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoProvisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiInvalidJwt::v2SchedulingInfoProvisionGet);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotProvisionUser_v2SchedulingInfoProvisionGet() {
+    void errorIfNotProvisionUser_v2SchedulingInfoProvisionGet() {
         var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoProvisionGet);
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoReserveGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoReserveGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
                 true, false, true, false, true
@@ -152,7 +151,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoReserveGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoReserveGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
                 true, false, true, false, true
@@ -161,7 +160,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNotAdmin_v2SchedulingInfoReserveGet() {
+    void errorIfNotAdmin_v2SchedulingInfoReserveGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
                 true, false, true, false, true
@@ -170,43 +169,43 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoReserveUuidGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoReserveUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoReserveUuidGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoReserveUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNotAdmin_v2SchedulingInfoReserveUuidGet() {
+    void errorIfNotAdmin_v2SchedulingInfoReserveUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
         assertEquals(403, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoUuidGet() {
+    void errorIfNoJwtToken_v2SchedulingInfoUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoUuidGet() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2SchedulingInfoUuidGet() {
+    void errorIfNoRoleAttInToken_v2SchedulingInfoUuidGet() {
         var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoJwtToken_v2SchedulingInfoUuidPut() {
+    void errorIfNoJwtToken_v2SchedulingInfoUuidPut() {
         var input = new UpdateSchedulingInfo()
                 .provisionStatus(ProvisionStatus.DEPROVISION_OK)
                 .provisionStatusDescription(randomString())
@@ -216,7 +215,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2SchedulingInfoUuidPut() {
+    void errorIfInvalidJwtToken_v2SchedulingInfoUuidPut() {
         var input = new UpdateSchedulingInfo()
                 .provisionStatus(ProvisionStatus.DEPROVISION_OK)
                 .provisionStatusDescription(randomString())
@@ -226,7 +225,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNotProvisionUser_v2SchedulingInfoUuidPut() {
+    void errorIfNotProvisionUser_v2SchedulingInfoUuidPut() {
         var input = new UpdateSchedulingInfo()
                 .provisionStatus(ProvisionStatus.DEPROVISION_OK)
                 .provisionStatusDescription(randomString())
@@ -238,7 +237,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 // ---------- No JWT errors --------
 
     @Test
-    public void testV2SchedulingInfoDeprovisionGet() throws ApiException {
+    void testV2SchedulingInfoDeprovisionGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoDeprovisionGetWithHttpInfo();
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -256,7 +255,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoGet() throws ApiException {
+    void testV2SchedulingInfoGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoGetWithHttpInfo(
                 OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                 OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC),
@@ -273,7 +272,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoPost() throws ApiException {
+    void testV2SchedulingInfoPost() throws ApiException {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
@@ -296,7 +295,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoPostThenV2SchedulingInfoUuidGet() throws ApiException {
+    void testV2SchedulingInfoPostThenV2SchedulingInfoUuidGet() throws ApiException {
         var input = new CreateSchedulingInfo()
                 .schedulingTemplateId(201L)
                 .organizationId("user-org-pool");
@@ -331,7 +330,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoProvisionGet() throws ApiException {
+    void testV2SchedulingInfoProvisionGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoProvisionGetWithHttpInfo();
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -349,7 +348,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoProvisionGetDefaultValues() throws ApiException {
+    void testV2SchedulingInfoProvisionGetDefaultValues() throws ApiException {
         // Create meeting should trigger create scheduling info with AWAITS_PROVISION
         var inputMeeting = new CreateMeeting()
                 .subject(randomString())
@@ -379,7 +378,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoReserveGet() throws ApiException {
+    void testV2SchedulingInfoReserveGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
                 null,null,null,null,
                 null,null,null,null,null);
@@ -401,7 +400,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoReserveGetThenV2SchedulingInfoReserveUuidGet() throws ApiException {
+    void testV2SchedulingInfoReserveGetThenV2SchedulingInfoReserveUuidGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
                 VmrType.LECTURE,null,null, VmrQuality.FULLHD,
                 null,null,null,null,null);
@@ -429,7 +428,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoReserveUuidGet() throws ApiException {
+    void testV2SchedulingInfoReserveUuidGet() throws ApiException {
         var reservationId = schedulingInfo413ReservationUuid();
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveUuidGetWithHttpInfo(reservationId);
         assertNotNull(result);
@@ -443,7 +442,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testUseReservedSchedulingInfo() throws ApiException {
+    void testUseReservedSchedulingInfo() throws ApiException {
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
         assertNotNull(schedulingInfo);
         var reservationId = schedulingInfo.getReservationId();
@@ -465,7 +464,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
 
     @Test
-    public void testV2SchedulingInfoUuidGet() throws ApiException {
+    void testV2SchedulingInfoUuidGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGetWithHttpInfo(schedulingInfo405Uuid());
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -483,7 +482,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoUuidPut() throws ApiException {
+    void testV2SchedulingInfoUuidPut() throws ApiException {
         var input = new UpdateSchedulingInfo()
                 .provisionStatus(ProvisionStatus.PROVISION_PROBLEMS)
                 .provisionStatusDescription(randomString())
@@ -501,7 +500,7 @@ public class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testV2SchedulingInfoUuidPutDeprovisionSchedulingInfo() throws ApiException, SQLException {
+    void testV2SchedulingInfoUuidPutDeprovisionSchedulingInfo() throws ApiException, SQLException {
         // Create scheduling info.
         var inputPost = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")

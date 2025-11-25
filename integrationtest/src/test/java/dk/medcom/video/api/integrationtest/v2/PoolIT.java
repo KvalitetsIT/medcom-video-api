@@ -2,22 +2,21 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.PoolV2Api;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class PoolIT extends AbstractIntegrationTest {
+class PoolIT extends AbstractIntegrationTest {
 
     private final PoolV2Api poolV2Api;
     private final PoolV2Api poolV2ApiNoHeader;
     private final PoolV2Api poolV2ApiInvalidToken;
     private final PoolV2Api poolV2ApiNoRoleAtt;
 
-    public PoolIT() {
+    PoolIT() {
         var apiClient = new ApiClient();
         apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
         apiClient.setBasePath(getApiBasePath());
@@ -40,25 +39,25 @@ public class PoolIT extends AbstractIntegrationTest {
     }
 
     @Test
-    public void errorIfNoJwtToken_v2PoolGetWithHttpInfo() {
+    void errorIfNoJwtToken_v2PoolGetWithHttpInfo() {
         var expectedException = assertThrows(ApiException.class, poolV2ApiNoHeader::v2PoolGetWithHttpInfo);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfInvalidJwtToken_v2PoolGetWithHttpInfo() {
+    void errorIfInvalidJwtToken_v2PoolGetWithHttpInfo() {
         var expectedException = assertThrows(ApiException.class, poolV2ApiInvalidToken::v2PoolGetWithHttpInfo);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void errorIfNoRoleAttInToken_v2PoolGetWithHttpInfo() {
+    void errorIfNoRoleAttInToken_v2PoolGetWithHttpInfo() {
         var expectedException = assertThrows(ApiException.class, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
         assertEquals(401, expectedException.getCode());
     }
 
     @Test
-    public void testV2PoolGet() throws ApiException {
+    void testV2PoolGet() throws ApiException {
         var result = poolV2Api.v2PoolGetWithHttpInfo();
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());

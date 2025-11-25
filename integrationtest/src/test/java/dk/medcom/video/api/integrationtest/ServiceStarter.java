@@ -11,10 +11,14 @@ import org.mockserver.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.testcontainers.containers.*;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.mariadb.MariaDBContainer;
+import org.testcontainers.mockserver.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
@@ -200,7 +204,7 @@ public class ServiceStarter {
 
     private void setupDatabaseContainer() {
         // SQL server for Video API.
-        var mariadb = new MariaDBContainer<>("mariadb:10.6")
+        var mariadb = new MariaDBContainer("mariadb:10.6")
                 .withDatabaseName("videodb")
                 .withUsername(jdbcUser)
                 .withPassword(jdbcPass)
@@ -293,7 +297,7 @@ public class ServiceStarter {
     }
 
     private void setupKeycloak() {
-        var keycloakContainer = new GenericContainer<>("quay.io/keycloak/keycloak:26.0")
+        var keycloakContainer = new GenericContainer<>("quay.io/keycloak/keycloak:26.3")
                 .withClasspathResourceMapping("keycloaktest-realm.json", "/opt/keycloak/data/import/keycloaktest-realm.json", BindMode.READ_ONLY)
                 .withCommand("start-dev", "--import-realm")
                 .withEnv("KEYCLOAK_LOGLEVEL", "DEBUG")

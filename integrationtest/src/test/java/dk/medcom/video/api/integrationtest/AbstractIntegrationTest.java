@@ -1,8 +1,8 @@
 package dk.medcom.video.api.integrationtest;
 
 import io.nats.client.JetStreamApiException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -20,15 +20,15 @@ public abstract class AbstractIntegrationTest {
     private static ServiceStarter serviceStarter;
 
 
-    @AfterClass
-    public static void afterClass() {
+    @AfterAll
+    static void afterAll() {
         if(videoApi != null) {
             videoApi.getDockerClient().stopContainerCmd(videoApi.getContainerId()).exec();
         }
     }
 
-    @BeforeClass
-    public static void beforeClass() throws JetStreamApiException, IOException, InterruptedException {
+    @BeforeAll
+    static void beforeAll() throws JetStreamApiException, IOException, InterruptedException {
         setup();
     }
 
