@@ -1037,20 +1037,20 @@ paths:
       parameters:
         - name: from-start-time
           in: query
-          description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
           required: false
           schema:
             type: string
             format: date-time
-          example: '2023-03-31T11:25:44.512Z'
+          example: '2023-03-31T11:25:44Z'
         - name: to-start-time
           in: query
-          description: to start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
+          description: to start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
           required: false
           schema:
             type: string
             format: date-time
-          example: '2023-03-31T11:25:44.512Z'
+          example: '2023-03-31T11:25:44Z'
         - name: short-id
           in: query
           description: short id of meeting, always 12 characters long
@@ -1326,20 +1326,20 @@ paths:
       parameters:
         - name: from-start-time
           in: query
-          description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
           required: true
           schema:
             type: string
             format: date-time
-          example: '2023-03-31T11:25:44.512Z'
+          example: '2023-03-31T11:25:44Z'
         - name: to-end-time
           in: query
-          description: to end time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
+          description: to end time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
           required: true
           schema:
             type: string
             format: date-time
-          example: '2023-03-31T11:25:44.512Z'
+          example: '2023-03-31T11:25:44Z'
         - name: provision-status
           in: query
           description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
@@ -2193,15 +2193,15 @@ components:
         organizedBy:
           $ref: '#/components/schemas/meetingUser'
         startTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         endTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -2211,15 +2211,15 @@ components:
           maxLength: 100
           example: PROJECT001.
         createdTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         shortId:
           type: string
           minLength: 12
@@ -2280,15 +2280,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         endTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -2405,15 +2405,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         endTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -2442,15 +2442,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         endTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -2547,10 +2547,10 @@ components:
           example: '10'
           maxLength: 100
         provisionTimestamp:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         provisionVmrId:
           type: string
           maxLength: 50
@@ -2591,15 +2591,15 @@ components:
         updatedBy:
           $ref: '#/components/schemas/meetingUser'
         createdTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         reservationId:
           type: string
           format: uuid
@@ -2909,15 +2909,15 @@ components:
         updatedBy:
           $ref: '#/components/schemas/meetingUser'
         createdTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
-          description: NB! Format changes in v2 from '2019-10-02T13:00:00 +0000' to '2019-10-02T15:00:00+02:00'
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+02:00
+          example: 2019-10-02T15:00:00+01:00
         _links:
           properties:
             self:

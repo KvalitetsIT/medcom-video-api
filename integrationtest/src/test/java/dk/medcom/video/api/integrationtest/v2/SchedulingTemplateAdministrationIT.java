@@ -2,6 +2,11 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
@@ -11,6 +16,7 @@ import org.openapitools.client.model.*;
 import java.util.Random;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
@@ -20,10 +26,12 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidJwt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoRoleAtt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNotAdmin;
+    private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
+
 
     SchedulingTemplateAdministrationIT() {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
         apiClient.setBasePath(getApiBasePath());
 
         schedulingTemplateAdministrationV2Api = new SchedulingTemplateAdministrationV2Api(apiClient);
@@ -402,6 +410,61 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         var expectedExceptionPut = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2Api.v2SchedulingTemplatesIdPut(resultThree.getData().getId(), updateSchedulingTemplateThree));
         assertEquals(406, expectedExceptionPut.getCode());
         assertTrue(expectedExceptionPut.getResponseBody().contains("Create or update of pool template failed due to only one pool template allowed"));
+    }
+
+    @Test
+    void testV2TimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "conferencingSysId": 1234,
+                  "uriPrefix": "format",
+                  "uriDomain": "timestamp-test.dk",
+                  "hostPinRequired": true,
+                  "guestPinRequired": true,
+                  "uriNumberRangeLow": 1000,
+                  "uriNumberRangeHigh": 9999,
+                  "ivrTheme": "10"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("scheduling-templates")
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "conferencingSysId": 1234,
+                  "uriPrefix": "format",
+                  "uriDomain": "timestamp-test.dk",
+                  "hostPinRequired": true,
+                  "guestPinRequired": true,
+                  "uriNumberRangeLow": 1000,
+                  "uriNumberRangeHigh": 9999,
+                  "ivrTheme": "10"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("scheduling-templates")
+                    .path(postResultJson.getString("id"))
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
     }
 
     // ---------- helper methods ---------

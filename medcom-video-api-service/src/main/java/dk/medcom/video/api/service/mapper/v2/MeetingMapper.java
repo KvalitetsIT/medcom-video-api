@@ -63,7 +63,7 @@ public class MeetingMapper {
         output.setDescription(input.description());
         output.setProjectCode(input.projectCode());
         output.setOrganizedByEmail(input.organizedByEmail());
-        output.setLabels(input.labels());
+        output.setLabels(input.labels() != null ? input.labels() : List.of());
         if (input.additionalInformation() != null) {
             output.setAdditionalInformation(modelToDto(input.additionalInformation()));
         }

@@ -2,6 +2,11 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
@@ -14,6 +19,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class VideoSchedulingInformationIT extends AbstractIntegrationTest {
@@ -25,11 +31,12 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotAdmin;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotProvisionUser;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
+    private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
     VideoSchedulingInformationIT() {
         var apiClient = new ApiClient();
         apiClient.setBasePath(getApiBasePath());
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
 
         videoSchedulingInformationV2Api = new VideoSchedulingInformationV2Api(apiClient);
         videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
@@ -517,6 +524,49 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
         var updatedSchedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidPut(createdSchedulingInfo.getUuid(), inputPut);
         verifyRowExistsInDatabase("select * from scheduling_info where uri_domain is null and uri_without_domain is null and uuid = '" + updatedSchedulingInfo.getUuid() + "'");
+    }
+
+    @Test
+    void testV2TimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "organizationId": "user-org-pool",
+                  "schedulingTemplateId": "201"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("scheduling-info")
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "provisionStatus": "AWAITS_PROVISION"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("scheduling-info")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+        assertThat(putResultJson.getString("provisionTimestamp")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
     }
 
     // ----------- test data help -----------

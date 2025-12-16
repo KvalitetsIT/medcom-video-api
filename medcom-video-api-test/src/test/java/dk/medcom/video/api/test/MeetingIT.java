@@ -3,6 +3,10 @@ package dk.medcom.video.api.test;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.InfoApi;
@@ -27,6 +31,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
@@ -449,6 +454,53 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 			assertTrue(result.next());
 		}
 	}
+
+    @Test
+    void testTimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "subject": "Test timestamp format.",
+                  "startTime": "2225-11-02T15:00:00+02:00",
+                  "endTime": "2225-11-02T15:00:00+02:00"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("meetings")
+                    .request()
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+
+        assertTrue(postResult.contains("\"startTime\":\"2225-11-02T13:00:00 +0000\""));
+        assertTrue(postResult.contains("\"endTime\":\"2225-11-02T13:00:00 +0000\""));
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "subject": "Test timestamp format.",
+                  "startTime": "2025-10-02T15:00:00 +02:00",
+                  "endTime": "2025-10-02T17:00:00 +02:00"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("meetings")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+
+        assertTrue(putResult.contains("\"startTime\":\"2025-10-02T13:00:00 +0000\""));
+        assertTrue(putResult.contains("\"endTime\":\"2025-10-02T15:00:00 +0000\""));
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+    }
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {
 		Calendar cal = (Calendar) calendar.clone();

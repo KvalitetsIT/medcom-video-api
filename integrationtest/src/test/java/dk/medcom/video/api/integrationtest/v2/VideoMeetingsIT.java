@@ -2,6 +2,11 @@ package dk.medcom.video.api.integrationtest.v2;
 
 import dk.medcom.video.api.integrationtest.AbstractIntegrationTest;
 import dk.medcom.video.api.integrationtest.v2.helper.HeaderBuilder;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
@@ -22,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class VideoMeetingsIT extends AbstractIntegrationTest {
 
@@ -30,12 +36,13 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     private final VideoMeetingsV2Api videoMeetingsV2ApiInvalidJwt;
     private final VideoMeetingsV2Api videoMeetingsV2ApiNoRoleAtt;
     private final VideoMeetingsV2Api videoMeetingsV2ApiOnlyProvisioner;
+    private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
 
     VideoMeetingsIT() {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
+        apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
         apiClient.setBasePath(getApiBasePath());
 
         videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
@@ -708,6 +715,72 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertTrue(inputPut.getLabels().containsAll(resultGet.getLabels()));
         assertNotNull(resultGet.getAdditionalInformation());
         assertTrue(resultGet.getAdditionalInformation().isEmpty());
+    }
+
+    @Test
+    void testV2TimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "subject": "Will timestamp format correct.",
+                  "startTime": "2025-11-02T15:00:00.123456+02:00",
+                  "endTime": "2025-11-02T15:00:00.987654+02:00"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("meetings")
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+
+        var runInDocker = Boolean.getBoolean("runInDocker");
+        if (runInDocker) {
+            assertTrue(postResult.contains("\"startTime\":\"2025-11-02T13:00:00Z\""));
+            assertTrue(postResult.contains("\"endTime\":\"2025-11-02T13:00:00Z\""));
+        } else {
+            assertTrue(postResult.contains("\"startTime\":\"2025-11-02T14:00:00+01:00\""));
+            assertTrue(postResult.contains("\"endTime\":\"2025-11-02T14:00:00+01:00\""));
+        }
+        assertFalse(postResult.contains("00:00.123456"));
+        assertFalse(postResult.contains("00:00.987654"));
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "subject": "Will timestamp format correct.",
+                  "startTime": "2025-10-02T15:00:00.123456+02:00",
+                  "endTime": "2025-10-02T17:00:00.987654+02:00"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(getApiBasePath()))
+                    .path("v2")
+                    .path("meetings")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .header("Authorization", "Bearer " + allRoleAttToken)
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+
+        if (runInDocker) {
+            assertTrue(putResult.contains("\"startTime\":\"2025-10-02T13:00:00Z\""));
+            assertTrue(putResult.contains("\"endTime\":\"2025-10-02T15:00:00Z\""));
+        } else {
+            assertTrue(putResult.contains("\"startTime\":\"2025-10-02T15:00:00+02:00\""));
+            assertTrue(putResult.contains("\"endTime\":\"2025-10-02T17:00:00+02:00\""));
+        }
+        assertFalse(putResult.contains("00:00.123456"));
+        assertFalse(putResult.contains("00:00.987654"));
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
     }
 
 
