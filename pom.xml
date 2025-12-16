@@ -110,12 +110,6 @@
 			</dependency>
 
 			<!-- Test dependencies - test containers -->
-      <dependency>
-         <groupId>org.testcontainers</groupId>
-         <artifactId>testcontainers</artifactId>
-         <version>2.0.2</version>
-      </dependency>
-
 			<dependency>
 				<groupId>org.testcontainers</groupId>
 				<artifactId>testcontainers-mockserver</artifactId>
@@ -140,12 +134,12 @@
 				<version>5.15.0</version>
 			</dependency>
 
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.21.0</version>
-      Format timestamp output  <scope>test</scope>
-      </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.21.0</version>
+                <scope>test</scope>
+            </dependency>
 
 			<!-- Code coverage -->
 			<dependency>
