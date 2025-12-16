@@ -723,8 +723,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var inputPost = """
                 {
                   "subject": "Will timestamp format correct.",
-                  "startTime": "2025-11-02T15:00:00.123456+02:00",
-                  "endTime": "2025-11-02T15:00:00.987654+02:00"
+                  "startTime": "3025-11-02T15:00:00.123456+02:00",
+                  "endTime": "3025-11-02T15:00:00.987654+02:00"
                 }""";
 
         String postResult;
@@ -740,11 +740,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var runInDocker = Boolean.getBoolean("runInDocker");
         if (runInDocker) {
-            assertTrue(postResult.contains("\"startTime\":\"2025-11-02T13:00:00Z\""));
-            assertTrue(postResult.contains("\"endTime\":\"2025-11-02T13:00:00Z\""));
+            assertTrue(postResult.contains("\"startTime\":\"3025-11-02T13:00:00Z\""));
+            assertTrue(postResult.contains("\"endTime\":\"3025-11-02T13:00:00Z\""));
         } else {
-            assertTrue(postResult.contains("\"startTime\":\"2025-11-02T14:00:00+01:00\""));
-            assertTrue(postResult.contains("\"endTime\":\"2025-11-02T14:00:00+01:00\""));
+            assertTrue(postResult.contains("\"startTime\":\"3025-11-02T14:00:00+01:00\""));
+            assertTrue(postResult.contains("\"endTime\":\"3025-11-02T14:00:00+01:00\""));
         }
         assertFalse(postResult.contains("00:00.123456"));
         assertFalse(postResult.contains("00:00.987654"));
