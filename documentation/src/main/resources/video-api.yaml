@@ -143,6 +143,16 @@ tags:
     description: Provisioner related
   - name: Info
     description: not related to a specific request
+  - name: Video Meetings V2
+    description: End user/planner related
+  - name: Video Scheduling Information V2
+    description: Provisioner related
+  - name: Scheduling Template Administration V2
+    description: Admin related
+  - name: Pool V2
+    description: Provisioner related
+  - name: Info V2
+    description: not related to a specific request
 servers:
   - url: 'http://localhost:8081'
 paths:
@@ -150,7 +160,7 @@ paths:
     get:
       tags:
         - Info
-      summary: gets some generel information on the API
+      summary: gets some general information on the API
       description: Use this as an initial test to see if the API is up running and replying.
       responses:
         '200':
@@ -162,6 +172,8 @@ paths:
 
   /meetings/findByUriWithDomain:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: find meeting by uri with domain.
@@ -182,14 +194,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
 
   /meetings/findByUriWithoutDomain:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: find meeting by uri without domain.
@@ -210,14 +224,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
 
   /meetings:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: gets a list of meetings
@@ -226,19 +242,63 @@ paths:
         - name: from-start-time
           in: query
           description: from start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ.
-          required: true
+          required: false
           schema:
             type: string
-            format: date
-          example: '2018-01-01T03:12:30%2B0100'
+            format: date-time
+          example: '2018-01-01T03:12:30+%2B0100'
         - name: to-start-time
           in: query
           description: to start time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
-          required: true
+          required: false
           schema:
             type: string
-            format: date
-          example: '2023-12-31T03:12:30-0100'
+            format: date-time
+          example: '2023-12-31T03:12:30+%2B0100'
+        - name: short-id
+          in: query
+          description: short id of meeting, always 12 characters long
+          required: false
+          schema:
+            type: string
+            minLength: 12
+            maxLength: 12
+          example: 'abcdefghijkl'
+        - name: subject
+          in: query
+          description: the subject of a meeting
+          required: false
+          schema:
+            type: string
+          example: subject
+        - name: organizedBy
+          in: query
+          description: the organizer of a meeting
+          required: false
+          schema:
+            type: string
+          example: organizer
+        - name: search
+          in: query
+          description: common string
+          required: false
+          schema:
+            type: string
+          example: searching for this
+        - name: label
+          in: query
+          description: the label of a meeting
+          required: false
+          schema:
+            type: string
+          example: label123
+        - name: uriWithDomain
+          in: query
+          description: the uri with domain of a meeting
+          required: false
+          schema:
+            type: string
+          example: '123456@video.domain'
       responses:
         '200':
           description: Ok
@@ -249,12 +309,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: adds a new meeting
@@ -279,15 +341,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
   /meetings/{uuid}:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: gets a specific meeting
@@ -302,14 +366,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: updates an existing meeting
@@ -331,16 +397,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
     patch:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: Updates an existing meeting through HTTP patch
@@ -362,16 +430,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/meeting'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
     delete:
+      security:
+        - userContext: [ ]
       tags:
         - Video Meetings
       summary: deletes an existing meeting
@@ -382,17 +452,19 @@ paths:
         '200':
           description: Ok
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
   /scheduling-info:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations from meetings
@@ -404,22 +476,23 @@ paths:
           required: true
           schema:
             type: string
-            format: date
-          example: '2018-01-01T03:12:30%2B0100'
+            format: date-time
+          example: '2018-01-01T03:12:30+%2B0100'
         - name: to-end-time
           in: query
           description: to end time, date format is yyyy-MM-dd'T'HH:mm:ssZZZ
           required: true
           schema:
             type: string
-            format: date
-          example: '2023-12-31T03:12:30-0100'
+            format: date-time
+          example: '2023-12-31T03:12:30+%2B0100'
         - name: provision-status
           in: query
           description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
           required: false
           schema:
             $ref: '#/components/schemas/provisionStatus'
+            default: AWAITS_PROVISION
       responses:
         '200':
           description: Ok
@@ -430,12 +503,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/scheduling-info'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: adds a new scheduling info
@@ -457,15 +532,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-info'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
   /scheduling-info/{uuid}:
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: updates an existing scheduling-info
@@ -487,16 +564,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-info'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
         '406':
-          $ref: '#/components/responses/406'
+          $ref: '#/components/responses/406_old'
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a specific scheduling information
@@ -511,15 +590,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-info'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
   /scheduling-templates:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: gets a list of scheduling templates matching own organization
@@ -534,12 +615,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/scheduling-template'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
     post:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: adds a new scheduling template
@@ -550,7 +633,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/create-scheduling-template'
+              $ref: '#/components/schemas/schedulingTemplateRequest'
       responses:
         '200':
           description: Ok
@@ -559,13 +642,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-template'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
   /scheduling-templates/{id}:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: gets a specific scheduling template
@@ -580,14 +665,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-template'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
     put:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: updates an existing scheduling template
@@ -600,7 +687,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/update-scheduling-template'
+              $ref: '#/components/schemas/schedulingTemplateRequest'
       responses:
         '200':
           description: Ok
@@ -609,14 +696,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-template'
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
     delete:
+      security:
+        - userContext: [ ]
       tags:
         - Scheduling Template Administration
       summary: deletes an existing scheduling template
@@ -627,15 +716,17 @@ paths:
         '200':
           description: Ok
         '400':
-          $ref: '#/components/responses/400'
+          $ref: '#/components/responses/400_old'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
         '404':
-          $ref: '#/components/responses/404'
+          $ref: '#/components/responses/404_old'
   /scheduling-info-provision:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations on meetings waiting to be provisioned
@@ -650,11 +741,13 @@ paths:
                 items:
                   $ref: '#/components/schemas/scheduling-info'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
   /scheduling-info-deprovision:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
@@ -669,12 +762,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/scheduling-info'
         '401':
-          $ref: '#/components/responses/401'
+          $ref: '#/components/responses/401_old'
         '403':
-          $ref: '#/components/responses/403'
+          $ref: '#/components/responses/403_old'
 
   /scheduling-info-reserve:
     get:
+      security:
+        - userContext: [ ]
       tags:
         - Video Scheduling Information
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
@@ -751,18 +846,967 @@ paths:
               schema:
                 $ref: '#/components/schemas/scheduling-info'
         '401':
+          $ref: '#/components/responses/401_old'
+        '403':
+          $ref: '#/components/responses/403_old'
+        '404':
+          $ref: '#/components/responses/404_old'
+
+  /scheduling-info-reserve/{uuid}:
+    get:
+      security:
+        - userContext: [ ]
+      tags:
+        - Video Scheduling Information
+      summary: Get scheduling info by reservation id.
+      description: Read a single scheduling info by id.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401_old'
+        '403':
+          $ref: '#/components/responses/403_old'
+        '404':
+          $ref: '#/components/responses/404_old'
+
+  /pool:
+    get:
+      security:
+        - userContext: [ ]
+      tags:
+        - Pool
+      summary: returns a list of pool information
+      description: Gets the pool information per organization including the default scheduling template for the organization. If this schedulingTemplate is null it is because the organisation in question do not have a default template. A default template must be created before it is possible to create scheduling info. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/pool/".
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/pool-info'
+        '400':
+          $ref: '#/components/responses/400_old'
+        '401':
+          $ref: '#/components/responses/401_old'
+        '403':
+          $ref: '#/components/responses/403_old'
+
+  /v2/info:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Info V2
+      summary: gets some general information on the API
+      description: >-
+        Use this as an initial test to see if the API is up running and replying. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings/findByUriWithDomain:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: find meeting by uri with domain.
+      description: >-
+        Find meeting by uri with domain. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - name: uri
+          in: query
+          description: uri with domain
+          required: true
+          schema:
+            type: string
+          example: '123456@video.domain'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings/findByUriWithoutDomain:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: find meeting by uri without domain.
+      description: >-
+        Find meeting by uri without domain. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - name: uri
+          in: query
+          description: uri without domain
+          required: true
+          schema:
+            type: string
+          example: '12345'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: gets a list of meetings
+      description: >-
+        Gets a list of meetings based on query parameters. 
+        If one is present the remaining are ignored. <br>
+        The query parameters are handled in order: <br>
+        * short-id <br>
+        * label <br>
+        * subject <br>
+        * organized-by <br>
+        * search (also from-start-time and to-start-time if present) <br>
+        * from-start-time and to-start-time <br>
+        * uri-with-domain <br>
+        
+        Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
+        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - name: from-start-time
+          in: query
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: to-start-time
+          in: query
+          description: to start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: short-id
+          in: query
+          description: short id of meeting, always 12 characters long
+          required: false
+          schema:
+            type: string
+            minLength: 12
+            maxLength: 12
+          example: 'abcdefghijkl'
+        - name: subject
+          in: query
+          description: the subject of a meeting
+          required: false
+          schema:
+            type: string
+          example: subject
+        - name: organizedBy
+          in: query
+          description: the organizer of a meeting
+          required: false
+          schema:
+            type: string
+          example: organizer
+        - name: search
+          in: query
+          description: common string
+          required: false
+          schema:
+            type: string
+          example: searching for this
+        - name: label
+          in: query
+          description: the label of a meeting
+          required: false
+          schema:
+            type: string
+          example: label123
+        - name: uriWithDomain
+          in: query
+          description: the uri with domain of a meeting
+          required: false
+          schema:
+            type: string
+          example: '123456@video.domain'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: adds a new meeting
+      description: >-
+        Adds a new meeting based on the given input data. <br> <br>
+        Selecting a template for the meeting is done using the following rules, using the one first matching  <Ul>
+        <li> when schedulingTemplateId is is given and valid, this template is used
+        <li> organization default template
+        <li> shared default template (organization not given)
+        </Ul> <br> <br>
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
+      requestBody:
+        description: meeting details to use while adding
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-meeting'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings/{uuid}:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: gets a specific meeting
+      description: >-
+        Gets a specific meeting based on the given uuid. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
           $ref: '#/components/responses/401'
         '403':
           $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
-
-  /scheduling-info-reserve/{uuid}:
-    get:
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      security:
+        - keycloakOIDC: []
       tags:
-        - Video Scheduling Information
+        - Video Meetings V2
+      summary: updates an existing meeting
+      description: >-
+        Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). 
+        In the later case only endTime will be updated. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        description: meeting details to update with
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-meeting'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+    patch:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: Updates an existing meeting through HTTP patch
+      description: >-
+        Updates a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0) or PROVISIONED_OK (3). 
+        In the later case only endTime can be updated. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        description: Meeting details to update with. If field is NOT present in the json structure it will not be updated. If field is set to null it will be deleted in the meeting.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/patch-meeting'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Meetings V2
+      summary: deletes an existing meeting
+      description: >-
+        Deletes a specific meeting. Only allowed when provisionStatus is AWAITS_PROVISION (0). <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: gets a list of scheduling informations from meetings
+      description: >-
+        Gets a a list of scheduling informations based on date interval and provision status. The start 
+        (minus VMR available before) or end time of the meeting must be within the date interval in order to be included 
+        in the response. Scheduling information is the "technically" part of a meeting. This request is e.g. the one to 
+        retrieve in order to determine what meetings to provision. <br> NB! using + in timezone should be encoded as %2B. <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info??from-start-time=2018-01-01T03:12:30%2B0100&to-end-time=2023-12-31T05:12:30%2B0100&provision-status=AWAITS_PROVISION" <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - name: from-start-time
+          in: query
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: to-end-time
+          in: query
+          description: to end time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: true
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: provision-status
+          in: query
+          description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
+          required: false
+          schema:
+            $ref: '#/components/schemas/provisionStatus'
+            default: AWAITS_PROVISION
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: adds a new scheduling info
+      description: >-
+        Adds a new scheduling information based on the given input data. <br> <br>
+        Selecting a template is done as when adding (post) a meeting. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
+      requestBody:
+        description: scheduling info details to use while adding
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-scheduling-info'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info/{uuid}:
+    put:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: updates an existing scheduling-info
+      description: >-
+        Updates a specific scheduling information. Scheduling information is the "technically" part of a meeting. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        description: scheduling information to update with
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-scheduling-info'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '406':
+          $ref: '#/components/responses/406'
+        '500':
+          $ref: '#/components/responses/500'
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: gets a specific scheduling information
+      description: >-
+        Gets a specific scheduling information based on the given uuid. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-templates:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Scheduling Template Administration V2
+      summary: gets a list of scheduling templates matching own organization
+      description: >-
+        Gets a list of scheduling templates matching the organization of the user requesting.  <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-templates/7". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-template'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Scheduling Template Administration V2
+      summary: adds a new scheduling template
+      description: >-
+        Adds a new scheduling template based on the given input data. If template is indicated as default, any other 
+        default template for same organization will be made non-default. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
+      requestBody:
+        description: scheduling template details to use while adding
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedulingTemplateRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-template'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+  /v2/scheduling-templates/{id}:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Scheduling Template Administration V2
+      summary: gets a specific scheduling template
+      description: >-
+        Gets a specific scheduling template based on the given id. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-template'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Scheduling Template Administration V2
+      summary: updates an existing scheduling template
+      description: >-
+        Updates a specific scheduling template. If template is indicated as default, any other default template for same 
+        organization will be made non-default. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        description: scheduling template details to update with
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedulingTemplateRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-template'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Scheduling Template Administration V2
+      summary: deletes an existing scheduling template
+      description: >-
+        Deletes a specific scheduling template. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info-provision:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: gets a list of scheduling informations on meetings waiting to be provisioned
+      description: >-
+        Gets a a list of scheduling informations to provision based on date and provision status. Scheduling information 
+        is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to determine what 
+        meetings to provision." <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-provision/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info-deprovision:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
+      description: >-
+        Gets a a list of scheduling informations to deprovision based on date and provision status. Scheduling 
+        information is the "technically" part of a meeting. This request is e.g. the one to retrieve in order to 
+        determine what meetings to deprovision." <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/scheduling-info-deprovision/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-provisioner-user
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info-reserve:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
+      summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
+      description: >-
+        Reserve a single scheduling info from the organisations pool.". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
+      parameters:
+        - name: vmrType
+          in: query
+          description: Type of the virtual meetingroom
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrType'
+            default: conference
+          example: 'lecture'
+        - name: hostView
+          in: query
+          description: The layout seen by Hosts
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+            default: one_main_seven_pips
+          example: 'one_main_zero_pips'
+        - name: guestView
+          in: query
+          description: The layout seen by Guests
+          required: false
+          schema:
+            $ref: '#/components/schemas/viewType'
+            default: one_main_seven_pips
+          example: 'one_main_zero_pips'
+        - name: vmrQuality
+          in: query
+          description: Controls the maximum call quality for participants connecting to this service
+          required: false
+          schema:
+            $ref: '#/components/schemas/vmrQuality'
+            default: hd
+          example: 'fullhd'
+        - name: enableOverlayText
+          in: query
+          description: 'If participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+            default: true
+          example: 'false'
+        - name: guestsCanPresent
+          in: query
+          description: 'Controls whether the Guests in the conference are allowed to present content. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+            default: true
+          example: 'false'
+        - name: forcePresenterIntoMain
+          in: query
+          description: 'Controls whether the Host who is presenting is locked into the main video position. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+            default: true
+          example: 'false'
+        - name: forceEncryption
+          in: query
+          description: 'Default value: false'
+          required: false
+          schema:
+            type: boolean
+            default: false
+          example: 'false'
+        - name: muteAllGuests
+          in: query
+          description: 'Controls whether to mute guests when they first join the conference. <br> Default value: true'
+          required: false
+          schema:
+            type: boolean
+            default: false
+          example: 'false'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/scheduling-info'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/scheduling-info-reserve/{uuid}:
+    get:
+      security:
+        - keycloakOIDC: []
+      tags:
+        - Video Scheduling Information V2
       summary: Get scheduling info by reservation id.
-      description: Read a single scheduling info by id.
+      description: >- 
+        Read a single scheduling info by id. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -778,13 +1822,27 @@ paths:
           $ref: '#/components/responses/403'
         '404':
           $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
 
-  /pool:
+  /v2/pool:
     get:
+      security:
+        - keycloakOIDC: []
       tags:
-        - Pool
+        - Pool V2
       summary: returns a list of pool information
-      description: Gets the pool information per organization including the default scheduling template for the organization. If this schedulingTemplate is null it is because the organisation in question do not have a default template. A default template must be created before it is possible to create scheduling info. <br> <br> This request also returns a url for the request itself. An example could be "http://localhost:8081/api/pool/".
+      description: >- 
+        Gets the pool information per organization including the default scheduling template for the organization. 
+        If this schedulingTemplate is null it is because the organisation in question do not have a default template.
+        A default template must be created before it is possible to create scheduling info. <br> <br> 
+        This request also returns a url for the request itself. An example could be "http://localhost:8081/api/pool/". <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
       responses:
         '200':
           description: Ok
@@ -800,7 +1858,35 @@ paths:
           $ref: '#/components/responses/401'
         '403':
           $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
 components:
+  securitySchemes:
+    userContext:
+      type: apiKey
+      in: header
+      name: X-SESSIONDATA
+
+    keycloakOIDC:
+      type: oauth2
+      description: >-
+        OIDC security implemented by Keycloak. The token should contain a user role claim with at least one of the following values: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user <br> <br>
+        It is specified in the description of the endpoint which values grants access.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/auth
+          tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
+          scopes: {}
+        clientCredentials:
+          tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
+          scopes: {}
+
   parameters:
     uuid:
       name: uuid
@@ -818,10 +1904,10 @@ components:
       required: true
       schema:
         type: integer
-        format: int32
+        format: int64
       example: 7
   responses:
-    '400':
+    '400_old':
       description: "Bad Request. This could be because: <br> * invalid date format in date format parameters/properties <br> * a uuid parameter does not have the correct format <br>  * one of the required parameters/properties are missing or is empty <br> * length of input is exeeding maximum length <br> * referenced entities like organisation, templates etc has some problems <br> (See a possible detailed error message in the in the response.)"
       content:
         application/hal+json:
@@ -918,13 +2004,13 @@ components:
                 path: /meetings
                 errorCode: 50
                 errorText: 'Scheduling template xxx not found.'
-    '401':
+    '401_old':
       description: "Unauthorized. This could be because: <br> * the role of the user may not use the request (only PROVISIONER can use the scheduling-info post request and only ADMIN can use the scheduling-template post and put request) <br> * the role mapping between 'user context' and the video API does not match <br> * the user is not correct configured. It could be missing email or organisation"
-    '403':
+    '403_old':
       description: "Forbidden. This could be because: <br> * the meeting requested does not belong the organisation of the user <br> * the meeting requested is not organized by the user <br> * The organisation of the user has not been created in the Video API"
-    '404':
+    '404_old':
       description: "Not Found. This could be because: <br> * the uuid being requested has been deleted <br> * the uuid being requested has never existed <br> * the id (scheduling template) being requested does not exist"
-    '406':
+    '406_old':
       description: "Not Acceptable. This could be because: <br> * Status of the meeting is not AWAITS_PROVISION or PROVISIONED_OK<br> * template configuration was inadequate <br> (See a possible detailed error message in the in the response.)"
       content:
         application/hal+json:
@@ -985,23 +2071,101 @@ components:
                 path: /meetings
                 errorCode: 31
                 errorText: 'The host pincode assignment failed due to invalid setup on the template used'
+
+    '400':
+      description: >-
+        Bad Request. This could be because: <br>
+        * One of the required parameters/properties are missing or is empty <br>
+        * Input parameter that should be unique is not unique <br>
+        * Format of parameter/property is wrong <br>
+        * Request not allowed due to organisation settings <br>
+        * No unused scheduling information found for organisation <br>
+        * Unable to generate unique shortId. Try again <br>
+        * Scheduling template not found <br>
+        * Scheduling info reservation can not be used in combination with guest pin and/or host pin <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
+    '401':
+      description: >-
+        Unauthorized. This could be because: <br>
+        * The role of the user may not use the request (only PROVISIONER can use the scheduling-info post request and only ADMIN can use the scheduling-template post and put request) <br>
+        * The role mapping between 'user context' and the video API does not match <br> 
+        * The user is not correct configured. It could be missing email or organisation <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
+    '403':
+      description: >-
+        Forbidden. This could be because: <br>
+        * The meeting requested does not belong the organisation of the user <br> 
+        * The meeting requested is not organized by the user <br> 
+        * The organisation of the user has not been created in the Video API <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
+    '404':
+      description: >-
+        Not found. This could be because: <br>
+        * The uuid being requested has been deleted <br> 
+        * The uuid being requested has never existed <br> 
+        * The id (scheduling template) being requested does not exist <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
+    '406':
+      description: >-
+        Not Acceptable. This could be because: <br>
+        * The meeting does not have correct provision status for update or delete allowed <br>
+        * Invalid setup on template or uri interval on template too small <br>
+        * Create or update pool template, when pool template already exists <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
+    '500':
+      description: >-
+        Internal Server Error. This could be because: <br>
+        * An unexpected error occurred <br>
+        (See a possible detailed error message in the response.)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/detailedError'
   schemas:
     info:
       type: object
       properties:
-        git:
-          properties:
-            commit:
-              properties:
-                time:
-                  type: string
-                  example: "10.10.2018 @ 11:52:54 CEST"
-                id:
-                  type: string
-                  example: "97fd935"
-            branch:
-              type: string
-              example: "master"
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/infoType'
+
+    infoType:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+          maxLength: 100
+          description: info key
+          example: "git"
+        value:
+          type: object
+          description: info value
+          example: "{branch=master, commit={id=9fa0555, time=27.01.2025 @ 11:35:12 CET}}"
+
     meeting:
       type: object
       required:
@@ -1029,13 +2193,15 @@ components:
         organizedBy:
           $ref: '#/components/schemas/meetingUser'
         startTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         endTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:30:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -1045,13 +2211,15 @@ components:
           maxLength: 100
           example: PROJECT001.
         createdTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T11:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         shortId:
           type: string
           minLength: 12
@@ -1068,15 +2236,7 @@ components:
           maxLength: 200
           example: 87527808-147f-4c54-88be-aec56c7194a3
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
         guestPinRequired:
           type: boolean
           example: false
@@ -1107,6 +2267,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+
     create-meeting:
       type: object
       required:
@@ -1119,13 +2280,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         endTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:30:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -1148,7 +2311,7 @@ components:
           description: When included it will override any value from the scheduling template
         schedulingTemplateId:
           type: integer
-          format: int32
+          format: int64
           example: 5
           description: when valid value included it will override the default template
         meetingType:
@@ -1162,19 +2325,12 @@ components:
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
+          description: Will be set to 'on' if not set in create meeting request.
         guestPinRequired:
           type: boolean
           example: false
-          description: When true shortlink will aske for pin
+          description: When true shortLink will ask for pin
         schedulingInfoReservationId:
           type: string
           format: uuid
@@ -1225,12 +2381,12 @@ components:
         guestPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         hostPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         additionalInformation:
           type: array
@@ -1249,13 +2405,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         endTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:30:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -1284,13 +2442,15 @@ components:
           maxLength: 100
           example: Short talk about hiring new people
         startTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         endTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2018-11-01T10:30:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         description:
           type: string
           maxLength: 500
@@ -1308,15 +2468,7 @@ components:
             type: string
             description: Array of labels to attach to meeting.
         guestMicrophone:
-          example: muted
-          description: Corresponds to numeric status 0, 1 and 2.
-          type: string
-          nullable: true
-          enum:
-            - off
-            - on
-            - muted
-            - null
+          $ref: '#/components/schemas/guestMicrophone'
         guestPinRequired:
           type: boolean
           example: false
@@ -1324,12 +2476,12 @@ components:
         guestPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         hostPin:
           type: integer
           format: int32
-          minimum: 10000
+          minimum: 1000
           maximum: 999999999
         additionalInformation:
           type: array
@@ -1395,9 +2547,10 @@ components:
           example: '10'
           maxLength: 100
         provisionTimestamp:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         provisionVmrId:
           type: string
           maxLength: 50
@@ -1438,13 +2591,15 @@ components:
         updatedBy:
           $ref: '#/components/schemas/meetingUser'
         createdTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T11:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         reservationId:
           type: string
           format: uuid
@@ -1483,6 +2638,7 @@ components:
         shortlink:
           type: string
           example: https://m.vconf.dk/abcdefghijkl
+
     create-scheduling-info:
       type: object
       required:
@@ -1494,9 +2650,10 @@ components:
           maxLength: 30
         schedulingTemplateId:
           type: integer
-          format: int32
+          format: int64
           example: 5
           description: The scheduling template to use for the scheduling info.
+
     update-scheduling-info:
       type: object
       required:
@@ -1511,6 +2668,7 @@ components:
         provisionVmrId:
           type: string
           maxLength: 50
+
     meetingUser:
       type: object
       properties:
@@ -1521,10 +2679,19 @@ components:
           type: string
           format: email
           maxLength: 45
+    guestMicrophone:
+      example: muted
+      description: Corresponds to numeric status 0, 1 and 2.
+      type: string
+      enum:
+        - 'muted'
+        - 'off'
+        - 'on'
     meetingType:
       example: NORMAL
       description: Indicates what type the meeting has.
       type: string
+      default: NORMAL
       enum:
         - NORMAL
         - POOL
@@ -1568,7 +2735,6 @@ components:
       example: hd
       description: Corresponds to numeric status 0, 1 and 2.
       type: string
-      default: hd
       enum:
         - sd
         - hd
@@ -1612,20 +2778,19 @@ components:
         - uriNumberRangeLow
         - uriNumberRangeHigh
         - ivrTheme
-        - isDefaultTemplate
         - isPoolTemplate
         - directMedia
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
           example: 9
         organisationId:
           type: string
           maxLength: 30
         conferencingSysId:
           type: integer
-          format: int32
+          format: int64
           example: 1234
         uriPrefix:
           type: string
@@ -1639,22 +2804,22 @@ components:
           example: true
         hostPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         hostPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         guestPinRequired:
           type: boolean
           example: true
         guestPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         guestPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         vMRAvailableBefore:
           type: integer
@@ -1670,11 +2835,11 @@ components:
           example: true
         uriNumberRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         uriNumberRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         ivrTheme:
           type: string
@@ -1682,6 +2847,7 @@ components:
           maxLength: 100
         isDefaultTemplate:
           type: boolean
+          default: false
           example: true
           description: only one default template per organization. Setting it will unset other default template
         isPoolTemplate:
@@ -1743,13 +2909,15 @@ components:
         updatedBy:
           $ref: '#/components/schemas/meetingUser'
         createdTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T10:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         updatedTime:
+          description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2018-10-01T11:00:00 +0000
+          example: 2019-10-02T15:00:00+01:00
         _links:
           properties:
             self:
@@ -1759,7 +2927,7 @@ components:
                   type: string
                   format: uri
                   example: http://localhost:8081/api/scheduling-template/46b46a1e-a4d3-4387-87ee-a67dcaa222cb
-    create-scheduling-template:
+    schedulingTemplateRequest:
       type: object
       required:
         - conferencingSysId
@@ -1770,11 +2938,10 @@ components:
         - uriNumberRangeLow
         - uriNumberRangeHigh
         - ivrTheme
-        - isDefaultTemplate
       properties:
         conferencingSysId:
           type: integer
-          format: int32
+          format: int64
           example: 1234
         uriPrefix:
           type: string
@@ -1789,22 +2956,22 @@ components:
           example: true
         hostPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         hostPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         guestPinRequired:
           type: boolean
           example: true
         guestPinRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         guestPinRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         vmrAvailableBefore:
           type: integer
@@ -1823,11 +2990,11 @@ components:
           default: false
         uriNumberRangeLow:
           type: integer
-          format: int32
+          format: int64
           example: 1000
         uriNumberRangeHigh:
           type: integer
-          format: int32
+          format: int64
           example: 9999
         ivrTheme:
           type: string
@@ -1835,6 +3002,7 @@ components:
           maxLength: 100
         isDefaultTemplate:
           type: boolean
+          default: false
           example: true
           description: only one default template per organization. Setting it will unset other default template
         isPoolTemplate:
@@ -1891,138 +3059,7 @@ components:
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
-    update-scheduling-template:
-      type: object
-      required:
-        - conferencingSysId
-        - uriPrefix
-        - uriDomain
-        - hostPinRequired
-        - guestPinRequired
-        - uriNumberRangeLow
-        - uriNumberRangeHigh
-        - ivrTheme
-        - isDefaultTemplate
-      properties:
-        conferencingSysId:
-          type: integer
-          format: int32
-          example: 1234
-        uriPrefix:
-          type: string
-          maxLength: 100
-          example: "abc"
-        uriDomain:
-          type: string
-          maxLength: 100
-          example: "test.dk"
-        hostPinRequired:
-          type: boolean
-          example: true
-        hostPinRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        hostPinRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        guestPinRequired:
-          type: boolean
-          example: true
-        guestPinRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        guestPinRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        vmrAvailableBefore:
-          type: integer
-          format: int32
-          example: 30
-          description: the number of minutes VMR meeting must be available before start
-          default: 0
-        maxParticipants:
-          type: integer
-          format: int32
-          example: 5
-          default: 0
-        endMeetingOnEndTime:
-          type: boolean
-          example: true
-          default: false
-        uriNumberRangeLow:
-          type: integer
-          format: int32
-          example: 1000
-        uriNumberRangeHigh:
-          type: integer
-          format: int32
-          example: 9999
-        ivrTheme:
-          type: string
-          example: '10'
-          maxLength: 100
-        isDefaultTemplate:
-          type: boolean
-          example: true
-          description: only one default template per organization. Setting it will unset other default template
-        isPoolTemplate:
-          type: boolean
-          default: false
-          example: true
-          description: only one pool template per organization
-        customPortalGuest:
-          type: string
-          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
-          maxLength: 200
-          description: If the scheduling template should use a custom portal for the guest portal.
-        customPortalHost:
-          type: string
-          example: https://some.custom.portal/%uri-with-domain%?pin=%pin%
-          maxLength: 200
-          description: If the scheduling template should use a custom portal for the host portal.
-        returnUrl:
-          type: string
-          example: https://some.url/xyz
-          maxLength: 200
-          description: If set this is the url that the portal should redirect the user to when the meeting ends.
-        vmrType:
-          $ref: '#/components/schemas/vmrType'
-        hostView:
-          $ref: '#/components/schemas/viewType'
-        guestView:
-          $ref: '#/components/schemas/viewType'
-        vmrQuality:
-          $ref: '#/components/schemas/vmrQuality'
-        enableOverlayText:
-          type: boolean
-          example: true
-          default: true
-          description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
-        guestsCanPresent:
-          type: boolean
-          example: true
-          default: true
-          description: controls whether the Guests in the conference are allowed to present content
-        forcePresenterIntoMain:
-          type: boolean
-          example: true
-          default: true
-          description: controls whether the Host who is presenting is locked into the main video position
-        forceEncryption:
-          type: boolean
-          example: false
-          default: false
-        muteAllGuests:
-          type: boolean
-          example: false
-          default: false
-          description: controls whether to mute guests when they first join the conference
-        directMedia:
-          $ref: '#/components/schemas/directMedia'
+
     pool-info:
       type: object
       required:
@@ -2040,58 +3077,183 @@ components:
           format: int32
         schedulingTemplate:
           $ref: '#/components/schemas/scheduling-template'
+        schedulingInfoList:
+          type: array
+          items:
+            $ref: '#/components/schemas/scheduling-info'
+
     not-acceptable:
       type: integer
       format: int32
-      enum:
-        - errorCode: 10
-          errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated'
-        - errorCode: 11
-          errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted'
-        - errorCode: 20
-          errorText: 'The Uri assignment failed due to invalid setup on the template used'
-        - errorCode: 21
-          errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template'
-        - errorCode: 30
-          errorText: 'The guest pincode assignment failed due to invalid setup on the template used'
-        - errorCode: 31
-          errorText: 'The host pincode assignment failed due to invalid setup on the template used'
-        - errorCode: 32
+      description: >-
+        - errorCode: 10 <br>
+          errorText: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated' <br>
+        - errorCode: 11 <br>
+          errorText: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted' <br>
+        - errorCode: 20 <br>
+          errorText: 'The Uri assignment failed due to invalid setup on the template used' <br>
+        - errorCode: 21 <br>
+          errorText: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template' <br>
+        - errorCode: 30 <br>
+          errorText: 'The guest pincode assignment failed due to invalid setup on the template used' <br>
+        - errorCode: 31 <br>
+          errorText: 'The host pincode assignment failed due to invalid setup on the template used' <br>
+        - errorCode: 32 <br>
           errorText: "Create or update of pool template failed due to only one pool template allowed"
+      enum:
+        - 10
+        - 11
+        - 20
+        - 21
+        - 30
+        - 31
+        - 32
+
     bad-request:
       type: integer
-      enum:
-        - errorCode: 10
-          errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx'
-        - errorCode: 11
-          errorText: 'Unused scheduling information not found for organisation xxx'
-        - errorCode: 12
-          errorText: 'ExternalId not unique within organisation.'
-        - errorCode: 13
-          errorText: 'OrganisationId xxx in request not found.'
-        - errorCode: 14
-          errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.'
-        - errorCode: 20
-          errorText: 'Unable to generate unique shortId. Try again.'
-        - errorCode: 30
-          errorText: 'Date format is wrong, year must only have 4 digits'
-        - errorCode: 40
-          errorText: 'Scheduling template xxx not found.'
-        - errorCode: 41
-          errorText: 'Scheduling template yyy does not belong to organisation xxx.'
-        - errorCode: 50
-          errorText: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.'
-        - errorCode: 60,
-          errorText: 'ReservationId not owned by organisation or not found.'
-        - errorCode: 70
-          errorText: 'Field can not be set to null'
-        - errorCode: 80
-          errorText: 'Organisation does not allow setting custom meeting address.'
-        - errorCode: 90
-          errorText: 'Supplied URI already used'
-        - errorCode: 100
-          errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].'
-        - errorCode: 110
-          errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.'
-        - errorCode: 120
+      description: >-
+        - errorCode: 10 <br>
+          errorText: 'Can not create ad hoc meeting on non ad hoc organization: xxx' <br>
+        - errorCode: 11 <br>
+          errorText: 'Unused scheduling information not found for organisation xxx' <br>
+        - errorCode: 12 <br>
+          errorText: 'ExternalId not unique within organisation.' <br>
+        - errorCode: 13 <br>
+          errorText: 'OrganisationId xxx in request not found.' <br>
+        - errorCode: 14 <br>
+          errorText: 'Scheduling information can not be created on organisation xxx that is not pool enabled.' <br>
+        - errorCode: 20 <br>
+          errorText: 'Unable to generate unique shortId. Try again.' <br>
+        - errorCode: 30 <br>
+          errorText: 'Date format is wrong, year must only have 4 digits' <br>
+        - errorCode: 40 <br>
+          errorText: 'Scheduling template xxx not found.' <br>
+        - errorCode: 41 <br>
+          errorText: 'Scheduling template yyy does not belong to organisation xxx.' <br>
+        - errorCode: 50 <br>
+          errorText: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.' <br>
+        - errorCode: 60, <br>
+          errorText: 'ReservationId not owned by organisation or not found.' <br>
+        - errorCode: 70 <br>
+          errorText: 'Field can not be set to null' <br>
+        - errorCode: 80 <br>
+          errorText: 'Organisation does not allow setting custom meeting address.' <br>
+        - errorCode: 90 <br>
+          errorText: 'Supplied URI already used' <br>
+        - errorCode: 100 <br>
+          errorText: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].' <br>
+        - errorCode: 110 <br>
+          errorText: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.' <br>
+        - errorCode: 120 <br>
           errorText: "Additional info keys not unique for meeting."
+      enum:
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 20
+        - 30
+        - 40
+        - 41
+        - 50
+        - 60
+        - 70
+        - 80
+        - 90
+        - 100
+        - 110
+        - 120
+
+    detailedError:
+      allOf:
+        - $ref: '#/components/schemas/basicError'
+        - type: object
+          required:
+            - detailed_error
+            - detailed_error_code
+          properties:
+            detailed_error:
+              description: Detailed error text. This could be a text describing an validation error.
+              type: string
+            detailed_error_code:
+              description: >-
+                Detailed error code. This could be a code describing an validation error. <br>
+                * 10: 'Input validation error.' <br>
+                * 11: 'Basic error.' <br>
+                * 12: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated' <br>
+                * 13: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted' <br>
+                * 14: 'The Uri assignment failed due to invalid setup on the template used' <br>
+                * 15: 'The Uri assignment failed. It was not possible to create a unique. Consider changing the interval on the template' <br>
+                * 16: 'The guest pin code assignment failed due to invalid setup on the template used' <br>
+                * 17: 'The host pin code assignment failed due to invalid setup on the template used' <br>
+                * 18: 'Create or update of pool template failed due to only one pool template allowed' <br>
+                * 19: 'Can not create ad hoc meeting on non ad hoc organization: xxx' <br>
+                * 20: 'Unused scheduling information not found for organisation xxx' <br>
+                * 21: 'ExternalId not unique within organisation.' <br>
+                * 22: 'OrganisationId xxx in request not found.' <br>
+                * 23: 'Scheduling information can not be created on organisation xxx that is not pool enabled.' <br>
+                * 24: 'Unable to generate unique shortId. Try again.' <br>
+                * 25: 'Date format is wrong, year must only have 4 digits' <br>
+                * 26: 'Scheduling template xxx not found.' <br>
+                * 27: 'Scheduling template yyy does not belong to organisation xxx.' <br>
+                * 28: 'Either both from-start-time and to-start-time must be provided or none of them must be provided.' <br>
+                * 29: 'ReservationId not owned by organisation or not found.' <br>
+                * 30: 'Field can not be set to null' <br>
+                * 31: 'Organisation does not allow setting custom meeting address.' <br>
+                * 32: 'Supplied URI already used' <br>
+                * 33: 'Supplied URI contains invalid characters. Valid characters: [A-Z], [a-z] and [0-9].' <br>
+                * 34: 'Scheduling info reservation can not be used in combination with guest pin and/or host pin.' <br>
+                * 35: 'Additional info keys not unique for meeting.' <br>
+                * 36: 'Must set at least one query parameter, when searching for meeting.'
+              type: string
+              enum:
+                - 10
+                - 11
+                - 12
+                - 13
+                - 14
+                - 15
+                - 16
+                - 17
+                - 18
+                - 19
+                - 20
+                - 21
+                - 22
+                - 23
+                - 24
+                - 25
+                - 26
+                - 27
+                - 28
+                - 29
+                - 30
+                - 31
+                - 32
+                - 33
+                - 34
+                - 35
+                - 36
+
+    basicError:
+      type: object
+      required:
+        - timestamp
+        - status
+        - error
+        - path
+      properties:
+        error:
+          description: Error message.
+          type: string
+        path:
+          description: Path
+          type: string
+        status:
+          description: HTTP status code
+          type: integer
+        timestamp:
+          description: Time of error
+          type: string
+          format: date-time

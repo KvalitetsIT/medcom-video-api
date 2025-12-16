@@ -1,0 +1,60 @@
+[
+  {
+    "httpRequest": {
+      "method" : "GET",
+      "path": "/services/organisationtree",
+      "queryStringParameters" : {
+         "organisationCode" : [ "user-org-pool" ]
+      }
+},
+    "httpResponse": {
+      "statusCode" : 200,
+      "headers" : {
+        "Content-Type" : [ "application/json" ]
+      },
+      "body": "{\"code\": \"user-org-pool\",\"name\": \"default user org\",\"poolSize\":10,\"children\":[],\"smsSenderName\":null,\"smsCallbackUrl\":null,\"groupId\":1}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method" : "GET",
+      "path": "/services/organisation",
+      "queryStringParameters" : {
+        "organisationCode" : [ "user-org-pool" ]
+      }
+    },
+    "httpResponse": {
+      "statusCode" : 200,
+      "headers" : {
+        "Content-Type" : [ "application/json" ]
+      },
+      "body": "{\"code\": \"user-org-pool\",\"name\": \"default user org\",\"poolSize\":10,\"children\":[],\"smsSenderName\":null,\"smsCallbackUrl\":null,\"groupId\":1}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method" : "GET",
+      "path": "/services/organisation"
+    },
+    "httpResponse": {
+      "statusCode" : 200,
+      "headers" : {
+        "Content-Type" : [ "application/json" ]
+      },
+      "body": "[{\"code\": \"user-org-pool\",\"name\": \"default user org\",\"poolSize\":10,\"children\":[],\"smsSenderName\":null,\"smsCallbackUrl\":null,\"groupId\":1},{\"code\": \"new-provisioner-org\",\"name\": \"new provisioner org\",\"poolSize\":9,\"children\":[],\"smsSenderName\":null,\"smsCallbackUrl\":null,\"groupId\":1}]"
+    }
+  },
+  {
+    "httpRequest": {
+      "method" : "GET",
+      "path": "/getsessiondata"
+    },
+    "httpResponse": {
+      "statusCode" : 200,
+      "headers" : {
+        "Content-Type" : [ "application/json" ]
+      },
+      "body": "{\"UserAttributes\": {\"organisation_id\": [\"user-org-pool\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\", \"dk:medcom:role:provisioner\"]}}"
+    }
+  }
+]

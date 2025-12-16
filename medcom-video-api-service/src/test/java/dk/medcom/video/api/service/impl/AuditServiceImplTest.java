@@ -2,11 +2,10 @@ package dk.medcom.video.api.service.impl;
 
 import dk.kvalitetsit.audit.client.AuditClient;
 import dk.kvalitetsit.audit.client.api.v1.AuditEvent;
-import dk.medcom.video.api.api.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.service.AuditServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -16,15 +15,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 
 public class AuditServiceImplTest {
     private AuditServiceImpl auditService;
     private AuditClient auditClient;
 
-    @Before
+    @BeforeEach
     public void setup() {
         auditClient = Mockito.mock(AuditClient.class);
         auditService = new AuditServiceImpl(auditClient);
