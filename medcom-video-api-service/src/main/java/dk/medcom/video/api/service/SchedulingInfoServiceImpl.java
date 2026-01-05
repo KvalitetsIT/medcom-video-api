@@ -106,7 +106,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException {
-		LOGGER.debug("Entry getSchedulingInfoByUuid. uuid=" + uuid);
+        LOGGER.debug("Entry getSchedulingInfoByUuid. uuid={}", uuid);
 		var performanceLogger = new PerformanceLogger("read scheduling info by uuid");
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		performanceLogger.logTimeSinceCreation();
@@ -202,67 +202,67 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		//Overwrite template value with input parameters
 		if (createMeetingDto.getMaxParticipants() > 0) { 
 			schedulingInfo.setMaxParticipants(createMeetingDto.getMaxParticipants());
-			LOGGER.debug("MaxParticipants is taken from input: " + createMeetingDto.getMaxParticipants());
+            LOGGER.debug("MaxParticipants is taken from input: {}", createMeetingDto.getMaxParticipants());
 		} else {
 			schedulingInfo.setMaxParticipants(schedulingTemplate.getMaxParticipants());	
 		}
 		if (createMeetingDto.isEndMeetingOnEndTime() != null) {
 			schedulingInfo.setEndMeetingOnEndTime(createMeetingDto.isEndMeetingOnEndTime());
-			LOGGER.debug("EndMeetingOnTime is taken from input: " + createMeetingDto.isEndMeetingOnEndTime().toString());
+            LOGGER.debug("EndMeetingOnTime is taken from input: {}", createMeetingDto.isEndMeetingOnEndTime().toString());
 		} else {
 			schedulingInfo.setEndMeetingOnEndTime(schedulingTemplate.getEndMeetingOnEndTime());	
 		}
 		if (createMeetingDto.getVmrType() != null){
 			schedulingInfo.setVmrType(createMeetingDto.getVmrType());
-			LOGGER.debug("VmrType is taken from input: " + createMeetingDto.getVmrType().toString());
+            LOGGER.debug("VmrType is taken from input: {}", createMeetingDto.getVmrType().toString());
 		}else {
 			schedulingInfo.setVmrType(schedulingTemplate.getVmrType());
 		}
 		if (createMeetingDto.getHostView() != null){
 			schedulingInfo.setHostView(createMeetingDto.getHostView());
-			LOGGER.debug("HostView is taken from input: " + createMeetingDto.getHostView().toString());
+            LOGGER.debug("HostView is taken from input: {}", createMeetingDto.getHostView().toString());
 		}else {
 			schedulingInfo.setHostView(schedulingTemplate.getHostView());
 		}
 		if (createMeetingDto.getGuestView() != null){
 			schedulingInfo.setGuestView(createMeetingDto.getGuestView());
-			LOGGER.debug("GuestView is taken from input: " + createMeetingDto.getGuestView().toString());
+            LOGGER.debug("GuestView is taken from input: {}", createMeetingDto.getGuestView().toString());
 		}else {
 			schedulingInfo.setGuestView(schedulingTemplate.getGuestView());
 		}
 		if (createMeetingDto.getVmrQuality() != null){
 			schedulingInfo.setVmrQuality(createMeetingDto.getVmrQuality());
-			LOGGER.debug("VmrQuality is taken from input: " + createMeetingDto.getVmrQuality().toString());
+            LOGGER.debug("VmrQuality is taken from input: {}", createMeetingDto.getVmrQuality().toString());
 		}else {
 			schedulingInfo.setVmrQuality(schedulingTemplate.getVmrQuality());
 		}
 		if (createMeetingDto.getEnableOverlayText() != null){
 			schedulingInfo.setEnableOverlayText(createMeetingDto.getEnableOverlayText());
-			LOGGER.debug("EnableOverlayText is taken from input: " + createMeetingDto.getEnableOverlayText().toString());
+            LOGGER.debug("EnableOverlayText is taken from input: {}", createMeetingDto.getEnableOverlayText().toString());
 		}else {
 			schedulingInfo.setEnableOverlayText(schedulingTemplate.getEnableOverlayText());
 		}
 		if (createMeetingDto.getGuestsCanPresent() != null){
 			schedulingInfo.setGuestsCanPresent(createMeetingDto.getGuestsCanPresent());
-			LOGGER.debug("GuestsCanPresent is taken from input: " + createMeetingDto.getGuestsCanPresent().toString());
+            LOGGER.debug("GuestsCanPresent is taken from input: {}", createMeetingDto.getGuestsCanPresent().toString());
 		}else {
 			schedulingInfo.setGuestsCanPresent(schedulingTemplate.getGuestsCanPresent());
 		}
 		if (createMeetingDto.getForcePresenterIntoMain() != null){
 			schedulingInfo.setForcePresenterIntoMain(createMeetingDto.getForcePresenterIntoMain());
-			LOGGER.debug("ForcePresenterIntoMain is taken from input: " + createMeetingDto.getForcePresenterIntoMain().toString());
+            LOGGER.debug("ForcePresenterIntoMain is taken from input: {}", createMeetingDto.getForcePresenterIntoMain().toString());
 		}else {
 			schedulingInfo.setForcePresenterIntoMain(schedulingTemplate.getForcePresenterIntoMain());
 		}
 		if (createMeetingDto.getForceEncryption() != null){
 			schedulingInfo.setForceEncryption(createMeetingDto.getForceEncryption());
-			LOGGER.debug("ForceEncryption is taken from input: " + createMeetingDto.getForceEncryption().toString());
+            LOGGER.debug("ForceEncryption is taken from input: {}", createMeetingDto.getForceEncryption().toString());
 		}else {
 			schedulingInfo.setForceEncryption(schedulingTemplate.getForceEncryption());
 		}
 		if (createMeetingDto.getMuteAllGuests() != null){
 			schedulingInfo.setMuteAllGuests(createMeetingDto.getMuteAllGuests());
-			LOGGER.debug("MuteAllGuests is taken from input: " + createMeetingDto.getMuteAllGuests().toString());
+            LOGGER.debug("MuteAllGuests is taken from input: {}", createMeetingDto.getMuteAllGuests().toString());
 		}else {
 			schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
 		}
@@ -355,7 +355,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo updateSchedulingInfo(String uuid, UpdateSchedulingInfoDto updateSchedulingInfoDto) throws RessourceNotFoundException, PermissionDeniedException {
-		LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid=" + uuid);
+        LOGGER.debug("Entry updateSchedulingInfo. uuid/updateSchedulingInfoDto. uuid={}", uuid);
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionStatusDescription(updateSchedulingInfoDto.getProvisionStatusDescription());
@@ -391,7 +391,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
 	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException{
-		LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid=" + uuid);
+        LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid={}", uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 
@@ -422,7 +422,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
 	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException {
-		LOGGER.debug("Entry deleteSchedulingInfo. uuid=" + uuid);
+        LOGGER.debug("Entry deleteSchedulingInfo. uuid={}", uuid);
 		
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
@@ -434,7 +434,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
 	public void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException {
-		LOGGER.debug("Entry deleteSchedulingInfoPool. uuid=" + uuid);
+        LOGGER.debug("Entry deleteSchedulingInfoPool. uuid={}", uuid);
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
@@ -444,11 +444,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	private String createPortalLink(Date startTime, SchedulingInfo schedulingInfo) {
-		LOGGER.debug("CitizenPortal (borgerPortal) parameter is: " + citizenPortal);
+        LOGGER.debug("CitizenPortal (borgerPortal) parameter is: {}", citizenPortal);
 		
 		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		String portalDate = formatter.format(startTime);
-		LOGGER.debug("portalDate is: " + portalDate);
+        LOGGER.debug("portalDate is: {}", portalDate);
 		
 		String portalPin;
 		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
@@ -482,7 +482,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		if (microphone != null){
 			portalLink.append("&microphone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=off
 		}
-		LOGGER.debug("portalLink is " + portalLink);
+        LOGGER.debug("portalLink is {}", portalLink);
 		return portalLink.toString();
 	}
 
@@ -513,7 +513,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		SchedulingTemplate schedulingTemplate  = schedulingTemplateRepository.findById(createSchedulingInfoDto.getSchedulingTemplateId()).orElse(null);
 
 		if (schedulingTemplate == null) {
-			LOGGER.debug(String.format("Scheduling template %s not found.", createSchedulingInfoDto.getSchedulingTemplateId()));
+			LOGGER.debug("Scheduling template {} not found.", createSchedulingInfoDto.getSchedulingTemplateId());
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND, createSchedulingInfoDto.getSchedulingTemplateId().toString());
 		}
 
@@ -602,7 +602,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	}
 
 	@Override
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
 
 		var organisationFromSchedulingInfo = schedulingInfo.getOrganisation().getOrganisationId();
@@ -638,7 +638,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
-	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
 		var performanceLogger = new PerformanceLogger("SchedulingInfoServiceImpl.attachMeetingToSchedulingInfo");
 		boolean fromOverflow = false;
 		long organisationId = findPoolOrganisation(meeting.getOrganisation());
@@ -745,13 +745,13 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Override
 	public SchedulingInfo getSchedulingInfoByReservation(UUID schedulingInfoReservationId) throws RessourceNotFoundException {
-		LOGGER.debug("Entry getSchedulingInfoByReservation. reservationId=" + schedulingInfoReservationId);
+        LOGGER.debug("Entry getSchedulingInfoByReservation. reservationId={}", schedulingInfoReservationId);
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByReservationId(schedulingInfoReservationId.toString());
 		if (schedulingInfo == null) {
 			LOGGER.debug("SchedulingInfo not found.");
 			throw new RessourceNotFoundException("schedulingInfo", "reservationId");
 		}
-		LOGGER.debug("Exit getSchedulingInfoByUuid");
+		LOGGER.debug("Exit getSchedulingInfoByReservation");
 		return schedulingInfo;
 	}
 }

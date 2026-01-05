@@ -8,7 +8,7 @@ import dk.medcom.video.api.dao.entity.MeetingAdditionalInfo;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import jakarta.annotation.Resource;
@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
 

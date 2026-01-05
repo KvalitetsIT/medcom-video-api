@@ -3,16 +3,16 @@ package dk.medcom.video.api.service.impl;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.service.CustomUriValidator;
 import dk.medcom.video.api.service.CustomUriValidatorImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class CustomUriValidatorServiceTest {
     private CustomUriValidator customUriValidator;
 
-    @Before
+    @BeforeEach
     public void setup() {
         customUriValidator = new CustomUriValidatorImpl();
     }

@@ -1,18 +1,15 @@
 package dk.medcom.video.api.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.List;
 
 import jakarta.annotation.Resource;
 
 import dk.medcom.video.api.dao.OrganisationRepository;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import dk.medcom.video.api.dao.entity.Organisation;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrganisationTest extends RepositoryTest {
 
@@ -37,8 +34,8 @@ public class OrganisationTest extends RepositoryTest {
 		organisation = subject.save(organisation);
 		
 		// Then
-		Assert.assertNotNull(organisation);
-		Assert.assertNotNull(organisation.getId());
+		assertNotNull(organisation);
+		assertNotNull(organisation.getId());
 		assertEquals(organisationId,  organisation.getOrganisationId());
 		assertEquals(name,  organisation.getName());
 		assertEquals(name,  organisation.toString());
@@ -55,10 +52,10 @@ public class OrganisationTest extends RepositoryTest {
 		Iterable<Organisation> organisations = subject.findAll();
 		
 		// Then
-		Assert.assertNotNull(organisations);
+		assertNotNull(organisations);
 		int numberOfOrganisations = 0;
 		for (Organisation organisation : organisations) {
-			Assert.assertNotNull(organisation);
+			assertNotNull(organisation);
 			numberOfOrganisations++;
 		}
 		assertEquals(11, numberOfOrganisations);
@@ -73,12 +70,12 @@ public class OrganisationTest extends RepositoryTest {
 		Organisation organisation = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNotNull(organisation);
+		assertNotNull(organisation);
 		assertEquals(id, organisation.getId());
 		assertEquals("company 1", organisation.getOrganisationId());
 		assertEquals("company name 1", organisation.getName());
 		assertEquals("SomeSender", organisation.getSmsSenderName());
-		Assert.assertNull(organisation.getPoolSize());
+		assertNull(organisation.getPoolSize());
 	}
 
 	@Test
@@ -90,7 +87,7 @@ public class OrganisationTest extends RepositoryTest {
 		Organisation organisation = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNull(organisation);
+		assertNull(organisation);
 	}
 
 	@Test
@@ -102,7 +99,7 @@ public class OrganisationTest extends RepositoryTest {
 		Organisation organisation = subject.findByOrganisationId(existingOrg);
 		
 		// Then
-		Assert.assertNotNull(organisation);
+		assertNotNull(organisation);
 	}
 	
 	@Test
@@ -114,7 +111,7 @@ public class OrganisationTest extends RepositoryTest {
 		Organisation organisation = subject.findByOrganisationId(existingOrg);
 		
 		// Then
-		Assert.assertNull(organisation);
+		assertNull(organisation);
 	}
 
 	@Test
@@ -126,7 +123,7 @@ public class OrganisationTest extends RepositoryTest {
 		Organisation organisation = subject.findByOrganisationId(existingOrg);
 
 		// Then
-		Assert.assertNotNull(organisation);
+		assertNotNull(organisation);
 		assertEquals(10, organisation.getPoolSize().longValue());
 		assertEquals("pool-test-org", organisation.getOrganisationId());
 		assertEquals("company name another-test-org", organisation.getName());

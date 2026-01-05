@@ -1,10 +1,5 @@
 package dk.medcom.video.api.dao.entity;
 
-import dk.medcom.video.api.api.DirectMedia;
-import dk.medcom.video.api.api.ViewType;
-import dk.medcom.video.api.api.VmrQuality;
-import dk.medcom.video.api.api.VmrType;
-
 import jakarta.persistence.*;
 import java.util.Date;
 
