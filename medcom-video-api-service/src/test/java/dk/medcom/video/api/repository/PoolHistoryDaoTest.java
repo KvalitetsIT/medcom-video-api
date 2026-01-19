@@ -3,7 +3,7 @@ package dk.medcom.video.api.repository;
 
 import dk.medcom.video.api.dao.PoolHistoryDao;
 import dk.medcom.video.api.dao.entity.PoolHistory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.annotation.Resource;
 import java.time.Instant;
@@ -17,7 +17,7 @@ public class PoolHistoryDaoTest extends RepositoryTest {
 	public void testCreate() {
 		// Given
 		var poolHistory = new PoolHistory();
-		poolHistory.setOrganisationCode("" + Instant.now().toEpochMilli() + "extend this string!".repeat(10));
+		poolHistory.setOrganisationCode(Instant.now().toEpochMilli() + "extend this string!".repeat(10));
 		poolHistory.setDesiredPoolSize(10);
 		poolHistory.setAvailablePoolRooms(20);
 		poolHistory.setStatusTime(Instant.now());

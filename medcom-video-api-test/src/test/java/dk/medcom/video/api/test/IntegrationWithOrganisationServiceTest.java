@@ -14,11 +14,15 @@ import org.mockserver.matchers.Times;
 import org.mockserver.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.*;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.mariadb.MariaDBContainer;
+import org.testcontainers.mockserver.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import jakarta.ws.rs.client.ClientBuilder;
@@ -33,8 +37,7 @@ public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mariadbLogger = LoggerFactory.getLogger("mariadb");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
-	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
-	private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
+    private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
 	private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
@@ -43,9 +46,8 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	private static final MariaDBContainer<?> mariadb;
-	private static GenericContainer<?> jetStreamService;
-	private static String jetStreamPath;
+	private static final MariaDBContainer mariadb;
+    private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
 	private static final String natsSubjectAudit = "natsSubject";
 
@@ -70,7 +72,7 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mariadb = new MariaDBContainer<>("mariadb:10.6")
+		mariadb = new MariaDBContainer("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
@@ -162,6 +164,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("pool.fill.organisation", "some_org")
 				.withEnv("pool.fill.interval", "PT1M")
 
+				.withEnv("spring.security.oauth2.resourceserver.jwt.issuer-uri", "http://localhost") //Irrelevant for v1
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
@@ -198,7 +202,7 @@ public class IntegrationWithOrganisationServiceTest {
 		var natsContainerName = "nats";
 		var natsContainerVersion = "2.9-alpine";
 
-		jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
+        GenericContainer<?> jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
 
 		jetStreamService.withNetwork(dockerNetwork)
 				.withNetworkAliases("nats")

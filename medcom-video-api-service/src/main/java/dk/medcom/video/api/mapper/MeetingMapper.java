@@ -1,7 +1,7 @@
 package dk.medcom.video.api.mapper;
 
 import dk.medcom.video.api.api.AdditionalInformationType;
-import dk.medcom.video.api.controller.MeetingSearchController;
+import dk.medcom.video.api.controller.v1.MeetingSearchController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.Meeting;

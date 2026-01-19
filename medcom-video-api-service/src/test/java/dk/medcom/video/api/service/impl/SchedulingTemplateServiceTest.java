@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
-import dk.medcom.video.api.api.DirectMedia;
+import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -15,9 +15,8 @@ import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.MeetingUserServiceImpl;
 import dk.medcom.video.api.service.OrganisationService;
 import dk.medcom.video.api.service.SchedulingTemplateServiceImpl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -26,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 
@@ -38,7 +37,7 @@ public class SchedulingTemplateServiceTest {
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
 	private SchedulingTemplateRepository schedulingTemplateRepository;
 
-	@Before
+	@BeforeEach
 	public void prepareTest() {
 		organisationTreeServiceClient = Mockito.mock(OrganisationTreeServiceClient.class);
 		createSchedulingTemplateDto = getCreateSchedulingTemplateDtoWithDefaultValues();
@@ -109,7 +108,7 @@ public class SchedulingTemplateServiceTest {
 		
 		// Then
 		assertNotNull(schedulingTemplate);
-		Assert.assertFalse(schedulingTemplate.getGuestPinRequired());
+		assertFalse(schedulingTemplate.getGuestPinRequired());
 
 		ArgumentCaptor<SchedulingTemplate> schedulingTemplateArgumentCaptor = ArgumentCaptor.forClass(SchedulingTemplate.class);
 		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
@@ -138,7 +137,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 	}
 
-	@Test(expected = RessourceNotFoundException.class)
+	@Test
 	public void testDeleteSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException  {
 		
 		// Given
@@ -149,7 +148,7 @@ public class SchedulingTemplateServiceTest {
 		schedulingTemplateService.deleteSchedulingTemplate(1L);
 		
 		// Then
-		schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(777L); //cheating, to retrieve null
+		assertThrows(RessourceNotFoundException.class, () -> schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(777L)); //cheating, to retrieve null
 	}
 
 	@Test 
@@ -171,10 +170,10 @@ public class SchedulingTemplateServiceTest {
 		// Then
 		assertNotNull(schedulingTemplate);
 		assertNotNull(schedulingTemplate.getOrganisation());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
-		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
-		assertEquals(schedulingTemplatesInService.get(0).getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
+		assertEquals(schedulingTemplatesInService.getFirst().getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
 		Mockito.verify(organisationTreeServiceClient, times(0)).getOrganisationTree("org");
 	}
 
@@ -229,11 +228,11 @@ public class SchedulingTemplateServiceTest {
 		
 		// Then
 		assertNotNull(schedulingTemplate);
-		Assert.assertNull(schedulingTemplate.getOrganisation());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
-		assertEquals(schedulingTemplatesInService.get(0).getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
-		assertEquals(schedulingTemplatesInService.get(0).getReturnUrl(), schedulingTemplate.getReturnUrl());
-		assertEquals(schedulingTemplatesInService.get(0).getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
+		assertNull(schedulingTemplate.getOrganisation());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
+		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
+		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
+		assertEquals(schedulingTemplatesInService.getFirst().getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
 		Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree("org");
 	}
 

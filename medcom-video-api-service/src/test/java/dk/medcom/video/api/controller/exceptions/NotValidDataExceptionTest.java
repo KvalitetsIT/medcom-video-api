@@ -1,7 +1,9 @@
 package dk.medcom.video.api.controller.exceptions;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NotValidDataExceptionTest {
 	
@@ -17,8 +19,8 @@ public class NotValidDataExceptionTest {
 		// When
 		
 		// Then
-		Assert.assertNotNull(subject);
-		Assert.assertEquals(String.format("Scheduling template %s does not belong to organisation %s.", var1, var2), subject.getErrorText());
+		assertNotNull(subject);
+		assertEquals(String.format("Scheduling template %s does not belong to organisation %s.", var1, var2), subject.getErrorText());
 	}
 
 	@Test
@@ -29,8 +31,8 @@ public class NotValidDataExceptionTest {
 		// When
 
 		// Then
-		Assert.assertNotNull(subject);
-		Assert.assertEquals(NotValidDataErrors.EXTERNAL_ID_NOT_UNIQUE.getErrorText(null), subject.getErrorText());
+		assertNotNull(subject);
+		assertEquals(NotValidDataErrors.EXTERNAL_ID_NOT_UNIQUE.getErrorText(null), subject.getErrorText());
 	}
 
 }

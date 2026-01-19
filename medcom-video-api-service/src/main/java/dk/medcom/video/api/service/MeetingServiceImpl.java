@@ -240,7 +240,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.logTimeSinceCreation();
 	}
 
-	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+	private void attachReservedSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException {
 		var performanceLogger = new PerformanceLogger("attach reserved scheduling info");
 		try {
 			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
@@ -357,7 +357,11 @@ public class MeetingServiceImpl implements MeetingService {
 		Calendar calendarNow = new GregorianCalendar();
 		meeting.setUpdatedTime(calendarNow.getTime());
 		meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
-		meeting.setGuestMicrophone(GuestMicrophone.valueOf(updateMeetingDto.getGuestMicrophone().name()));
+		if (updateMeetingDto.getGuestMicrophone() != null) {
+			meeting.setGuestMicrophone(GuestMicrophone.valueOf(updateMeetingDto.getGuestMicrophone().name()));
+		} else {
+			meeting.setGuestMicrophone(null);
+		}
 		meeting.setGuestPinRequired(updateMeetingDto.isGuestPinRequired());
 
 		meeting = meetingRepository.save(meeting);

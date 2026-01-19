@@ -20,12 +20,12 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 
 import jakarta.annotation.PostConstruct;
+import org.testcontainers.mariadb.MariaDBContainer;
+import org.testcontainers.mockserver.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import javax.sql.DataSource;
@@ -40,7 +40,6 @@ import java.util.function.Consumer;
 public class TestApplication extends SpringBootServletInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
     private static GenericContainer<?> testOrganisationFrontend;
-    private static GenericContainer<?> jetStreamService;
     private static final String natsSubjectSchedulingInfo = "schedulingInfo";
     private static final String natsSubjectAudit = "natsSubject";
     private static String jetStreamPath;
@@ -52,7 +51,7 @@ public class TestApplication extends SpringBootServletInitializer {
 
         setupJetStream(n);
 
-        var mariadb = new MariaDBContainer<>("mariadb:10.6")
+        var mariadb = new MariaDBContainer("mariadb:10.6")
                 .withDatabaseName("videodb")
                 .withUsername("videouser")
                 .withPassword("secret1234")
@@ -79,10 +78,10 @@ public class TestApplication extends SpringBootServletInitializer {
         Consumer<CreateContainerCmd> cmd = e -> e.withHostConfig(new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(phpMyAdminPort), new ExposedPort(phpMyAdminContainerPort))));
 
         System.out.println("------------------------");
-        System.out.println(mariadb.getNetworkAliases().get(0));
+        System.out.println(mariadb.getNetworkAliases().getFirst());
 
         HashMap<String, String> environmentMap = new HashMap<>();
-        environmentMap.put("PMA_HOST", mariadb.getNetworkAliases().get(0));
+        environmentMap.put("PMA_HOST", mariadb.getNetworkAliases().getFirst());
         environmentMap.put("PMA_USER", "videouser");
         environmentMap.put("PMA_PASSWORD", "secret1234");
         GenericContainer<?> phpMyAdmin = new GenericContainer<>("phpmyadmin/phpmyadmin:latest").
@@ -108,7 +107,7 @@ public class TestApplication extends SpringBootServletInitializer {
         var natsContainerName = "nats";
         var natsContainerVersion = "2.9-alpine";
 
-        jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
+        GenericContainer<?> jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
 
         jetStreamService.withNetwork(n)
                 .withNetworkAliases("nats")

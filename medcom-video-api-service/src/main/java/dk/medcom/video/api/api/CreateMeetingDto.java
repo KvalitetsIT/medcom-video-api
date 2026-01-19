@@ -2,6 +2,7 @@ package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import dk.medcom.video.api.dao.entity.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 function updateFile {
     local f="$1"
@@ -11,17 +11,17 @@ function updateFile {
 }
 
 echo "Add Dev version to list of versions"
-GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.tags"')
+GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.commit.id.describe"')
 echo "[]" > /kit/env
 
-if (echo "$GIT_BRANCH" | grep -Eq ^v[0-9]*\\.[0-9]*\\.[0-9]*); then
+if (echo "$GIT_BRANCH" | grep -Eq ^v[0-9]*\\.[0-9]*\\.[0-9]*$); then
   echo "Release version"
 else
   echo "Is dev version"
 
   url="${BASE_URL}/${GIT_BRANCH}.yaml"
 
-  cat /kit/env | jq --arg u $url '. += [{"name": "Dev", "url": $u }]' > /kit/env.tmp
+  cat /kit/env | jq --arg u $url '. += [{"name": "Dev", "url": $u }] | sort_by(.name)' > /kit/env.tmp
   updateFile /kit/env
 fi
 
@@ -36,6 +36,8 @@ echo "Creating file with version and path"
      updateFile /kit/env
    done
 )
+
+
 
 echo "Updates version in doc file"
 for file in $DOC_FILES

@@ -2,13 +2,13 @@ package dk.medcom.video.api.repository;
 
 
 import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.annotation.Resource;
 import java.util.UUID;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntitiesIvrThemeDaoTest extends RepositoryTest {
 
@@ -24,7 +24,7 @@ public class EntitiesIvrThemeDaoTest extends RepositoryTest {
 		var theme = subject.getTheme(uuid);
 		
 		// Then
-		Assert.assertNotNull(theme);
+		assertNotNull(theme);
 		assertTrue(theme.isEmpty());
 
 	}

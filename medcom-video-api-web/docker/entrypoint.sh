@@ -1,32 +1,13 @@
 #! /bin/bash
-if [ "$CONTAINER_TIMEZONE" = "" ]
+
+if [ "$TZ" = "" ]
 then
-   echo "Using default timezone"
-else
-	TZFILE="/usr/share/zoneinfo/$CONTAINER_TIMEZONE"
-	if [ ! -e "$TZFILE" ]
-	then 
-    	echo "requested timezone $CONTAINER_TIMEZONE doesn't exist"
-	else
-		cp /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime
-		echo "$CONTAINER_TIMEZONE" > /etc/timezone
-		echo "using timezone $CONTAINER_TIMEZONE"
-	fi
+   echo "Using default timezone (UTC)"
 fi
 
-if [[ -z $CONTEXT ]]; then
-	echo "Using default context: /"
-	export SERVER_SERVLET_CONTEXT_PATH=/
-else
-	echo "Using context: $CONTEXT"
-	export SERVER_CONTEXT_PATH=$CONTEXT
-	export SERVER_SERVLET_CONTEXT_PATH=$CONTEXT
-fi
-
-if [[ -z $SERVER_PORT ]]; then
-	echo "Using default port (8080)"
-else
-	export server_port=$SERVER_PORT
+if [[ -z $LOGGING_CONFIG ]]; then
+  echo "Default logback configuration file: /home/appuser/logback-spring.xml"
+  export LOGGING_CONFIG=/home/appuser/logback-spring.xml
 fi
 
 if [[ -z $LOG_LEVEL ]]; then
@@ -39,22 +20,24 @@ if [[ -z $LOG_LEVEL_FRAMEWORK ]]; then
   export LOG_LEVEL_FRAMEWORK=INFO
 fi
 
-if [[ -z $LOG_LEVEL_PERFORMANCE ]]; then
-  echo "Default LOG_LEVEL_PERFORMANCE = WARNING"
-  export LOG_LEVEL_PERFORMANCE=WARNING
-fi
-
-
 if [[ -z $CORRELATION_ID ]]; then
   echo "Default CORRELATION_ID = correlation-id"
-  export CORRELATION_ID=correlation-id
+  export CORRELATION_ID=x-request-id
 fi
 
-if [[ -z $logging_config ]]; then
-  echo "Default logging_config=/app/logback-spring.xml"
-  export logging_config="/home/appuser/logback-spring.xml"
+if [[ -z $CONTEXT ]]; then
+	echo "Using default context: /"
+	export SERVER_SERVLET_CONTEXT_PATH=/
+else
+	echo "Using context: $CONTEXT"
+	export SERVER_CONTEXT_PATH=$CONTEXT
+	export SERVER_SERVLET_CONTEXT_PATH=$CONTEXT
 fi
 
-envsubst < /home/appuser/configtemplates/logback.xml > /home/appuser/logback-spring.xml
+JAR_FILE=web.jar
 
-java $JVM_OPTS -jar medcom-video-api-web.jar
+echo "Starting service with the following command."
+echo "java $JVM_OPTS -jar $JAR_FILE"
+
+# start the application
+exec java $JVM_OPTS -jar $JAR_FILE

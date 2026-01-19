@@ -1,28 +1,29 @@
 package dk.medcom.video.api.configuration;
 
-import dk.kvalitetsit.audit.client.AuditClient;
-import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
-import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.*;
-import dk.medcom.video.api.interceptor.OrganisationInterceptor;
-import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.OrganisationServiceClient;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
+import java.util.Collections;
+import java.util.List;
+
+import dk.medcom.video.api.converter.StringToViewTypeConverter;
+import dk.medcom.video.api.converter.StringToVmrQualityConverter;
+import dk.medcom.video.api.converter.StringToVmrTypeConverter;
+import dk.medcom.video.api.interceptor.OauthInterceptor;
 import dk.medcom.video.api.service.*;
-import io.micrometer.core.instrument.Clock;
-import io.micrometer.prometheusmetrics.PrometheusConfig;
-import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import org.openapitools.model.ViewType;
+import org.openapitools.model.VmrQuality;
+import org.openapitools.model.VmrType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,8 +32,30 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Collections;
-import java.util.List;
+import dk.kvalitetsit.audit.client.AuditClient;
+import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserContextServiceImpl;
+import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
+import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
+import dk.medcom.video.api.dao.MeetingLabelRepository;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.dao.PoolHistoryDao;
+import dk.medcom.video.api.dao.PoolInfoRepository;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.SchedulingStatusRepository;
+import dk.medcom.video.api.dao.SchedulingTemplateRepository;
+import dk.medcom.video.api.interceptor.OrganisationInterceptor;
+import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
+import dk.medcom.video.api.organisation.OrganisationServiceClient;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -52,16 +75,21 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Value("${ALLOWED_ORIGINS}")
 	private List<String> allowedOrigins;
 
+	@Value("${short.link.base.url}")
+	private String shortLinkBaseUrl;
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		LOGGER.debug("Adding interceptors");
+		registry.addInterceptor(oauthInterceptor());
 		registry.addInterceptor(organisationInterceptor());
 		registry.addInterceptor(userSecurityInterceptor());
 	}
 
 	@Bean
-	public FilterRegistrationBean<CorsFilter> corsFilter() {
+	CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
+
 		config.setAllowCredentials(true);
 		allowedOrigins.forEach(config::addAllowedOrigin);
 		config.addAllowedHeader("*");
@@ -70,10 +98,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
 
-		FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-		bean.setOrder(0);
-
-		return bean;
+		return new CorsFilter(source);
 	}
 
 	@Bean
@@ -122,6 +147,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public SchedulingTemplateServiceV2 schedulingTemplateServiceV2(SchedulingTemplateService schedulingTemplateService) {
+		return new SchedulingTemplateServiceV2Impl(schedulingTemplateService);
+	}
+
+	@Bean
 	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
 		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
 	}
@@ -157,6 +187,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				auditClient,
 				schedulingInfoEventPublisher,
 				meetingAdditionalInfoRepository);
+	}
+
+	@Bean
+	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService) {
+		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl);
 	}
 
 	@Bean
@@ -197,6 +232,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public SchedulingInfoServiceV2 schedulingInfoServiceV2(SchedulingInfoService schedulingInfoService) {
+		return new SchedulingInfoServiceV2Impl(schedulingInfoService, shortLinkBaseUrl);
+	}
+
+	@Bean
 	public SchedulingStatusService schedulingStatusService(SchedulingStatusRepository schedulingStatusRepository) {
 		return new SchedulingStatusServiceImpl(
 				schedulingStatusRepository
@@ -216,6 +256,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				organisationStrategy,
 				poolInfoRepository
 		);
+	}
+
+	@Bean
+	public PoolInfoServiceV2 poolInfoServiceV2(PoolInfoService poolInfoService) {
+		return new PoolInfoServiceV2Impl(poolInfoService, shortLinkBaseUrl);
 	}
 
 	@Bean
@@ -251,6 +296,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
 		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
+	}
+
+	@Bean
+	public OauthInterceptor oauthInterceptor() {
+		return new OauthInterceptor();
 	}
 
 	@Bean
@@ -300,5 +350,20 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Override
 	public void configurePathMatch(PathMatchConfigurer configurer) {
 		configurer.setUseTrailingSlashMatch(true);
+	}
+
+	@Bean
+	public Converter<String, ViewType> stringViewTypeConverter() {
+		return new StringToViewTypeConverter();
+	}
+
+	@Bean
+	public Converter<String, VmrQuality> stringVmrQualityConverter() {
+		return new StringToVmrQualityConverter();
+	}
+
+	@Bean
+	public Converter<String, VmrType> stringVmrTypeConverter() {
+		return new StringToVmrTypeConverter();
 	}
 }

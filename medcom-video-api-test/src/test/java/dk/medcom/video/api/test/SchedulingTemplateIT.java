@@ -1,23 +1,27 @@
 package dk.medcom.video.api.test;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.SchedulingTemplateAdministrationApi;
 import org.openapitools.client.model.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest {
     private SchedulingTemplateAdministrationApi schedulingTemplate;
 
-    @Before
+    @BeforeEach
     public void setupApiClient() {
         var apiClient = new ApiClient()
                 .setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
@@ -29,14 +33,14 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
     @Test
     public void testCreateSchedulingTemplate_UseDefaultValues() throws ApiException {
         //Given
-        CreateSchedulingTemplate create = new CreateSchedulingTemplate();
-        create.setConferencingSysId(43);
+        SchedulingTemplateRequest create = new SchedulingTemplateRequest();
+        create.setConferencingSysId(43L);
         create.setUriPrefix("43");
         create.setUriDomain("test.dk");
         create.setHostPinRequired(true);
         create.setGuestPinRequired(true);
-        create.setUriNumberRangeLow(1);
-        create.setUriNumberRangeHigh(100);
+        create.setUriNumberRangeLow(1L);
+        create.setUriNumberRangeHigh(100L);
         create.setCustomPortalGuest("some_portal_guest");
         create.setCustomPortalHost("some_portal_host");
         create.setReturnUrl("return_url");
@@ -49,16 +53,16 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
-        Assert.assertNotNull(result.getVmrType());
-        Assert.assertNotNull(result.getHostView());
-        Assert.assertNotNull(result.getGuestView());
-        Assert.assertNotNull(result.getVmrQuality());
-        Assert.assertTrue(result.getEnableOverlayText());
-        Assert.assertTrue(result.getGuestsCanPresent());
-        Assert.assertTrue(result.getForcePresenterIntoMain());
-        Assert.assertFalse(result.getForceEncryption());
-        Assert.assertFalse(result.getMuteAllGuests());
+        assertNotNull(result);
+        assertNotNull(result.getVmrType());
+        assertNotNull(result.getHostView());
+        assertNotNull(result.getGuestView());
+        assertNotNull(result.getVmrQuality());
+        assertTrue(result.getEnableOverlayText());
+        assertTrue(result.getGuestsCanPresent());
+        assertTrue(result.getForcePresenterIntoMain());
+        assertFalse(result.getForceEncryption());
+        assertFalse(result.getMuteAllGuests());
         assertEquals(create.getCustomPortalGuest(), result.getCustomPortalGuest());
         assertEquals(create.getCustomPortalHost(), result.getCustomPortalHost());
         assertEquals(create.getReturnUrl(), result.getReturnUrl());
@@ -70,14 +74,14 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
     @Test
     public void testCreateSchedulingTemplate_OverwriteDefaultValues() throws ApiException {
         //Given
-        CreateSchedulingTemplate create = new CreateSchedulingTemplate();
-        create.setConferencingSysId(43);
+        SchedulingTemplateRequest create = new SchedulingTemplateRequest();
+        create.setConferencingSysId(43L);
         create.setUriPrefix("43");
         create.setUriDomain("test.dk");
         create.setHostPinRequired(true);
         create.setGuestPinRequired(true);
-        create.setUriNumberRangeLow(1);
-        create.setUriNumberRangeHigh(100);
+        create.setUriNumberRangeLow(1L);
+        create.setUriNumberRangeHigh(100L);
         create.setVmrType(VmrType.LECTURE);
         create.setHostView(ViewType.ONE_MAIN_SEVEN_PIPS);
         create.setEnableOverlayText(false);
@@ -89,7 +93,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = this.schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         assertEquals(create.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
         assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
@@ -99,17 +103,17 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
     @Test
     public void testUpdateSchedulingTemplate() throws ApiException {
         //Given
-        CreateSchedulingTemplate create = new CreateSchedulingTemplate();
-        create.setConferencingSysId(43);
+        SchedulingTemplateRequest create = new SchedulingTemplateRequest();
+        create.setConferencingSysId(43L);
         create.setUriPrefix("43");
         create.setUriDomain("test.dk");
         create.setHostPinRequired(true);
         create.setGuestPinRequired(true);
-        create.setUriNumberRangeLow(1);
-        create.setUriNumberRangeHigh(100);
+        create.setUriNumberRangeLow(1L);
+        create.setUriNumberRangeHigh(100L);
         create.setIvrTheme("ivr_theme");
 
-        UpdateSchedulingTemplate updateSchedulingTemplate = new UpdateSchedulingTemplate();
+        SchedulingTemplateRequest updateSchedulingTemplate = new SchedulingTemplateRequest();
         updateSchedulingTemplate.setConferencingSysId(create.getConferencingSysId());
         updateSchedulingTemplate.setUriPrefix(create.getUriPrefix());
         updateSchedulingTemplate.setUriDomain(create.getUriDomain());
@@ -132,7 +136,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         SchedulingTemplate result = schedulingTemplate.schedulingTemplatesIdGet(resultCreate.getId());
 
         //Then
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         assertEquals(updateSchedulingTemplate.getVmrType().toString(), result.getVmrType().toString());
         assertEquals(updateSchedulingTemplate.getHostView().toString(), result.getHostView().toString());
         assertEquals(updateSchedulingTemplate.getEnableOverlayText(), result.getEnableOverlayText());
@@ -145,36 +149,36 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
 
     @Test
     public void testOnlyOnePoolTemplate() throws ApiException {
-        CreateSchedulingTemplate createOne = new CreateSchedulingTemplate();
-        createOne.setConferencingSysId(43);
+        SchedulingTemplateRequest createOne = new SchedulingTemplateRequest();
+        createOne.setConferencingSysId(43L);
         createOne.setUriPrefix("43");
         createOne.setUriDomain("test.dk");
         createOne.setHostPinRequired(true);
         createOne.setGuestPinRequired(true);
-        createOne.setUriNumberRangeLow(1);
-        createOne.setUriNumberRangeHigh(100);
+        createOne.setUriNumberRangeLow(1L);
+        createOne.setUriNumberRangeHigh(100L);
         createOne.setIsPoolTemplate(true);
         createOne.setIvrTheme("ivr_theme");
 
-        CreateSchedulingTemplate createTwo = new CreateSchedulingTemplate();
-        createTwo.setConferencingSysId(43);
+        SchedulingTemplateRequest createTwo = new SchedulingTemplateRequest();
+        createTwo.setConferencingSysId(43L);
         createTwo.setUriPrefix("43");
         createTwo.setUriDomain("test.dk");
         createTwo.setHostPinRequired(true);
         createTwo.setGuestPinRequired(true);
-        createTwo.setUriNumberRangeLow(1);
-        createTwo.setUriNumberRangeHigh(100);
+        createTwo.setUriNumberRangeLow(1L);
+        createTwo.setUriNumberRangeHigh(100L);
         createTwo.setIsPoolTemplate(true);
         createTwo.setIvrTheme("ivr_theme");
 
-        CreateSchedulingTemplate createThree = new CreateSchedulingTemplate();
-        createThree.setConferencingSysId(43);
+        SchedulingTemplateRequest createThree = new SchedulingTemplateRequest();
+        createThree.setConferencingSysId(43L);
         createThree.setUriPrefix("43");
         createThree.setUriDomain("test.dk");
         createThree.setHostPinRequired(true);
         createThree.setGuestPinRequired(true);
-        createThree.setUriNumberRangeLow(1);
-        createThree.setUriNumberRangeHigh(100);
+        createThree.setUriNumberRangeLow(1L);
+        createThree.setUriNumberRangeHigh(100L);
         createThree.setIvrTheme("ivr_theme");
 
         SchedulingTemplate resultCreateOne = schedulingTemplate.schedulingTemplatesPost(createOne);
@@ -191,7 +195,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertNotNull(resultThree);
         assertFalse(resultThree.getIsPoolTemplate());
 
-        UpdateSchedulingTemplate updateSchedulingTemplateThree = new UpdateSchedulingTemplate();
+        SchedulingTemplateRequest updateSchedulingTemplateThree = new SchedulingTemplateRequest();
         updateSchedulingTemplateThree.setConferencingSysId(createThree.getConferencingSysId());
         updateSchedulingTemplateThree.setUriPrefix(createThree.getUriPrefix());
         updateSchedulingTemplateThree.setUriDomain(createThree.getUriDomain());
@@ -204,5 +208,56 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         var expectedExceptionUpdate = assertThrows(ApiException.class, () -> schedulingTemplate.schedulingTemplatesIdPut(resultThree.getId(), updateSchedulingTemplateThree));
         assertEquals(406, expectedExceptionUpdate.getCode());
         assertTrue(expectedExceptionUpdate.getResponseBody().contains("Create or update of pool template failed due to only one pool template allowed"));
+    }
+
+    @Test
+    void testTimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "conferencingSysId": 1234,
+                  "uriPrefix": "format",
+                  "uriDomain": "timestamp-test.dk",
+                  "hostPinRequired": true,
+                  "guestPinRequired": true,
+                  "uriNumberRangeLow": 1000,
+                  "uriNumberRangeHigh": 9999,
+                  "ivrTheme": "10"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-templates")
+                    .request()
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "conferencingSysId": 1234,
+                  "uriPrefix": "format",
+                  "uriDomain": "timestamp-test.dk",
+                  "hostPinRequired": true,
+                  "guestPinRequired": true,
+                  "uriNumberRangeLow": 1000,
+                  "uriNumberRangeHigh": 9999,
+                  "ivrTheme": "10"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-templates")
+                    .path(postResultJson.getString("id"))
+                    .request()
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
     }
 }
