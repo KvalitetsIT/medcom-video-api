@@ -72,7 +72,7 @@ public class SchedulingTemplateMapper {
                 input.getGuestPinRequired(),
                 input.getGuestPinRangeLow(),
                 input.getGuestPinRangeHigh(),
-                input.getVmrAvailableBefore(),
+                input.getvMRAvailableBefore(),
                 input.getMaxParticipants(),
                 input.getEndMeetingOnEndTime(),
                 input.getUriNumberRangeLow(),

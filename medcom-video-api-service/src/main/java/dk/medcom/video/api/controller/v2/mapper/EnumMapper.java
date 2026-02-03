@@ -9,7 +9,7 @@ public class EnumMapper {
     }
 
     public static VmrTypeModel externalToInternal(VmrType input) {
-        return VmrTypeModel.valueOf(input.toString());
+        return input != null ? VmrTypeModel.valueOf(input.toString()) : null;
     }
 
     public static ViewType internalToExternal(ViewTypeModel input) {
@@ -17,7 +17,7 @@ public class EnumMapper {
     }
 
     public static ViewTypeModel externalToInternal(ViewType input) {
-        return ViewTypeModel.valueOf(input.toString());
+        return input != null ? ViewTypeModel.valueOf(input.toString()) : null;
     }
 
     public static VmrQuality internalToExternal(VmrQualityModel input) {
@@ -33,7 +33,7 @@ public class EnumMapper {
     }
 
     public static DirectMediaModel externalToInternal(DirectMedia input) {
-        return DirectMediaModel.valueOf(input.toString());
+        return input != null ? DirectMediaModel.valueOf(input.toString()) : null;
     }
 
     public static ProvisionStatus internalToExternal(ProvisionStatusModel input) {

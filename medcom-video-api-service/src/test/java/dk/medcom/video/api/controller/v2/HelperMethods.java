@@ -205,7 +205,7 @@ public class HelperMethods {
                 .guestPinRequired(randomBoolean())
                 .guestPinRangeLow(count++)
                 .guestPinRangeHigh(count++)
-                .vmrAvailableBefore((int) count++)
+                .vMRAvailableBefore((int) count++)
                 .maxParticipants((int) count++)
                 .endMeetingOnEndTime(randomBoolean())
                 .uriNumberRangeLow(count++)
@@ -388,7 +388,7 @@ public class HelperMethods {
         assertEquals(expected.guestPinRequired(), actual.getGuestPinRequired());
         assertEquals(expected.guestPinRangeLow(), actual.getGuestPinRangeLow());
         assertEquals(expected.guestPinRangeHigh(), actual.getGuestPinRangeHigh());
-        assertEquals(expected.vMRAvailableBefore(), actual.getVmrAvailableBefore(), 0);
+        assertEquals(expected.vMRAvailableBefore(), actual.getvMRAvailableBefore(), 0);
         assertEquals(expected.maxParticipants(), actual.getMaxParticipants(), 0);
         assertEquals(expected.endMeetingOnEndTime(), actual.getEndMeetingOnEndTime());
         assertEquals(expected.uriNumberRangeLow(), actual.getUriNumberRangeLow());
@@ -399,16 +399,36 @@ public class HelperMethods {
         assertEquals(expected.customPortalGuest(), actual.getCustomPortalGuest());
         assertEquals(expected.customPortalHost(), actual.getCustomPortalHost());
         assertEquals(expected.returnUrl(), actual.getReturnUrl());
-        assertEquals(expected.vmrType().toString(), actual.getVmrType().toString());
-        assertEquals(expected.hostView().toString(), actual.getHostView().toString());
-        assertEquals(expected.guestView().toString(), actual.getGuestView().toString());
+        if (expected.vmrType() != null) {
+            assertNotNull(actual.getVmrType());
+            assertEquals(expected.vmrType().toString(), actual.getVmrType().toString());
+        } else {
+            assertNull(actual.getVmrType());
+        }
+        if (expected.hostView() != null) {
+            assertNotNull(actual.getHostView());
+            assertEquals(expected.hostView().toString(), actual.getHostView().toString());
+        } else {
+            assertNull(actual.getHostView());
+        }
+        if (expected.guestView() != null) {
+            assertNotNull(actual.getGuestView());
+            assertEquals(expected.guestView().toString(), actual.getGuestView().toString());
+        }  else {
+            assertNull(actual.getGuestView());
+        }
         assertVmrQuality(expected.vmrQuality(), actual.getVmrQuality());
         assertEquals(expected.enableOverlayText(), actual.getEnableOverlayText());
         assertEquals(expected.guestsCanPresent(), actual.getGuestsCanPresent());
         assertEquals(expected.forcePresenterIntoMain(), actual.getForcePresenterIntoMain());
         assertEquals(expected.forceEncryption(), actual.getForceEncryption());
         assertEquals(expected.muteAllGuests(), actual.getMuteAllGuests());
-        assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
+        if (expected.directMedia() != null) {
+            assertNotNull(actual.getDirectMedia());
+            assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
+        } else {
+            assertNull(actual.getDirectMedia());
+        }
 
         return true;
     }
@@ -433,9 +453,21 @@ public class HelperMethods {
         assertGuestMicrophone(actual.guestMicrophone(), expected.getGuestMicrophone());
         assertEquals(actual.guestPinRequired(), expected.getGuestPinRequired());
         assertLabels(actual.labels(), expected.getLabels());
-        assertEquals(actual.vmrType().toString(), expected.getVmrType().toString());
-        assertEquals(actual.hostView().toString(), expected.getHostView().toString());
-        assertEquals(actual.guestView().toString(), expected.getGuestView().toString());
+        if (expected.getVmrType() != null) {
+            assertEquals(actual.vmrType().toString(), expected.getVmrType().toString());
+        } else {
+            assertNull(actual.vmrType());
+        }
+        if (expected.getHostView() != null) {
+            assertEquals(actual.hostView().toString(), expected.getHostView().toString());
+        } else {
+            assertNull(actual.hostView());
+        }
+        if (expected.getGuestView() != null) {
+            assertEquals(actual.guestView().toString(), expected.getGuestView().toString());
+        }  else {
+            assertNull(actual.guestView());
+        }
         assertVmrQuality(actual.vmrQuality(), expected.getVmrQuality());
         assertEquals(actual.enableOverlayText(), expected.getEnableOverlayText());
         assertEquals(actual.guestsCanPresent(), expected.getGuestsCanPresent());

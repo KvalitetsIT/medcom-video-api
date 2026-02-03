@@ -5,11 +5,11 @@ import dk.medcom.video.api.service.model.*;
 
 public class EnumMapper {
     public static VmrType modelToEntity(VmrTypeModel input) {
-        return VmrType.valueOf(input.toString());
+        return input != null ? VmrType.valueOf(input.toString()) : null;
     }
 
     public static ViewType modelToEntity(ViewTypeModel input) {
-        return ViewType.valueOf(input.toString());
+        return input != null ? ViewType.valueOf(input.toString()) : null;
     }
 
     public static VmrQuality modelToEntity(VmrQualityModel input) {
@@ -17,7 +17,7 @@ public class EnumMapper {
     }
 
     public static DirectMedia modelToEntity(DirectMediaModel input) {
-        return DirectMedia.valueOf(input.toString());
+        return input != null ? DirectMedia.valueOf(input.toString()) : null;
     }
 
     public static GuestMicrophone modelToEntity(GuestMicrophoneModel input) {

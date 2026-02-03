@@ -182,7 +182,7 @@ public class SchedulingTemplateAdministrationControllerV2Test {
         var id = 3456L;
         var input = new SchedulingTemplateRequest().conferencingSysId(45678L).uriPrefix(randomString())
                 .uriDomain(randomString()).hostPinRequired(false).guestPinRequired(true)
-                .uriNumberRangeLow(65432L).uriNumberRangeHigh(34567L).ivrTheme(randomString());
+                .uriNumberRangeLow(65432L).uriNumberRangeHigh(34567L);
         var schedulingTemplate = randomSchedulingTemplate();
 
         Mockito.when(schedulingTemplateService.updateSchedulingTemplateV2(Mockito.eq(id), Mockito.any())).thenReturn(schedulingTemplate);
@@ -268,10 +268,8 @@ public class SchedulingTemplateAdministrationControllerV2Test {
     @Test
     public void testV2SchedulingTemplatesPostOnlyRequiredValues() {
         var input = new SchedulingTemplateRequest().conferencingSysId(45678L).uriPrefix(randomString())
-                .uriDomain(randomString()).hostPinRequired(false)
-                .guestPinRequired(true)
-                .uriNumberRangeLow(65432L).uriNumberRangeHigh(34567L)
-                .ivrTheme(randomString()).isDefaultTemplate(true);
+                .uriDomain(randomString()).hostPinRequired(false).guestPinRequired(true)
+                .uriNumberRangeLow(65432L).uriNumberRangeHigh(34567L);
         var schedulingTemplate = randomSchedulingTemplate();
 
         Mockito.when(schedulingTemplateService.createSchedulingTemplateV2(Mockito.any(), Mockito.eq(true))).thenReturn(schedulingTemplate);

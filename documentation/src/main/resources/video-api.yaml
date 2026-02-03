@@ -491,7 +491,8 @@ paths:
           description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
           required: false
           schema:
-            $ref: '#/components/schemas/provisionStatus'
+            allOf:
+              - $ref: '#/components/schemas/provisionStatus'
             default: AWAITS_PROVISION
       responses:
         '200':
@@ -1345,7 +1346,8 @@ paths:
           description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
           required: false
           schema:
-            $ref: '#/components/schemas/provisionStatus'
+            allOf:
+              - $ref: '#/components/schemas/provisionStatus'
             default: AWAITS_PROVISION
       responses:
         '200':
@@ -1713,7 +1715,8 @@ paths:
           description: Type of the virtual meetingroom
           required: false
           schema:
-            $ref: '#/components/schemas/vmrType'
+            allOf:
+              - $ref: '#/components/schemas/vmrType'
             default: conference
           example: 'lecture'
         - name: hostView
@@ -1721,7 +1724,8 @@ paths:
           description: The layout seen by Hosts
           required: false
           schema:
-            $ref: '#/components/schemas/viewType'
+            allOf:
+              - $ref: '#/components/schemas/viewType'
             default: one_main_seven_pips
           example: 'one_main_zero_pips'
         - name: guestView
@@ -1729,7 +1733,8 @@ paths:
           description: The layout seen by Guests
           required: false
           schema:
-            $ref: '#/components/schemas/viewType'
+            allOf:
+              - $ref: '#/components/schemas/viewType'
             default: one_main_seven_pips
           example: 'one_main_zero_pips'
         - name: vmrQuality
@@ -1737,7 +1742,8 @@ paths:
           description: Controls the maximum call quality for participants connecting to this service
           required: false
           schema:
-            $ref: '#/components/schemas/vmrQuality'
+            allOf:
+              - $ref: '#/components/schemas/vmrQuality'
             default: hd
           example: 'fullhd'
         - name: enableOverlayText
@@ -2196,12 +2202,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         endTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         description:
           type: string
           maxLength: 500
@@ -2214,12 +2220,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         updatedTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         shortId:
           type: string
           minLength: 12
@@ -2283,12 +2289,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         endTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         description:
           type: string
           maxLength: 500
@@ -2304,6 +2310,7 @@ components:
           type: integer
           format: int32
           example: 5
+          default: 0
           description: When included it will override any value from the scheduling template
         endMeetingOnEndTime:
           type: boolean
@@ -2325,11 +2332,13 @@ components:
           maxLength: 200
           example: dacb0d32-11ff-47c4-89bc-7893139a92a7
         guestMicrophone:
-          $ref: '#/components/schemas/guestMicrophone'
+          allOf:
+            - $ref: '#/components/schemas/guestMicrophone'
           description: Will be set to 'on' if not set in create meeting request.
         guestPinRequired:
           type: boolean
           example: false
+          default: false
           description: When true shortLink will ask for pin
         schedulingInfoReservationId:
           type: string
@@ -2338,6 +2347,7 @@ components:
           example: 8103c61c-eb64-4148-984b-1236f4ff5849
         labels:
           type: array
+          default: []
           items:
             type: string
             description: Array of labels to attach to meeting.
@@ -2352,26 +2362,21 @@ components:
         enableOverlayText:
           type: boolean
           example: true
-          default: true
           description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
         guestsCanPresent:
           type: boolean
           example: true
-          default: true
           description: controls whether the Guests in the conference are allowed to present content
         forcePresenterIntoMain:
           type: boolean
           example: true
-          default: true
           description: controls whether the Host who is presenting is locked into the main video position
         forceEncryption:
           type: boolean
           example: false
-          default: false
         muteAllGuests:
           type: boolean
           example: false
-          default: false
           description: controls whether to mute guests when they first join the conference
         uriWithoutDomain:
           type: string
@@ -2390,6 +2395,7 @@ components:
           maximum: 999999999
         additionalInformation:
           type: array
+          default: []
           items:
             $ref: '#/components/schemas/additionalInformationType'
 
@@ -2408,12 +2414,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         endTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         description:
           type: string
           maxLength: 500
@@ -2427,11 +2433,13 @@ components:
           example: mail@mail.dk
         labels:
           type: array
+          default: []
           items:
             type: string
             description: Array of labels to attach to meeting.
         additionalInformation:
           type: array
+          default: []
           items:
             $ref: '#/components/schemas/additionalInformationType'
     patch-meeting:
@@ -2445,12 +2453,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         endTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input in v2, but will be ignored.
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         description:
           type: string
           maxLength: 500
@@ -2550,7 +2558,7 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         provisionVmrId:
           type: string
           maxLength: 50
@@ -2565,26 +2573,21 @@ components:
         enableOverlayText:
           type: boolean
           example: true
-          default: true
           description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
         guestsCanPresent:
           type: boolean
           example: true
-          default: true
           description: controls whether the Guests in the conference are allowed to present content
         forcePresenterIntoMain:
           type: boolean
           example: true
-          default: true
           description: controls whether the Host who is presenting is locked into the main video position
         forceEncryption:
           type: boolean
           example: false
-          default: false
         muteAllGuests:
           type: boolean
           example: false
-          default: false
           description: controls whether to mute guests when they first join the conference
         createdBy:
           $ref: '#/components/schemas/meetingUser'
@@ -2594,12 +2597,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         updatedTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         reservationId:
           type: string
           format: uuid
@@ -2643,7 +2646,7 @@ components:
       type: object
       required:
         - organizationId
-        - provisionVmrId
+        - schedulingTemplateId
       properties:
         organizationId:
           type: string
@@ -2711,7 +2714,6 @@ components:
       example: conference
       description: Corresponds to numeric status 0 and 1.
       type: string
-      default: conference
       enum:
         - conference
         - lecture
@@ -2719,7 +2721,6 @@ components:
       example: one_main_seven_pips
       description: Corresponds to numeric status 0, 1, 2, 3 and 4.
       type: string
-      default: one_main_seven_pips
       enum:
         - one_main_zero_pips
         - one_main_seven_pips
@@ -2743,7 +2744,6 @@ components:
       example: best_effort
       description: Direct media
       type: string
-      default: never
       enum:
         - never
         - best_effort
@@ -2847,12 +2847,10 @@ components:
           maxLength: 100
         isDefaultTemplate:
           type: boolean
-          default: false
           example: true
           description: only one default template per organization. Setting it will unset other default template
         isPoolTemplate:
           type: boolean
-          default: false
           example: true
           description: only one pool template per organization
         customPortalGuest:
@@ -2881,26 +2879,21 @@ components:
         enableOverlayText:
           type: boolean
           example: true
-          default: true
           description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
         guestsCanPresent:
           type: boolean
           example: true
-          default: true
           description: controls whether the Guests in the conference are allowed to present content
         forcePresenterIntoMain:
           type: boolean
           example: true
-          default: true
           description: controls whether the Host who is presenting is locked into the main video position
         forceEncryption:
           type: boolean
           example: false
-          default: false
         muteAllGuests:
           type: boolean
           example: false
-          default: false
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
@@ -2912,12 +2905,12 @@ components:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         updatedTime:
           description: NB! Format changes in v2 from "yyyy-MM-dd'T'HH:mm:ss Z" to "yyyy-MM-dd'T'HH:mm:ssXXX"
           type: string
           format: date-time
-          example: 2019-10-02T15:00:00+01:00
+          example: 2019-10-02T15:00:00Z
         _links:
           properties:
             self:
@@ -2937,7 +2930,6 @@ components:
         - guestPinRequired
         - uriNumberRangeLow
         - uriNumberRangeHigh
-        - ivrTheme
       properties:
         conferencingSysId:
           type: integer
@@ -2973,7 +2965,7 @@ components:
           type: integer
           format: int64
           example: 9999
-        vmrAvailableBefore:
+        vMRAvailableBefore:
           type: integer
           format: int32
           example: 30
@@ -3036,26 +3028,21 @@ components:
         enableOverlayText:
           type: boolean
           example: true
-          default: true
           description: if participant name overlays are enabled, the display names or aliases of all participants are shown in a text overlay along the bottom of their video image
         guestsCanPresent:
           type: boolean
           example: true
-          default: true
           description: controls whether the Guests in the conference are allowed to present content
         forcePresenterIntoMain:
           type: boolean
           example: true
-          default: true
           description: controls whether the Host who is presenting is locked into the main video position
         forceEncryption:
           type: boolean
           example: false
-          default: false
         muteAllGuests:
           type: boolean
           example: false
-          default: false
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
@@ -3064,7 +3051,6 @@ components:
       type: object
       required:
         - organisationId
-        - email
       properties:
         organisationId:
           type: string

@@ -87,6 +87,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setEnableOverlayText(false);
         create.setDirectMedia(DirectMedia.BEST_EFFORT);
         create.setIvrTheme("ivr_theme");
+        create.setvMRAvailableBefore(10);
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -98,6 +99,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
         assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
         assertEquals(create.getDirectMedia(), result.getDirectMedia());
+        assertEquals(create.getvMRAvailableBefore(), result.getvMRAvailableBefore());
     }
 
     @Test
@@ -129,6 +131,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
         updateSchedulingTemplate.setDirectMedia(DirectMedia.BEST_EFFORT);
         updateSchedulingTemplate.setIvrTheme("ivr_theme");
+        updateSchedulingTemplate.setvMRAvailableBefore(15);
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -145,6 +148,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
         assertFalse(result.getIsPoolTemplate());
         assertEquals(DirectMedia.BEST_EFFORT, result.getDirectMedia());
+        assertEquals(updateSchedulingTemplate.getvMRAvailableBefore(), result.getvMRAvailableBefore());
     }
 
     @Test

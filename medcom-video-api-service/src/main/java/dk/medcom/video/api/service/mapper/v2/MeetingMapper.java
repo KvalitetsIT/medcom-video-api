@@ -23,9 +23,7 @@ public class MeetingMapper {
         output.setProjectCode(input.projectCode());
         output.setSchedulingInfoReservationId(input.schedulingInfoReservationId());
         output.setOrganizedByEmail(input.organizedByEmail());
-        if (input.maxParticipants() != null) {
-            output.setMaxParticipants(input.maxParticipants());
-        }
+        output.setMaxParticipants(input.maxParticipants());
         output.setEndMeetingOnEndTime(input.endMeetingOnEndTime());
         output.setSchedulingTemplateId(input.schedulingTemplateId());
         output.setMeetingType(EnumMapper.modelToEntity(input.meetingType()));
@@ -33,9 +31,7 @@ public class MeetingMapper {
         output.setLabels(input.labels() != null ? input.labels() : List.of());
         output.setExternalId(input.externalId());
         output.setGuestMicrophone(EnumMapper.modelToEntity(input.guestMicrophone()));
-        if (input.guestPinRequired() != null) {
-            output.setGuestPinRequired(input.guestPinRequired());
-        }
+        output.setGuestPinRequired(input.guestPinRequired());
         output.setVmrType(EnumMapper.modelToEntity(input.vmrType()));
         output.setHostView(EnumMapper.modelToEntity(input.hostView()));
         output.setGuestView(EnumMapper.modelToEntity(input.guestView()));

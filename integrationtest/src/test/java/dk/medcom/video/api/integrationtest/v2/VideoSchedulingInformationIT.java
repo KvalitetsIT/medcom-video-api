@@ -374,14 +374,14 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         var createdSchedulingInfo = res.getData().stream().filter(x -> x.getUuid().toString().equals(createResponse.getUuid().toString())).findFirst().orElseThrow();
         // Expects to be created with default values, i.e. values from default template of user-org-pool, scheduling template with id = 1
         assertEquals(VmrType.CONFERENCE, createdSchedulingInfo.getVmrType());
-        assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, createdSchedulingInfo.getHostView());
-        assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, createdSchedulingInfo.getGuestView());
+        assertEquals(ViewType.ONE_MAIN_ZERO_PIPS, createdSchedulingInfo.getHostView());
+        assertEquals(ViewType.ONE_MAIN_TWENTYONE_PIPS, createdSchedulingInfo.getGuestView());
         assertEquals(VmrQuality.SD, createdSchedulingInfo.getVmrQuality());
         assertEquals(Boolean.TRUE, createdSchedulingInfo.getEnableOverlayText());
-        assertEquals(Boolean.TRUE, createdSchedulingInfo.getGuestsCanPresent());
+        assertEquals(Boolean.FALSE, createdSchedulingInfo.getGuestsCanPresent());
         assertEquals(Boolean.TRUE, createdSchedulingInfo.getForcePresenterIntoMain());
         assertEquals(Boolean.FALSE, createdSchedulingInfo.getForceEncryption());
-        assertEquals(Boolean.FALSE, createdSchedulingInfo.getMuteAllGuests());
+        assertEquals(Boolean.TRUE, createdSchedulingInfo.getMuteAllGuests());
     }
 
     @Test
