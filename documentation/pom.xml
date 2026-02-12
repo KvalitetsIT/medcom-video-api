@@ -101,8 +101,12 @@
                                     <inline>
                                         <files>
                                             <file>
-                                                <source>${project.basedir}/src/main/resources/video-api.yaml</source>
-                                                <destName>${git.commit.id.describe}.yaml</destName>
+                                                <source>${project.basedir}/src/main/resources/video-api-v1.yaml</source>
+                                                <destName>${git.commit.id.describe}-v1.yaml</destName>
+                                            </file>
+                                            <file>
+                                                <source>${project.basedir}/src/main/resources/video-api-v2.yaml</source>
+                                                <destName>${git.commit.id.describe}-v2.yaml</destName>
                                             </file>
                                             <file>
                                                 <source>${project.build.outputDirectory}/git.properties</source>
@@ -140,11 +144,12 @@
                 <version>7.13.0</version>
                 <executions>
                     <execution>
+                        <id>test-v1</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/video-api.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/video-api-v1.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <configOptions>
                                 <sourceFolder>src/test/java</sourceFolder>
@@ -161,12 +166,59 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>server</id>
+                        <id>server-v1</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/video-api.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/video-api-v1.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <configOptions>
+                                <sourceFolder>src/main/java</sourceFolder>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <performBeanValidation>true</performBeanValidation>
+                                <library>spring-cloud</library>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useTags>true</useTags>
+                                <containerDefaultToNull>true</containerDefaultToNull>
+                            </configOptions>
+                            <output>${project.build.directory}/generated-sources/openapi/main</output>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-v2</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/video-api-v2.yaml</inputSpec>
+                            <generatorName>java</generatorName>
+                            <configOptions>
+                                <sourceFolder>src/test/java</sourceFolder>
+                                <dateLibrary>java8</dateLibrary>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <useJakartaEe>true</useJakartaEe>
+                                <containerDefaultToNull>true</containerDefaultToNull>
+                            </configOptions>
+                            <output>${project.build.directory}/generated-test-sources/openapi/test</output>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <addTestCompileSourceRoot>true</addTestCompileSourceRoot>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>server-v2</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/video-api-v2.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <configOptions>
                                 <sourceFolder>src/main/java</sourceFolder>
