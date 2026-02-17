@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
-import org.openapitools.client.api.SchedulingTemplateAdministrationV2Api;
 import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.api.VideoSchedulingInformationV2Api;
 import org.openapitools.client.model.*;
@@ -858,9 +857,96 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
     }
 
-    //----------- From v1 -----------
+    //----------- CORS and view tests -----------
     @Test
-    void testCorsAllowed() throws IOException, InterruptedException {
+    void testV2MeetingsFindByUriWithDomainGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/findByUriWithDomain", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsFindByUriWithDomainGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/findByUriWithDomain", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsFindByUriWithoutDomainGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/findByUriWithoutDomain", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsFindByUriWithoutDomainGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/findByUriWithoutDomain", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsPostCorsAllowed() throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://allowed:4100")
@@ -869,15 +955,134 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var client = HttpClient.newBuilder().build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("POST"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
         assertEquals(200, response.statusCode());
     }
 
     @Test
-    void testCorsDenied() throws IOException, InterruptedException {
+    void testV2MeetingsPostCorsDenied() throws IOException, InterruptedException {
         var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings", getApiBasePath())))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://denied:4200")
                 .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidPutCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("PUT"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidPutCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidPatchCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "PATCH")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("PATCH"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidPatchCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "PATCH")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidDeleteCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "DELETE")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("DELETE"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2MeetingsUuidDeleteCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/meetings/" + meeting301Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "DELETE")
                 .build();
 
         var client = HttpClient.newBuilder().build();

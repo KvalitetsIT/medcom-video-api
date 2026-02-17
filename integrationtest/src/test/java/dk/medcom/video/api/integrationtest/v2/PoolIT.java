@@ -7,6 +7,12 @@ import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.PoolV2Api;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PoolIT extends AbstractIntegrationTest {
@@ -61,5 +67,33 @@ class PoolIT extends AbstractIntegrationTest {
         return new PoolV2Api(apiClient);
     }
 
+    //----------- CORS tests -----------
+    @Test
+    void testV2PoolGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/pool", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
 
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2PoolGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/pool", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
 }

@@ -14,6 +14,11 @@ import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.api.VideoSchedulingInformationV2Api;
 import org.openapitools.client.model.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -535,6 +540,239 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertThat(putResultJson.getString("provisionTimestamp")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
         assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
         assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+    }
+
+    //----------- CORS tests -----------
+    @Test
+    void testV2SchedulingInfoGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoPostCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("POST"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoPostCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidPutCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("PUT"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidPutCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoProvisionGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-provision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoProvisionGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-provision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoDeprovisionGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-deprovision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoDeprovisionGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-deprovision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveUuidGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve/" + schedulingInfo413ReservationUuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveUuidGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve/" + schedulingInfo413ReservationUuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
     }
 
     // ----------- test data help -----------
