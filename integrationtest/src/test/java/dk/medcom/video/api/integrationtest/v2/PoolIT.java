@@ -11,53 +11,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PoolIT extends AbstractIntegrationTest {
 
-    private final PoolV2Api poolV2Api;
-    private final PoolV2Api poolV2ApiNoHeader;
-    private final PoolV2Api poolV2ApiInvalidToken;
-    private final PoolV2Api poolV2ApiNoRoleAtt;
-
-    PoolIT() {
-        var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
-        apiClient.setBasePath(getApiBasePath());
-        poolV2Api = new PoolV2Api(apiClient);
-
-        var apiClientNoHeader = new ApiClient();
-        apiClientNoHeader.setBasePath(getApiBasePath());
-        poolV2ApiNoHeader = new PoolV2Api(apiClientNoHeader);
-
-        var apiClientInvalidToken = new ApiClient();
-        apiClientInvalidToken.setBasePath(getApiBasePath());
-        apiClientInvalidToken.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
-        apiClientInvalidToken.setBasePath(getApiBasePath());
-        poolV2ApiInvalidToken = new PoolV2Api(apiClientInvalidToken);
-
-        var apiClientNoRoleAtt = new ApiClient();
-        apiClientNoRoleAtt.setBasePath(getApiBasePath());
-        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
-        poolV2ApiNoRoleAtt = new PoolV2Api(apiClientNoRoleAtt);
-    }
 
     @Test
     void errorIfNoJwtToken_v2PoolGetWithHttpInfo() {
-        var expectedException = assertThrows(ApiException.class, poolV2ApiNoHeader::v2PoolGetWithHttpInfo);
-        assertEquals(401, expectedException.getCode());
+        final PoolV2Api poolV2ApiNoHeader = createClient(null);
+        assertStatus(401, poolV2ApiNoHeader::v2PoolGetWithHttpInfo);
     }
 
     @Test
     void errorIfInvalidJwtToken_v2PoolGetWithHttpInfo() {
-        var expectedException = assertThrows(ApiException.class, poolV2ApiInvalidToken::v2PoolGetWithHttpInfo);
-        assertEquals(401, expectedException.getCode());
+        final PoolV2Api poolV2ApiInvalidToken = createClient(HeaderBuilder.getInvalidJwt());
+        assertStatus(401, poolV2ApiInvalidToken::v2PoolGetWithHttpInfo);
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2PoolGetWithHttpInfo() {
-        var expectedException = assertThrows(ApiException.class, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
-        assertEquals(401, expectedException.getCode());
+        final PoolV2Api poolV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
+        assertStatus(401, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
     }
 
     @Test
     void testV2PoolGet() throws ApiException {
+
+        var poolV2Api = createClient( HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()));
+
         var result = poolV2Api.v2PoolGetWithHttpInfo();
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
@@ -74,4 +51,15 @@ class PoolIT extends AbstractIntegrationTest {
         assertNotNull(poolInfoResult.getSchedulingInfoList());
         assertNotNull(poolInfoResult.getSchedulingTemplate());
     }
+
+    private PoolV2Api createClient(String token) {
+        var apiClient = new ApiClient();
+        apiClient.setBasePath(getApiBasePath());
+        if (token != null) {
+            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
+        }
+        return new PoolV2Api(apiClient);
+    }
+
+
 }

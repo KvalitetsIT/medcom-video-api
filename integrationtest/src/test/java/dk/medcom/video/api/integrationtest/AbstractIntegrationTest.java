@@ -3,12 +3,19 @@ package dk.medcom.video.api.integrationtest;
 import io.nats.client.JetStreamApiException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.function.Executable;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.api.PoolV2Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 
 import java.io.IOException;
 import java.sql.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(AbstractIntegrationTest.class);
@@ -64,4 +71,9 @@ public abstract class AbstractIntegrationTest {
         serviceStarter.verifyRowExistsInDatabase(sql);
     }
 
+
+    protected static void assertStatus(int expectedCode, Executable call) {
+        var ex = assertThrows(ApiException.class, call);
+        assertEquals(expectedCode, ex.getCode(), String.format("Expected status code: %s", expectedCode));
+    }
 }
