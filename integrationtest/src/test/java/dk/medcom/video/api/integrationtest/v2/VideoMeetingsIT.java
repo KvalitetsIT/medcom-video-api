@@ -36,146 +36,113 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     private static long count = 10000;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
     private final VideoMeetingsV2Api videoMeetingsV2ApiNoHeader;
-    private final VideoMeetingsV2Api videoMeetingsV2ApiInvalidJwt;
     private final VideoMeetingsV2Api videoMeetingsV2ApiNoRoleAtt;
     private final VideoMeetingsV2Api videoMeetingsV2ApiOnlyProvisioner;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiExpiredJwt;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiInvalidIssuerJwt;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiTamperedJwt;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiMissingSignatureJwt;
+    private final VideoMeetingsV2Api videoMeetingsV2ApiDifferentSignedJwt;
     private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
 
-// ------ JWT errors -------
-
     VideoMeetingsIT() {
+        var keycloakUrl = getKeycloakUrl();
+
+        videoMeetingsV2Api = createClient(allRoleAttToken);
+        videoMeetingsV2ApiNoHeader = createClient(null);
+        videoMeetingsV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(keycloakUrl));
+        videoMeetingsV2ApiOnlyProvisioner = createClient(HeaderBuilder.getJwtOnlyProvisioner(keycloakUrl));
+        videoMeetingsV2ApiExpiredJwt = createClient(HeaderBuilder.getExpiredJwt(keycloakUrl));
+        videoMeetingsV2ApiInvalidIssuerJwt = createClient(HeaderBuilder.getInvalidIssuerJwt());
+        videoMeetingsV2ApiTamperedJwt = createClient(HeaderBuilder.getTamperedJwt(keycloakUrl));
+        videoMeetingsV2ApiMissingSignatureJwt = createClient(HeaderBuilder.getMissingSignatureJwt(keycloakUrl));
+        videoMeetingsV2ApiDifferentSignedJwt = createClient(HeaderBuilder.getDifferentSignedJwt(keycloakUrl));
+
         var apiClient = new ApiClient();
         apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
         apiClient.setBasePath(getApiBasePath());
-
-        videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
         videoSchedulingInformationV2Api = new VideoSchedulingInformationV2Api(apiClient);
-
-        var apiClientNoHeader = new ApiClient();
-        apiClientNoHeader.setBasePath(getApiBasePath());
-        videoMeetingsV2ApiNoHeader = new VideoMeetingsV2Api(apiClientNoHeader);
-
-        var apiClientInvalidJwt = new ApiClient();
-        apiClientInvalidJwt.setBasePath(getApiBasePath());
-        apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
-        videoMeetingsV2ApiInvalidJwt = new VideoMeetingsV2Api(apiClientInvalidJwt);
-
-        var apiClientNoRoleAtt = new ApiClient();
-        apiClientNoRoleAtt.setBasePath(getApiBasePath());
-        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
-        videoMeetingsV2ApiNoRoleAtt = new VideoMeetingsV2Api(apiClientNoRoleAtt);
-
-        var apiClientOnlyProvisionerRoleAtt = new ApiClient();
-        apiClientOnlyProvisionerRoleAtt.setBasePath(getApiBasePath());
-        apiClientOnlyProvisionerRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtOnlyProvisioner(getKeycloakUrl()));
-        videoMeetingsV2ApiOnlyProvisioner = new VideoMeetingsV2Api(apiClientOnlyProvisionerRoleAtt);
     }
 
-    private static CreateMeeting randomCreateMeeting() {
-        return new CreateMeeting()
-                .subject(randomString())
-                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .description(randomString())
-                .projectCode(randomString())
-                .organizedByEmail(randomString())
-                .maxParticipants((int) count++)
-                .endMeetingOnEndTime(randomBoolean())
-                .schedulingTemplateId(count++)
-                .meetingType(MeetingType.NORMAL)
-                .uuid(UUID.randomUUID())
-                .externalId(randomString())
-                .guestMicrophone(GuestMicrophone.MUTED)
-                .guestPinRequired(randomBoolean())
-                .labels(List.of(randomString(), randomString()))
-                .vmrType(VmrType.CONFERENCE)
-                .hostView(ViewType.ONE_MAIN_SEVEN_PIPS)
-                .guestView(ViewType.ONE_MAIN_SEVEN_PIPS)
-                .vmrQuality(VmrQuality.HD)
-                .enableOverlayText(randomBoolean())
-                .guestsCanPresent(randomBoolean())
-                .forcePresenterIntoMain(randomBoolean())
-                .forceEncryption(randomBoolean())
-                .muteAllGuests(randomBoolean())
-                .uriWithoutDomain(randomString().replace("-", ""))
-                .guestPin((int) count++)
-                .hostPin((int) count++)
-                .additionalInformation(randomAdditionalInformation());
+    private VideoMeetingsV2Api createClient(String token) {
+        var apiClient = new ApiClient();
+        apiClient.setBasePath(getApiBasePath());
+        if (token != null) {
+            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
+        }
+        return new VideoMeetingsV2Api(apiClient);
     }
 
-    private static UpdateMeeting randomUpdateMeeting() {
-        return new UpdateMeeting()
-                .subject(randomString())
-                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .description(randomString())
-                .projectCode(randomString())
-                .organizedByEmail(randomString())
-                .labels(List.of(randomString(), randomString()))
-                .additionalInformation(randomAdditionalInformation());
-    }
-
-    private static PatchMeeting randomPatchMeeting() {
-        return new PatchMeeting()
-                .subject(randomString())
-                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .description(randomString())
-                .projectCode(randomString())
-                .organizedByEmail(randomString())
-                .labels(List.of(randomString(), randomString()))
-                .guestMicrophone(GuestMicrophone.MUTED)
-                .guestPinRequired(randomBoolean())
-                .guestPin((int) count++)
-                .hostPin((int) count++)
-                .additionalInformation(randomAdditionalInformation());
-    }
-
-    private static List<AdditionalInformationType> randomAdditionalInformation() {
-        return List.of(
-                new AdditionalInformationType().key(randomString()).value(randomString()),
-                new AdditionalInformationType().key(randomString()).value(randomString())
-        );
-    }
-
-    private static String randomString() {
-        return UUID.randomUUID().toString();
-    }
-
-    private static boolean randomBoolean() {
-        Random random = new Random();
-        return random.nextBoolean();
-    }
-
+    // ---------- JWT errors ------...
     @Test
     void errorIfNoJwtToken_v2MeetingsFindByUriWithDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithDomainGet(randomString()));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(randomString()));
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsFindByUriWithDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsFindByUriWithDomainGet(UUID.randomUUID().toString()));
+    void errorIfExpiredJwtToken_v2MeetingsFindByUriWithDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsFindByUriWithDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsFindByUriWithDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsFindByUriWithDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsFindByUriWithDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsFindByUriWithDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsFindByUriWithDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsFindByUriWithDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsFindByUriWithDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsFindByUriWithDomainGet(randomString()));
     }
 
     @Test
     void errorIfNoJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsFindByUriWithoutDomainGet(randomString()));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithoutDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsFindByUriWithoutDomainGet(UUID.randomUUID().toString()));
+    void errorIfExpiredJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsFindByUriWithoutDomainGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
     }
 
     @Test
@@ -183,12 +150,12 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsGet(
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
         ));
     }
 
@@ -197,26 +164,82 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsGet(
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
         ));
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsGet(
+    void errorIfExpiredJwtToken_v2MeetingsGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsGet(
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
+        ));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
+        ));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
+        ));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
+        ));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString()
         ));
     }
 
@@ -231,13 +254,33 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsPost() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsPost(randomCreateMeeting()));
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsPost() {
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsPost(randomCreateMeeting()));
     }
 
     @Test
-    void errorIfOnlyProvisionerRoleAtt_v2MeetingsPost() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsPost(randomCreateMeeting()));
+    void errorIfExpiredJwtToken_v2MeetingsPost() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsPost(randomCreateMeeting()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsPost() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsPost(randomCreateMeeting()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsPost() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsPost(randomCreateMeeting()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsPost() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsPost(randomCreateMeeting()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsPost() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsPost(randomCreateMeeting()));
     }
 
     @Test
@@ -251,13 +294,33 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsUuidDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidDelete(meeting301Uuid()));
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidDelete() {
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidDelete(meeting301Uuid()));
     }
 
     @Test
-    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidDelete() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidDelete(meeting301Uuid()));
+    void errorIfExpiredJwtToken_v2MeetingsUuidDelete() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidDelete(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsUuidDelete() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidDelete(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsUuidDelete() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidDelete(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsUuidDelete() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidDelete(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsUuidDelete() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidDelete(meeting301Uuid()));
     }
 
     @Test
@@ -271,8 +334,28 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsUuidGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidGet(meeting301Uuid()));
+    void errorIfExpiredJwtToken_v2MeetingsUuidGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidGet(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsUuidGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidGet(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsUuidGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidGet(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsUuidGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidGet(meeting301Uuid()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsUuidGet() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidGet(meeting301Uuid()));
     }
 
     @Test
@@ -280,22 +363,39 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
     }
 
-
-// -------- No JWT errors ----------
-
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidPatch() {
         assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsUuidPatch() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPatch() {
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
     }
 
     @Test
-    void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPatch() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    void errorIfExpiredJwtToken_v2MeetingsUuidPatch() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsUuidPatch() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsUuidPatch() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsUuidPatch() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsUuidPatch() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
     }
 
     @Test
@@ -309,15 +409,36 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2MeetingsUuidPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
-    }
-
-    @Test
     void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidPut() {
         assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
     }
 
+    @Test
+    void errorIfExpiredJwtToken_v2MeetingsUuidPut() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2MeetingsUuidPut() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2MeetingsUuidPut() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2MeetingsUuidPut() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2MeetingsUuidPut() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+    }
+
+    // -------- No JWT errors ----------
     @Test
     void testV2MeetingsFindByUriWithDomainGet() throws ApiException {
         var result = videoMeetingsV2Api.v2MeetingsFindByUriWithDomainGetWithHttpInfo("4005@test.dk");
@@ -503,7 +624,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsPostOnlyRequiredCreateMeetingValues() throws ApiException {
         var input = new CreateMeeting()
-                .subject(UUID.randomUUID().toString())
+                .subject(randomString())
                 .startTime(OffsetDateTime.now().plusHours(1))
                 .endTime(OffsetDateTime.now().plusHours(2));
 
@@ -1140,4 +1261,79 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         return UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5");
     }
 
+    private static CreateMeeting randomCreateMeeting() {
+        return new CreateMeeting()
+                .subject(randomString())
+                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .description(randomString())
+                .projectCode(randomString())
+                .organizedByEmail(randomString())
+                .maxParticipants((int) count++)
+                .endMeetingOnEndTime(randomBoolean())
+                .schedulingTemplateId(count++)
+                .meetingType(MeetingType.NORMAL)
+                .uuid(UUID.randomUUID())
+                .externalId(randomString())
+                .guestMicrophone(GuestMicrophone.MUTED)
+                .guestPinRequired(randomBoolean())
+                .labels(List.of(randomString(), randomString()))
+                .vmrType(VmrType.CONFERENCE)
+                .hostView(ViewType.ONE_MAIN_SEVEN_PIPS)
+                .guestView(ViewType.ONE_MAIN_SEVEN_PIPS)
+                .vmrQuality(VmrQuality.HD)
+                .enableOverlayText(randomBoolean())
+                .guestsCanPresent(randomBoolean())
+                .forcePresenterIntoMain(randomBoolean())
+                .forceEncryption(randomBoolean())
+                .muteAllGuests(randomBoolean())
+                .uriWithoutDomain(randomString().replace("-", ""))
+                .guestPin((int) count++)
+                .hostPin((int) count++)
+                .additionalInformation(randomAdditionalInformation());
+    }
+
+    private static UpdateMeeting randomUpdateMeeting() {
+        return new UpdateMeeting()
+                .subject(randomString())
+                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .description(randomString())
+                .projectCode(randomString())
+                .organizedByEmail(randomString())
+                .labels(List.of(randomString(), randomString()))
+                .additionalInformation(randomAdditionalInformation());
+    }
+
+    private static PatchMeeting randomPatchMeeting() {
+        return new PatchMeeting()
+                .subject(randomString())
+                .startTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .description(randomString())
+                .projectCode(randomString())
+                .organizedByEmail(randomString())
+                .labels(List.of(randomString(), randomString()))
+                .guestMicrophone(GuestMicrophone.MUTED)
+                .guestPinRequired(randomBoolean())
+                .guestPin((int) count++)
+                .hostPin((int) count++)
+                .additionalInformation(randomAdditionalInformation());
+    }
+
+    private static List<AdditionalInformationType> randomAdditionalInformation() {
+        return List.of(
+                new AdditionalInformationType().key(randomString()).value(randomString()),
+                new AdditionalInformationType().key(randomString()).value(randomString())
+        );
+    }
+
+    private static String randomString() {
+        return UUID.randomUUID().toString();
+    }
+
+    private static boolean randomBoolean() {
+        Random random = new Random();
+        return random.nextBoolean();
+    }
 }

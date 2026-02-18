@@ -28,17 +28,37 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
 
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2Api;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoHeader;
-    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidJwt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoRoleAtt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNotAdmin;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiExpiredJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidIssuerJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiTamperedJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiMissingSignatureJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiDifferentSignedJwt;
+
     private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
     SchedulingTemplateAdministrationIT() {
+        var keycloakUrl = getKeycloakUrl();
+
         schedulingTemplateAdministrationV2Api = createClient(allRoleAttToken);
         schedulingTemplateAdministrationV2ApiNoHeader = createClient(null);
-        schedulingTemplateAdministrationV2ApiInvalidJwt = createClient(HeaderBuilder.getInvalidJwt());
-        schedulingTemplateAdministrationV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
-        schedulingTemplateAdministrationV2ApiNotAdmin = createClient(HeaderBuilder.getJwtNotAdmin(getKeycloakUrl()));
+        schedulingTemplateAdministrationV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiNotAdmin = createClient(HeaderBuilder.getJwtNotAdmin(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiExpiredJwt = createClient(HeaderBuilder.getExpiredJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiInvalidIssuerJwt = createClient(HeaderBuilder.getInvalidIssuerJwt());
+        schedulingTemplateAdministrationV2ApiTamperedJwt = createClient(HeaderBuilder.getTamperedJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiMissingSignatureJwt = createClient(HeaderBuilder.getMissingSignatureJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiDifferentSignedJwt = createClient(HeaderBuilder.getDifferentSignedJwt(keycloakUrl));
+    }
+
+    private SchedulingTemplateAdministrationV2Api createClient(String token) {
+        var apiClient = new ApiClient();
+        apiClient.setBasePath(getApiBasePath());
+        if (token != null) {
+            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
+        }
+        return new SchedulingTemplateAdministrationV2Api(apiClient);
     }
 
     // ----------- JWT error ----------
@@ -48,13 +68,33 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesGet() {
-        assertStatus(401, schedulingTemplateAdministrationV2ApiInvalidJwt::v2SchedulingTemplatesGet);
+    void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
     }
 
     @Test
-    void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
-        assertStatus(401, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiExpiredJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiInvalidIssuerJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiTamperedJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiMissingSignatureJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiDifferentSignedJwt::v2SchedulingTemplatesGet);
     }
 
     @Test
@@ -63,13 +103,33 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdDelete() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdDelete(201L));
+    void errorIfNotAdmin_v2SchedulingTemplatesIdDelete() {
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdDelete(201L));
     }
 
     @Test
-    void errorIfNotAdmin_v2SchedulingTemplatesIdDelete() {
-        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdDelete(201L));
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdDelete(201L));
     }
 
     @Test
@@ -78,13 +138,33 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdGet() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdGet(201L));
+    void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
     }
 
     @Test
-    void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdGet(201L));
     }
 
     @Test
@@ -93,13 +173,33 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdPut() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    void errorIfNotAdmin_v2SchedulingTemplatesIdPut() {
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
     }
 
     @Test
-    void errorIfNotAdmin_v2SchedulingTemplatesIdPut() {
-        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
     }
 
     @Test
@@ -108,13 +208,33 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesPost() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    void errorIfNotAdmin_v2SchedulingTemplatesPost() {
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
     }
 
     @Test
-    void errorIfNotAdmin_v2SchedulingTemplatesPost() {
-        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
     }
 
 
@@ -627,14 +747,5 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
     private static boolean randomBoolean() {
         Random random = new Random();
         return random.nextBoolean();
-    }
-
-    private SchedulingTemplateAdministrationV2Api createClient(String token) {
-        var apiClient = new ApiClient();
-        apiClient.setBasePath(getApiBasePath());
-        if (token != null) {
-            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
-        }
-        return new SchedulingTemplateAdministrationV2Api(apiClient);
     }
 }
