@@ -3,9 +3,10 @@ package dk.medcom.video.api.context;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class WspUserContextTest {
@@ -14,7 +15,7 @@ public class WspUserContextTest {
 	WspUserContext subject;
 	
 	
-	@Before
+	@BeforeEach
 	public void setupTest() {
 		
 		subject = new WspUserContext();
@@ -30,13 +31,13 @@ public class WspUserContextTest {
 		SessionData sd = subject.parseSessionDataValue(headerValue);
 		
 		// Then
-		Assert.assertNotNull("Expected a sessiondata object", sd);
+		assertNotNull(sd, "Expected a sessiondata object");
 		Map<String, List<String>> userAttributes = sd.getUserAttributes();
-		Assert.assertNotNull("Exepcted userattributes", userAttributes);
-		Assert.assertTrue(userAttributes.containsKey("test:test"));
-		Assert.assertEquals(2, userAttributes.get("test:test").size());
-		Assert.assertTrue(userAttributes.get("test:test").contains("autovalue1"));
-		Assert.assertTrue(userAttributes.get("test:test").contains("autovalue2"));
+		assertNotNull(userAttributes, "Exepcted userattributes");
+		assertTrue(userAttributes.containsKey("test:test"));
+		assertEquals(2, userAttributes.get("test:test").size());
+		assertTrue(userAttributes.get("test:test").contains("autovalue1"));
+		assertTrue(userAttributes.get("test:test").contains("autovalue2"));
 	}
 	
 	@Test
@@ -49,7 +50,7 @@ public class WspUserContextTest {
 		SessionData sd = subject.parseSessionDataValue(headerValue);
 		
 		// Then
-		Assert.assertNull("Expected no sessiondata object", sd);
+		assertNull(sd, "Expected no sessiondata object");
 	}
 	
 	@Test
@@ -61,6 +62,6 @@ public class WspUserContextTest {
 		SessionData sd = subject.parseSessionDataValue(headerValue);
 		
 		// Then
-		Assert.assertNull("Expected no sessiondata object", sd);
+		assertNull(sd, "Expected no sessiondata object");
 	}
 }

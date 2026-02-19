@@ -1,15 +1,19 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsApi;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
@@ -19,7 +23,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	private final VideoSchedulingInformationApi schedulingInfoApi;
@@ -122,7 +127,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		// Create scheduling info.
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
 		createSchedulingInfo.setOrganizationId("company 3");
-		createSchedulingInfo.setSchedulingTemplateId(4);
+		createSchedulingInfo.setSchedulingTemplateId(4L);
 
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain = 'test.dk' and uri_without_domain is not null and uuid = '" + createdSchedulingInfo.getUuid() + "'");
@@ -207,7 +212,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void createSchedulingInfo() throws ApiException {
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
-		createSchedulingInfo.setSchedulingTemplateId(1);
+		createSchedulingInfo.setSchedulingTemplateId(1L);
 		createSchedulingInfo.setOrganizationId("company 1");
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 
@@ -222,4 +227,43 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
 		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
 	}
+
+    @Test
+    void testTimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "organizationId": "company 1",
+                  "schedulingTemplateId": "1"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-info")
+                    .request()
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "provisionStatus": "AWAITS_PROVISION"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-info")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+        assertThat(putResultJson.getString("provisionTimestamp")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+    }
 }

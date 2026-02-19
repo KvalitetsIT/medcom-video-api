@@ -1,19 +1,17 @@
 package dk.medcom.video.api.repository;
 
-import dk.medcom.video.api.api.DirectMedia;
+import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
@@ -130,15 +128,15 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		assertEquals("abc", schedulingTemplate.getUriPrefix());
 		assertEquals("test.dk", schedulingTemplate.getUriDomain());
-		Assert.assertTrue(schedulingTemplate.getHostPinRequired());
+		assertTrue(schedulingTemplate.getHostPinRequired());
 		assertEquals(1L, schedulingTemplate.getHostPinRangeLow().longValue());
 		assertEquals(91L, schedulingTemplate.getHostPinRangeHigh().longValue());
-		Assert.assertFalse(schedulingTemplate.getGuestPinRequired());
+		assertFalse(schedulingTemplate.getGuestPinRequired());
 		assertEquals(100L, schedulingTemplate.getGuestPinRangeLow().longValue());
 		assertEquals(991L, schedulingTemplate.getGuestPinRangeHigh().longValue());
 		assertEquals(15, schedulingTemplate.getVMRAvailableBefore());
 		assertEquals(10, schedulingTemplate.getMaxParticipants());
-		Assert.assertTrue(schedulingTemplate.getEndMeetingOnEndTime());
+		assertTrue(schedulingTemplate.getEndMeetingOnEndTime());
 		assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
 		assertEquals("/api/admin/configuration/v1/ivr_theme/10/", schedulingTemplate.getIvrTheme());
@@ -156,7 +154,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNull(schedulingTemplate);
+		assertNull(schedulingTemplate);
 	}
 	@Test
 	public void testFindSchedulingTemplateWithExistingOrganisation() {
@@ -195,7 +193,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
 		int numberOfSchedulingTemplates = 0;
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
-			Assert.assertNull(schedulingTemplate.getOrganisation());
+			assertNull(schedulingTemplate.getOrganisation());
 			numberOfSchedulingTemplates++;
 		}
 		
@@ -225,7 +223,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			numberOfSchedulingTemplates = 0;
 			for (SchedulingTemplate schedulingTemplate2 : schedulingTemplates) {
 				assertNotNull(schedulingTemplate2);
-				Assert.assertNull(schedulingTemplate2.getOrganisation());
+				assertNull(schedulingTemplate2.getOrganisation());
 				numberOfSchedulingTemplates++;
 			}
 			assertEquals(1, numberOfSchedulingTemplates);
@@ -270,7 +268,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
 		
 		// Then
-		Assert.assertNull(schedulingTemplate);
+		assertNull(schedulingTemplate);
 	
 	}
 
@@ -294,25 +292,25 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		assertNotNull(schedulingTemplates);
 		assertEquals(1, schedulingTemplates.size());
 
-		var schedulingTemplate = schedulingTemplates.get(0);
+		var schedulingTemplate = schedulingTemplates.getFirst();
 		assertNotNull(schedulingTemplate);
 		assertEquals(7L, schedulingTemplate.getId().longValue());
 		assertEquals(8L, schedulingTemplate.getOrganisation().getId().longValue());
 		assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		assertEquals("abc3c", schedulingTemplate.getUriPrefix());
 		assertEquals("test.dk", schedulingTemplate.getUriDomain());
-		Assert.assertTrue(schedulingTemplate.getHostPinRequired());
+		assertTrue(schedulingTemplate.getHostPinRequired());
 		assertEquals(1L, schedulingTemplate.getHostPinRangeLow().longValue());
 		assertEquals(91L, schedulingTemplate.getHostPinRangeHigh().longValue());
-		Assert.assertFalse(schedulingTemplate.getGuestPinRequired());
+		assertFalse(schedulingTemplate.getGuestPinRequired());
 		assertEquals(100L, schedulingTemplate.getGuestPinRangeLow().longValue());
 		assertEquals(991L, schedulingTemplate.getGuestPinRangeHigh().longValue());
 		assertEquals(15, schedulingTemplate.getVMRAvailableBefore());
 		assertEquals(25, schedulingTemplate.getMaxParticipants());
-		Assert.assertTrue(schedulingTemplate.getEndMeetingOnEndTime());
+		assertTrue(schedulingTemplate.getEndMeetingOnEndTime());
 		assertEquals(1000L, schedulingTemplate.getUriNumberRangeLow().longValue());
 		assertEquals(9991L, schedulingTemplate.getUriNumberRangeHigh().longValue());
 		assertEquals("/api/admin/configuration/v1/ivr_theme/30/", schedulingTemplate.getIvrTheme());
-		Assert.assertTrue(schedulingTemplate.getIsPoolTemplate());
+		assertTrue(schedulingTemplate.getIsPoolTemplate());
 	}
 }

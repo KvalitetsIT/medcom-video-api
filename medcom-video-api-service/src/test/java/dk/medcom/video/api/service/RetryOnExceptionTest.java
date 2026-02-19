@@ -1,9 +1,9 @@
 package dk.medcom.video.api.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 
 public class RetryOnExceptionTest {
@@ -74,7 +74,7 @@ public class RetryOnExceptionTest {
     }
 
     @Test
-    public void testThrowsException() throws Exception {
+    public void testThrowsException() {
         var mock = Mockito.mock(TestInterface.class);
 
         var someOtherCustomException = new SomeOtherCustomException();
@@ -106,10 +106,6 @@ public class RetryOnExceptionTest {
     }
 
     public static class SomeOtherCustomException extends RuntimeException {
-        public SomeOtherCustomException(Throwable t) {
-            super(t);
-        }
-
         public SomeOtherCustomException() {
             // Empty
         }

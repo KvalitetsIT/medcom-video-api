@@ -10,8 +10,8 @@ import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class PoolServiceImplTest {
     private final String poolOrganisation = "POOL_ORG";
     private final String poolEmail = "POOL_EMAIL";
 
-    @Before
+    @BeforeEach
     public void setup() {
         schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
         meetingUserRepository = Mockito.mock(MeetingUserRepository.class);

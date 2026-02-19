@@ -1,0 +1,113 @@
+package dk.medcom.video.api.controller.v1;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
+import dk.medcom.video.api.service.SchedulingTemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import dk.medcom.video.api.aspect.APISecurityAnnotation;
+import dk.medcom.video.api.context.UserRole;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
+import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
+import dk.medcom.video.api.api.SchedulingTemplateDto;
+import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
+
+@RestController
+public class SchedulingTemplateController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingTemplateController.class);
+
+	@Autowired
+	private SchedulingTemplateService schedulingTemplateService;
+	
+	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.GET)
+	public CollectionModel <SchedulingTemplateDto> getSchedulingTemplates() throws PermissionDeniedException  {
+		LOGGER.debug("Entry of /scheduling-templates.get");
+		
+		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateService.getSchedulingTemplates();
+		List<SchedulingTemplateDto> schedulingTemplateDtos = new LinkedList<>();
+		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
+			SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
+			schedulingTemplateDtos.add(schedulingTemplateDto);
+		}
+		CollectionModel<SchedulingTemplateDto> resources = CollectionModel.of(schedulingTemplateDtos);
+		
+		Link selfRelLink = linkTo(methodOn(SchedulingTemplateController.class).getSchedulingTemplates()).withSelfRel();
+		resources.add(selfRelLink);
+
+		LOGGER.debug("Exit of /scheduling-templates.get resources: " + resources);
+		return resources;
+
+	}
+	
+	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.GET)
+	public EntityModel <SchedulingTemplateDto> getSchedulingTemplateById(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException {
+		LOGGER.debug("Entry of /scheduling-templates.get id: " + id);
+		
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(id); 
+		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
+		
+		LOGGER.debug("Exit of /scheduling-template.get resource: " + resource);
+		return resource;
+
+	}
+	
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.POST)
+	public EntityModel <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException, NotAcceptableException {
+		LOGGER.debug("Entry of /scheduling-template.post");
+		
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
+		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
+		
+		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
+		return resource;
+
+	}	
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.PUT)
+	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
+	
+		LOGGER.debug("Entry of /scheduling-template.put id: " + id);
+		
+		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(id, updateSchedulingTemplateDto);
+		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
+		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
+		
+		LOGGER.debug("Exit of /scheduling-template.put resource: " + resource);
+		return resource;
+
+	}
+	
+	@APISecurityAnnotation({UserRole.ADMIN})
+	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.DELETE)
+	public EntityModel <SchedulingTemplateDto> deleteSchedulingTemplate(@PathVariable("id") Long id) throws PermissionDeniedException, RessourceNotFoundException  {
+		LOGGER.debug("Entry of /schedulingTemplate.delete id: " + id);
+		
+		schedulingTemplateService.deleteSchedulingTemplate(id);
+
+		LOGGER.debug("Exit of /scheduling-template.delete");
+		return null;
+	}
+}

@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 function updateFile {
     local f="$1"
@@ -11,17 +11,17 @@ function updateFile {
 }
 
 echo "Add Dev version to list of versions"
-GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.tags"')
+GIT_BRANCH=$(cat /kit/runningVersion.json | jq -r '."git.commit.id.describe"')
 echo "[]" > /kit/env
 
-if (echo "$GIT_BRANCH" | grep -Eq ^v[0-9]*\\.[0-9]*\\.[0-9]*); then
+if (echo "$GIT_BRANCH" | grep -Eq ^v[0-9]*\\.[0-9]*\\.[0-9]*$); then
   echo "Release version"
 else
   echo "Is dev version"
 
-  url="${BASE_URL}/${GIT_BRANCH}.yaml"
+  url="${BASE_URL}/${GIT_BRANCH}-${DOC_VERSION}.yaml"
 
-  cat /kit/env | jq --arg u $url '. += [{"name": "Dev", "url": $u }]' > /kit/env.tmp
+  cat /kit/env | jq --arg u $url '. += [{"name": "Dev", "url": $u }] | sort_by(.name)' > /kit/env.tmp
   updateFile /kit/env
 fi
 
@@ -30,7 +30,11 @@ echo "Creating file with version and path"
    IFS=$'\n'
    for version in $(cat kit/versions)
    do
-     url="${BASE_URL}/${version}.yaml"
+     if (echo "$version" | grep -Eq '^v2\.'); then
+       url="${BASE_URL}/${version}-${DOC_VERSION}.yaml"
+     else
+       url="${BASE_URL}/${version}.yaml"
+     fi
 
      cat /kit/env | jq --arg n $version --arg u $url '. += [{"name": $n, "url": $u}]' > /kit/env.tmp
      updateFile /kit/env

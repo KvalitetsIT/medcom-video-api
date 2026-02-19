@@ -1,41 +1,29 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.InfoApi;
 import org.openapitools.client.api.VideoMeetingsApi;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.GenericContainer;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -43,14 +31,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	private VideoMeetingsApi videoMeetings;
 	private VideoSchedulingInformationApi schedulingInfoApi;
 	private InfoApi infoApi;
 
-	@Before
+	@BeforeEach
 	public void setupApiClient() {
 		var apiClient = new ApiClient()
 				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
@@ -64,58 +53,11 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	}
 
 	@Test
-	@Ignore //Can't GET /manage/info
-	public void verifyTestResults() throws InterruptedException, IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-		Thread.sleep(5000);
-		TemporaryFolder folder = new TemporaryFolder();
-		folder.create();
-
-		GenericContainer<?> newman = new GenericContainer<>("postman/newman_ubuntu1404:4.1.0")
-					.withNetwork(dockerNetwork)
-					.withVolumesFrom(resourceContainer, BindMode.READ_WRITE)
-					.withCommand("run /collections/medcom-video-api.postman_collection.json -r cli,junit --reporter-junit-export /testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml --global-var host=videoapi --global-var port=8081");
-
-		newman.start();
-		attachLogger(newman, newmanLogger);
-
-		long waitTime = 500;
-		long loopLimit = 60;
-
-		for(int i = 0; newman.isRunning() && i < loopLimit; i++) {
-			System.out.println(i);
-			System.out.println("Waiting....");
-			Thread.sleep(waitTime);
-		}
-
-		resourceContainer.copyFileFromContainer("/testresult/TEST-dk.medcom.video.api.test.IntegrationTest.xml", folder.getRoot().getCanonicalPath() + "/TEST-dk.medcom.video.api.test.IntegrationTest.xml");
-
-		FileInputStream input = new FileInputStream(folder.getRoot().getCanonicalPath() + "/TEST-dk.medcom.video.api.test.IntegrationTest.xml");
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Document xmlDocument = builder.parse(input);
-		XPath xPath = XPathFactory.newInstance().newXPath();
-		String failureExpression = "/testsuites/testsuite/@failures";
-		String errorExpression = "/testsuites/testsuite/@errrors";
-
-		int failures = ((Double) xPath.compile(failureExpression).evaluate(xmlDocument, XPathConstants.NUMBER)).intValue();
-		int errors = ((Double) xPath.compile(errorExpression).evaluate(xmlDocument, XPathConstants.NUMBER)).intValue();
-
-		if(errors != 0 || failures != 0) {
-			StringBuilder stringBuilder = new StringBuilder();
-			Files.readAllLines(Paths.get(folder.getRoot().getCanonicalPath() + "/TEST-dk.medcom.video.api.test.IntegrationTest.xml")).forEach(x -> stringBuilder.append(x).append(System.lineSeparator()));
-			System.out.println(stringBuilder);
-		}
-
-		assertEquals(0, failures);
-		assertEquals(0, errors);
-	}
-
-	@Test(expected = ForbiddenException.class)
 	public void testCanNotReadOtherOrganisation()  {
-		getClient().path("meetings")
+		assertThrows(ForbiddenException.class, () -> getClient().path("meetings")
 				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc1")
 				.request()
-				.get(String.class);
+				.get(String.class));
 	}
 
 	@Test
@@ -242,12 +184,12 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testCanCreateWithMicIsMuted() throws ApiException {
 		var createMeeting = createMeeting("another_external_id3");
-		createMeeting.setGuestMicrophone(CreateMeeting.GuestMicrophoneEnum.MUTED);
+		createMeeting.setGuestMicrophone(org.openapitools.client.model.GuestMicrophone.MUTED);
 
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, meeting.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, meeting.getGuestMicrophone());
 	}
 
 	@Test
@@ -257,7 +199,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var meeting = videoMeetings.meetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
-		assertNull(meeting.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.ON, meeting.getGuestMicrophone());
 	}
 
 	@Test
@@ -426,7 +368,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
 		assertNotEquals(request.getEndTime(), getResponse.getEndTime());
-		assertEquals(Meeting.GuestMicrophoneEnum.MUTED, getResponse.getGuestMicrophone());
+		assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, getResponse.getGuestMicrophone());
 		assertEquals(true, getResponse.getGuestPinRequired());
 		assertEquals(2, getResponse.getAdditionalInformation().size());
 		assertTrue(getResponse.getAdditionalInformation().containsAll(request.getAdditionalInformation()));
@@ -512,6 +454,53 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 			assertTrue(result.next());
 		}
 	}
+
+    @Test
+    void testTimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "subject": "Test timestamp format.",
+                  "startTime": "2225-11-02T15:00:00+02:00",
+                  "endTime": "2225-11-02T15:00:00+02:00"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("meetings")
+                    .request()
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+
+        assertTrue(postResult.contains("\"startTime\":\"2225-11-02T13:00:00 +0000\""));
+        assertTrue(postResult.contains("\"endTime\":\"2225-11-02T13:00:00 +0000\""));
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "subject": "Test timestamp format.",
+                  "startTime": "2025-10-02T15:00:00 +02:00",
+                  "endTime": "2025-10-02T17:00:00 +02:00"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("meetings")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+
+        assertTrue(putResult.contains("\"startTime\":\"2025-10-02T13:00:00 +0000\""));
+        assertTrue(putResult.contains("\"endTime\":\"2025-10-02T15:00:00 +0000\""));
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+    }
 
 	private Date createDate(Calendar calendar, int hoursToAdd) {
 		Calendar cal = (Calendar) calendar.clone();

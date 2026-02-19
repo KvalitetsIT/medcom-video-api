@@ -1,12 +1,11 @@
 package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.service.IdGeneratorImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IdGeneratorImplTest {
     @Test
@@ -17,7 +16,7 @@ public class IdGeneratorImplTest {
         var result = generator.generateId(input);
 
         assertNotNull(result);
-        assertEquals(result, 12, result.length());
+        assertEquals(12, result.length(), result);
     }
 
     @Test

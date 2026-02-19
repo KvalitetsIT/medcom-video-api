@@ -8,13 +8,13 @@ import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingLabelsRepositoryTest extends RepositoryTest {
     @Resource
@@ -32,12 +32,13 @@ public class MeetingLabelsRepositoryTest extends RepositoryTest {
     @Test
     public void tesFindAllLabels() {
         Meeting meeting = meetingRepository.findById(7L).orElse(null);
+        assertNotNull(meeting);
 
         List<MeetingLabel> meetingLabels = meetingLabelRepository.findByMeeting(meeting);
 
         assertEquals(2, meetingLabels.size());
 
-        MeetingLabel firstMeetingLabel = meetingLabels.get(0);
+        MeetingLabel firstMeetingLabel = meetingLabels.getFirst();
         assertEquals("first label", firstMeetingLabel.getLabel());
         assertEquals(meeting.getId(), firstMeetingLabel.getMeeting().getId());
 

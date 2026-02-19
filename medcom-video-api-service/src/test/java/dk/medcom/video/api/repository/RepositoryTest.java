@@ -3,20 +3,20 @@ package dk.medcom.video.api.repository;
 import jakarta.transaction.Transactional;
 
 
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
-import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.mariadb.MariaDBContainer;
 
 import java.util.TimeZone;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @PropertySource("test.properties")
 @ContextConfiguration(
   classes = { TestConfiguration.class, DatabaseConfiguration.class }, 
@@ -30,10 +30,10 @@ abstract public class RepositoryTest {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 
-	@BeforeClass
+	@BeforeAll
 	public static void setupMariaDbJdbcUrl() {
 		if(!initialized) {
-			MariaDBContainer<?> mariadb = new MariaDBContainer<>("mariadb:10.6")
+			MariaDBContainer mariadb = new MariaDBContainer("mariadb:10.6")
 					.withDatabaseName("videodb")
 					.withUsername("videouser")
 					.withPassword("secret1234");

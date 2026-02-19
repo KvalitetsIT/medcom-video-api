@@ -1,5 +1,6 @@
 package dk.medcom.video.api.api;
 
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 

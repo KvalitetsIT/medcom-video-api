@@ -4,12 +4,11 @@ import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.annotation.Resource;
 
-//import dk.medcom.video.api.context.UserContext;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingUserRepositoryTest extends RepositoryTest{
 	
@@ -36,10 +35,10 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		meetingUser = subject.save(meetingUser);
 		
 		// Then
-		Assert.assertNotNull(meetingUser);
-		Assert.assertNotNull(meetingUser.getId());
-		Assert.assertEquals(email,  meetingUser.getEmail());
-		Assert.assertEquals(organisation,  meetingUser.getOrganisation());
+		assertNotNull(meetingUser);
+		assertNotNull(meetingUser.getId());
+		assertEquals(email,  meetingUser.getEmail());
+		assertEquals(organisation,  meetingUser.getOrganisation());
 	}
 	
 	@Test
@@ -51,10 +50,10 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		MeetingUser meetingUser = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(id, meetingUser.getId());
-		Assert.assertEquals("test-org", meetingUser.getOrganisation().getOrganisationId());
-		Assert.assertEquals("me@me101.dk", meetingUser.getEmail());
+		assertNotNull(meetingUser);
+		assertEquals(id, meetingUser.getId());
+		assertEquals("test-org", meetingUser.getOrganisation().getOrganisationId());
+		assertEquals("me@me101.dk", meetingUser.getEmail());
 
 	}
 
@@ -67,7 +66,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		MeetingUser meetingUser = subject.findById(id).orElse(null);
 		
 		// Then
-		Assert.assertNull(meetingUser);
+		assertNull(meetingUser);
 	}
 
 	@Test
@@ -83,10 +82,11 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, existingEmail);
 		
 		// Then
-		Assert.assertNotNull(meetingUser);
-		Assert.assertEquals(102L, meetingUser.getId(), 0);
-		Assert.assertEquals(organisation.getName(), meetingUser.getOrganisation().getName());
-		Assert.assertEquals(existingEmail, meetingUser.getEmail());
+		assertNotNull(meetingUser);
+		assertEquals(102L, meetingUser.getId(), 0);
+        assertNotNull(organisation);
+        assertEquals(organisation.getName(), meetingUser.getOrganisation().getName());
+		assertEquals(existingEmail, meetingUser.getEmail());
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class MeetingUserRepositoryTest extends RepositoryTest{
 		MeetingUser meetingUser = subject.findOneByOrganisationAndEmail(organisation, nonExistingEmail);
 		
 		// Then
-		Assert.assertNull(meetingUser);
+		assertNull(meetingUser);
 	}
 
 

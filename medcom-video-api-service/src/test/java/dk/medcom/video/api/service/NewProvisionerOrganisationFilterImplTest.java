@@ -1,18 +1,18 @@
 package dk.medcom.video.api.service;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NewProvisionerOrganisationFilterImplTest {
     private NewProvisionerOrganisationFilterImpl organisationFilter;
     private ArrayList<String> organisations;
 
-    @Before
+    @BeforeEach
     public void setup() {
         organisations = new ArrayList<>();
         organisationFilter = new NewProvisionerOrganisationFilterImpl(organisations);

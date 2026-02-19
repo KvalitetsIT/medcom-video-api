@@ -1,9 +1,10 @@
 package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dk.medcom.video.api.controller.MeetingSearchController;
+import dk.medcom.video.api.controller.v1.MeetingSearchController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.MeetingUser;
