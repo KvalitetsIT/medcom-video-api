@@ -10,10 +10,15 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
-import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.api.VideoSchedulingInformationV2Api;
+import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.model.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -26,81 +31,139 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2Api;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoHeader;
-    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiInvalidJwt;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNoRoleAtt;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotAdmin;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiNotProvisionUser;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiExpiredJwt;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiInvalidIssuerJwt;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiTamperedJwt;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiMissingSignatureJwt;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiDifferentSignedJwt;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
     private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
     VideoSchedulingInformationIT() {
+        var keycloakUrl = getKeycloakUrl();
+
+        videoSchedulingInformationV2Api = createClient(allRoleAttToken);
+        videoSchedulingInformationV2ApiNoHeader = createClient(null);
+        videoSchedulingInformationV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(keycloakUrl));
+        videoSchedulingInformationV2ApiNotAdmin = createClient(HeaderBuilder.getJwtNotAdmin(keycloakUrl));
+        videoSchedulingInformationV2ApiNotProvisionUser = createClient(HeaderBuilder.getJwtNotProvisionUser(keycloakUrl));
+        videoSchedulingInformationV2ApiExpiredJwt = createClient(HeaderBuilder.getExpiredJwt(keycloakUrl));
+        videoSchedulingInformationV2ApiInvalidIssuerJwt = createClient(HeaderBuilder.getInvalidIssuerJwt());
+        videoSchedulingInformationV2ApiTamperedJwt = createClient(HeaderBuilder.getTamperedJwt(keycloakUrl));
+        videoSchedulingInformationV2ApiMissingSignatureJwt = createClient(HeaderBuilder.getMissingSignatureJwt(keycloakUrl));
+        videoSchedulingInformationV2ApiDifferentSignedJwt = createClient(HeaderBuilder.getDifferentSignedJwt(keycloakUrl));
+
         var apiClient = new ApiClient();
         apiClient.setBasePath(getApiBasePath());
         apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
-
-        videoSchedulingInformationV2Api = new VideoSchedulingInformationV2Api(apiClient);
         videoMeetingsV2Api = new VideoMeetingsV2Api(apiClient);
+    }
 
-        var apiClientNoHeader = new ApiClient();
-        apiClientNoHeader.setBasePath(getApiBasePath());
-        videoSchedulingInformationV2ApiNoHeader = new VideoSchedulingInformationV2Api(apiClientNoHeader);
-
-        var apiClientInvalidJwt = new ApiClient();
-        apiClientInvalidJwt.setBasePath(getApiBasePath());
-        apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
-        videoSchedulingInformationV2ApiInvalidJwt = new VideoSchedulingInformationV2Api(apiClientInvalidJwt);
-
-        var apiClientNoRoleAtt = new ApiClient();
-        apiClientNoRoleAtt.setBasePath(getApiBasePath());
-        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
-        videoSchedulingInformationV2ApiNoRoleAtt = new VideoSchedulingInformationV2Api(apiClientNoRoleAtt);
-
-        var apiClientNotAdmin = new ApiClient();
-        apiClientNotAdmin.setBasePath(getApiBasePath());
-        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdmin(getKeycloakUrl()));
-        videoSchedulingInformationV2ApiNotAdmin = new VideoSchedulingInformationV2Api(apiClientNotAdmin);
-
-        var apiClientNotProvisionUser = new ApiClient();
-        apiClientNotProvisionUser.setBasePath(getApiBasePath());
-        apiClientNotProvisionUser.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotProvisionUser(getKeycloakUrl()));
-        videoSchedulingInformationV2ApiNotProvisionUser = new VideoSchedulingInformationV2Api(apiClientNotProvisionUser);
+    private VideoSchedulingInformationV2Api createClient(String token) {
+        var apiClient = new ApiClient();
+        apiClient.setBasePath(getApiBasePath());
+        if (token != null) {
+            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
+        }
+        return new VideoSchedulingInformationV2Api(apiClient);
     }
 
     //---------- JWT errors --------
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoDeprovisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoDeprovisionGet);
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoDeprovisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiInvalidJwt::v2SchedulingInfoDeprovisionGet);
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoDeprovisionGet);
     }
 
     @Test
     void errorIfNotProvisionUser_v2SchedulingInfoDeprovisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoDeprovisionGet);
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoDeprovisionGet);
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoDeprovisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiExpiredJwt::v2SchedulingInfoDeprovisionGet);
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoDeprovisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiInvalidIssuerJwt::v2SchedulingInfoDeprovisionGet);
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoDeprovisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiTamperedJwt::v2SchedulingInfoDeprovisionGet);
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoDeprovisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiMissingSignatureJwt::v2SchedulingInfoDeprovisionGet);
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoDeprovisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiDifferentSignedJwt::v2SchedulingInfoDeprovisionGet);
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingInfoGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(OffsetDateTime.now(), OffsetDateTime.now(), ProvisionStatus.AWAITS_PROVISION));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoGet(
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                ProvisionStatus.AWAITS_PROVISION
+        ));
     }
 
     @Test
@@ -108,17 +171,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoPost(input));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoPost() {
-        var input = new CreateSchedulingInfo()
-                .organizationId("user-org-pool")
-                .schedulingTemplateId(201L);
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoPost(input));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoPost(input));
     }
 
     @Test
@@ -126,89 +179,250 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         var input = new CreateSchedulingInfo()
                 .organizationId("user-org-pool")
                 .schedulingTemplateId(201L);
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotProvisionUser.v2SchedulingInfoPost(input));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNotProvisionUser.v2SchedulingInfoPost(input));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoPost() {
+        var input = new CreateSchedulingInfo()
+                .organizationId("user-org-pool")
+                .schedulingTemplateId(201L);
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoPost(input));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoPost() {
+        var input = new CreateSchedulingInfo()
+                .organizationId("user-org-pool")
+                .schedulingTemplateId(201L);
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoPost(input));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoPost() {
+        var input = new CreateSchedulingInfo()
+                .organizationId("user-org-pool")
+                .schedulingTemplateId(201L);
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoPost(input));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoPost() {
+        var input = new CreateSchedulingInfo()
+                .organizationId("user-org-pool")
+                .schedulingTemplateId(201L);
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoPost(input));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoPost() {
+        var input = new CreateSchedulingInfo()
+                .organizationId("user-org-pool")
+                .schedulingTemplateId(201L);
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoPost(input));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoProvisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoProvisionGet);
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoProvisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiInvalidJwt::v2SchedulingInfoProvisionGet);
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, videoSchedulingInformationV2ApiNoHeader::v2SchedulingInfoProvisionGet);
     }
 
     @Test
     void errorIfNotProvisionUser_v2SchedulingInfoProvisionGet() {
-        var expectedException = assertThrows(ApiException.class, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoProvisionGet);
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, videoSchedulingInformationV2ApiNotProvisionUser::v2SchedulingInfoProvisionGet);
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoProvisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiExpiredJwt::v2SchedulingInfoProvisionGet);
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoProvisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiInvalidIssuerJwt::v2SchedulingInfoProvisionGet);
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoProvisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiTamperedJwt::v2SchedulingInfoProvisionGet);
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoProvisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiMissingSignatureJwt::v2SchedulingInfoProvisionGet);
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoProvisionGet() {
+        assertStatus(401, videoSchedulingInformationV2ApiDifferentSignedJwt::v2SchedulingInfoProvisionGet);
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoReserveGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveGet(
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
                 true, false, true, false, true
         ));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoReserveGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoReserveGet(
-                VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
-                true, false, true, false, true
-        ));
-        assertEquals(401, expectedException.getCode());
     }
 
     @Test
     void errorIfNotAdmin_v2SchedulingInfoReserveGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveGet(
-                VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
-                true, false, true, false, true
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
         ));
-        assertEquals(403, expectedException.getCode());
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoReserveGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
+        ));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoReserveGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
+        ));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoReserveGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
+        ));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoReserveGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
+        ));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoReserveGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoReserveGet(
+                VmrType.LECTURE,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                ViewType.ONE_MAIN_SEVEN_PIPS,
+                VmrQuality.SD,
+                true,
+                false,
+                true,
+                false,
+                true
+        ));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoReserveUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoReserveUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
     }
 
     @Test
     void errorIfNotAdmin_v2SchedulingInfoReserveUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNotAdmin.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoReserveUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoReserveUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoReserveUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoReserveUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoReserveUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoReserveUuidGet(UUID.randomUUID()));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingInfoUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingInfoUuidGet() {
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoUuidGet() {
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
     }
 
     @Test
@@ -217,18 +431,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 .provisionStatus(ProvisionStatus.DEPROVISION_OK)
                 .provisionStatusDescription(randomString())
                 .provisionVmrId(randomString());
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingInfoUuidPut() {
-        var input = new UpdateSchedulingInfo()
-                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
-                .provisionStatusDescription(randomString())
-                .provisionVmrId(randomString());
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiInvalidJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
     }
 
     @Test
@@ -237,8 +440,52 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 .provisionStatus(ProvisionStatus.DEPROVISION_OK)
                 .provisionStatusDescription(randomString())
                 .provisionVmrId(randomString());
-        var expectedException = assertThrows(ApiException.class, () -> videoSchedulingInformationV2ApiNotProvisionUser.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNotProvisionUser.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingInfoUuidPut() {
+        var input = new UpdateSchedulingInfo()
+                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
+                .provisionStatusDescription(randomString())
+                .provisionVmrId(randomString());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiExpiredJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingInfoUuidPut() {
+        var input = new UpdateSchedulingInfo()
+                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
+                .provisionStatusDescription(randomString())
+                .provisionVmrId(randomString());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiInvalidIssuerJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingInfoUuidPut() {
+        var input = new UpdateSchedulingInfo()
+                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
+                .provisionStatusDescription(randomString())
+                .provisionVmrId(randomString());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiTamperedJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingInfoUuidPut() {
+        var input = new UpdateSchedulingInfo()
+                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
+                .provisionStatusDescription(randomString())
+                .provisionVmrId(randomString());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiMissingSignatureJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingInfoUuidPut() {
+        var input = new UpdateSchedulingInfo()
+                .provisionStatus(ProvisionStatus.DEPROVISION_OK)
+                .provisionStatusDescription(randomString())
+                .provisionVmrId(randomString());
+        assertStatus(401, () -> videoSchedulingInformationV2ApiDifferentSignedJwt.v2SchedulingInfoUuidPut(schedulingInfo405Uuid(), input));
     }
 
 // ---------- No JWT errors --------
@@ -387,8 +634,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     @Test
     void testV2SchedulingInfoReserveGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
-                null,null,null,null,
-                null,null,null,null,null);
+                null, null, null, null,
+                null, null, null, null, null);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
 
@@ -409,8 +656,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     @Test
     void testV2SchedulingInfoReserveGetThenV2SchedulingInfoReserveUuidGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
-                VmrType.LECTURE,null,null, VmrQuality.FULLHD,
-                null,null,null,null,null);
+                VmrType.LECTURE, null, null, VmrQuality.FULLHD,
+                null, null, null, null, null);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
 
@@ -450,7 +697,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     @Test
     void testUseReservedSchedulingInfo() throws ApiException {
-        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGet(null, null, null, null, null, null, null, null, null);
         assertNotNull(schedulingInfo);
         var reservationId = schedulingInfo.getReservationId();
 
@@ -536,7 +783,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 }""";
 
         String postResult;
-        try(var client = ClientBuilder.newClient()) {
+        try (var client = ClientBuilder.newClient()) {
             postResult = client.target(UriBuilder.fromPath(getApiBasePath()))
                     .path("v2")
                     .path("scheduling-info")
@@ -554,7 +801,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 }""";
 
         String putResult;
-        try(var client = ClientBuilder.newClient()) {
+        try (var client = ClientBuilder.newClient()) {
             putResult = client.target(UriBuilder.fromPath(getApiBasePath()))
                     .path("v2")
                     .path("scheduling-info")
@@ -567,6 +814,239 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertThat(putResultJson.getString("provisionTimestamp")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
         assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
         assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+    }
+
+    //----------- CORS tests -----------
+    @Test
+    void testV2SchedulingInfoGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoPostCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("POST"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoPostCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidPutCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("PUT"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidPutCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoUuidGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info/" + schedulingInfo405Uuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoProvisionGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-provision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoProvisionGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-provision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoDeprovisionGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-deprovision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoDeprovisionGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-deprovision", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveUuidGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve/" + schedulingInfo413ReservationUuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingInfoReserveUuidGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-info-reserve/" + schedulingInfo413ReservationUuid(), getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
     }
 
     // ----------- test data help -----------
@@ -585,5 +1065,4 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     private String randomString() {
         return UUID.randomUUID().toString();
     }
-
 }

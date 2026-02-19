@@ -13,6 +13,11 @@ import org.openapitools.client.ApiException;
 import org.openapitools.client.api.SchedulingTemplateAdministrationV2Api;
 import org.openapitools.client.model.*;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Random;
 import java.util.UUID;
 
@@ -23,128 +28,213 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
 
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2Api;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoHeader;
-    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidJwt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNoRoleAtt;
     private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiNotAdmin;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiExpiredJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiInvalidIssuerJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiTamperedJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiMissingSignatureJwt;
+    private final SchedulingTemplateAdministrationV2Api schedulingTemplateAdministrationV2ApiDifferentSignedJwt;
+
     private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
-
     SchedulingTemplateAdministrationIT() {
+        var keycloakUrl = getKeycloakUrl();
+
+        schedulingTemplateAdministrationV2Api = createClient(allRoleAttToken);
+        schedulingTemplateAdministrationV2ApiNoHeader = createClient(null);
+        schedulingTemplateAdministrationV2ApiNoRoleAtt = createClient(HeaderBuilder.getJwtNoRoleAtt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiNotAdmin = createClient(HeaderBuilder.getJwtNotAdmin(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiExpiredJwt = createClient(HeaderBuilder.getExpiredJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiInvalidIssuerJwt = createClient(HeaderBuilder.getInvalidIssuerJwt());
+        schedulingTemplateAdministrationV2ApiTamperedJwt = createClient(HeaderBuilder.getTamperedJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiMissingSignatureJwt = createClient(HeaderBuilder.getMissingSignatureJwt(keycloakUrl));
+        schedulingTemplateAdministrationV2ApiDifferentSignedJwt = createClient(HeaderBuilder.getDifferentSignedJwt(keycloakUrl));
+    }
+
+    private SchedulingTemplateAdministrationV2Api createClient(String token) {
         var apiClient = new ApiClient();
-        apiClient.addDefaultHeader("Authorization", "Bearer " + allRoleAttToken);
         apiClient.setBasePath(getApiBasePath());
-
-        schedulingTemplateAdministrationV2Api = new SchedulingTemplateAdministrationV2Api(apiClient);
-
-        var apiClientNoHeader = new ApiClient();
-        apiClientNoHeader.setBasePath(getApiBasePath());
-        schedulingTemplateAdministrationV2ApiNoHeader = new SchedulingTemplateAdministrationV2Api(apiClientNoHeader);
-
-        var apiClientInvalidJwt = new ApiClient();
-        apiClientInvalidJwt.setBasePath(getApiBasePath());
-        apiClientInvalidJwt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getInvalidJwt());
-        schedulingTemplateAdministrationV2ApiInvalidJwt = new SchedulingTemplateAdministrationV2Api(apiClientInvalidJwt);
-
-        var apiClientNoRoleAtt = new ApiClient();
-        apiClientNoRoleAtt.setBasePath(getApiBasePath());
-        apiClientNoRoleAtt.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNoRoleAtt(getKeycloakUrl()));
-        schedulingTemplateAdministrationV2ApiNoRoleAtt = new SchedulingTemplateAdministrationV2Api(apiClientNoRoleAtt);
-
-        var apiClientNotAdmin = new ApiClient();
-        apiClientNotAdmin.setBasePath(getApiBasePath());
-        apiClientNotAdmin.addDefaultHeader("Authorization", "Bearer " + HeaderBuilder.getJwtNotAdmin(getKeycloakUrl()));
-        schedulingTemplateAdministrationV2ApiNotAdmin = new SchedulingTemplateAdministrationV2Api(apiClientNotAdmin);
+        if (token != null) {
+            apiClient.addDefaultHeader("Authorization", "Bearer " + token);
+        }
+        return new SchedulingTemplateAdministrationV2Api(apiClient);
     }
 
     // ----------- JWT error ----------
     @Test
     void errorIfNoJwtToken_v2SchedulingTemplatesGet() {
-        var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoHeader::v2SchedulingTemplatesGet);
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesGet() {
-        var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiInvalidJwt::v2SchedulingTemplatesGet);
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, schedulingTemplateAdministrationV2ApiNoHeader::v2SchedulingTemplatesGet);
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
-        var expectedException = assertThrows(ApiException.class, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiExpiredJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiInvalidIssuerJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiTamperedJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiMissingSignatureJwt::v2SchedulingTemplatesGet);
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesGet() {
+        assertStatus(401, schedulingTemplateAdministrationV2ApiDifferentSignedJwt::v2SchedulingTemplatesGet);
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingTemplatesIdDelete() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdDelete(201L));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdDelete() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdDelete(201L));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdDelete(201L));
     }
 
     @Test
     void errorIfNotAdmin_v2SchedulingTemplatesIdDelete() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdDelete(201L));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdDelete(201L));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdDelete() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdDelete(201L));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingTemplatesIdGet() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdGet(201L));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdGet() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdGet(201L));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdGet(201L));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdGet(201L));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdGet() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdGet(201L));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingTemplatesIdPut() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesIdPut() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
     }
 
     @Test
     void errorIfNotAdmin_v2SchedulingTemplatesIdPut() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesIdPut() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesIdPut(201L, randomSchedulingTemplateRequest()));
     }
 
     @Test
     void errorIfNoJwtToken_v2SchedulingTemplatesPost() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
-        assertEquals(401, expectedException.getCode());
-    }
-
-    @Test
-    void errorIfInvalidJwtToken_v2SchedulingTemplatesPost() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiInvalidJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
-        assertEquals(401, expectedException.getCode());
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoHeader.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
     }
 
     @Test
     void errorIfNotAdmin_v2SchedulingTemplatesPost() {
-        var expectedException = assertThrows(ApiException.class, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
-        assertEquals(403, expectedException.getCode());
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNotAdmin.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiExpiredJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiInvalidIssuerJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiTamperedJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiMissingSignatureJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_v2SchedulingTemplatesPost() {
+        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiDifferentSignedJwt.v2SchedulingTemplatesPost(randomSchedulingTemplateRequest()));
     }
 
 
@@ -465,6 +555,152 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         var putResultJson = new JSONObject(putResult);
         assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
         assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\+01:00|\\+02:00|Z)$");
+    }
+
+    //----------- CORS tests -----------
+    @Test
+    void testV2SchedulingTemplatesGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesPostCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("POST"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesPostCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "POST")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdGetCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("GET"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdGetCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "GET")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdPutCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("PUT"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdPutCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "PUT")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdDeleteCorsAllowed() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://allowed:4100")
+                .header("Access-Control-Request-Method", "DELETE")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var headers = response.headers().map();
+        assertTrue(headers.get("Access-Control-Allow-Methods").contains("DELETE"));
+        assertTrue(headers.get("Access-Control-Allow-Origin").contains("http://allowed:4100"));
+        assertEquals(200, response.statusCode());
+    }
+
+    @Test
+    void testV2SchedulingTemplatesIdDeleteCorsDenied() throws IOException, InterruptedException {
+        var request = HttpRequest.newBuilder(URI.create(String.format("%s/v2/scheduling-templates/1", getApiBasePath())))
+                .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
+                .header("Origin", "http://denied:4200")
+                .header("Access-Control-Request-Method", "DELETE")
+                .build();
+
+        var client = HttpClient.newBuilder().build();
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(403, response.statusCode());
     }
 
     // ---------- helper methods ---------
