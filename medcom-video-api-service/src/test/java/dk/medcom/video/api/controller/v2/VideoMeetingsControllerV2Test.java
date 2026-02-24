@@ -9,10 +9,14 @@ import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.model.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -31,6 +35,10 @@ public class VideoMeetingsControllerV2Test {
         meetingService = Mockito.mock(MeetingServiceV2.class);
 
         videoMeetingsControllerV2 = new VideoMeetingsControllerV2(meetingService);
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
     }
     
     private void verifyNoMoreInteractions() {

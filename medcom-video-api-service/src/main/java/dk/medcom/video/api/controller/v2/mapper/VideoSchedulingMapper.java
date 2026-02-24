@@ -3,11 +3,9 @@ package dk.medcom.video.api.controller.v2.mapper;
 import dk.medcom.video.api.controller.v2.VideoSchedulingInformationControllerV2;
 import dk.medcom.video.api.service.model.*;
 import org.openapitools.model.*;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class VideoSchedulingMapper {
 
@@ -16,7 +14,8 @@ public class VideoSchedulingMapper {
     }
 
     public static SchedulingInfo internalToExternal(SchedulingInfoModel input) {
-        var selfLink = new SchedulingInfoLinksSelf().href(linkTo(methodOn(VideoSchedulingInformationControllerV2.class).v2SchedulingInfoUuidGet(input.uuid())).withRel("self").toUri());
+        var selfLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(VideoSchedulingInformationControllerV2.class).v2SchedulingInfoUuidGet(input.uuid())).scheme("https").build().toUri();
+        var schedulingInfoLinksSelf = new SchedulingInfoLinksSelf().href(selfLink);
 
         return new SchedulingInfo()
                 .reservationId(input.reservationId())
@@ -54,7 +53,7 @@ public class VideoSchedulingMapper {
                 .customPortalGuest(input.customPortalGuest())
                 .customPortalHost(input.customPortalHost())
                 .returnUrl(input.returnUrl())
-                .links(new SchedulingInfoLinks().self(selfLink));
+                .links(new SchedulingInfoLinks().self(schedulingInfoLinksSelf));
     }
 
     public static CreateSchedulingInfoModel externalToInternal(CreateSchedulingInfo input) {

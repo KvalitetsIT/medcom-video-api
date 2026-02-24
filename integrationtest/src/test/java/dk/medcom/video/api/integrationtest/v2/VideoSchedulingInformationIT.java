@@ -714,8 +714,9 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(result.getUuid());
         assertNotNull(schedulingInfo);
         assertEquals(reservationId, schedulingInfo.getReservationId());
-    }
 
+        testMeetingLinks(result.getUuid(), result.getLinks());
+    }
 
     @Test
     void testV2SchedulingInfoUuidGet() throws ApiException {
@@ -1064,5 +1065,42 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     private String randomString() {
         return UUID.randomUUID().toString();
+    }
+
+    private void testMeetingLinks(UUID meetingUuid, MeetingLinks links) {
+        assertNotNull(links);
+        assertNotNull(links.getSelf());
+        assertNotNull(links.getSelf().getHref());
+        var meetingLink = links.getSelf().getHref().toString().replace("https", "http");
+
+        var requestMeeting = HttpRequest.newBuilder(URI.create(meetingLink))
+                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
+                .build();
+
+        String schedulingInfoUuid;
+        HttpResponse<String> responseSchedulingInfo;
+        try (var client = HttpClient.newBuilder().build()) {
+            var responseMeeting = client.send(requestMeeting, HttpResponse.BodyHandlers.ofString());
+            assertNotNull(responseMeeting);
+            assertEquals(200, responseMeeting.statusCode());
+            assertNotNull(responseMeeting.body());
+            assertTrue(responseMeeting.body().contains("\"uuid\":\"%s\"".formatted(meetingUuid)));
+
+            assertNotNull(links.getSchedulingInfo());
+            assertNotNull(links.getSchedulingInfo().getHref());
+            var schedulingInfoLink = links.getSchedulingInfo().getHref().toString().replace("https", "http");
+            schedulingInfoUuid = schedulingInfoLink.replace(getApiBasePath() + "/v2/scheduling-info/", "");
+            var requestSchedulingInfo = HttpRequest.newBuilder(URI.create(schedulingInfoLink))
+                    .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
+                    .build();
+
+            responseSchedulingInfo = client.send(requestSchedulingInfo, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertNotNull(responseSchedulingInfo);
+        assertEquals(200, responseSchedulingInfo.statusCode());
+        assertNotNull(responseSchedulingInfo.body());
+        assertTrue(responseSchedulingInfo.body().matches("\\{\"uuid\":\"" + schedulingInfoUuid + "\".*\"meetingDetails\":.*\"uuid\":\"" + meetingUuid + "\".*}"));
     }
 }
