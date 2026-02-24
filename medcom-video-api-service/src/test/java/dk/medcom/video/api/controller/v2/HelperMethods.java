@@ -321,7 +321,10 @@ public class HelperMethods {
         assertEquals(expected.guestPinRequired(), actual.getGuestPinRequired());
         assertLabels(expected.labels(), actual.getLabels());
         assertNotNull(actual.getLinks());
+        assertNotNull(actual.getLinks().getSelf());
         assertTrue(actual.getLinks().getSelf().getHref().toString().contains(actual.getUuid().toString()));
+        assertNotNull(actual.getLinks().getSchedulingInfo());
+        assertTrue(actual.getLinks().getSchedulingInfo().getHref().toString().contains(actual.getUuid().toString()));
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
     }
 
