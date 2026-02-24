@@ -296,6 +296,7 @@ public class HelperMethods {
         assertMeeting(expected.meetingDetails(), actual.getMeetingDetails());
         assertNotNull(actual.getLinks());
         assertTrue(actual.getLinks().getSelf().getHref().toString().contains(actual.getUuid().toString()));
+        assertEquals("https", actual.getLinks().getSelf().getHref().getScheme());
         assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
         assertEquals(expected.shortLink(), actual.getShortLink());
         assertEquals(expected.shortlink(), actual.getShortlink());
@@ -323,8 +324,10 @@ public class HelperMethods {
         assertNotNull(actual.getLinks());
         assertNotNull(actual.getLinks().getSelf());
         assertTrue(actual.getLinks().getSelf().getHref().toString().contains(actual.getUuid().toString()));
+        assertEquals("https", actual.getLinks().getSelf().getHref().getScheme());
         assertNotNull(actual.getLinks().getSchedulingInfo());
         assertTrue(actual.getLinks().getSchedulingInfo().getHref().toString().contains(actual.getUuid().toString()));
+        assertEquals("https", actual.getLinks().getSchedulingInfo().getHref().getScheme());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
     }
 
@@ -367,6 +370,7 @@ public class HelperMethods {
         assertEquals(expected.updatedTime(), actual.getUpdatedTime());
         assertNotNull(actual.getLinks());
         assertTrue(actual.getLinks().getSelf().getHref().toString().contains(actual.getId().toString()));
+        assertEquals("https", actual.getLinks().getSelf().getHref().getScheme());
     }
 
     public static void assertPoolInfo(PoolInfoModel expected, PoolInfo actual) {
