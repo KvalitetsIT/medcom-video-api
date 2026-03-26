@@ -1,13 +1,13 @@
 package dk.medcom.video.api.repository;
 
 
-import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 
-import jakarta.annotation.Resource;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -280,6 +280,53 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
             numberOfSchedulingInfo++;
         }
         assertEquals(1, numberOfSchedulingInfo);
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputThatMatchesSchedulingInfo_ReturnsSchedulingInfo() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        String organisation = "test-org";
+        Set<String> organisations = Set.of(organisation, "non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(1, schedulingInfos.size());
+        assertEquals(organisation, schedulingInfos.getFirst().getOrganisation().getOrganisationId());
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputOrgIdThatDoesNotMatchSchedulingInfo_ReturnsEmptyList() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        Set<String> organisations = Set.of("non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(0, schedulingInfos.size());
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithEmptyInputOrgIds_ReturnsEmptyList() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        Set<String> organisations = Set.of();
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(0, schedulingInfos.size());
     }
 
     @Test
