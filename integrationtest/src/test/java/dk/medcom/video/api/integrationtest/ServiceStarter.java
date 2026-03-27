@@ -224,6 +224,7 @@ public class ServiceStarter {
 
         var mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
 

@@ -27,6 +27,10 @@ public class HeaderBuilder {
         return buildJwt(keycloakUrl, 100, "user-org-pool", "eva@klak.dk", List.of("meeting-provisioner"));
     }
 
+    public static String getJwtOnlyAdmin(String keycloakUrl) {
+        return buildJwt(keycloakUrl, 100, "user-org-pool", "eva@klak.dk", List.of("meeting-admin"));
+    }
+
     public static String getJwtNotProvisionUser(String keycloakUrl) {
         return buildJwt(keycloakUrl, 100, "user-org-pool", "eva@klak.dk", List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-planner"));
     }

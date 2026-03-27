@@ -10,8 +10,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
-import org.openapitools.client.api.VideoSchedulingInformationV2Api;
 import org.openapitools.client.api.VideoMeetingsV2Api;
+import org.openapitools.client.api.VideoSchedulingInformationV2Api;
 import org.openapitools.client.model.*;
 
 import java.io.IOException;
@@ -39,6 +39,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiTamperedJwt;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiMissingSignatureJwt;
     private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiDifferentSignedJwt;
+    private final VideoSchedulingInformationV2Api videoSchedulingInformationV2ApiOnlyAdmin;
     private final VideoMeetingsV2Api videoMeetingsV2Api;
     private final String allRoleAttToken = HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl());
 
@@ -55,6 +56,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         videoSchedulingInformationV2ApiTamperedJwt = createClient(HeaderBuilder.getTamperedJwt(keycloakUrl));
         videoSchedulingInformationV2ApiMissingSignatureJwt = createClient(HeaderBuilder.getMissingSignatureJwt(keycloakUrl));
         videoSchedulingInformationV2ApiDifferentSignedJwt = createClient(HeaderBuilder.getDifferentSignedJwt(keycloakUrl));
+        videoSchedulingInformationV2ApiOnlyAdmin = createClient(HeaderBuilder.getJwtOnlyAdmin(keycloakUrl));
 
         var apiClient = new ApiClient();
         apiClient.setBasePath(getApiBasePath());
@@ -509,9 +511,9 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void testV2SchedulingInfoGet() throws ApiException {
+    void testV2SchedulingInfoGet_WithAllUserRoles_ReturnsAllSchedulingInfo() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoGetWithHttpInfo(
-                OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC),
                 OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC),
                 ProvisionStatus.AWAITS_PROVISION);
         assertNotNull(result);
@@ -519,9 +521,26 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
         assertNotNull(result.getData());
         var schedulingInfosResult = result.getData();
-        assertTrue(schedulingInfosResult.size() >= 2);
 
-        assertTrue(schedulingInfosResult.stream().anyMatch(x -> x.getUriWithDomain().equals("4003@test.dk")));
+        assertTrue(schedulingInfosResult.stream().anyMatch(x -> x.getUriWithDomain().equals("4000@test.dk")),
+                "Expects the result to include scheduling info from a different organisation");
+        assertTrue(schedulingInfosResult.stream().anyMatch(x -> x.getUriWithDomain().equals("4005@test.dk")));
+    }
+
+    @Test
+    void testV2SchedulingInfoGet_WithAdminRole_ReturnsSchedulingInfoFromUserOrgAndChildOrgs() throws ApiException {
+        var result = videoSchedulingInformationV2ApiOnlyAdmin.v2SchedulingInfoGetWithHttpInfo(
+                OffsetDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC),
+                OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 0, ZoneOffset.UTC),
+                ProvisionStatus.AWAITS_PROVISION);
+        assertNotNull(result);
+        assertEquals(200, result.getStatusCode());
+
+        assertNotNull(result.getData());
+        var schedulingInfosResult = result.getData();
+
+        assertFalse(schedulingInfosResult.stream().anyMatch(x -> x.getUriWithDomain().equals("4000@test.dk")),
+                "Expects the result to only include scheduling info from user organisation organisation");
         assertTrue(schedulingInfosResult.stream().anyMatch(x -> x.getUriWithDomain().equals("4005@test.dk")));
     }
 
