@@ -2,7 +2,6 @@ package dk.medcom.video.api.controller.v1;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.api.CreateSchedulingInfoDto;
-import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingInfoDto;
 import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.aspect.APISecurityAnnotation;
@@ -11,8 +10,10 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.SchedulingInfoService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +23,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,7 +79,7 @@ public class SchedulingInfoController {
 	}
 	
 	@RequestMapping(value = "/scheduling-info/{uuid}", method = RequestMethod.GET)
-	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException {
+	public EntityModel <SchedulingInfoDto> getSchedulingInfoByUUID(@PathVariable("uuid") String uuid) throws RessourceNotFoundException, PermissionDeniedException {
 		var performanceLogger = new PerformanceLogger("get scheduling info");
 		SchedulingInfo schedulingInfo = schedulingInfoService.getSchedulingInfoByUuid(uuid);
 		SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);

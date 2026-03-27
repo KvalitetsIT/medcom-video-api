@@ -130,7 +130,7 @@ public class SchedulingInfoServiceV2ImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoByUuidV2() throws RessourceNotFoundException {
+    public void testGetSchedulingInfoByUuidV2() throws RessourceNotFoundException, PermissionDeniedException {
         var uuid = UUID.randomUUID();
         var schedulingInfo = randomSchedulingInfo();
 
@@ -145,7 +145,7 @@ public class SchedulingInfoServiceV2ImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoByUuidV2ResourceNotFound() throws RessourceNotFoundException {
+    public void testGetSchedulingInfoByUuidV2ResourceNotFound() throws RessourceNotFoundException, PermissionDeniedException {
         var uuid = UUID.randomUUID();
 
         Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(uuid.toString())).thenThrow(new RessourceNotFoundException("resource", "field"));

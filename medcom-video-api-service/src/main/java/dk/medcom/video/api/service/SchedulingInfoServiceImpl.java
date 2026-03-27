@@ -118,8 +118,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
-	@Override
-	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException {
+	@Override // TODO: update unit- and integrationtests
+	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
         LOGGER.debug("Entry getSchedulingInfoByUuid. uuid={}", uuid);
 		var performanceLogger = new PerformanceLogger("read scheduling info by uuid");
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
@@ -128,8 +128,22 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			LOGGER.debug("SchedulingInfo was null");
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
 		}
+		validateOrganisationAccess(schedulingInfo.getOrganisation());
 		LOGGER.debug("Exit getSchedulingInfoByUuid");
 		return schedulingInfo;
+	}
+
+	private void validateOrganisationAccess(Organisation organisation) throws PermissionDeniedException {
+		UserContext userContext = userContextService.getUserContext();
+		if (userContext.hasRole(UserRole.PROVISIONER)) return;
+		if (organisation.getOrganisationId().equals(userContext.getUserOrganisation())) return;
+		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.ADMIN, UserRole.MEETING_PLANNER))) {
+			Set<String> userOrganisationAndChildOrganisations = organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation())
+					.extractAllOrganisationCodes();
+			if (userOrganisationAndChildOrganisations.contains(organisation.getOrganisationId())) return;
+		}
+		LOGGER.debug("User does not have access to the organisation of the scheduling info");
+		throw new PermissionDeniedException();
 	}
 
 	@Transactional(rollbackFor = Throwable.class)
@@ -435,7 +449,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
-	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException {
+	public void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
         LOGGER.debug("Entry deleteSchedulingInfo. uuid={}", uuid);
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -450,7 +464,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException {
         LOGGER.debug("Entry deleteSchedulingInfoPool. uuid={}", uuid);
 
-		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
+		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
 		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner());
 

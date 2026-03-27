@@ -56,6 +56,8 @@ public class SchedulingInfoServiceV2Impl implements SchedulingInfoServiceV2 {
             return SchedulingInfoModel.from(schedulingInfoService.getSchedulingInfoByUuid(uuid.toString()), shortLinkBaseUrl);
         } catch (RessourceNotFoundException e) {
             throw new ResourceNotFoundExceptionV2(e.getRessource(), e.getField());
+        } catch (PermissionDeniedException e) {
+            throw new PermissionDeniedExceptionV2();
         }
     }
 
