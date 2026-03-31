@@ -10,6 +10,8 @@ INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (2, 'not-u
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'new-provisioner-org', 'new provisioner org', 1);
 -- pool overflow org
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (4, 'overflow', 'overflow pool org', 10, 1);
+-- sub org of default user org
+INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (12, 'sub-user-org', 'sub default org', 5, 1);
 
 
 -- * meeting_users * (id, organisation_id, email)
@@ -55,7 +57,7 @@ INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time, description, project_code, organized_by, updated_by, updated_time, created_time, short_id)
     VALUES (308, uuid(), 'Not-using-new-provisioner', 2, 104, '2020-10-02 15:00:00', '2500-11-02 16:00:00', 'Mødebeskrivelse 12', 'PRJCDE1', 104, 104, '2018-09-02 15:00:00', '2018-09-02 15:00:00', substr(sha2(uuid, 256), 1, 12));
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time , description, project_code, organized_by, updated_by, updated_time, created_time, short_id)
-    VALUES (309, uuid(), 'Using-new-provisioner', 2, 104, '2020-10-02 15:00:00', '2500-11-02 16:00:00', 'Mødebeskrivelse 13', 'PRJCDE1', 104, 104, '2018-09-02 15:00:00', '2018-09-02 15:00:00', substr(sha2(uuid, 256), 1, 12));
+    VALUES (309, '7496ac21-cdf9-427a-8b41-92c701ecfb0d', 'Using-new-provisioner', 2, 104, '2020-10-02 15:00:00', '2500-11-02 16:00:00', 'Mødebeskrivelse 13', 'PRJCDE1', 104, 104, '2018-09-02 15:00:00', '2018-09-02 15:00:00', substr(sha2(uuid, 256), 1, 12));
 -- Delete meeting
 INSERT INTO meetings (id, uuid, subject, organisation_id, created_by, start_time, end_time, description, project_code, organized_by, updated_by, updated_time, created_time, short_id)
     VALUES (310, '8787faaa-9716-48aa-bbeb-703c2c312f1a', 'delete-meeting', 1, 103, '2020-10-02 15:00:00', '2500-11-02 16:00:00', 'Slet mødet', 'PRJCDE1', 101, 101, '2018-09-02 15:00:00', '2025-09-02 15:00:00', substr(sha2(uuid, 256), 1, 12));

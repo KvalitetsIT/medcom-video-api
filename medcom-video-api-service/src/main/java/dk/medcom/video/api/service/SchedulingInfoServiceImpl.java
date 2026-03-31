@@ -118,7 +118,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
 	}
 
-	@Override // TODO: update integrationtests
+	@Override
 	public SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException {
         LOGGER.debug("Entry getSchedulingInfoByUuid. uuid={}", uuid);
 		var performanceLogger = new PerformanceLogger("read scheduling info by uuid");
