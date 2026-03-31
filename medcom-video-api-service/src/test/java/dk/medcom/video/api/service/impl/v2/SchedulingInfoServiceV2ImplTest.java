@@ -159,6 +159,20 @@ public class SchedulingInfoServiceV2ImplTest {
     }
 
     @Test
+    public void testGetSchedulingInfoByUuidV2PermissionDenied() throws RessourceNotFoundException, PermissionDeniedException {
+        var uuid = UUID.randomUUID();
+
+        Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(uuid.toString())).thenThrow(new PermissionDeniedException());
+
+        var expectedException = assertThrows(PermissionDeniedExceptionV2.class, () -> schedulingInfoServiceV2.getSchedulingInfoByUuidV2(uuid));
+        assertNotNull(expectedException);
+        assertNull(expectedException.getMessage());
+
+        Mockito.verify(schedulingInfoService).getSchedulingInfoByUuid(uuid.toString());
+        verifyNoMoreInteractions();
+    }
+
+    @Test
     public void testCreateSchedulingInfoV2() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
         var input = new CreateSchedulingInfoModel(randomString(), 123L);
         var schedulingInfo = randomSchedulingInfo();

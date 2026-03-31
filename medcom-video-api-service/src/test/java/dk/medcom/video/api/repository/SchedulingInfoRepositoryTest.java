@@ -286,7 +286,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
     void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputThatMatchesSchedulingInfo_ReturnsSchedulingInfo() {
         // Given
         Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
-        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 3, 14, 31, 0);
         ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
         String organisation = "test-org";
         Set<String> organisations = Set.of(organisation, "non-existing-org");
@@ -297,6 +297,25 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // Then
         assertEquals(1, schedulingInfos.size());
         assertEquals(organisation, schedulingInfos.getFirst().getOrganisation().getOrganisationId());
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputThatMatchesMultipleSchedulingInfo_ReturnsSchedulingInfo() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 3, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        var testOrg = "test-org";
+        var anotherTestOrg = "another-test-org";
+        Set<String> organisations = Set.of(testOrg, anotherTestOrg, "non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(2, schedulingInfos.size());
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(testOrg)));
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(anotherTestOrg)));
     }
 
     @Test
