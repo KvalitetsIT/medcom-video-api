@@ -1,6 +1,8 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.api.CreateMeetingDto;
+import dk.medcom.video.api.api.CreateSchedulingInfoDto;
+import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -19,7 +21,7 @@ public interface SchedulingInfoService {
 
     List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision();
 
-    SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException;
+    SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
     SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException;
@@ -32,7 +34,7 @@ public interface SchedulingInfoService {
     SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
-    void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException;
+    void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
     void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException;

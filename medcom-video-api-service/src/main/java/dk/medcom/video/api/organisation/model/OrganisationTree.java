@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganisationTree {
@@ -42,5 +45,12 @@ public class OrganisationTree {
 
     public void setChildren(List<OrganisationTree> children) {
         this.children = children;
+    }
+
+    public Set<String> extractAllOrganisationCodes() {
+        if (children == null) return Set.of(code);
+        var codes = children.stream()
+                .flatMap(child -> child.extractAllOrganisationCodes().stream());
+        return Stream.concat(Stream.of(code), codes).collect(Collectors.toSet());
     }
 }
