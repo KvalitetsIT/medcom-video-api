@@ -1123,6 +1123,8 @@ paths:
         Gets the participant list of the requested meeting. Only the owner organisation of the meeting may read this. <br> <br> 
         The following values of the user role claim grants access: <br>
         * TODO
+      parameters:
+        - $ref: '#/components/parameters/uuid'
       responses:
         '200':
           description: Ok
@@ -1149,82 +1151,6 @@ paths:
       description: >-
         Adds a participant list to the requested meeting. Only the owner organisation of the meeting may do this.
         Updates the updated_time of the meeting. <br> <br> 
-        The following values of the user role claim grants access: <br>
-        * TODO
-      parameters:
-        - $ref: '#/components/parameters/uuid'
-      requestBody:
-        description: List of meeting participants to add to meeting
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/meetingParticipantRequest'
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/hal+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/meetingParticipantResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '500':
-          $ref: '#/components/responses/500'
-    put: #TODO måske ikke både POST, PUT og PATCH
-      security:
-        - keycloakOIDC: [ ]
-      tags:
-        - Participants
-      summary: Adds a list of participants to the requested meeting
-      description: >-
-        Adds a participant list to the requested meeting. Only the owner organisation of the meeting may do this. <br> <br> 
-        The following values of the user role claim grants access: <br>
-        * TODO
-      parameters:
-        - $ref: '#/components/parameters/uuid'
-      requestBody:
-        description: List of meeting participants to add to meeting
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/meetingParticipantRequest'
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/hal+json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/meetingParticipantResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '500':
-          $ref: '#/components/responses/500'
-    patch:
-      security:
-        - keycloakOIDC: [ ]
-      tags:
-        - Participants
-      summary: Adds a list of participants to the requested meeting
-      description: >-
-        Adds a participant list to the requested meeting. Only the owner organisation of the meeting may do this. <br> <br> 
         The following values of the user role claim grants access: <br>
         * TODO
       parameters:
@@ -1292,34 +1218,6 @@ paths:
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-    patch:
-      security:
-        - keycloakOIDC: [ ]
-      tags:
-        - Participants
-      summary: Updates a participant of a meeting
-      description: >-
-        Updates a participant of a meeting. Only the owner organisation of the meeting may do this. <br> <br> 
-        The following values of the user role claim grants access: <br>
-        * TODO
-      parameters:
-        - $ref: '#/components/parameters/uuid'
-        - $ref: '#/components/parameters/id' #TODO
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/hal+json:
-              schema:
-                $ref: '#/components/schemas/meetingParticipantResponse'
-        '400':
-          $ref: '#/components/responses/400'
-        '401':
-          $ref: '#/components/responses/401'
-        '403':
-          $ref: '#/components/responses/403'
-        '500':
-          $ref: '#/components/responses/500'
     delete:
       security:
         - keycloakOIDC: [ ]
@@ -1345,7 +1243,7 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
-  /v2/meetings/by-participant-org:
+  /v2/meeting-details:
     get: #TODO skal det være muligt at sætte organisation selv? hvis man f.eks. skal læse fra underorganisationer
       security:
         - keycloakOIDC: [ ]
@@ -1357,6 +1255,13 @@ paths:
         a user participant or a device participant. Meetings owned by the user context organisation is not returned. <br> <br> 
         The following values of the user role claim grants access: <br>
         * TODO
+      parameters:
+        - name: participant-organisation
+          in: query
+          description: Participant organisation
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
@@ -1374,8 +1279,6 @@ paths:
           $ref: '#/components/responses/403'
         '500':
           $ref: '#/components/responses/500'
-
-  /v2/meetings/by-citizen:
     post:
       security:
         - keycloakOIDC: [ ] #TODO mere?
