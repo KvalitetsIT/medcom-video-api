@@ -1167,7 +1167,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         return UUID.randomUUID().toString();
     }
 
-    private void testMeetingLinks(UUID meetingUuid, MeetingLinks links) {
+    private void testMeetingLinks(UUID meetingUuid, DetailedMeetingLinks links) {
         assertNotNull(links);
         assertNotNull(links.getSelf());
         assertNotNull(links.getSelf().getHref());

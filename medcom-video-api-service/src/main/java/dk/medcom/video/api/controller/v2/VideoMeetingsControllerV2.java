@@ -40,7 +40,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsFindByUriWithDomainGet(String uri) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsFindByUriWithDomainGet(String uri) {
         logger.debug("Enter GET meetings by uri with domain: {}, v2.", uri);
         try {
             var meetings = meetingService.getMeetingsByUriWithDomainSingleV2(uri);
@@ -58,7 +58,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsFindByUriWithoutDomainGet(String uri) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsFindByUriWithoutDomainGet(String uri) {
         logger.debug("Enter GET meetings by uri without domain: {}, v2.", uri);
         try {
             var meetings = meetingService.getMeetingsByUriWithoutDomainV2(uri);
@@ -76,7 +76,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<List<Meeting>> v2MeetingsGet(OffsetDateTime fromStartTime, OffsetDateTime toStartTime, String shortId, String subject, String organizedBy, String search, String label, String uriWithDomain) {
+    public ResponseEntity<List<DetailedMeeting>> v2MeetingsGet(OffsetDateTime fromStartTime, OffsetDateTime toStartTime, String shortId, String subject, String organizedBy, String search, String label, String uriWithDomain) {
         logger.debug("Enter GET meetings, v2.");
         try {
             if (shortId != null && !shortId.isEmpty()) {
@@ -109,7 +109,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
         }
     }
 
-    private ResponseEntity<List<Meeting>> meetingsGet(OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
+    private ResponseEntity<List<DetailedMeeting>> meetingsGet(OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
         logger.debug("Get meetings by fromStartTime: {} toStartTime: {}, v2.", fromStartTime.toString(), toStartTime.toString());
 
         List<MeetingModel> meetings = meetingService.getMeetingsV2(fromStartTime, toStartTime);
@@ -117,7 +117,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
     }
 
-    private ResponseEntity<List<Meeting>> genericSearchMeetings(String search, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
+    private ResponseEntity<List<DetailedMeeting>> genericSearchMeetings(String search, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
         logger.debug("Get meetings by search: {}, fromStartTime: {}, toStartTime: {}, v2.", search, fromStartTime, toStartTime);
 
         if((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
@@ -132,31 +132,31 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
     }
 
-    private ResponseEntity<List<Meeting>> getMeetingsByLabel(String label) {
+    private ResponseEntity<List<DetailedMeeting>> getMeetingsByLabel(String label) {
         logger.debug("Get meetings by label: {}, v2.", label);
         var meetings = meetingService.getMeetingsByLabelV2(label);
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
     }
 
-    private ResponseEntity<List<Meeting>> getMeetingByShortId(String shortId) {
+    private ResponseEntity<List<DetailedMeeting>> getMeetingByShortId(String shortId) {
         logger.debug("Get meetings by shortId: {}, v2.", shortId);
         var meeting = meetingService.getMeetingByShortIdV2(shortId);
         return ResponseEntity.ok(List.of(VideoMeetingMapper.internalToExternal(meeting)));
     }
 
-    private ResponseEntity<List<Meeting>> getMeetingsBySubject(String subject) {
+    private ResponseEntity<List<DetailedMeeting>> getMeetingsBySubject(String subject) {
         logger.debug("Get meetings by subject: {}, v2.", subject);
         var meetings = meetingService.getMeetingsBySubjectV2(subject);
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
     }
 
-    private ResponseEntity<List<Meeting>> getMeetingsOrganizedBy(String organizedBy) {
+    private ResponseEntity<List<DetailedMeeting>> getMeetingsOrganizedBy(String organizedBy) {
         logger.debug("Get meetings by organized by: {}, v2.", organizedBy);
         var meetings = meetingService.getMeetingsByOrganizedByV2(organizedBy);
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
     }
 
-    private ResponseEntity<List<Meeting>> getMeetingsFindByUriWithDomainGet(String uri) {
+    private ResponseEntity<List<DetailedMeeting>> getMeetingsFindByUriWithDomainGet(String uri) {
         logger.debug("Get meetings by uri with domain: {}, v2.", uri);
         var meetings = meetingService.getMeetingsByUriWithDomainV2(uri);
         return ResponseEntity.ok(VideoMeetingMapper.internalToExternal(meetings));
@@ -165,7 +165,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsPost(CreateMeeting createMeeting) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsPost(CreateMeeting createMeeting) {
         logger.debug("Enter POST meetings, v2.");
 
         var performanceLogger = new PerformanceLogger("create meeting");
@@ -214,7 +214,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsUuidGet(UUID uuid) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsUuidGet(UUID uuid) {
         logger.debug("Enter GET meetings with uuid: {}, v2.", uuid);
         try {
             var meeting = meetingService.getMeetingByUuidV2(uuid);
@@ -232,7 +232,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsUuidPatch(UUID uuid, PatchMeeting patchMeeting) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsUuidPatch(UUID uuid, PatchMeeting patchMeeting) {
         logger.debug("Enter PATCH meetings with uuid: {}, v2.", uuid);
         try {
             var meeting = meetingService.patchMeetingV2(uuid, VideoMeetingMapper.externalToInternal(patchMeeting));
@@ -255,7 +255,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
-    public ResponseEntity<Meeting> v2MeetingsUuidPut(UUID uuid, UpdateMeeting updateMeeting) {
+    public ResponseEntity<DetailedMeeting> v2MeetingsUuidPut(UUID uuid, UpdateMeeting updateMeeting) {
         logger.debug("Enter PUT meetings with uuid: {}, v2.", uuid);
         try {
             var meeting = meetingService.updateMeetingV2(uuid, VideoMeetingMapper.externalToInternal(updateMeeting));

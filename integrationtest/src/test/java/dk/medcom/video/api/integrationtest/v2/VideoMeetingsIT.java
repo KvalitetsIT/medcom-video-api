@@ -1389,7 +1389,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         return random.nextBoolean();
     }
 
-    private void testLinks(UUID meetingUuid, MeetingLinks links) {
+    private void testLinks(UUID meetingUuid, DetailedMeetingLinks links) {
         assertNotNull(links);
         assertNotNull(links.getSelf());
         assertNotNull(links.getSelf().getHref());
