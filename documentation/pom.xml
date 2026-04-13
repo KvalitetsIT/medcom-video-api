@@ -157,6 +157,7 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
                                 <containerDefaultToNull>true</containerDefaultToNull>
+                                <useSealed>true</useSealed>
                             </configOptions>
                             <output>${project.build.directory}/generated-test-sources/openapi/test</output>
                             <generateApiTests>false</generateApiTests>
@@ -183,6 +184,7 @@
                                 <useJakartaEe>true</useJakartaEe>
                                 <useTags>true</useTags>
                                 <containerDefaultToNull>true</containerDefaultToNull>
+                                <useSealed>true</useSealed>
                             </configOptions>
                             <output>${project.build.directory}/generated-sources/openapi/main</output>
                             <generateApiDocumentation>false</generateApiDocumentation>
@@ -204,6 +206,7 @@
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
                                 <containerDefaultToNull>true</containerDefaultToNull>
+                                <useSealed>true</useSealed>
                             </configOptions>
                             <output>${project.build.directory}/generated-test-sources/openapi/test</output>
                             <generateApiTests>false</generateApiTests>
@@ -230,6 +233,7 @@
                                 <useJakartaEe>true</useJakartaEe>
                                 <useTags>true</useTags>
                                 <containerDefaultToNull>true</containerDefaultToNull>
+                                <useSealed>true</useSealed>
                             </configOptions>
                             <output>${project.build.directory}/generated-sources/openapi/main</output>
                             <generateApiDocumentation>false</generateApiDocumentation>
