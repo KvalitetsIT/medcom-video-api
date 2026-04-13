@@ -138,9 +138,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.PROVISIONER, UserRole.PROVISIONER_USER))) return;
 		if (organisation.getOrganisationId().equals(userContext.getUserOrganisation())) return;
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.ADMIN, UserRole.MEETING_PLANNER))) {
-			Set<String> userOrganisationAndChildOrganisations = organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation())
+			var requestOrganisationParents = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId())
 					.extractAllOrganisationCodes();
-			if (userOrganisationAndChildOrganisations.contains(organisation.getOrganisationId())) return;
+			if (requestOrganisationParents.contains(userContext.getUserOrganisation())) return;
 		}
 		LOGGER.debug("User does not have access to the organisation of the scheduling info");
 		throw new PermissionDeniedException();

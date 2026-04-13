@@ -98,8 +98,10 @@ public class IntegrationWithOrganisationServiceTest {
 		organisationService.start();
 		attachLogger(organisationService, organisationLogger);
 		mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
-		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
-		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponseWithChildren());
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse("some-super-pool-org", "pool-test-org"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "test-org")).respond(organisationTreeServiceResponse("pool-test-org", "test-org"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "new provisioner company")).respond(organisationTreeServiceResponse("some-super-provision-org", "new provisioner company"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse("pool-test-org", "test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
@@ -179,27 +181,16 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(videoApi, videoApiLogger);
 	}
 
-	private static HttpResponse organisationTreeServiceResponse() {
+	private static HttpResponse organisationTreeServiceResponse(String parentOrg, String childOrg) {
 		OrganisationTree t = new OrganisationTree();
 		t.setPoolSize(10);
-		t.setCode("pool-test-org");
-		t.setName("company name another-test-org");
-		t.setChildren(null);
+		t.setCode(parentOrg);
 
-		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
-	}
+		OrganisationTree childTree = new OrganisationTree();
+		childTree.setPoolSize(5);
+		childTree.setCode(childOrg);
 
-	private static HttpResponse organisationTreeServiceResponseWithChildren() {
-		OrganisationTree t = new OrganisationTree();
-		t.setPoolSize(10);
-		t.setCode("pool-test-org");
-		t.setName("company name another-test-org");
-
-		OrganisationTree childOrg = new OrganisationTree();
-		childOrg.setCode("test-org");
-		childOrg.setName("company name test-org");
-
-		t.setChildren(List.of(childOrg));
+		t.setChildren(List.of(childTree));
 
 		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
 	}
