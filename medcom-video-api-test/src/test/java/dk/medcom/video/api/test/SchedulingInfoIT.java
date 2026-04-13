@@ -12,7 +12,9 @@ import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsApi;
+import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
+import org.openapitools.client.api.VideoSchedulingInformationV2Api;
 import org.openapitools.client.model.*;
 import org.junit.jupiter.api.Test;
 
@@ -300,10 +302,10 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
-		var videoMeetingApi = new VideoMeetingsApi(apiClient);
-		var schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
+		var videoMeetingApi = new VideoMeetingsV2Api(apiClient);
+		var schedulingInfoApi = new VideoSchedulingInformationV2Api(apiClient);
 
-		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
+		var schedulingInfo = schedulingInfoApi.v2SchedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
 		assertNotNull(schedulingInfo);
 		var reservationId = schedulingInfo.getReservationId();
 
@@ -314,10 +316,10 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setSubject("This is a subject!");
 		createMeeting.setSchedulingInfoReservationId(schedulingInfo.getReservationId());
 
-		var result = videoMeetingApi.meetingsPost(createMeeting);
+		var result = videoMeetingApi.v2MeetingsPost(createMeeting);
 		assertNotNull(result);
 
-		schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(result.getUuid());
+		schedulingInfo = schedulingInfoApi.v2SchedulingInfoUuidGet(result.getUuid());
 		assertNotNull(schedulingInfo);
 		assertEquals(reservationId, schedulingInfo.getReservationId());
 	}

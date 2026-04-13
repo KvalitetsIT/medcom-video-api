@@ -146,6 +146,40 @@ tags:
 servers:
   - url: 'http://localhost:8081'
 paths:
+  /v3/meetings:
+    get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V3
+      summary: gets a list of meetings
+      description: "TBD"
+      parameters:
+        - name: type
+          in: query
+          description: filters the meeting to a certain type
+          required: false
+          schema:
+            type: string
+          example: 'simpleMeeting'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
   /v2/info:
     get:
       security:
@@ -204,7 +238,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -243,7 +277,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -349,7 +383,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/meeting'
+                  $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -389,7 +423,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -424,7 +458,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -464,7 +498,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -506,7 +540,7 @@ paths:
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meeting'
+                $ref: '#/components/schemas/detailedMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1133,7 +1167,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/meetingParticipantResponse'
+                  $ref: '#/components/schemas/Participant'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1163,7 +1197,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/meetingParticipantRequest'
+                $ref: '#/components/schemas/Participant'
       responses:
         '200':
           description: Ok
@@ -1172,7 +1206,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/meetingParticipantResponse'
+                  $ref: '#/components/schemas/Participant'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1202,14 +1236,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/meetingParticipantRequest'
+              $ref: '#/components/schemas/Participant'
       responses:
         '200':
           description: Ok
           content:
             application/hal+json:
               schema:
-                $ref: '#/components/schemas/meetingParticipantResponse'
+                $ref: '#/components/schemas/Participant'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1270,7 +1304,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/meetingSimpleResponse'
+                  $ref: '#/components/schemas/simpleMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1295,7 +1329,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/citizenParticipantRequest'
+              $ref: '#/components/schemas/CitizenParticipant'
       responses:
         '200':
           description: Ok
@@ -1304,7 +1338,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/meetingSimpleResponse'
+                  $ref: '#/components/schemas/simpleMeeting'
         '400':
           $ref: '#/components/responses/400'
         '401':
@@ -1457,6 +1491,20 @@ components:
     meeting:
       type: object
       required:
+        - type
+      description: "TBD"
+      oneOf:
+        - $ref: '#/components/schemas/detailedMeeting'
+        - $ref: '#/components/schemas/simpleMeeting'
+      discriminator:
+        propertyName: type
+        mapping:
+          detailedMeeting: '#/components/schemas/detailedMeeting'
+          simpleMeeting: '#/components/schemas/simpleMeeting'
+
+    detailedMeeting:
+      type: object
+      required:
         - subject
         - uuid
         - createdBy
@@ -1466,6 +1514,10 @@ components:
         - _links
         - shortId
       properties:
+        type:
+          type: string
+          description: "Identifies the variant of meeting"
+          example: "detailedMeeting"
         subject:
           type: string
           maxLength: 100
@@ -1686,7 +1738,7 @@ components:
         meetingParticipants:
           type: array
           items:
-            $ref: '#/components/schemas/meetingParticipantRequest'
+            $ref: '#/components/schemas/Participant'
 
     update-meeting:
       type: object
@@ -1734,7 +1786,7 @@ components:
         meetingParticipants:
           type: array
           items:
-            $ref: '#/components/schemas/meetingParticipantRequest'
+            $ref: '#/components/schemas/Participant'
 
     patch-meeting:
       type: object
@@ -1792,7 +1844,7 @@ components:
         meetingParticipants:
           type: array
           items:
-            $ref: '#/components/schemas/meetingParticipantRequest'
+            $ref: '#/components/schemas/Participant'
 
     scheduling-info:
       type: object
@@ -1921,7 +1973,7 @@ components:
           maxLength: 200
           description: If set this is the url that the portal should redirect the user to when the meeting ends.
         meetingDetails:
-          $ref: '#/components/schemas/meeting'
+          $ref: '#/components/schemas/detailedMeeting'
         _links:
           properties:
             self:
@@ -2366,8 +2418,21 @@ components:
           items:
             $ref: '#/components/schemas/scheduling-info'
 
-    meetingParticipantRequest:
+    Participant:
       type: object
+      description: "TBD"
+      oneOf:
+        - $ref: '#/components/schemas/OrganisationParticipant'
+        - $ref: '#/components/schemas/UserParticipant'
+        - $ref: '#/components/schemas/DeviceParticipant'
+        - $ref: '#/components/schemas/CitizenParticipant'
+      discriminator:
+        propertyName: type
+        mapping:
+          OrganisationParticipant: '#/components/schemas/OrganisationParticipant'
+          UserParticipant: '#/components/schemas/UserParticipant'
+          DeviceParticipant: '#/components/schemas/DeviceParticipant'
+          CitizenParticipant: '#/components/schemas/CitizenParticipant'
       properties:
         role:
           description: Role of participant
@@ -2376,47 +2441,8 @@ components:
             - host
             - guest
           default: guest
-        participantType:
-          description: Kind of participant
-          type: string
-          enum:
-            - organisation
-            - user
-            - device
-            - citizen
-        participantId:
-          oneOf:
-            - $ref: '#/components/schemas/organisationParticipant'
-            - $ref: '#/components/schemas/userParticipant'
-            - $ref: '#/components/schemas/deviceParticipant'
-            - $ref: '#/components/schemas/citizenParticipantRequest'
 
-    meetingParticipantResponse:
-      type: object
-      properties:
-        role:
-          description: Role of participant
-          type: string
-          enum:
-            - host
-            - guest
-          default: guest
-        participantType:
-          description: Kind of participant
-          type: string
-          enum:
-            - organisation
-            - user
-            - device
-            - citizen
-        participantId:
-          oneOf:
-            - $ref: '#/components/schemas/organisationParticipant'
-            - $ref: '#/components/schemas/userParticipant'
-            - $ref: '#/components/schemas/deviceParticipant'
-            - $ref: '#/components/schemas/citizenParticipantResponse'
-
-    organisationParticipant:
+    OrganisationParticipant:
       type: object
       required:
         - organisationId
@@ -2425,35 +2451,45 @@ components:
           description: Organisation id
           type: string
           # TODO overvej om det skal være et uuid (udvidelse af org service)
+        type:
+          type: string
+          description: "Identifies the variant of participant"
+          example: "OrganisationParticipant"
 
-    userParticipant:
-      type: object
-      required:
-        - organisationId
-        - email
-      properties:
-        organisationId:
-          description: Organisation id of user
-          type: string
-        email:
-          description: Email of user
-          type: string
+    UserParticipant:
+      allOf:
+        - $ref: "#/components/schemas/OrganisationParticipant"
+        - type: object
+          required:
+            - organisationId
+            - email
+          properties:
+            email:
+              description: Email of user
+              type: string
+            type:
+              type: string
+              description: "Identifies the variant of participant"
+              example: "UserParticipant"
 
-    deviceParticipant:
-      type: object
-      required:
-        - organisationId
-        - deviceId
-      properties:
-        organisationId:
-          description: Organisation id of device
-          type: string
-        deviceId:
-          description: Uuid of device
-          type: string
-          format: uuid
+    DeviceParticipant:
+      allOf:
+        - $ref: "#/components/schemas/OrganisationParticipant"
+        - type: object
+          required:
+            - organisationId
+            - deviceId
+          properties:
+            deviceId:
+              description: Uuid of device
+              type: string
+              format: uuid
+            type:
+              type: string
+              description: "Identifies the variant of participant"
+              example: "DeviceParticipant"
 
-    citizenParticipantRequest:
+    CitizenParticipant:
       type: object
       required:
         - cprId
@@ -2461,13 +2497,19 @@ components:
         cprId:
           description: Encrypted cpr of citizen, only for requests, never for responses
           type: string
+        type:
+          type: string
+          description: "Identifies the variant of participant"
+          example: "CitizenParticipant"
 
-    citizenParticipantResponse:
-      type: object
 
-    meetingSimpleResponse:
+    simpleMeeting:
       type: object
       properties:
+        type:
+          type: string
+          description: "Identifies the variant of meeting"
+          example: "simpleMeeting"
         pin:
           description: Host or guest pin of meeting, should match if user is host or guest
           type: integer

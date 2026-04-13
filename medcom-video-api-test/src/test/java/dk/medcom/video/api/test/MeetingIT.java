@@ -11,6 +11,7 @@ import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.InfoApi;
 import org.openapitools.client.api.VideoMeetingsApi;
+import org.openapitools.client.api.VideoMeetingsV2Api;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MeetingIT extends IntegrationWithOrganisationServiceTest {
-	private VideoMeetingsApi videoMeetings;
+	private VideoMeetingsV2Api videoMeetings;
 	private VideoSchedulingInformationApi schedulingInfoApi;
 	private InfoApi infoApi;
 
@@ -45,7 +46,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 				.setBasePath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort))
 				.setOffsetDateTimeFormat(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss X"));
 
-		videoMeetings = new VideoMeetingsApi(apiClient);
+		videoMeetings = new VideoMeetingsV2Api(apiClient);
 
 		infoApi = new InfoApi(apiClient);
 
@@ -91,10 +92,10 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testUriWithDomain() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
-		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		var createdMeeting = videoMeetings.v2MeetingsPost(createMeeting);
 		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
 		// 1236@test.dk 1238
-		var result = videoMeetings.meetingsFindByUriWithDomainGet(schedulingInfo.getUriWithDomain());
+		var result = videoMeetings.v2MeetingsFindByUriWithDomainGet(schedulingInfo.getUriWithDomain());
 
 		assertNotNull(result);
 		assertEquals(createdMeeting.getUuid(), result.getUuid());
@@ -106,9 +107,9 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void testUriWithoutDomain() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
-		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		var createdMeeting = videoMeetings.v2MeetingsPost(createMeeting);
 		var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(createdMeeting.getUuid());
-		var result = videoMeetings.meetingsFindByUriWithoutDomainGet(schedulingInfo.getUriWithoutDomain());
+		var result = videoMeetings.v2MeetingsFindByUriWithoutDomainGet(schedulingInfo.getUriWithoutDomain());
 
 		assertNotNull(result);
 		assertEquals(createdMeeting.getUuid(), result.getUuid());
@@ -118,7 +119,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	public void testCanCreatePoolMeeting() throws ApiException {
 		var createMeeting = createMeeting(UUID.randomUUID().toString());
 		createMeeting.meetingType(MeetingType.POOL);
-		var result = videoMeetings.meetingsPost(createMeeting);
+		var result = videoMeetings.v2MeetingsPost(createMeeting);
 
 		assertNotNull(result);
 	}
@@ -136,7 +137,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key one", "value one"));
 		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key two", "value two"));
 
-		var createdMeeting = videoMeetings.meetingsPost(createMeeting);
+		var createdMeeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(createdMeeting);
 		assertEquals(createMeeting.getExternalId(), createdMeeting.getExternalId());
 		assertEquals(2, createdMeeting.getLabels().size());
@@ -157,14 +158,14 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		updateMeeting.setLabels(new ArrayList<>());
 		updateMeeting.getLabels().add("Another Label");
 
-		var updatedMeeting = videoMeetings.meetingsUuidPut(createdMeeting.getUuid(), updateMeeting);
+		var updatedMeeting = videoMeetings.v2MeetingsUuidPut(createdMeeting.getUuid(), updateMeeting);
 		assertNotNull(updatedMeeting);
 		assertEquals(createMeeting.getExternalId(), updatedMeeting.getExternalId());
 		assertEquals(1, updatedMeeting.getLabels().size());
 		assertTrue(updateMeeting.getLabels().containsAll(updatedMeeting.getLabels()));
 		assertTrue(updatedMeeting.getAdditionalInformation().isEmpty());
 
-		var readMeeting = videoMeetings.meetingsUuidGet(createdMeeting.getUuid());
+		var readMeeting = videoMeetings.v2MeetingsUuidGet(createdMeeting.getUuid());
 		assertNotNull(readMeeting);
 		assertEquals(createMeeting.getExternalId(), readMeeting.getExternalId());
 		assertEquals(1, readMeeting.getLabels().size());
@@ -176,7 +177,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	public void testCanCreateExternalId() throws ApiException {
 		var createMeeting = createMeeting("another_external_id");
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 	}
@@ -186,7 +187,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting("another_external_id3");
 		createMeeting.setGuestMicrophone(org.openapitools.client.model.GuestMicrophone.MUTED);
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 		assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, meeting.getGuestMicrophone());
@@ -196,7 +197,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	public void testCanCreateWithMicNotSet() throws ApiException {
 		var createMeeting = createMeeting("another_external_id2");
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 		assertEquals(org.openapitools.client.model.GuestMicrophone.ON, meeting.getGuestMicrophone());
@@ -206,7 +207,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	public void testCanCreateWithGuestPinRequiredNotSet() throws ApiException {
 		var createMeeting = createMeeting("another_external_id4");
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 		assertFalse(meeting.getGuestPinRequired());
@@ -217,7 +218,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting("another_external_id5");
 		createMeeting.setGuestPinRequired(false);
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 		assertFalse(meeting.getGuestPinRequired());
@@ -228,7 +229,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting("another_external_id6");
 		createMeeting.setGuestPinRequired(true);
 
-		var meeting = videoMeetings.meetingsPost(createMeeting);
+		var meeting = videoMeetings.v2MeetingsPost(createMeeting);
 		assertNotNull(meeting);
 		assertEquals(createMeeting.getExternalId(), meeting.getExternalId());
 		assertTrue(meeting.getGuestPinRequired());
@@ -239,7 +240,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		var createMeeting = createMeeting("external_id");
 
 		try {
-			videoMeetings.meetingsPost(createMeeting);
+			videoMeetings.v2MeetingsPost(createMeeting);
 			fail();
 		}
 		catch(ApiException e) {
@@ -357,13 +358,13 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		request.setDescription("SOME DESCRIPTION");
 		request.setGuestPinRequired(true);
 		request.setAdditionalInformation(List.of(createAdditionalInformationType("new key", "new value"), createAdditionalInformationType("another key", "another value")));
-		var response = videoMeetings.meetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
+		var response = videoMeetings.v2MeetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
 		var updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
 		// Then
 		assertNotNull(response);
 
-		var getResponse = videoMeetings.meetingsUuidGet(UUID.fromString(createResponse.getUuid()));
+		var getResponse = videoMeetings.v2MeetingsUuidGet(UUID.fromString(createResponse.getUuid()));
 
 		assertNotNull(getResponse);
 		assertNotEquals(createMeeting.getDescription(), getResponse.getDescription());
@@ -379,13 +380,13 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		request = new PatchMeeting();
 		request.setHostPin(4321);
 		request.setGuestPin(1234);
-		response = videoMeetings.meetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
+		response = videoMeetings.v2MeetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
 
 		// Then
 		assertNotNull(response);
 		assertEquals(2, response.getAdditionalInformation().size());
 
-		getResponse = videoMeetings.meetingsUuidGet(UUID.fromString(createResponse.getUuid()));
+		getResponse = videoMeetings.v2MeetingsUuidGet(UUID.fromString(createResponse.getUuid()));
 		updatedSchedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(createResponse.getUuid()));
 
 		assertNotNull(getResponse);
@@ -398,7 +399,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 	public void testNotAcceptableException() {
 
 		try {
-			videoMeetings.meetingsUuidDelete(UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5"));
+			videoMeetings.v2MeetingsUuidDelete(UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc5"));
 			fail();
 		}
 		catch(ApiException e) {

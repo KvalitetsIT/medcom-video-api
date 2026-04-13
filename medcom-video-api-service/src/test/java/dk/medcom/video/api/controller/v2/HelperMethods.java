@@ -302,7 +302,7 @@ public class HelperMethods {
         assertEquals(expected.shortlink(), actual.getShortlink());
     }
 
-    public static void assertMeeting(MeetingModel expected, Meeting actual) {
+    public static void assertMeeting(MeetingModel expected, DetailedMeeting actual) {
         assertEquals(expected.subject(), actual.getSubject());
         assertEquals(expected.uuid(), actual.getUuid());
         assertMeetingUser(expected.createdBy(), actual.getCreatedBy());

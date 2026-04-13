@@ -10,22 +10,22 @@ import java.util.List;
 
 public class VideoMeetingMapper {
 
-    public static List<Meeting> internalToExternal(List<MeetingModel> input) {
+    public static List<DetailedMeeting> internalToExternal(List<MeetingModel> input) {
         return input.stream().map(VideoMeetingMapper::internalToExternal).toList();
     }
 
-    public static Meeting internalToExternal(MeetingModel input) {
+    public static DetailedMeeting internalToExternal(MeetingModel input) {
         if (input == null) {
             return null;
         }
 
         var selfLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(VideoMeetingsControllerV2.class).v2MeetingsUuidGet(input.uuid())).scheme("https").build().toUri();
-        var meetingLinksSelf = new MeetingLinksSelf().href(selfLink);
+        var meetingLinksSelf = new DetailedMeetingLinksSelf().href(selfLink);
 
         var schedulingInfoLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(VideoSchedulingInformationControllerV2.class).v2SchedulingInfoUuidGet(input.uuid())).scheme("https").build().toUri();
-        var meetingLinksSchedulingInfo = new MeetingLinksSchedulingInfo().href(schedulingInfoLink);
+        var meetingLinksSchedulingInfo = new DetailedMeetingLinksSchedulingInfo().href(schedulingInfoLink);
 
-        return new Meeting()
+        return new DetailedMeeting()
                 .subject(input.subject())
                 .uuid(input.uuid())
                 .createdBy(internalToExternal(input.createdBy()))
@@ -45,7 +45,7 @@ public class VideoMeetingMapper {
                 .guestMicrophone(EnumMapper.internalToExternal(input.guestMicrophone()))
                 .guestPinRequired(input.guestPinRequired())
                 .additionalInformation(input.additionalInformation().stream().map(VideoMeetingMapper::internalToExternal).toList())
-                .links(new MeetingLinks().self(meetingLinksSelf).schedulingInfo(meetingLinksSchedulingInfo));
+                .links(new DetailedMeetingLinks().self(meetingLinksSelf).schedulingInfo(meetingLinksSchedulingInfo));
     }
 
     public static CreateMeetingModel externalToInternal(CreateMeeting input) {
