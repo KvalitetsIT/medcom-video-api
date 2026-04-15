@@ -157,6 +157,8 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
             return ResponseEntity.ok(VideoSchedulingMapper.internalToExternal(schedulingInfo));
         } catch (ResourceNotFoundExceptionV2 e) {
             throw new ResourceNotFoundException(e.getMessage());
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
         } catch (Exception e) {
             logger.error("Caught unexpected exception.", e);
             throw new InternalServerErrorException("Unexpected exception caught. " + e);

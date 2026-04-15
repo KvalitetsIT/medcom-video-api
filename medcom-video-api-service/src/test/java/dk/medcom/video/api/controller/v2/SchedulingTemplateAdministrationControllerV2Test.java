@@ -7,10 +7,14 @@ import dk.medcom.video.api.service.SchedulingTemplateServiceV2;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.model.*;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
@@ -27,6 +31,10 @@ public class SchedulingTemplateAdministrationControllerV2Test {
         schedulingTemplateService = Mockito.mock(SchedulingTemplateServiceV2.class);
 
         schedulingTemplateAdministrationControllerV2 = new SchedulingTemplateAdministrationControllerV2(schedulingTemplateService);
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
     }
     
     private void verifyNoMoreInteractions() {

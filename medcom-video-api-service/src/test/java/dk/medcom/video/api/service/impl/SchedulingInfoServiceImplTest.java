@@ -1,6 +1,8 @@
 package dk.medcom.video.api.service.impl;
 
-import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.api.CreateMeetingDto;
+import dk.medcom.video.api.api.CreateSchedulingInfoDto;
+import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
@@ -12,11 +14,13 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -137,6 +141,8 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(schedulingInfoRepository,
@@ -184,6 +190,8 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
@@ -231,6 +239,8 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
@@ -280,6 +290,8 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
         SchedulingInfoServiceImpl schedulingInfoService = new SchedulingInfoServiceImpl(
@@ -929,6 +941,205 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoAwaitsDeProvision();
         assertEquals(1, result.size());
         assertEquals(schedulingInfo2, result.getFirst());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"PROVISIONER", "PROVISIONER_USER"})
+    void testGetSchedulingInfoByUuid_WhenUserIsProvisionerOrProvisionerUser_ReturnForAnyUuid(UserRole userRole) throws RessourceNotFoundException, PermissionDeniedException {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfo = createSchedulingInfo();
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        var result = schedulingInfoService.getSchedulingInfoByUuid(input);
+        assertEquals(schedulingInfo, result);
+
+        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"ADMIN", "MEETING_PLANNER"})
+    void testGetSchedulingInfoByUuid_WhenUserIsAdminOrPlanner_ReturnWhenSameOrgAsUser(UserRole userRole) throws RessourceNotFoundException, PermissionDeniedException {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+        var userOrganisation = "test-org";
+        var schedInfoOrg = createOrganisation();
+        schedInfoOrg.setOrganisationId(userOrganisation);
+
+        var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setOrganisation(schedInfoOrg);
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        var result = schedulingInfoService.getSchedulingInfoByUuid(input);
+        assertEquals(schedulingInfo, result);
+
+        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"ADMIN", "MEETING_PLANNER"})
+    void testGetSchedulingInfoByUuid_WhenUserIsAdminOrPlanner_ReturnWhenSubOrgOfUser(UserRole userRole) throws RessourceNotFoundException, PermissionDeniedException {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+        var userOrganisation = "test-org";
+        var schedInfoOrg = createOrganisation();
+        schedInfoOrg.setOrganisationId("sched-info-org");
+
+        var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree(schedInfoOrg.getOrganisationId())), createOrganisationTree("D"));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+                .thenReturn(organisationTree);
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setOrganisation(schedInfoOrg);
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        var result = schedulingInfoService.getSchedulingInfoByUuid(input);
+        assertEquals(schedulingInfo, result);
+
+        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"ADMIN", "MEETING_PLANNER"})
+    void testGetSchedulingInfoByUuid_WhenUserIsAdminOrPlanner_PermissionDeniedNotInTree(UserRole userRole) {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+        var userOrganisation = "test-org";
+        var schedInfoOrg = createOrganisation();
+        schedInfoOrg.setOrganisationId("sched-info-org");
+
+        var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+                .thenReturn(organisationTree);
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setOrganisation(schedInfoOrg);
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
+        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"USER", "UNDEFINED"})
+    void testGetSchedulingInfoByUuid_WhenUserIsNeitherProvisionerAdminOrPlanner_ReturnWhenSameOrgAsUser(UserRole userRole) throws RessourceNotFoundException, PermissionDeniedException {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+        var userOrganisation = "test-org";
+        var schedInfoOrg = createOrganisation();
+        schedInfoOrg.setOrganisationId(userOrganisation);
+
+        var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setOrganisation(schedInfoOrg);
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        var result = schedulingInfoService.getSchedulingInfoByUuid(input);
+        assertEquals(schedulingInfo, result);
+
+        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"USER", "UNDEFINED"})
+    void testGetSchedulingInfoByUuid_WhenUserIsNeitherProvisionerAdminOrPlanner_PermissionDeniedNotSameOrg(UserRole userRole) {
+        var schedulingInfoService = createSchedulingInfoService();
+        var input = UUID.randomUUID().toString();
+        var userOrganisation = "test-org";
+        var schedInfoOrg = createOrganisation();
+        schedInfoOrg.setOrganisationId("sched-info-org");
+
+        var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var schedulingInfo = createSchedulingInfo();
+        schedulingInfo.setOrganisation(schedInfoOrg);
+        Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
+
+        assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
+        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"PROVISIONER", "PROVISIONER_USER"})
+    void getSchedulingInfo_WhenUserIsProvisionerOrProvisionerUser_ReturnsSchedulingInfoForAllOrganisations(UserRole userRole) {
+        var schedulingInfoService = createSchedulingInfoService();
+        var from = Mockito.mock(Date.class);
+        var to = Mockito.mock(Date.class);
+        var status = ProvisionStatus.PROVISIONED_OK;
+        var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
+        Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatus(from, to, status))
+                .thenReturn(expectedSchedulingInfo);
+
+        var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
+
+        assertEquals(expectedSchedulingInfo, schedulingInfo);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"ADMIN", "MEETING_PLANNER"})
+    void getSchedulingInfo_WhenUserIsAdminOrPlanner_ReturnsSchedulingInfoForAllOrganisations(UserRole userRole) {
+        var schedulingInfoService = createSchedulingInfoService();
+        var from = Mockito.mock(Date.class);
+        var to = Mockito.mock(Date.class);
+        var status = ProvisionStatus.PROVISIONED_OK;
+        var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole, UserRole.USER), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        var organisationTree = createOrganisationTree("A", createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+                .thenReturn(organisationTree);
+        var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
+        Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A", "B", "C", "D")))
+                .thenReturn(expectedSchedulingInfo);
+
+        var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
+
+        assertEquals(expectedSchedulingInfo, schedulingInfo);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class, names = {"USER", "UNDEFINED"})
+    void getSchedulingInfo_WhenUserIsNeitherProvisionerAdminOrPlanner_ReturnsSchedulingInfoForUserOrganisation(UserRole userRole) {
+        var schedulingInfoService = createSchedulingInfoService();
+        var from = Mockito.mock(Date.class);
+        var to = Mockito.mock(Date.class);
+        var status = ProvisionStatus.PROVISIONED_OK;
+        var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole), null);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        var organisationTree = createOrganisationTree("A", createOrganisationTree("B"));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+                .thenReturn(organisationTree);
+        var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
+        Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A")))
+                .thenReturn(expectedSchedulingInfo);
+
+        var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
+
+        assertEquals(expectedSchedulingInfo, schedulingInfo);
+    }
+
+    private OrganisationTree createOrganisationTree(String code, OrganisationTree ... children) {
+        var organisationTree = new OrganisationTree();
+        organisationTree.setCode(code);
+        organisationTree.setChildren(Arrays.asList(children));
+        return organisationTree;
     }
 
     private SchedulingInfo createSchedulingInfo(boolean newProvisioner) {

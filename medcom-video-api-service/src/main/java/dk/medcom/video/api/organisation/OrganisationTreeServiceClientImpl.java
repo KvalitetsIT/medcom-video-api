@@ -1,27 +1,36 @@
 package dk.medcom.video.api.organisation;
 
 import dk.medcom.video.api.organisation.model.OrganisationTree;
-
 import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.UriBuilder;
 
 public class OrganisationTreeServiceClientImpl implements OrganisationTreeServiceClient {
-    private final String endpoint;
+    private final WebTarget baseTarget;
 
     public OrganisationTreeServiceClientImpl(String endpoint) {
-        this.endpoint = endpoint;
+        this.baseTarget = ClientBuilder.newClient()
+                .target(UriBuilder.fromPath(endpoint));
     }
 
     @Override
     public OrganisationTree getOrganisationTree(String organisationCode) {
-        return ClientBuilder.newClient()
-                .target(UriBuilder.fromPath(endpoint))
+        return baseTarget
                 .path("services")
                 .path("organisationtree")
                 .queryParam("organisationCode", organisationCode)
                 .request()
-                .get(new GenericType<>() {
-                });
+                .get(OrganisationTree.class);
+    }
+
+    @Override
+    public OrganisationTree getOrganisationTreeChildren(String organisationCode) {
+        return baseTarget
+                .path("services")
+                .path("v1")
+                .path("organisationtree-children")
+                .queryParam("organisationCode", organisationCode)
+                .request()
+                .get(OrganisationTree.class);
     }
 }

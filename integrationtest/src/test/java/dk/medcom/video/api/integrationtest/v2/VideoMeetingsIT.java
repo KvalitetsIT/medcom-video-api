@@ -448,6 +448,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingResult = result.getData();
         assertEquals("Get by uri 4005", meetingResult.getSubject());
         assertEquals("Get this meeting by uri 4005", meetingResult.getDescription());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -462,6 +464,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals("custom.portal/guest", schedulingInfo.getCustomPortalGuest());
         assertEquals("custom.portal/host", schedulingInfo.getCustomPortalHost());
         assertEquals("return-url", schedulingInfo.getReturnUrl());
+
+        testLinks(result.getUuid(), result.getLinks());
     }
 
     @Test
@@ -473,6 +477,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingResult = result.getData();
         assertEquals("Get by uri 4005", meetingResult.getSubject());
         assertEquals("Get this meeting by uri 4005", meetingResult.getDescription());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -480,6 +486,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeeting();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
+        assertNotNull(schedulingInfo.getUriWithoutDomain());
         var result = videoMeetingsV2Api.v2MeetingsFindByUriWithoutDomainGet(schedulingInfo.getUriWithoutDomain());
 
         assertNotNull(result);
@@ -487,6 +494,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals("custom.portal/guest", schedulingInfo.getCustomPortalGuest());
         assertEquals("custom.portal/host", schedulingInfo.getCustomPortalHost());
         assertEquals("return-url", schedulingInfo.getReturnUrl());
+
+        testLinks(result.getUuid(), result.getLinks());
     }
 
     @Test
@@ -501,6 +510,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingsResult = result.getData();
         assertFalse(meetingsResult.isEmpty());
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting301Uuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -516,6 +527,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting302Uuid().toString())));
 
         assertFalse(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(otherOrgMeetingUuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -529,6 +542,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertFalse(meetingsResult.isEmpty());
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting301Uuid().toString())));
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting302Uuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -549,6 +564,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         assertFalse(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meetingUri4005Uuid().toString())));
         assertFalse(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(otherOrgMeetingUuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -562,6 +579,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertFalse(meetingsResult.isEmpty());
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting301Uuid().toString())));
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meeting302Uuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -574,6 +593,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingsResult = result.getData();
         assertFalse(meetingsResult.isEmpty());
         assertTrue(meetingsResult.stream().anyMatch(x -> x.getUuid().toString().equals(meetingUri4005Uuid().toString())));
+
+        meetingsResult.forEach(x -> testLinks(x.getUuid(), x.getLinks()));
     }
 
     @Test
@@ -594,6 +615,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(1, resultGet.size());
         assertEquals(resultPost.getUuid(), resultGet.getFirst().getUuid());
         assertEquals("https://video.link/" + resultGet.getFirst().getShortId(), resultGet.getFirst().getShortLink());
+
+        testLinks(resultGet.getFirst().getUuid(), resultGet.getFirst().getLinks());
     }
 
     @Test
@@ -606,6 +629,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingResult = result.getData();
         assertNotNull(meetingResult.getUuid());
         assertEquals(input.getSubject(), meetingResult.getSubject());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -619,6 +644,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var meetingResult = result.getData();
         assertNotNull(meetingResult.getUuid());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -665,6 +692,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         // From scheduling template 201 (default in user-org-pool)
         assertNotNull(meetingResult.getGuestPinRequired());
         assertFalse(meetingResult.getGuestPinRequired());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -680,6 +709,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertNotNull(meetingResult);
         assertEquals(input.getExternalId(), meetingResult.getExternalId());
         assertEquals(org.openapitools.client.model.GuestMicrophone.MUTED, meetingResult.getGuestMicrophone());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -695,6 +726,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(input.getExternalId(), meetingResult.getExternalId());
         assertNotNull(meetingResult.getGuestPinRequired());
         assertFalse(meetingResult.getGuestPinRequired());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -710,6 +743,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(input.getExternalId(), meetingResult.getExternalId());
         assertNotNull(meetingResult.getGuestPinRequired());
         assertTrue(meetingResult.getGuestPinRequired());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -749,6 +784,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(12, meetingResult.getShortId().length());
         assertEquals("https://video.link/" + meetingResult.getShortId(), meetingResult.getShortLink());
         assertEquals("external_id", meetingResult.getExternalId());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -765,6 +802,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertNotNull(result);
         assertEquals("external_id_1", result.getExternalId());
         assertEquals(GuestMicrophone.MUTED, result.getGuestMicrophone());
+
+        testLinks(result.getUuid(), result.getLinks());
     }
 
     @Test
@@ -774,6 +813,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertNotNull(result);
         assertEquals("external_id_2", result.getExternalId());
         assertNull(result.getGuestMicrophone());
+
+        testLinks(result.getUuid(), result.getLinks());
     }
 
     @Test
@@ -787,6 +828,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingResult = result.getData();
         assertEquals(meetingUuid, meetingResult.getUuid());
         assertEquals(input.getSubject(), meetingResult.getSubject());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -846,6 +889,9 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(inputSecondPatch.getGuestPin(), updatedSchedulingInfoTwo.getGuestPin());
         assertNotNull(resultSecondGet.getAdditionalInformation());
         assertEquals(2, resultSecondGet.getAdditionalInformation().size());
+
+        testLinks(resultFirstPatch.getUuid(), resultFirstPatch.getLinks());
+        testLinks(resultSecondPatch.getUuid(), resultSecondPatch.getLinks());
     }
 
     @Test
@@ -859,6 +905,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var meetingResult = result.getData();
         assertEquals(meetingUuid, meetingResult.getUuid());
         assertEquals(input.getSubject(), meetingResult.getSubject());
+
+        testLinks(meetingResult.getUuid(), meetingResult.getLinks());
     }
 
     @Test
@@ -910,6 +958,10 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertTrue(inputPut.getLabels().containsAll(resultGet.getLabels()));
         assertNotNull(resultGet.getAdditionalInformation());
         assertTrue(resultGet.getAdditionalInformation().isEmpty());
+
+        testLinks(resultPost.getUuid(), resultPost.getLinks());
+        testLinks(resultPut.getUuid(), resultPut.getLinks());
+        testLinks(resultGet.getUuid(), resultGet.getLinks());
     }
 
     @Test
@@ -1335,5 +1387,43 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     private static boolean randomBoolean() {
         Random random = new Random();
         return random.nextBoolean();
+    }
+
+    private void testLinks(UUID meetingUuid, MeetingLinks links) {
+        assertNotNull(links);
+        assertNotNull(links.getSelf());
+        assertNotNull(links.getSelf().getHref());
+        var meetingLink = links.getSelf().getHref().toString().replace("https", "http");
+
+        var requestMeeting = HttpRequest.newBuilder(URI.create(meetingLink))
+                .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
+                .build();
+
+        String schedulingInfoUuid;
+        HttpResponse<String> responseSchedulingInfo;
+        try (var client = HttpClient.newBuilder().build()) {
+            var responseMeeting = client.send(requestMeeting, HttpResponse.BodyHandlers.ofString());
+            assertNotNull(responseMeeting);
+            assertEquals(200, responseMeeting.statusCode());
+            assertNotNull(responseMeeting.body());
+            assertTrue(responseMeeting.body().contains("\"uuid\":\"%s\"".formatted(meetingUuid)));
+
+            assertNotNull(links.getSchedulingInfo());
+            assertNotNull(links.getSchedulingInfo().getHref());
+            var schedulingInfoLink = links.getSchedulingInfo().getHref().toString().replace("https", "http");
+            schedulingInfoUuid = schedulingInfoLink.replace(getApiBasePath() + "/v2/scheduling-info/", "");
+            var requestSchedulingInfo = HttpRequest.newBuilder(URI.create(schedulingInfoLink))
+                    .header("Authorization", "Bearer " + HeaderBuilder.getJwtAllRoleAtt(getKeycloakUrl()))
+                    .build();
+
+            responseSchedulingInfo = client.send(requestSchedulingInfo, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        
+        assertNotNull(responseSchedulingInfo);
+        assertEquals(200, responseSchedulingInfo.statusCode());
+        assertNotNull(responseSchedulingInfo.body());
+        assertTrue(responseSchedulingInfo.body().matches("\\{\"uuid\":\"" + schedulingInfoUuid + "\".*\"meetingDetails\":.*\"uuid\":\"" + meetingUuid + "\".*}"));
     }
 }

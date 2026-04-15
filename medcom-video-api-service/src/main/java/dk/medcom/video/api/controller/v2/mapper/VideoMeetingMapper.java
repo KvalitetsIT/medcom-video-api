@@ -1,13 +1,12 @@
 package dk.medcom.video.api.controller.v2.mapper;
 
 import dk.medcom.video.api.controller.v2.VideoMeetingsControllerV2;
+import dk.medcom.video.api.controller.v2.VideoSchedulingInformationControllerV2;
 import dk.medcom.video.api.service.model.*;
 import org.openapitools.model.*;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class VideoMeetingMapper {
 
@@ -20,7 +19,11 @@ public class VideoMeetingMapper {
             return null;
         }
 
-        var selfLink = new MeetingLinksSelf().href(linkTo(methodOn(VideoMeetingsControllerV2.class).v2MeetingsUuidGet(input.uuid())).withRel("self").toUri());
+        var selfLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(VideoMeetingsControllerV2.class).v2MeetingsUuidGet(input.uuid())).scheme("https").build().toUri();
+        var meetingLinksSelf = new MeetingLinksSelf().href(selfLink);
+
+        var schedulingInfoLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(VideoSchedulingInformationControllerV2.class).v2SchedulingInfoUuidGet(input.uuid())).scheme("https").build().toUri();
+        var meetingLinksSchedulingInfo = new MeetingLinksSchedulingInfo().href(schedulingInfoLink);
 
         return new Meeting()
                 .subject(input.subject())
@@ -42,7 +45,7 @@ public class VideoMeetingMapper {
                 .guestMicrophone(EnumMapper.internalToExternal(input.guestMicrophone()))
                 .guestPinRequired(input.guestPinRequired())
                 .additionalInformation(input.additionalInformation().stream().map(VideoMeetingMapper::internalToExternal).toList())
-                .links(new MeetingLinks().self(selfLink));
+                .links(new MeetingLinks().self(meetingLinksSelf).schedulingInfo(meetingLinksSchedulingInfo));
     }
 
     public static CreateMeetingModel externalToInternal(CreateMeeting input) {

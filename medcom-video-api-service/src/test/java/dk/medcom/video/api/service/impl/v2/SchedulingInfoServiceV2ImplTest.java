@@ -130,7 +130,7 @@ public class SchedulingInfoServiceV2ImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoByUuidV2() throws RessourceNotFoundException {
+    public void testGetSchedulingInfoByUuidV2() throws RessourceNotFoundException, PermissionDeniedException {
         var uuid = UUID.randomUUID();
         var schedulingInfo = randomSchedulingInfo();
 
@@ -145,7 +145,7 @@ public class SchedulingInfoServiceV2ImplTest {
     }
 
     @Test
-    public void testGetSchedulingInfoByUuidV2ResourceNotFound() throws RessourceNotFoundException {
+    public void testGetSchedulingInfoByUuidV2ResourceNotFound() throws RessourceNotFoundException, PermissionDeniedException {
         var uuid = UUID.randomUUID();
 
         Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(uuid.toString())).thenThrow(new RessourceNotFoundException("resource", "field"));
@@ -153,6 +153,20 @@ public class SchedulingInfoServiceV2ImplTest {
         var expectedException = assertThrows(ResourceNotFoundExceptionV2.class, () -> schedulingInfoServiceV2.getSchedulingInfoByUuidV2(uuid));
         assertNotNull(expectedException);
         assertEquals("Resource: resource in field: field not found.", expectedException.getMessage());
+
+        Mockito.verify(schedulingInfoService).getSchedulingInfoByUuid(uuid.toString());
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetSchedulingInfoByUuidV2PermissionDenied() throws RessourceNotFoundException, PermissionDeniedException {
+        var uuid = UUID.randomUUID();
+
+        Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(uuid.toString())).thenThrow(new PermissionDeniedException());
+
+        var expectedException = assertThrows(PermissionDeniedExceptionV2.class, () -> schedulingInfoServiceV2.getSchedulingInfoByUuidV2(uuid));
+        assertNotNull(expectedException);
+        assertNull(expectedException.getMessage());
 
         Mockito.verify(schedulingInfoService).getSchedulingInfoByUuid(uuid.toString());
         verifyNoMoreInteractions();

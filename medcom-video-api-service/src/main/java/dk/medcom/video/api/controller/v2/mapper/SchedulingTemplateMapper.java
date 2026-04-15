@@ -3,11 +3,9 @@ package dk.medcom.video.api.controller.v2.mapper;
 import dk.medcom.video.api.controller.v2.SchedulingTemplateAdministrationControllerV2;
 import dk.medcom.video.api.service.model.*;
 import org.openapitools.model.*;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 public class SchedulingTemplateMapper {
 
@@ -19,7 +17,9 @@ public class SchedulingTemplateMapper {
         if (input == null) {
             return null;
         }
-        var selfLink = new SchedulingTemplateLinksSelf().href(linkTo(methodOn(SchedulingTemplateAdministrationControllerV2.class).v2SchedulingTemplatesIdGet(input.id())).withRel("self").toUri());
+
+        var selfLink = MvcUriComponentsBuilder.fromMethodCall(MvcUriComponentsBuilder.on(SchedulingTemplateAdministrationControllerV2.class).v2SchedulingTemplatesIdGet(input.id())).scheme("https").build().toUri();
+        var schedulingTemplateLinksSelf = new SchedulingTemplateLinksSelf().href(selfLink);
 
         return new SchedulingTemplate()
                 .id(input.id())
@@ -58,7 +58,7 @@ public class SchedulingTemplateMapper {
                 .updatedBy(internalToExternal(input.updatedBy()))
                 .createdTime(input.createdTime())
                 .updatedTime(input.updatedTime())
-                .links(new SchedulingTemplateLinks().self(selfLink));
+                .links(new SchedulingTemplateLinks().self(schedulingTemplateLinksSelf));
     }
 
     public static SchedulingTemplateRequestModel externalToInternal(SchedulingTemplateRequest input) {

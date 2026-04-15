@@ -18,6 +18,22 @@
   {
     "httpRequest": {
       "method" : "GET",
+      "path": "/services/v1/organisationtree-children",
+      "queryStringParameters" : {
+         "organisationCode" : [ "user-org-pool" ]
+      }
+},
+    "httpResponse": {
+      "statusCode" : 200,
+      "headers" : {
+        "Content-Type" : [ "application/json" ]
+      },
+      "body": "{\"code\": \"user-org-pool\",\"name\": \"default user org\",\"poolSize\":10,\"children\":[],\"smsSenderName\":null,\"smsCallbackUrl\":null,\"groupId\":1}"
+    }
+  },
+  {
+    "httpRequest": {
+      "method" : "GET",
       "path": "/services/organisation",
       "queryStringParameters" : {
         "organisationCode" : [ "user-org-pool" ]

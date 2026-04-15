@@ -2,9 +2,13 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.service.NewProvisionerOrganisationFilter;
 import dk.medcom.video.api.service.PoolInfoServiceV2;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
@@ -23,6 +27,10 @@ public class PoolControllerV2Test {
         provisionerOrganisationFilter = Mockito.mock(NewProvisionerOrganisationFilter.class);
 
         poolControllerV2 = new PoolControllerV2(poolInfoService, provisionerOrganisationFilter);
+
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
     }
 
     private void verifyNoMoreInteractions() {
