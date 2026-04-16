@@ -1,13 +1,13 @@
 package dk.medcom.video.api.dao;
 
-import dk.medcom.video.api.api.ProvisionStatus;
+import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo, Long> {
 	List<SchedulingInfo> findAll();
@@ -19,6 +19,9 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);
+
+	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3 AND s.organisation.organisationId IN (?4)")
+	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus, Set<String> organisationIds);
 
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE s.vMRStartTime <= ?1 AND m.endTime >= ?1 AND s.provisionStatus = ?2")
 	List<SchedulingInfo> findAllWithinStartAndEndTimeLessThenAndStatus(Date fromStartTime, ProvisionStatus provisionStatus);

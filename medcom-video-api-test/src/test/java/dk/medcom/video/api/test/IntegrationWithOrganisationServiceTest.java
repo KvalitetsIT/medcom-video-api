@@ -14,11 +14,15 @@ import org.mockserver.matchers.Times;
 import org.mockserver.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.*;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.mariadb.MariaDBContainer;
+import org.testcontainers.mockserver.MockServerContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import jakarta.ws.rs.client.ClientBuilder;
@@ -28,13 +32,13 @@ import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.List;
 
 public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mariadbLogger = LoggerFactory.getLogger("mariadb");
 	private static final Logger videoApiLogger = LoggerFactory.getLogger("video-api");
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
-	protected static final Logger newmanLogger = LoggerFactory.getLogger("newman");
-	private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
+    private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
 	private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
@@ -43,9 +47,8 @@ public class IntegrationWithOrganisationServiceTest {
 	protected static GenericContainer<?> videoApi;
 	protected static Integer videoApiPort;
 	protected static Integer videoAdminApiPort;
-	private static final MariaDBContainer<?> mariadb;
-	private static GenericContainer<?> jetStreamService;
-	private static String jetStreamPath;
+	private static final MariaDBContainer mariadb;
+    private static String jetStreamPath;
 	private static final String natsSubjectSchedulingInfo = "schedulingInfo";
 	private static final String natsSubjectAudit = "natsSubject";
 
@@ -70,7 +73,7 @@ public class IntegrationWithOrganisationServiceTest {
         System.out.println("Created: " + resourceContainer.isCreated());
 
 		// SQL server for Video API.
-		mariadb = new MariaDBContainer<>("mariadb:10.6")
+		mariadb = new MariaDBContainer("mariadb:10.6")
 				.withDatabaseName("videodb")
 				.withUsername(DB_USER)
 				.withPassword(DB_PASSWORD)
@@ -96,6 +99,7 @@ public class IntegrationWithOrganisationServiceTest {
 		attachLogger(organisationService, organisationLogger);
 		mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponse());
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationTreeServiceResponseWithChildren());
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
@@ -141,6 +145,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("mapping.role.user", "dk:medcom:role:user")
 				.withEnv("mapping.role.meeting_planner", "dk:medcom:role:meeting_planner")
 				.withEnv("LOG_LEVEL", "debug")
+				.withEnv("sessiondata.headername", "session-data")
 				.withEnv("spring.flyway.locations", "classpath:db/migration,filesystem:/app/sql")
 				.withClasspathResourceMapping("db/migration/V901__insert _test_data.sql", "/app/sql/V901__insert _test_data.sql", BindMode.READ_ONLY)
 				.withClasspathResourceMapping("db/migration/V902__create_view.sql", "/app/sql/V902__create_view.sql", BindMode.READ_ONLY)
@@ -162,6 +167,8 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("pool.fill.organisation", "some_org")
 				.withEnv("pool.fill.interval", "PT1M")
 
+				.withEnv("spring.security.oauth2.resourceserver.jwt.issuer-uri", "http://localhost") //Irrelevant for v1
+
 				.withClasspathResourceMapping("docker/logback-test.xml", "/configtemplates/logback.xml", BindMode.READ_ONLY)
 				.withExposedPorts(8080, 8081)
 				.withStartupTimeout(Duration.ofSeconds(180))
@@ -182,6 +189,21 @@ public class IntegrationWithOrganisationServiceTest {
 		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
 	}
 
+	private static HttpResponse organisationTreeServiceResponseWithChildren() {
+		OrganisationTree t = new OrganisationTree();
+		t.setPoolSize(10);
+		t.setCode("pool-test-org");
+		t.setName("company name another-test-org");
+
+		OrganisationTree childOrg = new OrganisationTree();
+		childOrg.setCode("test-org");
+		childOrg.setName("company name test-org");
+
+		t.setChildren(List.of(childOrg));
+
+		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
+	}
+
 	private static HttpResponse organisationServiceResponse(String code) {
 		Organisation t = new Organisation();
 		t.setPoolSize(10);
@@ -198,7 +220,7 @@ public class IntegrationWithOrganisationServiceTest {
 		var natsContainerName = "nats";
 		var natsContainerVersion = "2.9-alpine";
 
-		jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
+        GenericContainer<?> jetStreamService = new GenericContainer<>(natsContainerName + ":" + natsContainerVersion);
 
 		jetStreamService.withNetwork(dockerNetwork)
 				.withNetworkAliases("nats")

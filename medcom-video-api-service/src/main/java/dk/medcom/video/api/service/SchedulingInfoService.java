@@ -1,13 +1,13 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.api.CreateMeetingDto;
+import dk.medcom.video.api.api.CreateSchedulingInfoDto;
+import dk.medcom.video.api.api.UpdateSchedulingInfoDto;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.dao.entity.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -21,7 +21,7 @@ public interface SchedulingInfoService {
 
     List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision();
 
-    SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException;
+    SchedulingInfo getSchedulingInfoByUuid(String uuid) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
     SchedulingInfo createSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotAcceptableException, PermissionDeniedException, NotValidDataException;
@@ -34,7 +34,7 @@ public interface SchedulingInfoService {
     SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
-    void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException;
+    void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
     void deleteSchedulingInfoPool(String uuid) throws RessourceNotFoundException;
@@ -44,9 +44,9 @@ public interface SchedulingInfoService {
 
     SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException;
 
-    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) throws NotValidDataException, NotAcceptableException, PermissionDeniedException;
+    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow);
 
-    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) throws NotValidDataException, NotAcceptableException, PermissionDeniedException;
+    SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto);
 
     SchedulingInfo reserveSchedulingInfo(VmrType vmrType,
                                          ViewType hostView,

@@ -4,25 +4,26 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.controller.v1.MeetingUpdateController;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.api.PatchMeetingDto;
 import dk.medcom.video.api.api.UpdateMeetingDto;
 import dk.medcom.video.api.service.MeetingService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MeetingUpdateControllerTest {
     private MeetingUpdateController meetingUpdateController;
     private MeetingService meetingService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
         meetingUpdateController = new MeetingUpdateController(meetingService, "short_link_base_url");
@@ -36,7 +37,7 @@ public class MeetingUpdateControllerTest {
         input.setLabels(Collections.singletonList("SOME_LABEL"));
 
         var meetingLabel = new MeetingLabel();
-        meetingLabel.setLabel(input.getLabels().get(0));
+        meetingLabel.setLabel(input.getLabels().getFirst());
 
         var meeting = new Meeting();
         meeting.setDescription(input.getDescription());
@@ -49,7 +50,7 @@ public class MeetingUpdateControllerTest {
         assertNotNull(result.getContent());
         assertEquals(input.getDescription(), result.getContent().getDescription());
         assertEquals(1, result.getContent().getLabels().size());
-        assertEquals(input.getLabels().get(0), result.getContent().getLabels().get(0));
+        assertEquals(input.getLabels().getFirst(), result.getContent().getLabels().getFirst());
     }
 
     @Test
@@ -70,7 +71,7 @@ public class MeetingUpdateControllerTest {
         input.getLabels().add("SOME_LABEL");
 
         var meetingLabel = new MeetingLabel();
-        meetingLabel.setLabel(input.getLabels().get(0));
+        meetingLabel.setLabel(input.getLabels().getFirst());
 
         var meeting = new Meeting();
         meeting.setSubject(input.getSubject());
@@ -91,6 +92,6 @@ public class MeetingUpdateControllerTest {
         assertEquals(input.getDescription(), result.getContent().getDescription());
         assertEquals(input.getProjectCode(), result.getContent().projectCode());
         assertEquals(1, result.getContent().getLabels().size());
-        assertEquals(input.getLabels().get(0), result.getContent().getLabels().get(0));
+        assertEquals(input.getLabels().getFirst(), result.getContent().getLabels().getFirst());
     }
 }

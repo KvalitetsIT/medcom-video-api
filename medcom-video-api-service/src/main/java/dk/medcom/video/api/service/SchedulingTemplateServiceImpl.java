@@ -1,14 +1,12 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.api.*;
-import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableErrors;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,9 +92,9 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		if (organisation != null) {
 			//first try: find default template for organization. Use list just in case.
 			schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true);
-			if (schedulingTemplates.size() > 0) {
-				LOGGER.debug("Template found using default organization template: " + schedulingTemplates.get(0).toString());
-				return schedulingTemplates.get(0);
+			if (!schedulingTemplates.isEmpty()) {
+                LOGGER.debug("Template found using default organization template: {}", schedulingTemplates.getFirst().toString());
+				return schedulingTemplates.getFirst();
 			}
 
 			// Find in tree
@@ -106,22 +104,22 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 				var schedulingTemplateFromTree = schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull(parent.get().getCode());
 				if(schedulingTemplateFromTree != null && !schedulingTemplateFromTree.isEmpty()) {
 					LOGGER.debug("Scheduling template found in organisation tree. Using scheduling template from organisation: {}", parent.get().getCode());
-					return schedulingTemplateFromTree.get(0);
+					return schedulingTemplateFromTree.getFirst();
 				}
 				parent = organisationFinder.findParentOrganisation(parent.get().getCode(), organisationTree);
 			}
 
 			//second try: find shared default template, where organization is null
 			schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull();
-			if (schedulingTemplates.size() > 0) {
-				LOGGER.debug("Template found using shared default template: " + schedulingTemplates.get(0).toString());
-				return schedulingTemplates.get(0);
+			if (!schedulingTemplates.isEmpty()) {
+                LOGGER.debug("Template found using shared default template: {}", schedulingTemplates.getFirst().toString());
+				return schedulingTemplates.getFirst();
 			}
 
 			//if none of above is found - create the shared default template
 			CreateSchedulingTemplateDto createSchedulingTemplateDto = getSchedulingTemplateDto();
 			SchedulingTemplate schedulingTemplate = createSchedulingTemplate(createSchedulingTemplateDto, false);
-			LOGGER.debug("Creating default schedulingTemplate: " + schedulingTemplate.toString());
+            LOGGER.debug("Creating default schedulingTemplate: {}", schedulingTemplate.toString());
 			return schedulingTemplateRepository.save(schedulingTemplate);
 
 		}
@@ -136,7 +134,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(organisationService.getUserOrganisation(), schedulingTemplateId);
 		
 		if (schedulingTemplate == null) {
-			LOGGER.debug("scheduleTemplate not found. Id: " + schedulingTemplateId + ". Organisation: " + organisationService.getUserOrganisation().toString());
+            LOGGER.info("scheduleTemplate not found. Id: {}. Organisation: {}", schedulingTemplateId, organisationService.getUserOrganisation().toString());
 			throw new RessourceNotFoundException("schedulingTemplate", "id");
 		}
 		return schedulingTemplate;
@@ -287,7 +285,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	
 	@Override
 	public void deleteSchedulingTemplate(Long id) throws PermissionDeniedException, RessourceNotFoundException  {
-		LOGGER.debug("Entry deleteSchedulingTemplate. id: " + id);
+        LOGGER.debug("Entry deleteSchedulingTemplate. id: {}", id);
 		
 		SchedulingTemplate schedulingTemplate = getSchedulingTemplateFromOrganisationAndId(id);
 		
@@ -303,8 +301,8 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true); 
 		//cannot return "same" record as being return, because compare on	 isDefaultTemplate has been made in call method. 	
 
-		if (schedulingTemplates.size() == 0) {
-			LOGGER.debug("No existing default template exist for organization: " + organisationService.getUserOrganisation().toString());
+		if (schedulingTemplates.isEmpty()) {
+            LOGGER.debug("No existing default template exist for organization: {}", organisationService.getUserOrganisation().toString());
 			return true;
 		}
 		
@@ -314,19 +312,19 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 			Calendar calendarNow = new GregorianCalendar();
 			schedulingTemplate.setUpdatedTime(calendarNow.getTime());
 			schedulingTemplateRepository.save(schedulingTemplate);
-			LOGGER.debug("Changed default template not to be default: " + schedulingTemplate.toString());
+            LOGGER.debug("Changed default template not to be default: {}", schedulingTemplate);
 		}
 		
 		//double check just to be sure that the reset was completed
 		schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);	
 
-		if (schedulingTemplates.size() == 0) {
-			LOGGER.debug("Existing default template has been reset as non-default for organization: " + organisationService.getUserOrganisation().toString());
+		if (schedulingTemplates.isEmpty()) {
+            LOGGER.debug("Existing default template has been reset as non-default for organization: {}", organisationService.getUserOrganisation().toString());
 			return true;
 		}
 		
 		//we have not been able to reset existing template and hence cannot add a new default
-		LOGGER.debug("Existing default templates prevent adding a new one. Organisation : " + organisationService.getUserOrganisation().toString());
+        LOGGER.debug("Existing default templates prevent adding a new one. Organisation : {}", organisationService.getUserOrganisation().toString());
 		return false;
 	}
 
@@ -353,7 +351,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		createSchedulingTemplateDto.setEndMeetingOnEndTime(endMeetingOnEndTime);
 		createSchedulingTemplateDto.setUriNumberRangeLow(uriNumberRangeLow);
 		createSchedulingTemplateDto.setUriNumberRangeHigh(uriNumberRangeHigh);
-		createSchedulingTemplateDto.setIvrTheme(ivrTheme);;
+		createSchedulingTemplateDto.setIvrTheme(ivrTheme);
 		return createSchedulingTemplateDto;
 	}
 	

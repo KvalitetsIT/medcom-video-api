@@ -37,7 +37,7 @@ jobs:
 
 # Login to docker hub using secrets in GitHub.
     - name: Login to docker
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -57,7 +57,7 @@ jobs:
         echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
 
     - name: Upload Jacoco coverage report
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: jacoco-report
         path: medcom-video-api-qa/target/site/jacoco-aggregate/
@@ -112,7 +112,7 @@ jobs:
       run: ./build/docker-push.sh ${{ env.DOCKER_DOCUMENTATION }}:${{ steps.tag.outputs.VERSION }}
 
     - name: Create Release Note
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       if: ${{ steps.tag.conclusion != 'skipped' }}
       with:
         generate_release_notes: true

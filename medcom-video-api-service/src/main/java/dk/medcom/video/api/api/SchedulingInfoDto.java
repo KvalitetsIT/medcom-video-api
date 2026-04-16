@@ -1,11 +1,10 @@
 package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import dk.medcom.video.api.controller.SchedulingInfoController;
+import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.entity.Meeting;
-import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.controller.v1.SchedulingInfoController;
+import dk.medcom.video.api.dao.entity.*;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -118,7 +117,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 			Link selfLink = linkTo(methodOn(SchedulingInfoController.class).getSchedulingInfoByUUID(uuid)).withRel("self");
 			add(selfLink);
 			
-		} catch (RessourceNotFoundException e) {
+		} catch (RessourceNotFoundException | PermissionDeniedException e) {
 			// Empty
 		}
 	}

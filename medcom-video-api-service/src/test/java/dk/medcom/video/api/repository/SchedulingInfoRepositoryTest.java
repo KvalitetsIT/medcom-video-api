@@ -1,18 +1,16 @@
 package dk.medcom.video.api.repository;
 
 
-import dk.medcom.video.api.api.*;
+import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
-import org.junit.Assert;
-import org.junit.Test;
-
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Test;
+
 import java.util.*;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
@@ -113,8 +111,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo = subject.save(schedulingInfo);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
-        Assert.assertNotNull(schedulingInfo.getId());
+        assertNotNull(schedulingInfo);
+        assertNotNull(schedulingInfo.getId());
         assertEquals(hostPin, schedulingInfo.getHostPin());
         assertEquals(guestPin, schedulingInfo.getGuestPin());
         assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
@@ -159,10 +157,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         Iterable<SchedulingInfo> schedulingInfos = subject.findAll();
 
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
+            assertNotNull(schedulingInfo);
             numberOfSchedulingInfo++;
         }
         assertEquals(11, numberOfSchedulingInfo);
@@ -177,7 +175,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         SchedulingInfo schedulingInfo = subject.findById(id).orElse(null);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
+        assertNotNull(schedulingInfo);
         assertEquals(id, schedulingInfo.getId());
         assertEquals(1001L, schedulingInfo.getHostPin().longValue());
         assertEquals(2001L, schedulingInfo.getGuestPin().longValue());
@@ -216,7 +214,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
         // Then
         assertNotNull(meeting);
-        Assert.assertNotNull(schedulingInfo);
+        assertNotNull(schedulingInfo);
         assertEquals(meetingId, schedulingInfo.getMeeting().getId());
         assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
     }
@@ -237,8 +235,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setUuid(meeting.getUuid());
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
-        Assert.assertNotNull(meeting);
+        assertNotNull(schedulingInfo);
+        assertNotNull(meeting);
         assertEquals(meetingId, schedulingInfo.getMeeting().getId());
         assertEquals(meeting.getUuid(), schedulingInfo.getUuid());
     }
@@ -254,10 +252,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
 
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
+            assertNotNull(schedulingInfo);
             numberOfSchedulingInfo++;
         }
         assertEquals(5, numberOfSchedulingInfo);
@@ -275,13 +273,79 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatus(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus);
 
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
+            assertNotNull(schedulingInfo);
             numberOfSchedulingInfo++;
         }
         assertEquals(1, numberOfSchedulingInfo);
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputThatMatchesSchedulingInfo_ReturnsSchedulingInfo() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 3, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        String organisation = "test-org";
+        Set<String> organisations = Set.of(organisation, "non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(1, schedulingInfos.size());
+        assertEquals(organisation, schedulingInfos.getFirst().getOrganisation().getOrganisationId());
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputThatMatchesMultipleSchedulingInfo_ReturnsSchedulingInfo() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 3, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        var testOrg = "test-org";
+        var anotherTestOrg = "another-test-org";
+        Set<String> organisations = Set.of(testOrg, anotherTestOrg, "non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(2, schedulingInfos.size());
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(testOrg)));
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(anotherTestOrg)));
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithInputOrgIdThatDoesNotMatchSchedulingInfo_ReturnsEmptyList() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        Set<String> organisations = Set.of("non-existing-org");
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(0, schedulingInfos.size());
+    }
+
+    @Test
+    void findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations_WithEmptyInputOrgIds_ReturnsEmptyList() {
+        // Given
+        Calendar calendarFrom = new GregorianCalendar(2018, Calendar.DECEMBER, 1, 15, 15, 0);
+        Calendar calendarTo = new GregorianCalendar(2018, Calendar.DECEMBER, 2, 14, 31, 0);
+        ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
+        Set<String> organisations = Set.of();
+
+        // When
+        List<SchedulingInfo> schedulingInfos = subject.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(calendarFrom.getTime(), calendarTo.getTime(), provisionStatus, organisations);
+
+        // Then
+        assertEquals(0, schedulingInfos.size());
     }
 
     @Test
@@ -293,11 +357,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // When
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
-            Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+            assertNotNull(schedulingInfo);
+            assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
             numberOfSchedulingInfo++;
         }
         assertEquals(1, numberOfSchedulingInfo);
@@ -312,11 +376,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // When
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinStartAndEndTimeLessThenAndStatus(calendarFrom.getTime(), provisionStatus);
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
-            Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+            assertNotNull(schedulingInfo);
+            assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
             numberOfSchedulingInfo++;
         }
         assertEquals(0, numberOfSchedulingInfo);
@@ -331,11 +395,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // When
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinEndTimeLessThenAndStatus(calendarTo.getTime(), provisionStatus);
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
-            Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+            assertNotNull(schedulingInfo);
+            assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
             numberOfSchedulingInfo++;
         }
         assertEquals(1, numberOfSchedulingInfo);
@@ -350,11 +414,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // When
         Iterable<SchedulingInfo> schedulingInfos = subject.findAllWithinEndTimeLessThenAndStatus(calendarTo.getTime(), provisionStatus);
         // Then
-        Assert.assertNotNull(schedulingInfos);
+        assertNotNull(schedulingInfos);
         int numberOfSchedulingInfo = 0;
         for (SchedulingInfo schedulingInfo : schedulingInfos) {
-            Assert.assertNotNull(schedulingInfo);
-            Assert.assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
+            assertNotNull(schedulingInfo);
+            assertEquals(provisionStatus, schedulingInfo.getProvisionStatus());
             numberOfSchedulingInfo++;
         }
         assertEquals(0, numberOfSchedulingInfo);
@@ -371,7 +435,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
+        assertNotNull(schedulingInfo);
         assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
 
     }
@@ -392,8 +456,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setMeetingUser(meetingUser);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
-        Assert.assertNotNull(meetingUser);
+        assertNotNull(schedulingInfo);
+        assertNotNull(meetingUser);
         assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
 
     }
@@ -409,7 +473,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         SchedulingInfo schedulingInfo = subject.findById(schedulingInfoId).orElse(null);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
+        assertNotNull(schedulingInfo);
         assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 
     }
@@ -429,8 +493,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setUpdatedByUser(meetingUser);
 
         // Then
-        Assert.assertNotNull(schedulingInfo);
-        Assert.assertNotNull(meetingUser);
+        assertNotNull(schedulingInfo);
+        assertNotNull(meetingUser);
         assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 
     }
@@ -482,7 +546,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(207, schedulingInfos.get(0).getId().intValue());
+        assertEquals(207, schedulingInfos.getFirst().getId().intValue());
     }
 
     @Test
@@ -529,7 +593,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.get(0).getId());
+        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.getFirst().getId());
     }
 
     @Test
@@ -575,7 +639,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.get(0).getId());
+        assertEquals(schedulingInfoVmrType.getId(), schedulingInfos.getFirst().getId());
     }
 
     @Test
@@ -623,7 +687,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 createMeetingDto.getMuteAllGuests());
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(211, schedulingInfos.get(0).getId().intValue());
+        assertEquals(211, schedulingInfos.getFirst().getId().intValue());
     }
 
     @Test
@@ -681,7 +745,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
-        assertEquals(207, schedulingInfos.get(0).getId().intValue());
+        assertEquals(207, schedulingInfos.getFirst().getId().intValue());
     }
 
     @Test
@@ -741,12 +805,12 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         List<SchedulingInfo> result = subject.findAllByUriWithDomainAndProvisionStatusOk(uris, ProvisionStatus.PROVISIONED_OK);
 
         //Then
-        Assert.assertFalse(result.isEmpty());
-        SchedulingInfo schedulingInfo = result.get(0);
-        Assert.assertEquals(uris.get(0), schedulingInfo.getUriWithDomain());
-        Assert.assertNotNull(schedulingInfo.getOrganisation());
-        Assert.assertNotNull(schedulingInfo.getOrganisation().getId());
-        Assert.assertNotNull(schedulingInfo.getOrganisation().getName());
+        assertFalse(result.isEmpty());
+        SchedulingInfo schedulingInfo = result.getFirst();
+        assertEquals(uris.getFirst(), schedulingInfo.getUriWithDomain());
+        assertNotNull(schedulingInfo.getOrganisation());
+        assertNotNull(schedulingInfo.getOrganisation().getId());
+        assertNotNull(schedulingInfo.getOrganisation().getName());
     }
 
     @Test
@@ -759,6 +823,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         List<SchedulingInfo> result = subject.findAllByUriWithDomainAndProvisionStatusOk(uris, ProvisionStatus.PROVISIONED_OK);
 
         //Then
-        Assert.assertTrue(result.isEmpty());
+        assertTrue(result.isEmpty());
     }
 }

@@ -1,25 +1,32 @@
 package dk.medcom.video.api.test;
 
 import dk.medcom.video.api.api.CreateMeetingDto;
-import dk.medcom.video.api.api.GuestMicrophone;
+import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.api.MeetingDto;
 import dk.medcom.video.api.api.SchedulingInfoDto;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.core.UriBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.VideoMeetingsApi;
 import org.openapitools.client.api.VideoSchedulingInformationApi;
 import org.openapitools.client.model.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	private final VideoSchedulingInformationApi schedulingInfoApi;
@@ -49,6 +56,65 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("custom_portal_host", result.getCustomPortalHost());
 		assertEquals("return_url", result.getReturnUrl());
 		assertEquals(DirectMedia.NEVER.toString(), result.getDirectMedia().toString());
+	}
+
+	@Test
+	void testSchedulingInfoUuidGet_WithProvisionerRoles_CanReadOutsideOfUserOrganisationTree() {
+		var result = getClient()
+				.path("scheduling-info")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc6") //In new provisioner company
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:provisioner"))
+				.get(SchedulingInfoDto.class);
+
+		assertNotNull(result);
+		assertEquals("1243@test.dk", result.getUriWithDomain());
+	}
+
+	@Test
+	void testSchedulingInfoUuidGet_WithAdminRole_CannotReadOutsideOfUserOrganisationTree() {
+		assertThrows(ForbiddenException.class, () -> getClient()
+				.path("scheduling-info")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc6") //In new provisioner company
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:admin"))
+				.get(SchedulingInfoDto.class));
+	}
+
+	@Test
+	void testSchedulingInfoUuidGet_WithAdminRole_CanReadFromUserOrganisationTree() {
+		var result = getClient()
+				.path("scheduling-info")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fce") //In test-org
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:admin"))
+				.get(SchedulingInfoDto.class);
+
+		assertNotNull(result);
+		assertEquals("1232@test.dk", result.getUriWithDomain());
+	}
+
+	@Test
+	void testSchedulingInfoUuidGet_WithUserRole_CannotReadOutsideOfUserOrganisationTree() {
+		assertThrows(ForbiddenException.class, () -> getClient()
+				.path("scheduling-info")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fce") //In test-org
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:user"))
+				.get(SchedulingInfoDto.class));
+	}
+
+	@Test
+	void testSchedulingInfoUuidGet_WithUserRole_CanReadFromUserOrganisation() {
+		var result = getClient()
+				.path("scheduling-info")
+				.path("7cc82183-0d47-439a-a00c-38f7a5a01fc4") //In pool-test-org
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:user"))
+				.get(SchedulingInfoDto.class);
+
+		assertNotNull(result);
+		assertEquals("1210@test.dk", result.getUriWithDomain());
 	}
 
 	@Test
@@ -122,7 +188,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		// Create scheduling info.
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
 		createSchedulingInfo.setOrganizationId("company 3");
-		createSchedulingInfo.setSchedulingTemplateId(4);
+		createSchedulingInfo.setSchedulingTemplateId(4L);
 
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain = 'test.dk' and uri_without_domain is not null and uuid = '" + createdSchedulingInfo.getUuid() + "'");
@@ -137,6 +203,58 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		verifyRowExistsInDatabase("select * from scheduling_info where uri_domain is null and uri_without_domain is null and uuid = '" + updatedSchedulingInfo.getUuid() + "'");
 	}
+
+	@Test
+	void testSchedulingInfoGet_WithProvisionerRoles_ReturnsAllSchedulingInfo() {
+		var result = getClient()
+				.path("scheduling-info")
+				.queryParam("from-start-time", "2018-10-02T15:00:00 %2B0100")
+				.queryParam("to-end-time", "3025-10-02T15:00:00 %2B0100")
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:provisioner"))
+				.get(String.class);
+
+		assertTrue(result.contains("\"uriWithDomain\":\"1210@test.dk\"")); //pool-test-org
+		assertTrue(result.contains("\"uriWithDomain\":\"1230@test.dk\""), //test-org
+				"Expects the result to include scheduling info from a sub organisation");
+		assertTrue(result.contains("\"uriWithDomain\":\"1231@test.dk\""), //another-test-org
+				"Expects the result to include scheduling info from a different organisation");
+	}
+
+	@Test
+	void testSchedulingInfoGet_WithAdminRole_ReturnsSchedulingInfoInTree() {
+		var result = getClient()
+				.path("scheduling-info")
+				.queryParam("from-start-time", "2018-10-02T15:00:00 %2B0100")
+				.queryParam("to-end-time", "3025-10-02T15:00:00 %2B0100")
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:admin"))
+				.get(String.class);
+
+		assertTrue(result.contains("\"uriWithDomain\":\"1210@test.dk\"")); //pool-test-org
+		assertTrue(result.contains("\"uriWithDomain\":\"1230@test.dk\""), //test-org
+				"Expects the result to include scheduling info from a sub organisation");
+		assertFalse(result.contains("\"uriWithDomain\":\"1231@test.dk\""), //another-test-org
+				"Expects the result to not include scheduling info from a different organisation");
+	}
+
+	@Test
+	void testSchedulingInfoGet_WithUserRole_ReturnsSchedulingInfoInUserOrg() {
+		var result = getClient()
+				.path("scheduling-info")
+				.queryParam("from-start-time", "2018-10-02T15:00:00 %2B0100")
+				.queryParam("to-end-time", "3025-10-02T15:00:00 %2B0100")
+				.request()
+				.header("session-data", buildHeaderWithRole("dk:medcom:role:user"))
+				.get(String.class);
+
+		assertTrue(result.contains("\"uriWithDomain\":\"1210@test.dk\"")); //pool-test-org
+		assertFalse(result.contains("\"uriWithDomain\":\"1230@test.dk\""), //test-org
+				"Expects the result to not include scheduling info from a sub organisation");
+		assertFalse(result.contains("\"uriWithDomain\":\"1231@test.dk\""), //another-test-org
+				"Expects the result to not include scheduling info from a different organisation");
+	}
+
 
 	@Test
 	public void testReserveSchedulingInformation_DefaultValues() throws ApiException {
@@ -207,7 +325,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 	@Test
 	public void createSchedulingInfo() throws ApiException {
 		CreateSchedulingInfo createSchedulingInfo = new CreateSchedulingInfo();
-		createSchedulingInfo.setSchedulingTemplateId(1);
+		createSchedulingInfo.setSchedulingTemplateId(1L);
 		createSchedulingInfo.setOrganizationId("company 1");
 		var createdSchedulingInfo = schedulingInfoApi.schedulingInfoPost(createSchedulingInfo);
 
@@ -221,5 +339,49 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		assertEquals("custom_portal_guest", createdSchedulingInfo.getCustomPortalGuest());
 		assertEquals("custom_portal_host", createdSchedulingInfo.getCustomPortalHost());
 		assertEquals("return_url", createdSchedulingInfo.getReturnUrl());
+	}
+
+    @Test
+    void testTimestampFormat() throws JSONException {
+        // POST
+        var inputPost = """
+                {
+                  "organizationId": "company 1",
+                  "schedulingTemplateId": "1"
+                }""";
+
+        String postResult;
+        try(var client = ClientBuilder.newClient()) {
+            postResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-info")
+                    .request()
+                    .post(Entity.json(inputPost), String.class);
+        }
+        var postResultJson = new JSONObject(postResult);
+        assertThat(postResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+
+        // PUT
+        var inputPut = """
+                {
+                  "provisionStatus": "AWAITS_PROVISION"
+                }""";
+
+        String putResult;
+        try(var client = ClientBuilder.newClient()) {
+            putResult = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("scheduling-info")
+                    .path(postResultJson.getString("uuid"))
+                    .request()
+                    .put(Entity.json(inputPut), String.class);
+        }
+        var putResultJson = new JSONObject(putResult);
+        assertThat(putResultJson.getString("provisionTimestamp")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("createdTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+        assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
+    }
+
+	private String buildHeaderWithRole(String role) {
+		var header = "{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"%s\"]}}".formatted(role);
+		return Base64.getEncoder().encodeToString(header.getBytes());
 	}
 }

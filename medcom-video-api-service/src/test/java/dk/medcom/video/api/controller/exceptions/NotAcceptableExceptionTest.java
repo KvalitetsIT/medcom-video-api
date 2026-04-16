@@ -1,14 +1,16 @@
 package dk.medcom.video.api.controller.exceptions;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NotAcceptableExceptionTest {
 	
 	NotAcceptableException subject;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		subject = new NotAcceptableException(NotAcceptableErrors.URI_ASSIGNMENT_FAILED_NOT_POSSIBLE_TO_CREATE_UNIQUE);
 	}
@@ -20,8 +22,8 @@ public class NotAcceptableExceptionTest {
 		// When
 		
 		// Then
-		Assert.assertNotNull(subject);
-		Assert.assertEquals(21, subject.getErrorCode());
+		assertNotNull(subject);
+		assertEquals(21, subject.getErrorCode());
 
 	}
 
