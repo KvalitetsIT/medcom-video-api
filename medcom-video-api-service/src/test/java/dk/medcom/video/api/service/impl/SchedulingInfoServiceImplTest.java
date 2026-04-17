@@ -995,8 +995,8 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree(schedInfoOrg.getOrganisationId())), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+        var organisationTree = createParentOrganisationTree(userOrganisation, createParentOrganisationTree("B", createParentOrganisationTree(schedInfoOrg.getOrganisationId(), createParentOrganisationTree("sched-info-org", null))));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTree("sched-info-org"))
                 .thenReturn(organisationTree);
 
         var schedulingInfo = createSchedulingInfo();
@@ -1006,7 +1006,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationTreeServiceClient).getOrganisationTree("sched-info-org");
     }
 
     @ParameterizedTest
@@ -1021,8 +1021,8 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
+        var organisationTree = createParentOrganisationTree("A", createParentOrganisationTree("B", createParentOrganisationTree("C", createParentOrganisationTree("sched-info-org", null))));
+        Mockito.when(organisationTreeServiceClient.getOrganisationTree("sched-info-org"))
                 .thenReturn(organisationTree);
 
         var schedulingInfo = createSchedulingInfo();
@@ -1030,7 +1030,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationTreeServiceClient).getOrganisationTree("sched-info-org");
     }
 
     @ParameterizedTest
@@ -1133,6 +1133,13 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
+    }
+
+    private OrganisationTree createParentOrganisationTree(String code, OrganisationTree child) {
+        var organisationTree = new OrganisationTree();
+        organisationTree.setCode(code);
+        if (child != null) organisationTree.setChildren(Collections.singletonList(child));
+        return organisationTree;
     }
 
     private OrganisationTree createOrganisationTree(String code, OrganisationTree ... children) {

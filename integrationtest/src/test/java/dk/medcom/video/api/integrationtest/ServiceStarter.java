@@ -223,8 +223,10 @@ public class ServiceStarter {
         organisationService.start();
 
         var mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
-        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponse());
-        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponseWithChildren());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponse("some-super-org", "user-org-pool"));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "sub-user-org")).respond(organisationTreeServiceResponse("user-org-pool", "sub-user-org"));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisationtree").withQueryStringParameter("organisationCode", "not-user-org")).respond(organisationTreeServiceResponse("some-not-user-super-org", "not-user-org"));
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponse("user-org-pool", "sub-user-org"));
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
 
@@ -232,26 +234,14 @@ public class ServiceStarter {
         attachLogger(organisationService, organisationLogger);
     }
 
-    private static HttpResponse organisationTreeServiceResponse() {
+    private static HttpResponse organisationTreeServiceResponse(String parentOrg, String childOrg) {
         OrganisationTree t = new OrganisationTree();
         t.setPoolSize(10);
-        t.setCode("user-org-pool");
-        t.setName("default user org");
-        t.setChildren(null);
-
-        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
-    }
-
-    private static HttpResponse organisationTreeServiceResponseWithChildren() {
-        OrganisationTree t = new OrganisationTree();
-        t.setPoolSize(10);
-        t.setCode("user-org-pool");
-        t.setName("default user org");
+        t.setCode(parentOrg);
 
         OrganisationTree childTree = new OrganisationTree();
         childTree.setPoolSize(5);
-        childTree.setCode("sub-user-org");
-        childTree.setName("sub default org");
+        childTree.setCode(childOrg);
 
         t.setChildren(List.of(childTree));
 
