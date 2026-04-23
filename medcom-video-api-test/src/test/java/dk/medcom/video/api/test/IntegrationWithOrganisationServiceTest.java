@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dk.medcom.video.api.organisation.model.Organisation;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
@@ -40,6 +41,7 @@ public class IntegrationWithOrganisationServiceTest {
 	private static final Logger mockServerLogger = LoggerFactory.getLogger("mock-server");
     private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
 	private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
+	private static final Logger keycloakLogger = LoggerFactory.getLogger("keycloak-mock");
 	private static final Logger logger = LoggerFactory.getLogger(IntegrationWithOrganisationServiceTest.class);
 
 	protected static Network dockerNetwork;
@@ -103,6 +105,16 @@ public class IntegrationWithOrganisationServiceTest {
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "pool-test-org")).respond(organisationServiceResponse("pool-test-org"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/pool-test-org/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
+
+		// Keycloak mock server
+		MockServerContainer keycloakService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))
+				.withNetwork(dockerNetwork)
+				.withNetworkAliases("keycloakservice");
+		keycloakService.start();
+		attachLogger(keycloakService, keycloakLogger);
+		mockServerClient = new MockServerClient(keycloakService.getHost(), keycloakService.getMappedPort(1080));
+		mockServerClient.when(HttpRequest.request().withMethod("POST").withBody("grant_type=client_credentials&client_id=videoApiClient&client_secret=videoApiClientSecret"), Times.unlimited()).respond(getKeycloakTokenResponse());
 
 		try {
 			setupJetStream();
@@ -154,6 +166,10 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("organisationtree.service.endpoint", "http://organisation:1080")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
+
+				.withEnv("keycloak.service.endpoint", "http://keycloakservice:1080")
+				.withEnv("keycloak.service.client", "videoApiClient")
+				.withEnv("keycloak.service.clientsecret", "videoApiClientSecret")
 
 				.withEnv("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200")
 
@@ -284,6 +300,17 @@ public class IntegrationWithOrganisationServiceTest {
 
 	private static HttpResponse getResponse() {
 		return new HttpResponse().withBody("{\"UserAttributes\": {\"organisation_id\": [\"pool-test-org\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\", \"dk:medcom:role:provisioner\"]}}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+	}
+
+	private static HttpResponse getKeycloakTokenResponse() {
+		return new HttpResponse().withBody("{\"access_token\":\"mock-access-token\"}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+	}
+
+	private static HttpResponse organisationSimpleResponse() {
+		var org = new OrganisationSimple("pool-test-org");
+		var org2 = new OrganisationSimple("test-org");
+
+		return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(List.of(org2, org), MediaType.JSON_UTF_8));
 	}
 
 	void verifyRowExistsInDatabase(String sql) throws SQLException {

@@ -2,6 +2,7 @@ package dk.medcom.video.api.integrationtest;
 
 import dk.medcom.video.api.Application;
 import dk.medcom.video.api.organisation.model.Organisation;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
@@ -33,6 +34,7 @@ public class ServiceStarter {
     private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
     private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
     private static final Logger keycloakLogger = LoggerFactory.getLogger("keycloak");
+    private static final Logger keycloakMockLogger = LoggerFactory.getLogger("keycloak-mock");
 
     protected static Network dockerNetwork;
     private static String jetStreamPath;
@@ -43,6 +45,9 @@ public class ServiceStarter {
     private static final String jdbcPass = "secret1234";
     private static String organisationPath;
     private static String keycloakUrl;
+    private static final String videoApiClient = "video-api-client";
+    private static final String videoApiClientSecret = "video-api-client-secret";
+    private static String keycloakMockPath;
 
     private static boolean firstStart = true;
 
@@ -54,6 +59,7 @@ public class ServiceStarter {
         setupMockOrganisationService();
         setupJetStream();
         setupKeycloak();
+        setupMockKeycloakService();
 
         System.setProperty("jdbc.url", jdbcUrl);
         System.setProperty("jdbc.user", jdbcUser);
@@ -95,6 +101,10 @@ public class ServiceStarter {
         System.setProperty("organisation.service.endpoint", organisationPath + "/services");
         System.setProperty("organisationtree.service.endpoint", organisationPath);
 
+        System.setProperty("keycloak.service.endpoint", keycloakMockPath + "/realms/broker");
+        System.setProperty("keycloak.service.client", videoApiClient);
+        System.setProperty("keycloak.service.clientsecret", videoApiClientSecret);
+
         System.setProperty("short.link.base.url", "https://video.link/");
 
         System.setProperty("overflow.pool.organisation.id", "overflow");
@@ -124,6 +134,7 @@ public class ServiceStarter {
             setupMockOrganisationService();
             setupJetStream();
             setupKeycloak();
+            setupMockKeycloakService();
         }
 
         GenericContainer<?> service;
@@ -177,6 +188,10 @@ public class ServiceStarter {
                 .withEnv("short.link.base.url", "https://video.link/")
                 .withEnv("overflow.pool.organisation.id", "overflow")
 
+                .withEnv("keycloak.service.endpoint", "http://keycloak-mock:1080/realms/broker")
+                .withEnv("keycloak.service.client", videoApiClient)
+                .withEnv("keycloak.service.clientsecret", videoApiClientSecret)
+
                 .withEnv("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200")
 
                 .withEnv("audit.nats.url", "nats://nats:4222")
@@ -227,9 +242,36 @@ public class ServiceStarter {
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponseWithChildren());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
 
         organisationPath = "http://localhost:" + organisationService.getMappedPort(1080);
         attachLogger(organisationService, organisationLogger);
+    }
+
+    private void setupMockKeycloakService() {
+        // Keycloak mock server
+        var organisationService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0")).
+                withNetwork(dockerNetwork).
+                withNetworkAliases("keycloak-mock");
+        organisationService.start();
+
+        var mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
+        mockServerClient.when(HttpRequest.request().withMethod("POST").withPath("/realms/broker/protocol/openid-connect/token").withBody("grant_type=client_credentials&client_id=" + videoApiClient + "&client_secret=" + videoApiClientSecret))
+                .respond(accessTokenResponse());
+
+        keycloakMockPath = "http://localhost:" + organisationService.getMappedPort(1080);
+        attachLogger(organisationService, keycloakMockLogger);
+    }
+
+    private static HttpResponse accessTokenResponse() {
+        return new HttpResponse().withBody("{\"access_token\":\"mock-access-token\"}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+    }
+
+    private static HttpResponse organisationSimpleResponse() {
+        var org = new OrganisationSimple("user-org-pool");
+        var org2 = new OrganisationSimple("sub-user-org");
+
+        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(List.of(org2, org), MediaType.JSON_UTF_8));
     }
 
     private static HttpResponse organisationTreeServiceResponse() {

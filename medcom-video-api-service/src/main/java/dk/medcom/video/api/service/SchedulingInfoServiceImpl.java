@@ -12,8 +12,10 @@ import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.organisation.OrganisationServiceClientV2;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.domain.MessageType;
 import dk.medcom.video.api.service.domain.SchedulingInfoEvent;
@@ -47,23 +49,24 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 	private final PoolFinderService poolFinderService;
 	private final String citizenPortal;
+	private final OrganisationServiceClientV2 organisationServiceClientV2;
 
 	public SchedulingInfoServiceImpl(SchedulingInfoRepository schedulingInfoRepository,
-									 SchedulingTemplateRepository schedulingTemplateRepository,
-									 SchedulingTemplateService schedulingTemplateService,
-									 SchedulingStatusService schedulingStatusService,
-									 MeetingUserService meetingUserService,
-									 OrganisationRepository organisationRepository,
-									 OrganisationStrategy organisationStrategy,
-									 UserContextService userContextService,
-									 String overflowPoolOrganisationId,
-									 OrganisationTreeServiceClient organisationTreeServiceClient,
-									 AuditService auditService,
-									 CustomUriValidator customUriValidator,
-									 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-									 NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
-									 PoolFinderService poolFinderService,
-									 String citizenPortal) {
+                                     SchedulingTemplateRepository schedulingTemplateRepository,
+                                     SchedulingTemplateService schedulingTemplateService,
+                                     SchedulingStatusService schedulingStatusService,
+                                     MeetingUserService meetingUserService,
+                                     OrganisationRepository organisationRepository,
+                                     OrganisationStrategy organisationStrategy,
+                                     UserContextService userContextService,
+                                     String overflowPoolOrganisationId,
+                                     OrganisationTreeServiceClient organisationTreeServiceClient,
+                                     AuditService auditService,
+                                     CustomUriValidator customUriValidator,
+                                     SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+                                     NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+                                     PoolFinderService poolFinderService,
+                                     String citizenPortal, OrganisationServiceClientV2 organisationServiceClientV2) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -80,8 +83,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
 		this.poolFinderService = poolFinderService;
 		this.citizenPortal = citizenPortal;
+        this.organisationServiceClientV2 = organisationServiceClientV2;
 
-		if(overflowPoolOrganisationId == null)  {
+        if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
 		}
 		this.overflowPoolOrganisationId = overflowPoolOrganisationId;
@@ -95,8 +99,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
         String userOrg = userContext.getUserOrganisation();
         if (userContext.hasAnyNumberOfRoles(List.of(UserRole.ADMIN, UserRole.MEETING_PLANNER))) {
-            Set<String> userOrganisationAndChildOrganisations = organisationTreeServiceClient.getOrganisationTreeChildren(userOrg)
-                    .extractAllOrganisationCodes();
+            Set<String> userOrganisationAndChildOrganisations = organisationServiceClientV2.getDescendantsOfOrganisation(userOrg)
+                    .stream().map(OrganisationSimple::code).collect(Collectors.toSet());
             return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(fromStartTime, toEndTime, provisionStatus, userOrganisationAndChildOrganisations);
         }
         return schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(fromStartTime, toEndTime, provisionStatus, Set.of(userOrg));
@@ -138,8 +142,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.PROVISIONER, UserRole.PROVISIONER_USER))) return;
 		if (organisation.getOrganisationId().equals(userContext.getUserOrganisation())) return;
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.ADMIN, UserRole.MEETING_PLANNER))) {
-			Set<String> userOrganisationAndChildOrganisations = organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation())
-					.extractAllOrganisationCodes();
+			Set<String> userOrganisationAndChildOrganisations = organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation())
+					.stream().map(OrganisationSimple::code).collect(Collectors.toSet());
 			if (userOrganisationAndChildOrganisations.contains(organisation.getOrganisationId())) return;
 		}
 		LOGGER.debug("User does not have access to the organisation of the scheduling info");
