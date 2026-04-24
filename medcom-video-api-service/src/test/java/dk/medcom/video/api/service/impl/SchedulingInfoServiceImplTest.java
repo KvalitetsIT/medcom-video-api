@@ -13,8 +13,10 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
+import dk.medcom.video.api.organisation.OrganisationServiceClientV2;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +59,7 @@ public class SchedulingInfoServiceImplTest {
     private AuditService auditService;
     private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
     private PoolFinderService poolFinderService;
+    private OrganisationServiceClientV2 organisationServiceClientV2;
 
     @BeforeEach
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
@@ -103,6 +106,8 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
 
         poolFinderService = Mockito.mock(PoolFinderService.class);
+
+        organisationServiceClientV2 = Mockito.mock(OrganisationServiceClientV2.class);
     }
 
     @Test
@@ -122,7 +127,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                "",
+                organisationServiceClientV2);
 
         assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L));
     }
@@ -160,7 +166,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal");
+                "citizen_portal",
+                organisationServiceClientV2);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
 
@@ -210,7 +217,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal");
+                "citizen_portal",
+                organisationServiceClientV2);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
 
@@ -259,7 +267,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                "",
+                organisationServiceClientV2);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -310,7 +319,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                "",
+                organisationServiceClientV2);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -746,7 +756,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                "",
+                organisationServiceClientV2);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
     }
@@ -773,7 +784,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                "",
+                organisationServiceClientV2);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
         Mockito.verifyNoMoreInteractions(auditService);
@@ -958,7 +970,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -980,7 +992,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -995,9 +1007,10 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree(schedInfoOrg.getOrganisationId())), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+
+        var organisationDescendants = List.of(createRandomOrganisationSimple(), new OrganisationSimple(schedInfoOrg.getOrganisationId()), createRandomOrganisationSimple());
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setOrganisation(schedInfoOrg);
@@ -1006,7 +1019,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userOrganisation);
     }
 
     @ParameterizedTest
@@ -1021,16 +1034,16 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+        var organisationDescendants = List.of(createRandomOrganisationSimple(), createRandomOrganisationSimple(), createRandomOrganisationSimple());
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setOrganisation(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userOrganisation);
     }
 
     @ParameterizedTest
@@ -1052,7 +1065,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1072,7 +1085,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1091,6 +1104,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1102,9 +1116,9 @@ public class SchedulingInfoServiceImplTest {
         var status = ProvisionStatus.PROVISIONED_OK;
         var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-        var organisationTree = createOrganisationTree("A", createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+        var organisationDescendants = List.of(new OrganisationSimple("A"), new OrganisationSimple("B"), new OrganisationSimple("C"), new OrganisationSimple("D"));
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
         var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
         Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A", "B", "C", "D")))
                 .thenReturn(expectedSchedulingInfo);
@@ -1112,6 +1126,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userContext.getUserOrganisation());
     }
 
     @ParameterizedTest
@@ -1123,9 +1138,6 @@ public class SchedulingInfoServiceImplTest {
         var status = ProvisionStatus.PROVISIONED_OK;
         var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-        var organisationTree = createOrganisationTree("A", createOrganisationTree("B"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
         var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
         Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A")))
                 .thenReturn(expectedSchedulingInfo);
@@ -1133,13 +1145,8 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
-    }
 
-    private OrganisationTree createOrganisationTree(String code, OrganisationTree ... children) {
-        var organisationTree = new OrganisationTree();
-        organisationTree.setCode(code);
-        organisationTree.setChildren(Arrays.asList(children));
-        return organisationTree;
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     private SchedulingInfo createSchedulingInfo(boolean newProvisioner) {
@@ -1244,7 +1251,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 excludeOrganisationsFilter,
                 poolFinderService,
-                "citizen_portal");
+                "citizen_portal",
+                organisationServiceClientV2);
     }
 
 
@@ -1278,5 +1286,9 @@ public class SchedulingInfoServiceImplTest {
 
     private Organisation createOverflowPool() {
         return createOrganisation(true, OVERFLOW_POOL, 3);
+    }
+
+    private OrganisationSimple createRandomOrganisationSimple() {
+        return new OrganisationSimple(UUID.randomUUID().toString());
     }
 }

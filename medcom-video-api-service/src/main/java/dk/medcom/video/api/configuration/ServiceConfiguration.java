@@ -7,6 +7,9 @@ import dk.medcom.video.api.converter.StringToViewTypeConverter;
 import dk.medcom.video.api.converter.StringToVmrQualityConverter;
 import dk.medcom.video.api.converter.StringToVmrTypeConverter;
 import dk.medcom.video.api.interceptor.OauthInterceptor;
+import dk.medcom.video.api.keycloak.KeycloakHttpClientService;
+import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
+import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import org.openapitools.model.ViewType;
 import org.openapitools.model.VmrQuality;
@@ -24,6 +27,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,10 +53,6 @@ import dk.medcom.video.api.dao.SchedulingStatusRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
-import dk.medcom.video.api.organisation.OrganisationServiceClient;
-import dk.medcom.video.api.organisation.OrganisationStrategy;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
-import dk.medcom.video.api.organisation.OrganisationTreeServiceClientImpl;
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
@@ -210,7 +210,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 													   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
 													   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
 													   PoolFinderService poolFinderService,
-													   @Value("${scheduling.info.citizen.portal}") String citizenPortal) {
+													   @Value("${scheduling.info.citizen.portal}") String citizenPortal,
+													   OrganisationServiceClientV2 organisationServiceClientV2) {
 		return new SchedulingInfoServiceImpl(
 				schedulingInfoRepository,
 				schedulingTemplateRepository,
@@ -227,7 +228,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				schedulingInfoEventPublisher,
 				newProvisionerOrganisationFilter,
 				poolFinderService,
-				citizenPortal
+				citizenPortal,
+				organisationServiceClientV2
 		);
 	}
 
@@ -311,6 +313,21 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
 		return new OrganisationTreeServiceClientImpl(endpoint);
+	}
+
+	@Bean
+	public OrganisationServiceClientV2 organisationServiceClientV2(KeycloakHttpClientService keycloakHttpClientService,
+                                                                   @Value("${organisation.service.endpoint}") String endpoint,
+                                                                   RestClient.Builder restClientBuilder) {
+		return new OrganisationServiceClientV2Impl(keycloakHttpClientService, endpoint, restClientBuilder);
+	}
+
+	@Bean
+	public KeycloakHttpClientService keycloakHttpClientService(@Value("${keycloak.service.endpoint}") String endpoint,
+	                                                           @Value("${keycloak.service.client}") String client,
+	                                                           @Value("${keycloak.service.clientsecret}") String clientSecret,
+	                                                           RestClient.Builder restClientBuilder) {
+		return new KeycloakHttpClientServiceImpl(endpoint, client, clientSecret, restClientBuilder);
 	}
 
 	@Bean
