@@ -317,7 +317,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public OrganisationServiceClientV2 organisationServiceClientV2(KeycloakHttpClientService keycloakHttpClientService,
-                                                                   @Value("${organisation.service.endpoint}") String endpoint,
+                                                                   @Value("${organisation.service.v2.endpoint}") String endpoint,
                                                                    RestClient.Builder restClientBuilder) {
 		return new OrganisationServiceClientV2Impl(keycloakHttpClientService, endpoint, restClientBuilder);
 	}

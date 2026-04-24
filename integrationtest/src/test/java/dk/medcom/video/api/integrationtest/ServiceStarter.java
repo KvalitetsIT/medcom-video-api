@@ -99,6 +99,7 @@ public class ServiceStarter {
 
         System.setProperty("organisation.service.enabled", "true");
         System.setProperty("organisation.service.endpoint", organisationPath + "/services");
+        System.setProperty("organisation.service.v2.endpoint", organisationPath);
         System.setProperty("organisationtree.service.endpoint", organisationPath);
 
         System.setProperty("keycloak.service.endpoint", keycloakMockPath + "/realms/broker");
@@ -184,6 +185,7 @@ public class ServiceStarter {
 
                 .withEnv("organisation.service.enabled", "true")
                 .withEnv("organisation.service.endpoint", "http://organisation:1080/services")
+                .withEnv("organisation.service.v2.endpoint", "http://organisation:1080")
                 .withEnv("organisationtree.service.endpoint", "http://organisation:1080")
                 .withEnv("short.link.base.url", "https://video.link/")
                 .withEnv("overflow.pool.organisation.id", "overflow")
