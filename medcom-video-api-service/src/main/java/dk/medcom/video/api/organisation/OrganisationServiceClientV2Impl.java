@@ -27,7 +27,7 @@ public class OrganisationServiceClientV2Impl implements OrganisationServiceClien
         try {
             return restClient.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/v2/organisation/" + code + "/descendants")
+                            .path("/services/v2/organisation/" + code + "/descendants")
                             .build())
                     .header("Authorization", retrieveAccessTokenHeader())
                     .retrieve()

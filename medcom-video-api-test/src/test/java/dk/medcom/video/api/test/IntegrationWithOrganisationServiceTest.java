@@ -163,6 +163,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withClasspathResourceMapping("db/migration/V902__create_view.sql", "/app/sql/V902__create_view.sql", BindMode.READ_ONLY)
 				.withEnv("organisation.service.enabled", "true")
 				.withEnv("organisation.service.endpoint", "http://organisation:1080/services")
+				.withEnv("organisation.service.v2.endpoint", "http://organisation:1080")
 				.withEnv("organisationtree.service.endpoint", "http://organisation:1080")
 				.withEnv("short.link.base.url", "https://video.link/")
 				.withEnv("overflow.pool.organisation.id", "overflow")
