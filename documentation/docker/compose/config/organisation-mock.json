@@ -63,14 +63,14 @@
   {
     "httpRequest": {
       "method" : "GET",
-      "path": "/getsessiondata"
+      "path": "/user/getsessiondata"
     },
     "httpResponse": {
       "statusCode" : 200,
       "headers" : {
         "Content-Type" : [ "application/json" ]
       },
-      "body": "{\"UserAttributes\": {\"organisation_id\": [\"user-org-pool\"],\"email\":[\"eva@klak.dk\"],\"userrole\":[\"dk:medcom:role:admin\", \"dk:medcom:role:provisioner\"]}}"
+      "body": "{\"UserAttributes\": {\"dk:medcom:organisation_id\": [\"user-org-pool\"],\"dk:medcom:email\":[\"eva@klak.dk\"],\"dk:medcom:video:role\":[\"meeting-admin\", \"meeting-provisioner\"]}}"
     }
   }
 ]
