@@ -1,4 +1,4 @@
-package dk.medcom.video.api.interceptor;
+package dk.medcom.video.api.controller.advice;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Objects;
 
 @ControllerAdvice
-public class RequestFieldMetricInterceptor extends RequestBodyAdviceAdapter {
-    private final static Logger logger = LoggerFactory.getLogger(RequestFieldMetricInterceptor.class);
+public class RequestBodyFieldMetricAdvice extends RequestBodyAdviceAdapter {
+    private final static Logger logger = LoggerFactory.getLogger(RequestBodyFieldMetricAdvice.class);
 
     private final MeterRegistry meterRegistry;
 
-    public RequestFieldMetricInterceptor(MeterRegistry meterRegistry) {
+    public RequestBodyFieldMetricAdvice(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
@@ -52,7 +52,7 @@ public class RequestFieldMetricInterceptor extends RequestBodyAdviceAdapter {
                 if (field.get(body) != null) {
                     if (field.getType().getSimpleName().equals("List")) {
                         var fieldAsList = (List<?>) field.get(body);
-                        Counter.builder("declared.request.body.fields")
+                        Counter.builder("api.request.fields.usage")
                                 .tag("method", method)
                                 .tag("object", body.getClass().getSimpleName())
                                 .tag("field", field.getName())
@@ -60,7 +60,7 @@ public class RequestFieldMetricInterceptor extends RequestBodyAdviceAdapter {
                                 .register(meterRegistry)
                                 .increment();
                     } else {
-                        Counter.builder("declared.request.body.fields")
+                        Counter.builder("api.request.fields.usage")
                                 .tag("method", method)
                                 .tag("object", body.getClass().getSimpleName())
                                 .tag("field", field.getName())
