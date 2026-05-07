@@ -61,7 +61,7 @@ services:
       - jdbc_user=orguser
       - jdbc_pass=secret1234
 
-      - userservice_url=""
+      - userservice_url=http://organisation:1080/user
       - userservice_token_attribute_organisation=dk:medcom:organisation_id
       - userservice_token_attribute_username=dk:medcom:email
       - userservice_token_attribute_email=dk:medcom:email
@@ -96,6 +96,7 @@ services:
       - organisation.service.enabled=true
       - organisation.service.endpoint=http://organisation:1080/services
       - organisationtree.service.endpoint=http://organisation:1080
+      - organisation.service.v2.endpoint=http://organisation:1080
 
       - short.link.base.url=""
 
@@ -113,11 +114,15 @@ services:
 
       - spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:9000/auth/realms/keycloaktest
       - spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://keycloak:9000/auth/realms/keycloaktest/protocol/openid-connect/certs
+      - keycloak.service.endpoint=http://localhost:9000/auth/realms/keycloaktest
+      - keycloak.service.client=videoApiClient
+      - keycloak.service.clientsecret=videoApiClientSecret
      depends_on:
       mysql:
        condition: service_healthy
      ports:
       - 8080:8080
+      - 8081:8081
 
    documentation-and-test:
      image: kvalitetsit/medcom-video-api-documentation:latest
