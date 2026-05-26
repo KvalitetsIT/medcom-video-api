@@ -72,8 +72,8 @@ public class HelperMethods {
                 GuestMicrophoneModel.muted,
                 randomBoolean(),
                 List.of(randomString(),
-                randomString()),
-                randomAdditionalInformationModel());
+                        randomString()),
+                randomAdditionalInformationModel(), 0);
     }
 
     public static SchedulingTemplateModel randomSchedulingTemplate() {
@@ -123,7 +123,7 @@ public class HelperMethods {
                 (int) count++,
                 randomSchedulingTemplate(),
                 List.of(randomSchedulingInfo(),
-                randomSchedulingInfo()));
+                        randomSchedulingInfo()));
     }
 
     private static MeetingUserModel randomMeetingUser() {
@@ -200,6 +200,30 @@ public class HelperMethods {
                 .additionalInformation(List.of(randomAdditionalInformationInput()));
     }
 
+    public static MeetingModel randomMeetingWithXParticipants(int x) {
+        return new MeetingModel(randomString(),
+                UUID.randomUUID(),
+                randomMeetingUser(),
+                randomMeetingUser(),
+                randomMeetingUser(),
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                GuestMicrophoneModel.muted,
+                randomBoolean(),
+                List.of(randomString(),
+                        randomString()),
+                randomAdditionalInformationModel(), x);
+    }
+
+
     public static SchedulingTemplateRequest randomSchedulingTemplateRequestInput() {
         return new SchedulingTemplateRequest()
                 .conferencingSysId(count++)
@@ -246,6 +270,18 @@ public class HelperMethods {
                 .provisionStatus(ProvisionStatus.PROVISIONED_OK)
                 .provisionStatusDescription(randomString())
                 .provisionVmrId(randomString());
+    }
+
+    public static CreateParticipant randomCreateParticipantInput() {
+        return new CreateParticipant()
+                .externalId(randomString())
+                .organisation(randomString())
+                .role(ParticipantRole.GUEST)
+                .type(ParticipantType.CITIZEN);
+    }
+
+    public static UpdateParticipant randomUpdateParticipant() {
+        return new UpdateParticipant().role(ParticipantRole.GUEST);
     }
 
     private static AdditionalInformationType randomAdditionalInformationInput() {
@@ -333,6 +369,7 @@ public class HelperMethods {
         assertTrue(actual.getLinks().getSchedulingInfo().getHref().toString().contains(actual.getUuid().toString()));
         assertEquals("https", actual.getLinks().getSchedulingInfo().getHref().getScheme());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
+        assertEquals(expected.knownParticipants(), actual.getKnownParticipants(), 0);
     }
 
     public static void assertSchedulingTemplate(SchedulingTemplateModel expected, SchedulingTemplate actual) {
@@ -385,7 +422,7 @@ public class HelperMethods {
         assertSchedulingTemplate(expected.schedulingTemplate(), actual.getSchedulingTemplate());
         assertEquals(expected.schedulingInfoList().size(), actual.getSchedulingInfoList().size());
 
-        for (int i=0; i < expected.schedulingInfoList().size(); i++) {
+        for (int i = 0; i < expected.schedulingInfoList().size(); i++) {
             assertSchedulingInfo(expected.schedulingInfoList().get(i), actual.getSchedulingInfoList().get(i));
         }
     }
@@ -426,7 +463,7 @@ public class HelperMethods {
         if (expected.guestView() != null) {
             assertNotNull(actual.getGuestView());
             assertEquals(expected.guestView().toString(), actual.getGuestView().toString());
-        }  else {
+        } else {
             assertNull(actual.getGuestView());
         }
         assertVmrQuality(expected.vmrQuality(), actual.getVmrQuality());
@@ -478,7 +515,7 @@ public class HelperMethods {
         }
         if (expected.getGuestView() != null) {
             assertEquals(actual.guestView().toString(), expected.getGuestView().toString());
-        }  else {
+        } else {
             assertNull(actual.guestView());
         }
         assertVmrQuality(actual.vmrQuality(), expected.getVmrQuality());
@@ -555,7 +592,7 @@ public class HelperMethods {
         }
 
         assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i ++) {
+        for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i), actual.get(i));
         }
     }
@@ -567,7 +604,7 @@ public class HelperMethods {
         }
 
         assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i ++) {
+        for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i).key(), actual.get(i).getKey());
             assertEquals(expected.get(i).value(), actual.get(i).getValue());
         }
