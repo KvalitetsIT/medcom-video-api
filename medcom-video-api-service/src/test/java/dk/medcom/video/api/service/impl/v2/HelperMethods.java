@@ -203,7 +203,7 @@ public class HelperMethods {
                 randomString(),
                 (int) count++,
                 (int) count++,
-                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
+                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()), List.of());
     }
 
     public static UpdateMeetingModel randomUpdateMeetingModel() {
