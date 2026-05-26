@@ -483,18 +483,17 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
         LOGGER.debug("portalDate is: {}", portalDate);
 
 		String portalPin;
-		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
+		if (schedulingInfo.getGuestPin() != null) {
 			portalPin = schedulingInfo.getGuestPin().toString();
 			LOGGER.debug("Portal pin used is guest");
 		}
-		else {
-			if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
+		else if (schedulingInfo.getHostPin() != null) {
 				portalPin = schedulingInfo.getHostPin().toString();
 				LOGGER.debug("Portal pin used is host");
-			} else {
-				portalPin = "";
-				LOGGER.debug("Portal pin used is empty");
-			}
+		}
+		else {
+			portalPin = "";
+			LOGGER.debug("Portal pin used is empty");
 		}
 
 		String microphone = null;
@@ -502,17 +501,17 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			if (schedulingInfo.getMeeting().getGuestMicrophone() != GuestMicrophone.on){
 				microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
 			}
-			LOGGER.debug("Guest microphone is: "+ schedulingInfo.getMeeting().getGuestMicrophone());
+            LOGGER.debug("Guest microphone is: {}", schedulingInfo.getMeeting().getGuestMicrophone());
 		}else {
 			LOGGER.debug("Guest microphone is not set");
 		}
 
 		StringBuilder portalLink = new StringBuilder();
 		//Minimum portal link
-		portalLink.append(citizenPortal).append("/?url=").append(schedulingInfo.getUriWithDomain()).append("&pin=").append(portalPin).append("&start_dato=").append(portalDate);
+		portalLink.append(citizenPortal).append("/?conference=").append(schedulingInfo.getUriWithDomain()).append("&pin=").append(portalPin).append("&start_dato=").append(portalDate);
 
 		if (microphone != null){
-			portalLink.append("&microphone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=off
+			portalLink.append("&muteMicrophone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?conference=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&muteMicrophone=off
 		}
         LOGGER.debug("portalLink is {}", portalLink);
 		return portalLink.toString();
