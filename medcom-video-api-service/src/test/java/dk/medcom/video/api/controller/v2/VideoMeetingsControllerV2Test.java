@@ -5,42 +5,51 @@ import dk.medcom.video.api.controller.v2.exception.NotValidDataException;
 import dk.medcom.video.api.controller.v2.exception.PermissionDeniedException;
 import dk.medcom.video.api.controller.v2.exception.ResourceNotFoundException;
 import dk.medcom.video.api.service.MeetingServiceV2;
+import dk.medcom.video.api.service.ParticipantService;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.model.ParticipantModel;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.openapitools.model.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static dk.medcom.video.api.controller.v2.HelperMethods.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 public class VideoMeetingsControllerV2Test {
 
     private VideoMeetingsControllerV2 videoMeetingsControllerV2;
     private MeetingServiceV2 meetingService;
+    private ParticipantService participantService;
 
     @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingServiceV2.class);
+        participantService = Mockito.mock(ParticipantService.class);
 
-        videoMeetingsControllerV2 = new VideoMeetingsControllerV2(meetingService);
+        videoMeetingsControllerV2 = new VideoMeetingsControllerV2(meetingService, participantService);
 
         HttpServletRequest mockRequest = new MockHttpServletRequest();
         ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
         RequestContextHolder.setRequestAttributes(servletRequestAttributes);
     }
-    
+
     private void verifyNoMoreInteractions() {
         Mockito.verifyNoMoreInteractions(meetingService);
     }
@@ -462,7 +471,7 @@ public class VideoMeetingsControllerV2Test {
         var input = randomCreateMeetingInput();
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.createMeetingV2(Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsPost(input);
         assertNotNull(result);
@@ -481,7 +490,7 @@ public class VideoMeetingsControllerV2Test {
                 .endTime(OffsetDateTime.now());
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.createMeetingV2(Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsPost(input);
         assertNotNull(result);
@@ -498,7 +507,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostPermissionDenied() {
         var input = randomCreateMeetingInput();
 
-        Mockito.when(meetingService.createMeetingV2(Mockito.any())).thenThrow(new PermissionDeniedExceptionV2());
+        Mockito.when(meetingService.createMeetingV2(any())).thenThrow(new PermissionDeniedExceptionV2());
 
         var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsPost(input));
         assertNotNull(expectedException);
@@ -513,7 +522,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostNotAcceptable() {
         var input = randomCreateMeetingInput();
 
-        Mockito.when(meetingService.createMeetingV2(Mockito.any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.createMeetingV2(any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotAcceptableException.class, () -> videoMeetingsControllerV2.v2MeetingsPost(input));
         assertNotNull(expectedException);
@@ -529,7 +538,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostNotValidData() {
         var input = randomCreateMeetingInput();
 
-        Mockito.when(meetingService.createMeetingV2(Mockito.any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.createMeetingV2(any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotValidDataException.class, () -> videoMeetingsControllerV2.v2MeetingsPost(input));
         assertNotNull(expectedException);
@@ -653,7 +662,7 @@ public class VideoMeetingsControllerV2Test {
         var input = randomPatchMeetingInput();
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input);
         assertNotNull(result);
@@ -672,7 +681,7 @@ public class VideoMeetingsControllerV2Test {
         var input = new PatchMeeting();
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input);
         assertNotNull(result);
@@ -690,7 +699,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomPatchMeetingInput();
 
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new PermissionDeniedExceptionV2());
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenThrow(new PermissionDeniedExceptionV2());
 
         var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input));
         assertNotNull(expectedException);
@@ -706,7 +715,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomPatchMeetingInput();
 
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotValidDataException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input));
         assertNotNull(expectedException);
@@ -723,7 +732,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomPatchMeetingInput();
 
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
 
         var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input));
         assertNotNull(expectedException);
@@ -739,7 +748,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomPatchMeetingInput();
 
-        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.patchMeetingV2(Mockito.eq(uuid), any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotAcceptableException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPatch(uuid, input));
         assertNotNull(expectedException);
@@ -757,7 +766,7 @@ public class VideoMeetingsControllerV2Test {
         var input = randomUpdateMeetingInput();
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input);
         assertNotNull(result);
@@ -777,7 +786,7 @@ public class VideoMeetingsControllerV2Test {
                 .endTime(OffsetDateTime.now());
 
         var meeting = randomMeeting();
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenReturn(meeting);
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenReturn(meeting);
 
         var result = videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input);
         assertNotNull(result);
@@ -795,7 +804,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomUpdateMeetingInput();
 
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
 
         var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input));
         assertNotNull(expectedException);
@@ -811,7 +820,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomUpdateMeetingInput();
 
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new PermissionDeniedExceptionV2());
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenThrow(new PermissionDeniedExceptionV2());
 
         var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input));
         assertNotNull(expectedException);
@@ -827,7 +836,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomUpdateMeetingInput();
 
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenThrow(new NotAcceptableExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotAcceptableException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input));
         assertNotNull(expectedException);
@@ -844,7 +853,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var input = randomUpdateMeetingInput();
 
-        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), Mockito.any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
+        Mockito.when(meetingService.updateMeetingV2(Mockito.eq(uuid), any())).thenThrow(new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Message"));
 
         var expectedException = assertThrows(NotValidDataException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidPut(uuid, input));
         assertNotNull(expectedException);
@@ -854,5 +863,157 @@ public class VideoMeetingsControllerV2Test {
 
         Mockito.verify(meetingService).updateMeetingV2(Mockito.eq(uuid), Mockito.argThat(x -> assertUpdateMeeting(x, input)));
         verifyNoMoreInteractions();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 5, 10, 0})
+    public void testV2MeetingsPostWithVariousParticipantCounts(int count) {
+        var input = randomCreateMeetingInput();
+        var participants = Collections.nCopies(count,
+                new CreateParticipant(ParticipantType.CITIZEN, "", ParticipantRole.GUEST));
+        input.setParticipants(participants);
+        var meeting = randomMeetingWithXParticipants(count);
+        Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
+        var result = videoMeetingsControllerV2.v2MeetingsPost(input);
+        assertEquals(result.getBody().getKnownParticipants(), count);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsGet() {
+        var uuid = UUID.randomUUID();
+        var participants = List.of(new ParticipantModel(1L, dk.medcom.video.api.dao.entity.ParticipantType.USER,
+                "Test User", "test@example.com", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST));
+
+        Mockito.when(participantService.getParticipants(uuid)).thenReturn(participants);
+
+        var result = videoMeetingsControllerV2.v2MeetingsUuidParticipantsGet(uuid);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(1, result.getBody().size());
+
+        var participant = result.getBody().getFirst();
+        assertSame(ParticipantRole.GUEST, participant.getRole());
+        assertEquals("Test User", participant.getExternalId());
+
+        Mockito.verify(participantService).getParticipants(uuid);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsGetNotFound() {
+        var uuid = UUID.randomUUID();
+
+        Mockito.when(participantService.getParticipants(uuid))
+                .thenThrow(new ResourceNotFoundExceptionV2("", ""));
+
+        var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsGet(uuid));
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsGetPermissionDenied() {
+        var uuid = UUID.randomUUID();
+
+        Mockito.when(participantService.getParticipants(uuid))
+                .thenThrow(new PermissionDeniedExceptionV2());
+
+        var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsGet(uuid));
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsPost() {
+        var uuid = UUID.randomUUID();
+        var input = List.of(randomCreateParticipantInput(), randomCreateParticipantInput(), randomCreateParticipantInput());
+        var participants = List.of(new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST));
+
+        Mockito.when(participantService.createParticipants(Mockito.eq(uuid), Mockito.any())).thenReturn(participants);
+
+        var result = videoMeetingsControllerV2.v2MeetingsUuidParticipantsPost(uuid, input);
+
+        assertSame(ParticipantRole.GUEST, result.getBody().getFirst().getRole());
+        assertEquals(1l, (long) result.getBody().getFirst().getId());
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsPostNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(participantService.createParticipants(Mockito.eq(uuid), Mockito.any())).thenThrow(new ResourceNotFoundExceptionV2("", ""));
+
+        var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsPost(uuid, List.of()));
+
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsPostPermissionDenied() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(participantService.createParticipants(Mockito.eq(uuid), Mockito.any())).thenThrow(new PermissionDeniedExceptionV2());
+
+        var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsPost(uuid, List.of()));
+
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void testV2MeetingsUuiParticipantsPutId() {
+        var uuid = UUID.randomUUID();
+        var updateParticipant = randomUpdateParticipant();
+        var participantModel = new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST);
+
+        Mockito.when(participantService.updateParticipant(Mockito.eq(uuid), Mockito.eq(1l), Mockito.any())).thenReturn(participantModel);
+
+        var result = videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdPut(uuid, 1l, updateParticipant);
+
+        assertSame(ParticipantRole.GUEST, result.getBody().getRole());
+    }
+
+    @Test
+    public void testV2MeetingsUuiParticipantsPutIdNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(participantService.updateParticipant(Mockito.eq(uuid), Mockito.any(), Mockito.any())).thenThrow(new ResourceNotFoundExceptionV2(
+                "", ""));
+        var updateParticipant = randomUpdateParticipant();
+
+        var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdPut(uuid, 1l, updateParticipant));
+
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void testV2MeetingsUuiParticipantsPutIdPermissionDenied() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(participantService.updateParticipant(Mockito.eq(uuid), Mockito.any(), Mockito.any())).thenThrow(new PermissionDeniedExceptionV2());
+        var updateParticipant = randomUpdateParticipant();
+
+        var expectedException = assertThrows(PermissionDeniedException.class, () -> videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdPut(uuid, 1l, updateParticipant));
+
+        assertTrue(expectedException.getHttpStatus() == HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsIdDelete() {
+        var uuid = UUID.randomUUID();
+        var result = videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdDelete(uuid, 1L);
+        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
+        Mockito.verify(participantService).deleteParticipant(uuid, 1L);
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsIdDeleteNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.doThrow(new ResourceNotFoundExceptionV2("", ""))
+                .when(participantService).deleteParticipant(uuid, 1L);
+        assertThrows(ResourceNotFoundException.class, () ->
+                videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdDelete(uuid, 1L));
+    }
+
+    @Test
+    public void testV2MeetingsUuidParticipantsIdDeletePermissionDenied() {
+        var uuid = UUID.randomUUID();
+        Mockito.doThrow(new PermissionDeniedExceptionV2())
+                .when(participantService).deleteParticipant(uuid, 1L);
+        assertThrows(PermissionDeniedException.class, () ->
+                videoMeetingsControllerV2.v2MeetingsUuidParticipantsIdDelete(uuid, 1L));
     }
 }
