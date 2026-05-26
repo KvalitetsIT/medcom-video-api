@@ -511,8 +511,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		portalLink.append(citizenPortal).append("/?conference=").append(schedulingInfo.getUriWithDomain()).append("&pin=").append(portalPin).append("&start_dato=").append(portalDate);
 
 		if (microphone != null){
-			portalLink.append("&muteMicrophone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?conference=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&muteMicrophone=off
+			portalLink.append("&muteMicrophone=").append(microphone);
 		}
+		portalLink.append("&join=1");	//Example: https://portal-test.vconf.dk/?conference=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&muteMicrophone=off&join=1
         LOGGER.debug("portalLink is {}", portalLink);
 		return portalLink.toString();
 	}

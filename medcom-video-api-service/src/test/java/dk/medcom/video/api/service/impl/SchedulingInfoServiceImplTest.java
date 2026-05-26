@@ -179,7 +179,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
 
@@ -230,7 +230,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
 
@@ -627,7 +627,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -668,7 +668,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -818,7 +818,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off", result.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -849,7 +849,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted", result.getPortalLink());
+        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
