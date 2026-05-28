@@ -2,131 +2,131 @@ openapi: 3.0.0
 info:
   title: VDX Booking Module API
   description: API description for the VDX Booking interface which allow for scheduling of video meetings. <br/> <br/>
-    The overall rules for the different roles are 
+    The overall rules for the different roles are
     <ul>
-      <li> normal meeting user can handle own meetings, including retrieve list of scheduling templates from own organization
-      <li> meeting planner can handle meetings in the same organization. By using the organizedByEmail parameter the role can handle meetings on behalf on others
-      <li> provisioner can call the provision service and create scheduling information.
-      <li> admin user can the same as meeting planner and also create and update scheduling templates
+    <li> normal meeting user can handle own meetings, including retrieve list of scheduling templates from own organization
+    <li> meeting planner can handle meetings in the same organization. By using the organizedByEmail parameter the role can handle meetings on behalf on others
+    <li> provisioner can call the provision service and create scheduling information.
+    <li> admin user can the same as meeting planner and also create and update scheduling templates
     </Ul>
     <h3>Versions:</h3>
-    0.1.1 
+    0.1.1
     <Ul>
-      <Li> changed format for provisionVmrId property on update-scheduling-info request to uuid format
-      <Li> added meeting put and delete request
-      <Li> removed "api" from each request path
-      <Li> renamed ccsid to uuid (as the real API already are using) <br>
-      <Li> moved uuid path parameter to "component" part of format to allow for reuse (no functional impact)
-      <Li> added response codes for each request
-      <Li> only a 'provioner' can run a 'put scheduling-info' request <br> 
+    <Li> changed format for provisionVmrId property on update-scheduling-info request to uuid format
+    <Li> added meeting put and delete request
+    <Li> removed "api" from each request path
+    <Li> renamed ccsid to uuid (as the real API already are using) <br>
+    <Li> moved uuid path parameter to "component" part of format to allow for reuse (no functional impact)
+    <Li> added response codes for each request
+    <Li> only a 'provioner' can run a 'put scheduling-info' request <br>
     </Ul>
-    0.2.0 
+    0.2.0
     <Ul>
-    <Li> added provsionStatusDescription to update-scheduling-info and scheduling-info 
+    <Li> added provsionStatusDescription to update-scheduling-info and scheduling-info
     </Ul>
-    0.2.1 
+    0.2.1
     <Ul>
-      <Li> changed format for provisionVmrId property on update-scheduling-info request from uuid format to no format requirement 
+    <Li> changed format for provisionVmrId property on update-scheduling-info request from uuid format to no format requirement
     </Ul>
-    0.3.0 
+    0.3.0
     <Ul>
-      <Li> added ivrTheme and portalLink to scheduling-info
-      <Li> added projectCode and organizedByEmail  to create-meeting and update-meeting
-      <Li> added projectCode and organizedBy group to meeting
-      <Li> added new role meeting Planner, who can create/update meetings on behalf on others
-      <Li> normal meeting user can now only see and update own meetings
-      <Li> added updatedBy, createdTime, updatedTime to meeting
-      <Li> added createdBy, updatedBy, createdTime, updatedTime to scheduling-info 
+    <Li> added ivrTheme and portalLink to scheduling-info
+    <Li> added projectCode and organizedByEmail  to create-meeting and update-meeting
+    <Li> added projectCode and organizedBy group to meeting
+    <Li> added new role meeting Planner, who can create/update meetings on behalf on others
+    <Li> normal meeting user can now only see and update own meetings
+    <Li> added updatedBy, createdTime, updatedTime to meeting
+    <Li> added createdBy, updatedBy, createdTime, updatedTime to scheduling-info
     </Ul>
-    0.3.1 
+    0.3.1
     <Ul>
-      <Li> all users must have an organisation and an email in order to create or update data
-      <Li> not filled organizedByEmail on create-meeting and update-meeting behaves like when field not present (create/update user will be the organizer) 
+    <Li> all users must have an organisation and an email in order to create or update data
+    <Li> not filled organizedByEmail on create-meeting and update-meeting behaves like when field not present (create/update user will be the organizer)
     </Ul>
-    0.4.0 
+    0.4.0
     <Ul>
-      <Li> it is now possible to update endTime on a meeting when it has status PROVISIONED_OK
+    <Li> it is now possible to update endTime on a meeting when it has status PROVISIONED_OK
     </Ul>
-    0.5.0 
+    0.5.0
     <Ul>
-      <Li> extended projectCode from 20 to 100 characters
-      <Li> added maxParticipants, endMeetingOnEndTime and schedulingTemplateId to create-meeting
-      <Li> added post, put, delete and get scheduling-template, the 3 first are only available for admin user
-      <Li> within the API it is now posible to have more than one role
+    <Li> extended projectCode from 20 to 100 characters
+    <Li> added maxParticipants, endMeetingOnEndTime and schedulingTemplateId to create-meeting
+    <Li> added post, put, delete and get scheduling-template, the 3 first are only available for admin user
+    <Li> within the API it is now posible to have more than one role
     </Ul>
     0.6.0
     <Ul>
-      <Li> added post scheduling-info
-      <Li> added get pool-info
-      <Li> added meetingType and uuid to create-meeting
+    <Li> added post scheduling-info
+    <Li> added get pool-info
+    <Li> added meetingType and uuid to create-meeting
     </Ul>
-    1.0.5 
+    1.0.5
     <Ul>
-      <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request 
+    <Li> added errorCode and errorText to 406 - Not Acceptable and 400 - Bad Request
     </Ul>
-    1.1.0 
+    1.1.0
     <Ul>
-      <Li> added get scheduling-info-provision
-      <Li> added get scheduling-info-deprovision
-      <Li> added guestMicrophone to create-meeting 
+    <Li> added get scheduling-info-provision
+    <Li> added get scheduling-info-deprovision
+    <Li> added guestMicrophone to create-meeting
     </Ul>
-    1.2.0 
+    1.2.0
     <Ul>
-      <Li> added scheduling-info-reserve
-      <Li> Extended create meeting with optional field schedulingInfoReservationId
-      <Li> Document labels.
+    <Li> added scheduling-info-reserve
+    <Li> Extended create meeting with optional field schedulingInfoReservationId
+    <Li> Document labels.
     </Ul>
-    1.3.0 
+    1.3.0
     <Ul>
-      <Li> added guestPingRequired to create-meeting 
+    <Li> added guestPingRequired to create-meeting
     </UL>
-    1.4.0 
+    1.4.0
     <Ul>
-      <Li> Implement HTTP PATCH for updates 
+    <Li> Implement HTTP PATCH for updates
     </UL>
-    1.5.0 
+    1.5.0
     <Ul>
-      <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info, meetings and scheduling-info-reserve 
+    <Li> added vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption and muteAllGuests to scheduling-templates, scheduling-info, meetings and scheduling-info-reserve
     </UL>
-    1.6.0 
+    1.6.0
     <Ul>
-      <Li> Added uriWithoutDomain to create meeting. 
+    <Li> Added uriWithoutDomain to create meeting.
     </UL>
-    1.6.1 
+    1.6.1
     <Ul>
-      <Li> Updated error text for code 100.
+    <Li> Updated error text for code 100.
     </Ul>
-    1.6.2 
+    1.6.2
     <Ul>
-      <Li> Search by uri with domain and uri without domain.
+    <Li> Search by uri with domain and uri without domain.
     </Ul>
-    1.6.3 
+    1.6.3
     <Ul>
-      <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.    
+    <Li> Possibility to set host and guest pin in POST and PATCH meeting operations.
     </Ul>
     1.7.0
     <Ul>
-      <Li> Added custom portal to scheduling template and scheduling info.
+    <Li> Added custom portal to scheduling template and scheduling info.
     </Ul>
     1.7.12
     <Ul>
-      <Li> Renamed vmrQuality item full_hd to fullhd. Have not yet been used, so it is not causing compatibility problems.
+    <Li> Renamed vmrQuality item full_hd to fullhd. Have not yet been used, so it is not causing compatibility problems.
     </Ul>
     1.10.0
     <Ul>
-      <Li> Add direct_media to scheduling info and scheduling template.
+    <Li> Add direct_media to scheduling info and scheduling template.
     </Ul>
     1.12.0
     <Ul>
-      <Li> Add additional_information to meeting and create-meeting.
+    <Li> Add additional_information to meeting and create-meeting.
     </Ul>
     1.12.3
     <Ul>
-      <Li> Add error message for duplicate key in additional information.
+    <Li> Add error message for duplicate key in additional information.
     </Ul>
     1.13.0
     <UL>
-      <Li> Update documentation to match source code.
+    <Li> Update documentation to match source code.
     </UL>
 
   version: "1.12.3"
@@ -149,7 +149,7 @@ paths:
   /v2/info:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Info V2
       summary: gets some general information on the API
@@ -178,7 +178,7 @@ paths:
   /v2/meetings/findByUriWithDomain:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: find meeting by uri with domain.
@@ -217,7 +217,7 @@ paths:
   /v2/meetings/findByUriWithoutDomain:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: find meeting by uri without domain.
@@ -256,7 +256,7 @@ paths:
   /v2/meetings:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: gets a list of meetings
@@ -360,7 +360,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: adds a new meeting
@@ -404,7 +404,7 @@ paths:
   /v2/meetings/{uuid}:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: gets a specific meeting
@@ -437,7 +437,7 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: updates an existing meeting
@@ -479,7 +479,7 @@ paths:
           $ref: '#/components/responses/500'
     patch:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: Updates an existing meeting through HTTP patch
@@ -521,7 +521,7 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: deletes an existing meeting
@@ -550,13 +550,141 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
-  /v2/scheduling-info:
+  /v2/meetings/{uuid}/participants:
     get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: gets participants of a specific meeting
+      description: >-
+        Gets participants of a specific meeting based on the given uuid. <br> <br> 
+        Only members of the owner organisation of the meeting can use this endpoint.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/participant'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
       security:
         - keycloakOIDC: []
       tags:
+        - Video Meetings V2
+      summary: adds a list of participants to a meeting
+      description: >-
+        Adds a list of participants to a specified meeting. <br> <br>
+        Only members of the owner organisation of the meeting can use this endpoint
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/create-participant'
+      responses:
+        '200':
+          description: Ok
+          content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/participant'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings/{uuid}/participants/{id}:
+    put:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: updates a participant on a meeting
+      description: >-
+        Updates a participant on a specified meeting. <br> <br>
+        Only members of the owner organisation of the meeting can use this endpoint.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/update-participant'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participant'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: deletes a participant from a meeting
+      description: >-
+        Deletes a specific participant from a specific meeting. <br> <br>
+        Only member of the owner organisation can use this endpoint.
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+        - $ref: '#/components/parameters/id'
+      responses:
+          '204':
+            description: No content
+          '400':
+            $ref: '#/components/responses/400'
+          '401':
+            $ref: '#/components/responses/401'
+          '403':
+            $ref: '#/components/responses/403'
+          '404':
+            $ref: '#/components/responses/404'
+          '500':
+            $ref: '#/components/responses/500'
+
+  /v2/scheduling-info:
+    get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
         - Video Scheduling Information V2
-      summary: gets a list of scheduling informations from meetings
+      summary: gets a list of scheduling information from meetings
       description: >-
         Gets a a list of scheduling informations based on date interval and provision status. The start 
         (minus VMR available before) or end time of the meeting must be within the date interval in order to be included 
@@ -588,7 +716,7 @@ paths:
           example: '2023-03-31T11:25:44Z'
         - name: provision-status
           in: query
-          description:  Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
+          description: Corresponds to numeric status 0, 1, 2, 3, 4, 5 and 6. <br>When not included the default value "AWAITS_PROVISION" will be used.
           required: false
           schema:
             allOf:
@@ -613,7 +741,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: adds a new scheduling info
@@ -650,7 +778,7 @@ paths:
   /v2/scheduling-info/{uuid}:
     put:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: updates an existing scheduling-info
@@ -688,7 +816,7 @@ paths:
           $ref: '#/components/responses/500'
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: gets a specific scheduling information
@@ -723,7 +851,7 @@ paths:
   /v2/scheduling-templates:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Scheduling Template Administration V2
       summary: gets a list of scheduling templates matching own organization
@@ -755,7 +883,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Scheduling Template Administration V2
       summary: adds a new scheduling template
@@ -789,7 +917,7 @@ paths:
   /v2/scheduling-templates/{id}:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Scheduling Template Administration V2
       summary: gets a specific scheduling template
@@ -822,7 +950,7 @@ paths:
           $ref: '#/components/responses/500'
     put:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Scheduling Template Administration V2
       summary: updates an existing scheduling template
@@ -859,7 +987,7 @@ paths:
           $ref: '#/components/responses/500'
     delete:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Scheduling Template Administration V2
       summary: deletes an existing scheduling template
@@ -886,7 +1014,7 @@ paths:
   /v2/scheduling-info-provision:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be provisioned
@@ -916,7 +1044,7 @@ paths:
   /v2/scheduling-info-deprovision:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: gets a list of scheduling informations on meetings waiting to be deprovisioned
@@ -946,7 +1074,7 @@ paths:
   /v2/scheduling-info-reserve:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: Reserves af scheduling info for later use. This enables knowing the host pin etc. before creating the meeting.
@@ -1050,11 +1178,11 @@ paths:
   /v2/scheduling-info-reserve/{uuid}:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Scheduling Information V2
       summary: Get scheduling info by reservation id.
-      description: >- 
+      description: >-
         Read a single scheduling info by id. <br> <br> 
         The following values of the user role claim grants access: <br>
         * meeting-admin
@@ -1079,11 +1207,11 @@ paths:
   /v2/pool:
     get:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Pool V2
       summary: returns a list of pool information
-      description: >- 
+      description: >-
         Gets the pool information per organization including the default scheduling template for the organization. 
         If this schedulingTemplate is null it is because the organisation in question do not have a default template.
         A default template must be created before it is possible to create scheduling info. <br> <br> 
@@ -1133,10 +1261,10 @@ components:
         authorizationCode:
           authorizationUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/auth
           tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
-          scopes: {}
+          scopes: { }
         clientCredentials:
           tokenUrl: https://<keycloak-url>/realms/<realm>/protocol/openid-connect/token
-          scopes: {}
+          scopes: { }
 
   parameters:
     uuid:
@@ -1353,6 +1481,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        knownParticipants:
+          type: integer
+          format: int32
+          example: 5
 
     create-meeting:
       type: object
@@ -1427,7 +1559,7 @@ components:
           example: 8103c61c-eb64-4148-984b-1236f4ff5849
         labels:
           type: array
-          default: []
+          default: [ ]
           items:
             type: string
             description: Array of labels to attach to meeting.
@@ -1475,9 +1607,14 @@ components:
           maximum: 999999999
         additionalInformation:
           type: array
-          default: []
+          default: [ ]
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        participants:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/create-participant'
 
     update-meeting:
       type: object
@@ -1513,13 +1650,13 @@ components:
           example: mail@mail.dk
         labels:
           type: array
-          default: []
+          default: [ ]
           items:
             type: string
             description: Array of labels to attach to meeting.
         additionalInformation:
           type: array
-          default: []
+          default: [ ]
           items:
             $ref: '#/components/schemas/additionalInformationType'
     patch-meeting:
@@ -2240,3 +2377,66 @@ components:
           description: Time of error
           type: string
           format: date-time
+
+    create-participant:
+      type: object
+      required:
+        - type
+        - externalId
+        - role
+      properties:
+        type:
+          $ref: '#/components/schemas/participantType'
+        externalId:
+          type: string
+          maxLength: 255
+          example: email@email.dk
+        organisation:
+          type: string
+          maxLength: 255
+          example: user-org
+        role:
+          $ref: '#/components/schemas/participantRole'
+
+    update-participant:
+      type: object
+      required:
+        - role
+      properties:
+        role:
+          $ref: '#/components/schemas/participantRole'
+
+    participantType:
+      type: string
+      enum:
+        - ORGANISATION
+        - USER
+        - DEVICE
+        - CITIZEN
+      example: USER
+
+    participantRole:
+      type: string
+      enum:
+        - GUEST
+        - HOST
+      example: HOST
+
+    participant:
+      type: object
+      required:
+        - id
+        - type
+        - externalId
+        - role
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/participantType'
+        externalId:
+          type: string
+          maxLength: 255
+        role:
+          $ref: '#/components/schemas/participantRole'

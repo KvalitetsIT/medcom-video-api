@@ -45,6 +45,7 @@ public class VideoMeetingMapper {
                 .guestMicrophone(EnumMapper.internalToExternal(input.guestMicrophone()))
                 .guestPinRequired(input.guestPinRequired())
                 .additionalInformation(input.additionalInformation().stream().map(VideoMeetingMapper::internalToExternal).toList())
+                .knownParticipants(input.knownParticipants())
                 .links(new MeetingLinks().self(meetingLinksSelf).schedulingInfo(meetingLinksSchedulingInfo));
     }
 
@@ -77,7 +78,8 @@ public class VideoMeetingMapper {
                 input.getUriWithoutDomain(),
                 input.getHostPin(),
                 input.getGuestPin(),
-                externalToInternal(input.getAdditionalInformation()));
+                externalToInternal(input.getAdditionalInformation()),
+                ParticipantMapper.externalToInternal(input.getParticipants()));
     }
 
     public static PatchMeetingModel externalToInternal(PatchMeeting input) {
