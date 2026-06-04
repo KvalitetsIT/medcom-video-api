@@ -19,6 +19,7 @@ import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.PortalLinkBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -60,6 +61,7 @@ public class SchedulingInfoServiceImplTest {
     private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
     private PoolFinderService poolFinderService;
     private OrganisationServiceClientV2 organisationServiceClientV2;
+    private PortalLinkBuilder videoPortalParser;
 
     @BeforeEach
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
@@ -108,6 +110,8 @@ public class SchedulingInfoServiceImplTest {
         poolFinderService = Mockito.mock(PoolFinderService.class);
 
         organisationServiceClientV2 = Mockito.mock(OrganisationServiceClientV2.class);
+
+        videoPortalParser = new PortalLinkBuilder("http://citizen_portal/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1");
     }
 
     @Test
@@ -127,8 +131,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L));
     }
@@ -166,8 +170,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
 
@@ -179,7 +183,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
 
@@ -217,8 +221,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
 
@@ -230,7 +234,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
 
@@ -267,8 +271,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -319,8 +323,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -627,7 +631,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -668,7 +672,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -756,8 +760,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
     }
@@ -784,8 +788,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
         Mockito.verifyNoMoreInteractions(auditService);
@@ -818,7 +822,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off&join=1", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -849,7 +853,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?conference=null&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted&join=1", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -1222,6 +1226,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(true);
+        schedulingInfo.setUriWithDomain("uri-with-domain");
 
         return schedulingInfo;
     }
@@ -1251,8 +1256,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 excludeOrganisationsFilter,
                 poolFinderService,
-                "citizen_portal",
-                organisationServiceClientV2);
+                organisationServiceClientV2,
+                videoPortalParser);
     }
 
 

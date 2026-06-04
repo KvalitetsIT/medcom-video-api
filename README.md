@@ -57,7 +57,17 @@ Værdierne af userservice.token.attribute.userrole er ikke konfigurable. Der er 
 
 ## Drift
 ### Environment variables
-Video api'et afvikles i docker. Følgende environment variable kan sættes op:
+Video api'et afvikles i docker. 
+
+Environment variablen `scheduling.info.citizen.portal.template` kan have følgende værdier som placeholders:
+* `__pin__`, mappes til guestPin, hvis ikke null, ellers hostPin, hvis ikke null, og ellers til en tom string.
+* `__uri-with-domain__`, mappes til uriWithDomain på scheduling info.
+* `__uri-domain__`, mappes til uriDomain på scheduling info.
+* `__start-date__`, sættes til start-dato på tilknyttede møde
+* `__return-url__`, mappes til returnUrl på scheduling info.
+* `__microphone__`, hvis scheduling info har tilknyttet møde med guestMicrophone sat til `off` eller `muted` sættes til hhv. `off`, `muted`, og ellers sættes den ikke.
+
+Følgende environment variable kan sættes op:
 
 | Environment variable                                  | Beskrivelse                                                                                                                                                                 | Krævet / Default             |
 |-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|
@@ -98,7 +108,7 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | scheduling.template.default.uri.number.range.low      | Default værdi for scheduling template uri_number_range_low, long.                                                                                                           | Yes                          |
 | scheduling.template.default.uri.number.range.high     | Default værdi for scheduling template uri_number_range_high, long.                                                                                                          | Yes                          |
 | scheduling.template.default.ivr.theme                 | Default værdi for scheduling template ivr_theme, string.                                                                                                                    | Yes                          |
-| scheduling.info.citizen.portal                        | URL til citizen portal link.                                                                                                                                                | Yes                          |
+| scheduling.info.citizen.portal.template               | URL skabelon til citizen portal link.                                                                                                                                       | Yes                          |
 | mapping.role.provisioner                              | Navn på provisioner role.                                                                                                                                                   | Yes                          |
 | mapping.role.admin                                    | Navn på admin role                                                                                                                                                          | Yes                          |
 | mapping.role.user                                     | Navn på user role                                                                                                                                                           | Yes                          |
