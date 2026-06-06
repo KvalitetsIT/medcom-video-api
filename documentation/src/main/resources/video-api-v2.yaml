@@ -1112,6 +1112,208 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+  /v2/meetings/{uuid}/participants: #Alle endpoints på nær GET skal opdatere updated_time på mødet
+    get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Participants
+      summary: Returns a list of participants in requested meeting
+      description: >-
+        Gets the participant list of the requested meeting. Only the owner organisation of the meeting may read this. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * TODO
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meetingParticipantResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Participants
+      summary: Adds a list of participants to requested meeting
+      description: >-
+        Adds a participant list to the requested meeting. Only the owner organisation of the meeting may do this.
+        Updates the updated_time of the meeting. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * TODO
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+      requestBody:
+        description: List of meeting participants to add to meeting
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/meetingParticipantRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meetingParticipantResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meetings/{uuid}/participants/{id}: #Alle endpoints skal opdatere updated_time på mødet
+    put:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Participants
+      summary: Updates a participant of a meeting
+      description: >-
+        Updates a participant of a meeting. Only the owner organisation of the meeting may do this. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * TODO
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+        - $ref: '#/components/parameters/id' #TODO
+      requestBody:
+        description: List of meeting participants to add to meeting
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/meetingParticipantRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/meetingParticipantResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Participants
+      summary: Deletes a participant from a meeting
+      description: >-
+        Deletes a participant from a meeting. Only the owner organisation of the meeting may do this. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * TODO
+      parameters:
+        - $ref: '#/components/parameters/uuid'
+        - $ref: '#/components/parameters/id' #TODO
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meeting-details:
+    get: #TODO skal det være muligt at sætte organisation selv? hvis man f.eks. skal læse fra underorganisationer
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Participants
+      summary: Returns all meetings where the user organisation is a participant.
+      description: >-
+        Returns all meetings where the organisation from the user context is a participant, either as an organisation participant,
+        a user participant or a device participant. Meetings owned by the user context organisation is not returned. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * TODO
+      parameters:
+        - name: participant-organisation
+          in: query
+          description: Participant organisation
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meetingSimpleResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+    post:
+      security:
+        - keycloakOIDC: [ ] #TODO mere?
+      tags:
+        - Participants
+      summary: Returns all meetings in with the citizen is a participant.
+      description: >-
+        Returns all meetings where the citizen is a participant. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * citizen-lookup
+      requestBody:
+        description: Citizen id
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/citizenParticipantRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meetingSimpleResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
 components:
   securitySchemes:
     userContext:
@@ -1353,6 +1555,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        meetingParticipants:
+          description: Number of meeting participants
+          type: integer
 
     create-meeting:
       type: object
@@ -1478,6 +1683,10 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        meetingParticipants:
+          type: array
+          items:
+            $ref: '#/components/schemas/meetingParticipantRequest'
 
     update-meeting:
       type: object
@@ -1522,6 +1731,11 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        meetingParticipants:
+          type: array
+          items:
+            $ref: '#/components/schemas/meetingParticipantRequest'
+
     patch-meeting:
       type: object
       properties:
@@ -1575,6 +1789,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        meetingParticipants:
+          type: array
+          items:
+            $ref: '#/components/schemas/meetingParticipantRequest'
 
     scheduling-info:
       type: object
@@ -2147,6 +2365,114 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/scheduling-info'
+
+    meetingParticipantRequest:
+      type: object
+      properties:
+        role:
+          description: Role of participant
+          type: string
+          enum:
+            - host
+            - guest
+          default: guest
+        participantType:
+          description: Kind of participant
+          type: string
+          enum:
+            - organisation
+            - user
+            - device
+            - citizen
+        participantId:
+          oneOf:
+            - $ref: '#/components/schemas/organisationParticipant'
+            - $ref: '#/components/schemas/userParticipant'
+            - $ref: '#/components/schemas/deviceParticipant'
+            - $ref: '#/components/schemas/citizenParticipantRequest'
+
+    meetingParticipantResponse:
+      type: object
+      properties:
+        role:
+          description: Role of participant
+          type: string
+          enum:
+            - host
+            - guest
+          default: guest
+        participantType:
+          description: Kind of participant
+          type: string
+          enum:
+            - organisation
+            - user
+            - device
+            - citizen
+        participantId:
+          oneOf:
+            - $ref: '#/components/schemas/organisationParticipant'
+            - $ref: '#/components/schemas/userParticipant'
+            - $ref: '#/components/schemas/deviceParticipant'
+            - $ref: '#/components/schemas/citizenParticipantResponse'
+
+    organisationParticipant:
+      type: object
+      required:
+        - organisationId
+      properties:
+        organisationId:
+          description: Organisation id
+          type: string
+          # TODO overvej om det skal være et uuid (udvidelse af org service)
+
+    userParticipant:
+      type: object
+      required:
+        - organisationId
+        - email
+      properties:
+        organisationId:
+          description: Organisation id of user
+          type: string
+        email:
+          description: Email of user
+          type: string
+
+    deviceParticipant:
+      type: object
+      required:
+        - organisationId
+        - deviceId
+      properties:
+        organisationId:
+          description: Organisation id of device
+          type: string
+        deviceId:
+          description: Uuid of device
+          type: string
+          format: uuid
+
+    citizenParticipantRequest:
+      type: object
+      required:
+        - cprId
+      properties:
+        cprId:
+          description: Encrypted cpr of citizen, only for requests, never for responses
+          type: string
+
+    citizenParticipantResponse:
+      type: object
+
+    meetingSimpleResponse:
+      type: object
+      properties:
+        pin:
+          description: Host or guest pin of meeting, should match if user is host or guest
+          type: integer
+        #TODO felter skal afklares
+
 
     detailedError:
       allOf:
