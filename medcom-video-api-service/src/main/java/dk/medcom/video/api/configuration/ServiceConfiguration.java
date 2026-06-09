@@ -146,6 +146,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationTreeServiceClient organisationTreeServiceClient) {
+		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationTreeServiceClient);
 	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationServiceClientV2) {
 		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationServiceClientV2);
 	}
@@ -184,8 +186,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantRepository participantRepository) {
-		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantRepository);
+	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao) {
+		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao);
 	}
 
 	@Bean
@@ -367,8 +369,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public ParticipantService participantService(ParticipantRepository participantRepository, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService){
-		return new ParticipantServiceImpl(participantRepository, meetingRepository, userContextService, meetingUserService, organisationService);
+	public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService){
+		return new ParticipantServiceImpl(participantDao, meetingRepository, userContextService, meetingUserService, organisationService);
 	}
 
 	@Override

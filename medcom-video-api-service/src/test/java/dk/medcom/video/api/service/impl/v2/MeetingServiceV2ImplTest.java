@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service.impl.v2;
 
 import dk.medcom.video.api.controller.exceptions.*;
-import dk.medcom.video.api.dao.ParticipantRepository;
+import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
@@ -30,9 +30,9 @@ public class MeetingServiceV2ImplTest {
     @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
-        ParticipantRepository participantRepository = Mockito.mock(ParticipantRepository.class);
-        Mockito.when(participantRepository.findByMeeting(Mockito.any())).thenReturn(List.of());
-        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantRepository);
+        ParticipantDao p = Mockito.mock(ParticipantDao.class);
+        Mockito.when(p.findByMeeting(Mockito.any())).thenReturn(List.of());
+        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, p);
     }
 
     private void verifyNoMoreInteractions() {

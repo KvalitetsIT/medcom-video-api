@@ -228,6 +228,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidParticipantsPost(meeting301Uuid(), createParticipants()));
     }
 
+    // ---------- JWT errors - v2MeetingsUuidParticipantsPut ----------
+
     @Test
     void errorIfNoJwtToken_v2MeetingsUuidParticipantsIdPut() {
         assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));

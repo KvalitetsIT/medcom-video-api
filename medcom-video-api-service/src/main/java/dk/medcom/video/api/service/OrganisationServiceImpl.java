@@ -1,11 +1,13 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.organisation.OrganisationServiceClientV2;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.OrganisationTree;
+import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,15 +19,18 @@ public class OrganisationServiceImpl implements OrganisationService {
 	private final OrganisationRepository organisationRepository;
 	private final OrganisationStrategy organisationStrategy;
 	private final OrganisationServiceClientV2 organisationServiceClientV2;
+	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 
 	public OrganisationServiceImpl(UserContextService userContextService,
 								   OrganisationRepository organisationRepository,
 								   OrganisationStrategy organisationStrategy,
 								   OrganisationServiceClientV2 organisationServiceClientV2) {
+								   OrganisationStrategy organisationStrategy, OrganisationTreeServiceClient organisationTreeServiceClient) {
 		this.organisationRepository = organisationRepository;
 		this.organisationStrategy = organisationStrategy;
 		this.userService = userContextService;
 		this.organisationServiceClientV2 = organisationServiceClientV2;
+		this.organisationTreeServiceClient = organisationTreeServiceClient;
 	}
 
 	@Override
@@ -34,11 +39,11 @@ public class OrganisationServiceImpl implements OrganisationService {
 	}
 
 	@Override
-	public Organisation getUserOrganisation() throws PermissionDeniedException {
+	public Organisation getUserOrganisation() throws PermissionDeniedExceptionV2 {
 		Organisation organisation = organisationRepository.findByOrganisationId(userService.getUserContext().getUserOrganisation());
 		if (organisation == null) {
 			LOGGER.debug("Organization was null");
-			throw new PermissionDeniedException();
+			throw new PermissionDeniedExceptionV2();
 		}			
 		return organisation;
 	}
@@ -57,6 +62,42 @@ public class OrganisationServiceImpl implements OrganisationService {
 	@Override
 	public boolean isPolicyServerEnabledForUserOrganisation() {
 		return isPolicyServerEnabledForOrganisation(userService.getUserContext().getUserOrganisation());
+	}
+
+	@Override
+	public boolean userIsPermittedForOrganisation(String organisationId){
+		var userOrganisationCode = userService.getUserContext().getUserOrganisation();
+		var tree = organisationTreeServiceClient.getOrganisationTree(userOrganisationCode);
+		if (tree == null) {
+			return false;
+		}
+		var userNode = findNode(userOrganisationCode, tree);
+		return userNode != null && subtreeContains(userNode, organisationId);
+	}
+
+	private OrganisationTree findNode(String code, OrganisationTree node) {
+		if (code.equals(node.getCode())) {
+			return node;
+		}
+		for (var child : node.getChildren()) {
+			var found = findNode(code, child);
+			if (found != null) {
+				return found;
+			}
+		}
+		return null;
+	}
+
+	private boolean subtreeContains(OrganisationTree node, String code) {
+		if (code.equals(node.getCode())) {
+			return true;
+		}
+		for (var child : node.getChildren()) {
+			if (subtreeContains(child, code)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
