@@ -10,13 +10,12 @@ public record ParticipantModel(
         String externalId,
         String organisation,
         ParticipantRole role) {
-
     public static ParticipantModel from(Participant participant) {
         return new ParticipantModel(
-                participant.getId(),
-                participant.getType(),
-                participant.getExternalId(),
-                participant.getOrganisation(),
-                participant.getRole());
+                participant.id(),
+                participant.type(),
+                participant.externalId(),
+                participant.organisation(),
+                participant.role());
     }
 }

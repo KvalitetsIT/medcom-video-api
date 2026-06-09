@@ -560,6 +560,11 @@ paths:
       description: >-
         Gets participants of a specific meeting based on the given uuid. <br> <br> 
         Only members of the owner organisation of the meeting can use this endpoint.
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
+        * meeting-provisioner
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -2411,10 +2416,12 @@ components:
           type: string
           maxLength: 255
           example: email@email.dk
+          description: External id of the participant, e.g. an email address
         organisation:
           type: string
           maxLength: 255
           example: user-org
+          description: The organisation the participant belongs to
         role:
           $ref: '#/components/schemas/participantRole'
 
@@ -2434,6 +2441,7 @@ components:
         - DEVICE
         - CITIZEN
       example: USER
+      description: The type of participant
 
     participantRole:
       type: string
@@ -2441,6 +2449,7 @@ components:
         - GUEST
         - HOST
       example: HOST
+      description: The participant's role in the meeting
 
     participant:
       type: object
@@ -2453,10 +2462,12 @@ components:
         id:
           type: integer
           format: int64
+          description: The id of the participant
         type:
           $ref: '#/components/schemas/participantType'
         externalId:
           type: string
           maxLength: 255
+          description: External id of the participant, e.g. an email address
         role:
           $ref: '#/components/schemas/participantRole'
