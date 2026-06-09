@@ -1,7 +1,7 @@
 package dk.medcom.video.api.repository;
 
 import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.ParticipantRepository;
+import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Participant;
 import jakarta.annotation.Resource;
@@ -11,10 +11,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ParticipantRepositoryTest extends RepositoryTest {
+public class ParticipantDaoTest extends RepositoryTest {
 
     @Resource
-    private ParticipantRepository subject;
+    private ParticipantDao subject;
 
     @Resource
     private MeetingRepository meetingRepository;

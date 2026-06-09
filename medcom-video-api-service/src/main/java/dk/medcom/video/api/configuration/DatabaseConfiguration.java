@@ -22,56 +22,61 @@ import javax.sql.DataSource;
 @Configuration
 @ComponentScan("dk.medcom.video.api.dao.impl")
 @EnableAutoConfiguration
-@EntityScan(basePackages = { "dk.medcom.video.api.dao" })
+@EntityScan(basePackages = {"dk.medcom.video.api.dao"})
 @EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 
-	@Value("${jdbc.driverClassName}")
-	private String jdbcDriverClassName;
+    @Value("${jdbc.driverClassName}")
+    private String jdbcDriverClassName;
 
-	@Value("${jdbc.url}")
-	private String jdbcUrl;
+    @Value("${jdbc.url}")
+    private String jdbcUrl;
 
-	@Value("${jdbc.user}")
-	private String jdbcUser;
+    @Value("${jdbc.user}")
+    private String jdbcUser;
 
-	@Value("${jdbc.pass}")
-	private String jdbcPass;
+    @Value("${jdbc.pass}")
+    private String jdbcPass;
 
-	@Bean
-	public PoolHistoryDao poolHistoryDao(DataSource dataSource) {
-		return new PoolHistoryDaoImpl(dataSource);
-	}
+    @Bean
+    public PoolHistoryDao poolHistoryDao(DataSource dataSource) {
+        return new PoolHistoryDaoImpl(dataSource);
+    }
 
-	@Bean
-	public PoolInfoRepository poolInfoRepository(DataSource dataSource) {
-		return new PoolInfoRepositoryImpl(dataSource);
-	}
+    @Bean
+    public PoolInfoRepository poolInfoRepository(DataSource dataSource) {
+        return new PoolInfoRepositoryImpl(dataSource);
+    }
 
-	@Bean
-	public EntitiesIvrThemeDao entitiesIvrThemeDao(DataSource dataSource) {
-		return new EntitiesIvrThemeDaoImpl(dataSource);
-	}
+    @Bean
+    public ParticipantDao participantDao(DataSource dataSource) {
+        return new ParticipantDaoImpl(dataSource);
+    }
 
-	@Bean
-	public DataSource dataSource() {
-		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(jdbcDriverClassName);
-		dataSource.setUrl(jdbcUrl);
-		dataSource.setUsername(jdbcUser);
-		dataSource.setPassword(jdbcPass);
+    @Bean
+    public EntitiesIvrThemeDao entitiesIvrThemeDao(DataSource dataSource) {
+        return new EntitiesIvrThemeDaoImpl(dataSource);
+    }
 
-		return dataSource;
-	}
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(jdbcDriverClassName);
+        dataSource.setUrl(jdbcUrl);
+        dataSource.setUsername(jdbcUser);
+        dataSource.setPassword(jdbcPass);
 
-	@Bean
-	@ConditionalOnProperty(value="baseline.flyway", havingValue = "true")
-	public FlywayMigrationStrategy cleanMigrateStrategy() {
-		return flyway -> {
-			flyway.baseline();
-			throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
-		};
-	}
+        return dataSource;
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "baseline.flyway", havingValue = "true")
+    public FlywayMigrationStrategy cleanMigrateStrategy() {
+        return flyway -> {
+            flyway.baseline();
+            throw new RuntimeException("Remove baseline.flyway configuration parameter again and start service.");
+        };
+    }
 }
