@@ -235,6 +235,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<List<Participant>> v2MeetingsUuidParticipantsGet(UUID uuid) {
         logger.debug("Enter GET participants by meeting uuid: {}, v2.", uuid);
         try {
@@ -250,6 +251,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Void> v2MeetingsUuidParticipantsIdDelete(UUID uuid, Long id) {
         logger.debug("Enter DELETE participant by meeting uuid: {} and participant id {1}, v2.", uuid, id);
         try {
@@ -264,6 +266,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<Participant> v2MeetingsUuidParticipantsIdPut(UUID uuid, Long id, UpdateParticipant updateParticipant) {
         logger.debug("ENTER PUT participant by meeting uuid: {} and participant id: {}, v2.", uuid, id);
         try {
@@ -279,6 +282,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
     public ResponseEntity<List<Participant>> v2MeetingsUuidParticipantsPost(UUID uuid, List<CreateParticipant> createParticipant) {
         logger.debug("Enter POST participants by meeting uuid: {}, v2.", uuid);
         try {

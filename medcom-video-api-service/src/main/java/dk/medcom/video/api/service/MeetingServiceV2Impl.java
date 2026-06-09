@@ -4,7 +4,7 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
-import dk.medcom.video.api.dao.ParticipantRepository;
+import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.service.exception.*;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
@@ -24,16 +24,16 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final Logger logger = LoggerFactory.getLogger(MeetingServiceV2Impl.class);
     private final MeetingService meetingService;
     private final String shortLinkBaseUrl;
-    private final ParticipantRepository participantRepository;
+    private final ParticipantDao participantDao;
 
-    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl, ParticipantRepository participantRepository) {
+    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl, ParticipantDao participantDao) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
-        this.participantRepository = participantRepository;
+        this.participantDao = participantDao;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
-        int count = participantRepository.findByMeeting(meeting).size();
+        int count = participantDao.findByMeeting(meeting).size();
         return MeetingModel.from(meeting, shortLinkBaseUrl, count);
     }
 
@@ -160,14 +160,18 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
             var meeting = meetingService.createMeeting(MeetingMapper.modelToDto(createMeeting));
             if (createMeeting.participants() != null) {
                 createMeeting.participants().forEach(p -> {
-                    var participant = new Participant();
-                    participant.setMeeting(meeting);
-                    participant.setType(p.type());
-                    participant.setRole(p.role());
-                    participant.setOrganisation(p.organisation());
-                    participant.setExternalId(p.externalId());
+                    var participant = new Participant(
+                            null,
+                            meeting.getId(),
+                            meeting.getUuid(),
+                            p.type(),
+                            p.externalId(),
+                            p.organisation(),
+                            p.role());
 
-                    participantRepository.save(participant);
+                    participantDao.save(participant);
+
+                    participantDao.save(participant);
                 });
             }
             return toModel(meeting);
