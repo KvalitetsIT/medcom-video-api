@@ -11,6 +11,7 @@ import dk.medcom.video.api.keycloak.KeycloakHttpClientService;
 import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.PortalLinkBuilder;
 import org.openapitools.model.ViewType;
 import org.openapitools.model.VmrQuality;
 import org.openapitools.model.VmrType;
@@ -196,22 +197,22 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public SchedulingInfoService schedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
-													   SchedulingTemplateRepository schedulingTemplateRepository,
-													   SchedulingTemplateService schedulingTemplateService,
-													   SchedulingStatusService schedulingStatusService,
-													   MeetingUserService meetingUserService,
-													   OrganisationRepository organisationRepository,
-													   OrganisationStrategy organisationStrategy,
-													   UserContextService userContextService,
-													   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
-													   OrganisationTreeServiceClient organisationTreeServiceClient,
-													   AuditService auditService,
-													   CustomUriValidator customUriValidator,
-													   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-													   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
-													   PoolFinderService poolFinderService,
-													   @Value("${scheduling.info.citizen.portal}") String citizenPortal,
-													   OrganisationServiceClientV2 organisationServiceClientV2) {
+	                                                   SchedulingTemplateRepository schedulingTemplateRepository,
+	                                                   SchedulingTemplateService schedulingTemplateService,
+	                                                   SchedulingStatusService schedulingStatusService,
+	                                                   MeetingUserService meetingUserService,
+	                                                   OrganisationRepository organisationRepository,
+	                                                   OrganisationStrategy organisationStrategy,
+	                                                   UserContextService userContextService,
+	                                                   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+	                                                   OrganisationTreeServiceClient organisationTreeServiceClient,
+	                                                   AuditService auditService,
+	                                                   CustomUriValidator customUriValidator,
+	                                                   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+	                                                   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+	                                                   PoolFinderService poolFinderService,
+	                                                   OrganisationServiceClientV2 organisationServiceClientV2,
+	                                                   PortalLinkBuilder videoPortalParser) {
 		return new SchedulingInfoServiceImpl(
 				schedulingInfoRepository,
 				schedulingTemplateRepository,
@@ -228,9 +229,14 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				schedulingInfoEventPublisher,
 				newProvisionerOrganisationFilter,
 				poolFinderService,
-				citizenPortal,
-				organisationServiceClientV2
+				organisationServiceClientV2,
+				videoPortalParser
 		);
+	}
+
+	@Bean
+	public PortalLinkBuilder videoPortalParser(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate) {
+		return new PortalLinkBuilder(portalLinkTemplate);
 	}
 
 	@Bean
