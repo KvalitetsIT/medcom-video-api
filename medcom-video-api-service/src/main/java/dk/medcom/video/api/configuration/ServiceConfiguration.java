@@ -143,7 +143,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationTreeServiceClient organisationTreeServiceClient) {
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationTreeServiceClient) {
 		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationTreeServiceClient);
 	}
 
