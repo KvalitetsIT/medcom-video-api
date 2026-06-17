@@ -18,11 +18,11 @@ info:
     <Li> renamed ccsid to uuid (as the real API already are using) <br>
     <Li> moved uuid path parameter to "component" part of format to allow for reuse (no functional impact)
     <Li> added response codes for each request
-    <Li> only a 'provioner' can run a 'put scheduling-info' request <br>
+    <Li> only a 'provisioner' can run a 'put scheduling-info' request <br>
     </Ul>
     0.2.0
     <Ul>
-    <Li> added provsionStatusDescription to update-scheduling-info and scheduling-info
+    <Li> added provisionStatusDescription to update-scheduling-info and scheduling-info
     </Ul>
     0.2.1
     <Ul>
@@ -560,11 +560,11 @@ paths:
       description: >-
         Gets participants of a specific meeting based on the given uuid. <br> <br> 
         Only members of the owner organisation of the meeting can use this endpoint.
+        Requires one of the following roles:
         * meeting-admin <br>
         * meeting-user <br>
         * meeting-planner <br>
         * meeting-provisioner-user
-        * meeting-provisioner
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -595,6 +595,11 @@ paths:
       description: >-
         Adds a list of participants to a specified meeting. <br> <br>
         Only members of the owner organisation of the meeting can use this endpoint
+        Requires one of the following roles:
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -633,6 +638,11 @@ paths:
       description: >-
         Updates a participant on a specified meeting. <br> <br>
         Only members of the owner organisation of the meeting can use this endpoint.
+         Requires one of the following roles:
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
         - $ref: '#/components/parameters/id'
@@ -666,6 +676,11 @@ paths:
       description: >-
         Deletes a specific participant from a specific meeting. <br> <br>
         Only member of the owner organisation can use this endpoint.
+        Requires one of the following roles:
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
         - $ref: '#/components/parameters/id'
