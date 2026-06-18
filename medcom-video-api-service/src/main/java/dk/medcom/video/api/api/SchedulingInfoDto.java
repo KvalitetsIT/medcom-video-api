@@ -57,6 +57,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	private String callType;
 
 	public SchedulingInfoDto() {	
 	}
@@ -94,6 +95,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		customPortalHost = schedulingInfo.getCustomPortalHost();
 		returnUrl = schedulingInfo.getReturnUrl();
 		directMedia = schedulingInfo.getDirectMedia();
+		callType = schedulingInfo.getCallType();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
 		MeetingUserDto meetingUserDto = new MeetingUserDto(meetingUser);
@@ -355,4 +357,12 @@ public class SchedulingInfoDto extends RepresentationModel {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

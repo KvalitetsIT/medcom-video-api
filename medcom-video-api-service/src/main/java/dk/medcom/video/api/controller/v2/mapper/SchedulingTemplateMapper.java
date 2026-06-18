@@ -54,6 +54,7 @@ public class SchedulingTemplateMapper {
                 .customPortalHost(input.customPortalHost())
                 .returnUrl(input.returnUrl())
                 .directMedia(EnumMapper.internalToExternal(input.directMedia()))
+                .callType(input.callType())
                 .createdBy(internalToExternal(input.createdBy()))
                 .updatedBy(internalToExternal(input.updatedBy()))
                 .createdTime(input.createdTime())
@@ -92,7 +93,8 @@ public class SchedulingTemplateMapper {
                 input.getForcePresenterIntoMain(),
                 input.getForceEncryption(),
                 input.getMuteAllGuests(),
-                EnumMapper.externalToInternal(input.getDirectMedia()));
+                EnumMapper.externalToInternal(input.getDirectMedia()),
+                input.getCallType());
     }
 
     private static MeetingUser internalToExternal(MeetingUserModel input) {

@@ -43,6 +43,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		String customPortalGuest = UUID.randomUUID().toString();
 		String customPortalHost = UUID.randomUUID().toString();
 		String returnUrl = UUID.randomUUID().toString();
+		String callType = UUID.randomUUID().toString();
 
 		Organisation organisation = subjectO.findById(organisationId).orElse(null);
 		
@@ -67,6 +68,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		schedulingTemplate.setCustomPortalHost(customPortalHost);
 		schedulingTemplate.setReturnUrl(returnUrl);
 		schedulingTemplate.setDirectMedia(DirectMedia.best_effort);
+		schedulingTemplate.setCallType(callType);
 
 		// When
 		schedulingTemplate = subject.save(schedulingTemplate);
@@ -94,6 +96,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		assertEquals(customPortalHost, schedulingTemplate.getCustomPortalHost());
 		assertEquals(returnUrl, schedulingTemplate.getReturnUrl());
 		assertEquals(DirectMedia.best_effort, schedulingTemplate.getDirectMedia());
+		assertEquals(callType, schedulingTemplate.getCallType());
 	}
 
 	@Test
@@ -143,6 +146,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		assertEquals("some_portal_guest", schedulingTemplate.getCustomPortalGuest());
 		assertEquals("some_portal_host", schedulingTemplate.getCustomPortalHost());
 		assertEquals("return_url", schedulingTemplate.getReturnUrl());
+		assertEquals("call-type", schedulingTemplate.getCallType());
 	}
 
 	@Test

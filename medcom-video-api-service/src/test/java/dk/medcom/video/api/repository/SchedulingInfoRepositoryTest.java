@@ -44,6 +44,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         String customPortalGuest = "custom_portal_guest";
         String customPortalHost = "custom_portal_host";
         String returnUrl = "return_url";
+        String callType = "call_type";
 
         ProvisionStatus provisionStatus = ProvisionStatus.AWAITS_PROVISION;
         String provisionStatusDescription = "All okay untill now";
@@ -106,6 +107,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setReturnUrl(returnUrl);
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(true);
+        schedulingInfo.setCallType(callType);
 
         // When
         schedulingInfo = subject.save(schedulingInfo);
@@ -147,6 +149,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(returnUrl, schedulingInfo.getReturnUrl());
         assertEquals(DirectMedia.best_effort, schedulingInfo.getDirectMedia());
         assertTrue(schedulingInfo.isNewProvisioner());
+        assertEquals(callType, schedulingInfo.getCallType());
     }
 
     @Test
@@ -187,6 +190,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals("custom_portal_host", schedulingInfo.getCustomPortalHost());
         assertEquals("return_url", schedulingInfo.getReturnUrl());
         assertFalse(schedulingInfo.isNewProvisioner());
+        assertEquals("call_type", schedulingInfo.getCallType());
     }
 
     @Test

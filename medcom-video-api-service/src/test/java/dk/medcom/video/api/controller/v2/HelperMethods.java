@@ -48,6 +48,7 @@ public class HelperMethods {
                 randomMeeting(),
                 DirectMediaModel.best_effort,
                 randomString(),
+                randomString(),
                 randomString());
     }
 
@@ -107,6 +108,7 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 DirectMediaModel.never,
+                randomString(),
                 randomMeetingUser(),
                 randomMeetingUser(),
                 OffsetDateTime.now(),
@@ -225,7 +227,8 @@ public class HelperMethods {
                 .forcePresenterIntoMain(randomBoolean())
                 .forceEncryption(randomBoolean())
                 .muteAllGuests(randomBoolean())
-                .directMedia(DirectMedia.NEVER);
+                .directMedia(DirectMedia.NEVER)
+                .callType(randomString());
     }
 
     public static CreateSchedulingInfo randomCreateSchedulingInfoInput() {
@@ -300,6 +303,7 @@ public class HelperMethods {
         assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
         assertEquals(expected.shortLink(), actual.getShortLink());
         assertEquals(expected.shortlink(), actual.getShortlink());
+        assertEquals(expected.callType(), actual.getCallType());
     }
 
     public static void assertMeeting(MeetingModel expected, Meeting actual) {
@@ -371,6 +375,7 @@ public class HelperMethods {
         assertNotNull(actual.getLinks());
         assertTrue(actual.getLinks().getSelf().getHref().toString().contains(actual.getId().toString()));
         assertEquals("https", actual.getLinks().getSelf().getHref().getScheme());
+        assertEquals(expected.callType(), actual.getCallType());
     }
 
     public static void assertPoolInfo(PoolInfoModel expected, PoolInfo actual) {
@@ -436,6 +441,7 @@ public class HelperMethods {
         } else {
             assertNull(actual.getDirectMedia());
         }
+        assertEquals(expected.callType(), actual.getCallType());
 
         return true;
     }

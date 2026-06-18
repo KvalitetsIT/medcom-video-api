@@ -83,6 +83,7 @@ public class SchedulingInfo {
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
 	private boolean newProvisioner;				//using the new (true) or old (false) provisioner service
+	private String callType;
 
 	public Long getId() {
 		return id;
@@ -368,4 +369,12 @@ public class SchedulingInfo {
 	public void setNewProvisioner(boolean newProvisioner) {
 		this.newProvisioner = newProvisioner;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

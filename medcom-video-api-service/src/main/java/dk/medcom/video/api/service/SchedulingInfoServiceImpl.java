@@ -542,6 +542,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+		schedulingInfo.setCallType(schedulingTemplate.getCallType());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 

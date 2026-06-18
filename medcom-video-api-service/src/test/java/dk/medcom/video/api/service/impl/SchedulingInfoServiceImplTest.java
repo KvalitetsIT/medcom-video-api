@@ -1193,6 +1193,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setReturnUrl("some_return_url");
         schedulingTemplate.setVmrType(VmrType.conference);
         schedulingTemplate.setDirectMedia(DirectMedia.best_effort);
+        schedulingTemplate.setCallType("template_call-type");
 
         return schedulingTemplate;
     }
@@ -1227,6 +1228,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(true);
         schedulingInfo.setUriWithDomain("uri-with-domain");
+        schedulingInfo.setCallType("some_call-type");
 
         return schedulingInfo;
     }

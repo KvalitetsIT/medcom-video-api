@@ -1702,6 +1702,10 @@ components:
           example: https://some.url/xyz
           maxLength: 200
           description: If set this is the url that the portal should redirect the user to when the meeting ends.
+        callType:
+          type: string
+          example: AudioSendRecvVideoSendRecvPresentationSendRecv
+          description: Default Pexip call type
         meetingDetails:
           $ref: '#/components/schemas/meeting'
         _links:
@@ -1977,6 +1981,10 @@ components:
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
+        callType:
+          type: string
+          example: AudioSendRecvVideoSendRecvPresentationSendRecv
+          description: Default Pexip call type
         createdBy:
           $ref: '#/components/schemas/meetingUser'
         updatedBy:
@@ -2126,6 +2134,10 @@ components:
           description: controls whether to mute guests when they first join the conference
         directMedia:
           $ref: '#/components/schemas/directMedia'
+        callType:
+          type: string
+          example: AudioSendRecvVideoSendRecvPresentationSendRecv
+          description: Default Pexip call type
 
     pool-info:
       type: object

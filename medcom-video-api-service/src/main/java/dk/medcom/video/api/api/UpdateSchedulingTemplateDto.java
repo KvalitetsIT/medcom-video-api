@@ -70,6 +70,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
+	private String callType;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -310,4 +311,12 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }
