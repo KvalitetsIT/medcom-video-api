@@ -69,6 +69,7 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	
 	private boolean isDefaultTemplate;
 	private boolean isPoolTemplate;
+	private String callType;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -309,4 +310,12 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

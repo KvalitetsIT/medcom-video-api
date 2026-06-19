@@ -650,7 +650,7 @@ public class MeetingServiceV2ImplTest {
     public void testPatchMeetingV2NullValues() throws RessourceNotFoundException, NotValidDataException, NotAcceptableException, PermissionDeniedException {
         var uuid = UUID.randomUUID();
         var input = new PatchMeetingModel(null, null, null, null, null, null,
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, null);
         var meeting = randomMeeting();
         Mockito.when(meetingService.patchMeeting(Mockito.eq(uuid), Mockito.any())).thenReturn(meeting);
 

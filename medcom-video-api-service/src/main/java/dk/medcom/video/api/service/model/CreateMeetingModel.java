@@ -32,5 +32,6 @@ public record CreateMeetingModel(String subject,
                                  String uriWithoutDomain,
                                  Integer hostPin,
                                  Integer guestPin,
+                                 String callType,
                                  List<AdditionalInformationModel> additionalInformation) {
 }

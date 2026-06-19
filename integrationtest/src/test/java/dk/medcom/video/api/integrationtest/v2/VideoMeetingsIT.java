@@ -748,6 +748,64 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void testV2MeetingsPostWithSchedulingInfoDefaultValues() throws ApiException {
+        var input = new CreateMeeting()
+                .subject(randomString())
+                .startTime(OffsetDateTime.now().plusHours(1))
+                .endTime(OffsetDateTime.now().plusHours(2))
+                .schedulingTemplateId(201L);
+        var meeting = videoMeetingsV2Api.v2MeetingsPost(input);
+        assertNotNull(meeting);
+
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(meeting.getUuid());
+        assertNotNull(schedulingInfo);
+
+        assertTrue(schedulingInfo.getHostPin() != null && 1000 < schedulingInfo.getHostPin() && schedulingInfo.getHostPin() < 9100);
+        assertNull(schedulingInfo.getGuestPin()); //GuestPinRequired = false
+        assertEquals(15, schedulingInfo.getMaxParticipants());
+        assertEquals(true, schedulingInfo.getEndMeetingOnEndTime());
+        assertTrue(schedulingInfo.getUriWithDomain().contains("@def-test.dk"));
+        assertEquals(VmrType.CONFERENCE, schedulingInfo.getVmrType());
+        assertEquals(ViewType.ONE_MAIN_ZERO_PIPS, schedulingInfo.getHostView());
+        assertEquals(ViewType.ONE_MAIN_TWENTYONE_PIPS, schedulingInfo.getGuestView());
+        assertEquals(VmrQuality.SD, schedulingInfo.getVmrQuality());
+        assertEquals(true, schedulingInfo.getEnableOverlayText());
+        assertEquals(false, schedulingInfo.getGuestsCanPresent());
+        assertEquals(true, schedulingInfo.getForcePresenterIntoMain());
+        assertEquals(false, schedulingInfo.getForceEncryption());
+        assertEquals(true, schedulingInfo.getMuteAllGuests());
+        assertNull(schedulingInfo.getReservationId());
+        assertEquals("call_type_template", schedulingInfo.getCallType());
+    }
+
+    @Test
+    void testV2MeetingsPostWithSchedulingInfo() throws ApiException {
+        var input = randomCreateMeeting();
+        var meeting = videoMeetingsV2Api.v2MeetingsPost(input);
+        assertNotNull(meeting);
+
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(meeting.getUuid());
+        assertNotNull(schedulingInfo);
+
+        assertEquals(input.getHostPin(), schedulingInfo.getHostPin());
+        assertEquals(input.getGuestPin(), schedulingInfo.getGuestPin());
+        assertEquals(input.getMaxParticipants(), schedulingInfo.getMaxParticipants());
+        assertEquals(input.getEndMeetingOnEndTime(), schedulingInfo.getEndMeetingOnEndTime());
+        assertEquals(input.getUriWithoutDomain(), schedulingInfo.getUriWithoutDomain());
+        assertEquals(input.getVmrType(), schedulingInfo.getVmrType());
+        assertEquals(input.getHostView(), schedulingInfo.getHostView());
+        assertEquals(input.getGuestView(), schedulingInfo.getGuestView());
+        assertEquals(input.getVmrQuality(), schedulingInfo.getVmrQuality());
+        assertEquals(input.getEnableOverlayText(), schedulingInfo.getEnableOverlayText());
+        assertEquals(input.getGuestsCanPresent(), schedulingInfo.getGuestsCanPresent());
+        assertEquals(input.getForcePresenterIntoMain(), schedulingInfo.getForcePresenterIntoMain());
+        assertEquals(input.getForceEncryption(), schedulingInfo.getForceEncryption());
+        assertEquals(input.getMuteAllGuests(), schedulingInfo.getMuteAllGuests());
+        assertEquals(input.getSchedulingInfoReservationId(), schedulingInfo.getReservationId());
+        assertEquals(input.getCallType(), schedulingInfo.getCallType());
+    }
+
+    @Test
     void testV2MeetingsPostDuplicateOrganisationExternalId() {
         var createMeeting = randomCreateMeeting();
         createMeeting.setExternalId("external_id");
@@ -870,11 +928,13 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertTrue(resultGet.getAdditionalInformation().containsAll(inputFirstPatch.getAdditionalInformation()));
         assertEquals(originalSchedulingInfo.getHostPin(), updatedSchedulingInfo.getHostPin());
         assertEquals(originalSchedulingInfo.getGuestPin(), updatedSchedulingInfo.getGuestPin());
+        assertEquals(originalSchedulingInfo.getCallType(), updatedSchedulingInfo.getCallType());
 
         // Second PATCH
         var inputSecondPatch = new PatchMeeting()
                 .hostPin(4321)
-                .guestPin(1234);
+                .guestPin(1234)
+                .callType("new-call-type");
         var resultSecondPatch = videoMeetingsV2Api.v2MeetingsUuidPatch(resultPost.getUuid(), inputSecondPatch);
 
         assertNotNull(resultSecondPatch);
@@ -887,6 +947,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertNotNull(resultSecondGet);
         assertEquals(inputSecondPatch.getHostPin(), updatedSchedulingInfoTwo.getHostPin());
         assertEquals(inputSecondPatch.getGuestPin(), updatedSchedulingInfoTwo.getGuestPin());
+        assertEquals(inputSecondPatch.getCallType(), updatedSchedulingInfoTwo.getCallType());
         assertNotNull(resultSecondGet.getAdditionalInformation());
         assertEquals(2, resultSecondGet.getAdditionalInformation().size());
 
@@ -1342,6 +1403,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .uriWithoutDomain(randomString().replace("-", ""))
                 .guestPin((int) count++)
                 .hostPin((int) count++)
+                .callType(randomString())
                 .additionalInformation(randomAdditionalInformation());
     }
 
@@ -1370,6 +1432,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .guestPinRequired(randomBoolean())
                 .guestPin((int) count++)
                 .hostPin((int) count++)
+                .callType(randomString())
                 .additionalInformation(randomAdditionalInformation());
     }
 

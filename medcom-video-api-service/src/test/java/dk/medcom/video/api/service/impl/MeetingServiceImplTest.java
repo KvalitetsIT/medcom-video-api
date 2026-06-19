@@ -341,6 +341,7 @@ public class MeetingServiceImplTest {
 		patchMeetingDto.setGuestMicrophone(GuestMicrophone.muted);
 		patchMeetingDto.setHostPin(9876);
 		patchMeetingDto.setGuestPin(7890);
+		patchMeetingDto.setCallType("call-type");
 		var result = meetingService.patchMeeting(uuid, patchMeetingDto);
 
 		// Then

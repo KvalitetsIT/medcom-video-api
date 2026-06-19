@@ -77,6 +77,8 @@ public class CreateMeetingDto {
 	@Min(value = 1000, message = "guestPin should not be less than 1000.")
 	private Integer guestPin;
 
+	private String callType;
+
 	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
 	public List<String> getLabels() {
@@ -312,4 +314,12 @@ public class CreateMeetingDto {
 	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
 		this.additionalInformation = additionalInformation;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

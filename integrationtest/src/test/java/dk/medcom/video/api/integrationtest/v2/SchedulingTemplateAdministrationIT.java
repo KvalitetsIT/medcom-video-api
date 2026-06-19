@@ -276,6 +276,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertEquals("user-org-pool", schedulingTemplateResult.getOrganisationId());
         assertEquals(22, schedulingTemplateResult.getConferencingSysId(), 0);
         assertEquals("default", schedulingTemplateResult.getUriPrefix());
+        assertEquals("call_type_template", schedulingTemplateResult.getCallType());
     }
 
     @Test
@@ -307,6 +308,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertNotNull(schedulingTemplateResult.getUpdatedBy());
         assertEquals("user-org-pool", schedulingTemplateResult.getUpdatedBy().getOrganisationId());
         assertEquals("eva@klak.dk", schedulingTemplateResult.getUpdatedBy().getEmail());
+        assertEquals(input.getCallType(), schedulingTemplateResult.getCallType());
     }
 
     @Test
@@ -397,6 +399,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertEquals(input.getForceEncryption(), schedulingTemplateResult.getForceEncryption());
         assertEquals(input.getMuteAllGuests(), schedulingTemplateResult.getMuteAllGuests());
         assertEquals(input.getDirectMedia(), schedulingTemplateResult.getDirectMedia());
+        assertEquals(input.getCallType(), schedulingTemplateResult.getCallType());
     }
 
     @Test
@@ -436,6 +439,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertNull(schedulingTemplateResult.getCustomPortalGuest());
         assertNull(schedulingTemplateResult.getCustomPortalHost());
         assertNull(schedulingTemplateResult.getReturnUrl());
+        assertNull(schedulingTemplateResult.getCallType());
         assertNotNull(schedulingTemplateResult.getCreatedBy());
         assertEquals("user-org-pool", schedulingTemplateResult.getCreatedBy().getOrganisationId());
         assertEquals("eva@klak.dk", schedulingTemplateResult.getCreatedBy().getEmail());
@@ -737,7 +741,8 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
                 .forcePresenterIntoMain(randomBoolean())
                 .forceEncryption(randomBoolean())
                 .muteAllGuests(randomBoolean())
-                .directMedia(DirectMedia.BEST_EFFORT);
+                .directMedia(DirectMedia.BEST_EFFORT)
+                .callType(randomString());
     }
 
     static String randomString() {

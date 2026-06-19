@@ -77,6 +77,7 @@ public class VideoMeetingMapper {
                 input.getUriWithoutDomain(),
                 input.getHostPin(),
                 input.getGuestPin(),
+                input.getCallType(),
                 externalToInternal(input.getAdditionalInformation()));
     }
 
@@ -93,6 +94,7 @@ public class VideoMeetingMapper {
                 input.getGuestPinRequired(),
                 input.getHostPin(),
                 input.getGuestPin(),
+                input.getCallType(),
                 externalToInternal(input.getAdditionalInformation()));
     }
 

@@ -57,6 +57,7 @@ public class SchedulingInfoEventMapper {
         }
         schedulingInfoEvent.setDirectMedia(schedulingInfo.getDirectMedia().toString());
         schedulingInfoEvent.setProvisionVMRId(schedulingInfo.getProvisionVMRId());
+        schedulingInfoEvent.setCallType(schedulingInfoEvent.getCallType());
 
         return schedulingInfoEvent;
     }

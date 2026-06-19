@@ -55,6 +55,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	public Date createdTime;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z") 		//Date format should be: "2018-07-12T09:00:00
 	public Date updatedTime;
+	private String callType;
 
 	public SchedulingTemplateDto() {	
 	}
@@ -96,6 +97,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		customPortalHost = schedulingTemplate.getCustomPortalHost();
 		returnUrl = schedulingTemplate.getReturnUrl();
 		directMedia = schedulingTemplate.getDirectMedia();
+		callType = schedulingTemplate.getCallType();
 
 		createdTime = schedulingTemplate.getCreatedTime();
 		updatedTime = schedulingTemplate.getUpdatedTime();
@@ -407,4 +409,12 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

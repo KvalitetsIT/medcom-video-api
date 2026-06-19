@@ -591,6 +591,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertEquals("custom.portal/guest", schedulingInfoResult.getCustomPortalGuest());
         assertEquals("custom.portal/host", schedulingInfoResult.getCustomPortalHost());
         assertEquals("return-url", schedulingInfoResult.getReturnUrl());
+        assertEquals("call_type_template", schedulingInfoResult.getCallType());
     }
 
     @Test
@@ -779,6 +780,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertEquals("custom_portal_host", schedulingInfoResult.getCustomPortalHost());
         assertEquals("return_url", schedulingInfoResult.getReturnUrl());
         assertEquals(DirectMedia.NEVER, schedulingInfoResult.getDirectMedia());
+        assertEquals("call_type", schedulingInfoResult.getCallType());
     }
 
     @Test

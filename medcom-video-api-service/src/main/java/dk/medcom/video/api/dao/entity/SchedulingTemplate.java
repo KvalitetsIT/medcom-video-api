@@ -69,6 +69,7 @@ public class SchedulingTemplate {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	private String callType;
 
 	public Long getId() {
 		return id;
@@ -338,4 +339,12 @@ public class SchedulingTemplate {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

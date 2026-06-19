@@ -88,7 +88,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	@Override
 	public SchedulingTemplate getSchedulingTemplateInOrganisationTree() throws PermissionDeniedException, NotAcceptableException {
 		Organisation organisation = organisationService.getUserOrganisation();
-		List<SchedulingTemplate> schedulingTemplates = null;
+		List<SchedulingTemplate> schedulingTemplates;
 		if (organisation != null) {
 			//first try: find default template for organization. Use list just in case.
 			schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true);
@@ -207,6 +207,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalHost(createSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(createSchedulingTemplateDto.getReturnUrl());
 		schedulingTemplate.setDirectMedia(createSchedulingTemplateDto.getDirectMedia() != null ? createSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
+		schedulingTemplate.setCallType(createSchedulingTemplateDto.getCallType());
 
 		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
@@ -272,6 +273,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalHost(updateSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(updateSchedulingTemplateDto.getReturnUrl());
 		schedulingTemplate.setDirectMedia(updateSchedulingTemplateDto.getDirectMedia() != null ? updateSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
+		schedulingTemplate.setCallType(updateSchedulingTemplateDto.getCallType());
 
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();

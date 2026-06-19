@@ -38,6 +38,7 @@ public class SchedulingInfoEvent {
     private Instant meetingEndTime;
     private String directMedia;
     private String provisionVMRId;
+    private String callType;
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
@@ -301,5 +302,13 @@ public class SchedulingInfoEvent {
 
     public void setProvisionVMRId(String provisionVMRId) {
         this.provisionVMRId = provisionVMRId;
+    }
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
     }
 }

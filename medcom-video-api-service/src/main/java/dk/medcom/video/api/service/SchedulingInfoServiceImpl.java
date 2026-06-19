@@ -297,6 +297,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}else {
 			schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
 		}
+		if (createMeetingDto.getCallType() != null) {
+			schedulingInfo.setCallType(createMeetingDto.getCallType());
+			LOGGER.debug("CallType is taken from input: {}", createMeetingDto.getCallType());
+		}else {
+			schedulingInfo.setCallType(schedulingTemplate.getCallType());
+		}
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
 		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
@@ -412,7 +418,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	//used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
-	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException{
+	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin, String callType) throws RessourceNotFoundException, PermissionDeniedException{
         LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid={}", uuid);
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -430,6 +436,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
+		schedulingInfo.setCallType(callType);
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
@@ -542,6 +549,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+		schedulingInfo.setCallType(schedulingTemplate.getCallType());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 

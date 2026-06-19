@@ -66,6 +66,7 @@ Environment variablen `scheduling.info.citizen.portal.template` kan have følgen
 * `__start-date__`, sættes til start-dato på tilknyttede møde
 * `__return-url__`, mappes til returnUrl på scheduling info.
 * `__microphone__`, hvis scheduling info har tilknyttet møde med guestMicrophone sat til `off` eller `muted` sættes til hhv. `off`, `muted`, og ellers sættes den ikke.
+* `__call-type__`, sættes til callType på scheduling info.
 
 Følgende environment variable kan sættes op:
 
