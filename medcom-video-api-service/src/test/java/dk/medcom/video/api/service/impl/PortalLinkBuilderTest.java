@@ -16,7 +16,7 @@ public class PortalLinkBuilderTest {
 
     @Test
     void testParserAllValuesPresent() {
-        var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&join=1";
+        var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1";
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
@@ -31,29 +31,28 @@ public class PortalLinkBuilderTest {
         schedulingInfo.setMeeting(meeting);
         schedulingInfo.setUriDomain("fdsa");
         schedulingInfo.setReturnUrl("qwer");
+        schedulingInfo.setCallType("zxcv");
 
         var portalParser = new PortalLinkBuilder(template);
 
         var result = portalParser.buildPortalLink(startTime, schedulingInfo);
-        assertEquals("http://citizen/?pin=1234&conference=asdf&microphone=off&start_dato=2019-10-10T09:00:00&domain=fdsa&redirectTo=qwer&join=1#pin=1234&conference=asdf&microphone=off&start_dato=2019-10-10T09:00:00&domain=fdsa&redirectTo=qwer&join=1", result);
+        assertEquals("http://citizen/?pin=1234&conference=asdf&microphone=off&start_dato=2019-10-10T09:00:00&domain=fdsa&redirectTo=qwer&callType=zxcv&join=1#pin=1234&conference=asdf&microphone=off&start_dato=2019-10-10T09:00:00&domain=fdsa&redirectTo=qwer&callType=zxcv&join=1", result);
     }
 
     @Test
     void testParserNoValuesPresent() {
-        var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&join=1";
+        var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1";
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         var startTime = calendar.getTime();
-        var meeting = new Meeting();
-        meeting.setGuestMicrophone(GuestMicrophone.off);
 
         var schedulingInfo = new SchedulingInfo();
 
         var portalParser = new PortalLinkBuilder(template);
 
         var result = portalParser.buildPortalLink(startTime, schedulingInfo);
-        assertEquals("http://citizen/?pin=&start_dato=2019-10-10T09:00:00&join=1#pin=&conference=&microphone=&start_dato=2019-10-10T09:00:00&domain=&redirectTo=&join=1", result);
+        assertEquals("http://citizen/?pin=&start_dato=2019-10-10T09:00:00&join=1#pin=&conference=&microphone=&start_dato=2019-10-10T09:00:00&domain=&redirectTo=&callType=&join=1", result);
     }
 
     @Test

@@ -58,7 +58,8 @@ public record PortalLinkModel(String videoPortal,
         URI_DOMAIN("__uri-domain__", PortalLinkPlaceholder::mapUriDomain),
         START_DATE("__start-date__", PortalLinkPlaceholder::mapStartDate),
         RETURN_URL("__return-url__", PortalLinkPlaceholder::mapReturnUrl),
-        MICROPHONE("__microphone__", PortalLinkPlaceholder::mapMicrophone)
+        MICROPHONE("__microphone__", PortalLinkPlaceholder::mapMicrophone),
+        CALL_TYPE("__call-type__", PortalLinkPlaceholder::mapCallType)
         ;
 
         private final static Logger logger = LoggerFactory.getLogger(PortalLinkPlaceholder.class);
@@ -120,6 +121,10 @@ public record PortalLinkModel(String videoPortal,
                 logger.debug("Guest microphone is not set");
             }
             return Optional.empty();
+        }
+
+        private static Optional<String> mapCallType(Date date, SchedulingInfo schedulingInfo) {
+            return Optional.ofNullable(schedulingInfo.getCallType());
         }
     }
 }
