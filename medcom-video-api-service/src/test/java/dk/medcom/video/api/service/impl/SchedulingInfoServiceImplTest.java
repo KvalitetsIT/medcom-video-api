@@ -134,7 +134,7 @@ public class SchedulingInfoServiceImplTest {
                 organisationServiceClientV2,
                 videoPortalParser);
 
-        assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L));
+        assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L, "call-type"));
     }
 
     @Test
@@ -147,6 +147,7 @@ public class SchedulingInfoServiceImplTest {
 
         var hostPin = 1234L;
         var guestPin = 4321L;
+        var callType = "call-type";
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
@@ -173,7 +174,7 @@ public class SchedulingInfoServiceImplTest {
                 organisationServiceClientV2,
                 videoPortalParser);
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin, callType);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -186,12 +187,13 @@ public class SchedulingInfoServiceImplTest {
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
+        assertEquals(callType, capturedSchedulingInfo.getCallType());
 
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
 
     @Test
-    public void testUpdateSchedulingInfoNullPin() throws RessourceNotFoundException, PermissionDeniedException {
+    public void testUpdateSchedulingInfoNullPinCallType() throws RessourceNotFoundException, PermissionDeniedException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         Date startTime = calendar.getTime();
@@ -224,7 +226,7 @@ public class SchedulingInfoServiceImplTest {
                 organisationServiceClientV2,
                 videoPortalParser);
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null, null);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -237,6 +239,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
+        assertNull(capturedSchedulingInfo.getCallType());
 
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
@@ -448,10 +451,11 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
         assertEquals(schedulingTemplateIdOne.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
         assertTrue(capturedSchedulingInfo.isNewProvisioner());
+        assertEquals(schedulingTemplateIdOne.getCallType(), capturedSchedulingInfo.getCallType());
     }
 
     @Test
-    public void testCreateSchedulingInfoMeetingCustomUriWithDomainAndPin() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomainPinAndCallType() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         calendar.add(Calendar.MINUTE, -10);
@@ -474,6 +478,7 @@ public class SchedulingInfoServiceImplTest {
         createMeetingDto.setUriWithoutDomain("573489");
         createMeetingDto.setHostPin(1234);
         createMeetingDto.setGuestPin(4321);
+        createMeetingDto.setCallType("this-call-type");
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
@@ -487,6 +492,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(createMeetingDto.getHostPin().longValue(), capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(createMeetingDto.getGuestPin().longValue(), capturedSchedulingInfo.getGuestPin().longValue());
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+        assertEquals(createMeetingDto.getCallType(), capturedSchedulingInfo.getCallType());
 
         assertEquals(capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
         assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());

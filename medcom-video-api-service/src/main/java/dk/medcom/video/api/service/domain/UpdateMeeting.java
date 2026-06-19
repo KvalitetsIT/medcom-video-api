@@ -17,6 +17,7 @@ public class UpdateMeeting {
     private boolean GuestPinRequired;
     private BigDecimal guestPin;
     private BigDecimal hostPin;
+    private String callType;
     private List<AdditionalInformationType> meetingAdditionalInfo = new ArrayList<>();
 
     public String getSubject() {
@@ -113,5 +114,13 @@ public class UpdateMeeting {
 
     public void setMeetingAdditionalInfo(List<AdditionalInformationType> meetingAdditionalInfo) {
         this.meetingAdditionalInfo = meetingAdditionalInfo;
+    }
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
     }
 }

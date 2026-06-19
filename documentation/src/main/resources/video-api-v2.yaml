@@ -1478,6 +1478,10 @@ components:
           default: []
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        callType:
+          type: string
+          example: AudioSendRecvVideoSendRecvPresentationSendRecv
+          description: Default Pexip call type
 
     update-meeting:
       type: object
@@ -1575,6 +1579,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/additionalInformationType'
+        callType:
+          type: string
+          example: AudioSendRecvVideoSendRecvPresentationSendRecv
+          description: Default Pexip call type
 
     scheduling-info:
       type: object

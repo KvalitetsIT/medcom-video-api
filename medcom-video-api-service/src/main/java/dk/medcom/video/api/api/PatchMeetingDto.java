@@ -59,6 +59,10 @@ public class PatchMeetingDto {
     @JsonIgnore
     private boolean guestPinSet;
 
+    private String callType;
+    @JsonIgnore
+    private boolean callTypeSet;
+
     private List<AdditionalInformationType> additionalInformation;
     @JsonIgnore
     private boolean additionalInfoSet;
@@ -218,5 +222,18 @@ public class PatchMeetingDto {
 
     public boolean isAdditionalInfoSet() {
         return additionalInfoSet;
+    }
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+        this.callTypeSet = true;
+    }
+
+    public boolean isCallTypeSet() {
+        return callTypeSet;
     }
 }

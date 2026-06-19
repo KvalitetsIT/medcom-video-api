@@ -165,7 +165,8 @@ public class HelperMethods {
                 .uriWithoutDomain(randomString())
                 .guestPin((int) count++)
                 .hostPin((int) count++)
-                .additionalInformation(List.of(randomAdditionalInformationInput()));
+                .additionalInformation(List.of(randomAdditionalInformationInput()))
+                .callType(randomString());
     }
 
     public static PatchMeeting randomPatchMeetingInput() {
@@ -181,7 +182,8 @@ public class HelperMethods {
                 .guestPinRequired(randomBoolean())
                 .guestPin((int) count++)
                 .hostPin((int) count++)
-                .additionalInformation(List.of(randomAdditionalInformationInput()));
+                .additionalInformation(List.of(randomAdditionalInformationInput()))
+                .callType(randomString());
     }
 
     public static UpdateMeeting randomUpdateMeetingInput() {
@@ -491,6 +493,7 @@ public class HelperMethods {
         assertEquals(actual.guestPin(), expected.getGuestPin());
         assertEquals(actual.hostPin(), expected.getHostPin());
         assertAdditionalInformation(actual.additionalInformation(), expected.getAdditionalInformation());
+        assertEquals(actual.callType(), expected.getCallType());
 
         return true;
     }
@@ -508,6 +511,7 @@ public class HelperMethods {
         assertEquals(expected.guestPin(), actual.getGuestPin());
         assertEquals(expected.hostPin(), actual.getHostPin());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
+        assertEquals(expected.callType(), actual.getCallType());
 
         return true;
     }

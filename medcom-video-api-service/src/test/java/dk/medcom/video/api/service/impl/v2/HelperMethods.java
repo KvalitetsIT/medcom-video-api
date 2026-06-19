@@ -206,6 +206,7 @@ public class HelperMethods {
                 randomString(),
                 (int) count++,
                 (int) count++,
+                randomString(),
                 List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
@@ -232,6 +233,7 @@ public class HelperMethods {
                 randomBoolean(),
                 (int) count++,
                 (int) count++,
+                randomString(),
                 List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
@@ -364,6 +366,7 @@ public class HelperMethods {
         assertEquals(expected.uriWithoutDomain(), actual.getUriWithoutDomain());
         assertEquals(expected.hostPin(), actual.getHostPin());
         assertEquals(expected.guestPin(), actual.getGuestPin());
+        assertEquals(expected.callType(), actual.getCallType());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
 
         return true;
@@ -412,6 +415,8 @@ public class HelperMethods {
         assertEquals(expected.guestPin() != null, actual.isGuestPinSet());
         assertEquals(expected.hostPin(), actual.getHostPin());
         assertEquals(expected.hostPin() != null, actual.isHostPinSet());
+        assertEquals(expected.callType(), actual.getCallType());
+        assertEquals(expected.callType() != null, actual.isCallTypeSet());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
         assertEquals(expected.additionalInformation() != null, actual.isAdditionalInfoSet());
 
