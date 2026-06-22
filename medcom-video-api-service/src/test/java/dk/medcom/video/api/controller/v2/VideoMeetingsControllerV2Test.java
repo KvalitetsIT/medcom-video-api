@@ -870,7 +870,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostWithVariousParticipantCounts(int count) {
         var input = randomCreateMeetingInput();
         var participants = Collections.nCopies(count,
-                new CreateParticipant(ParticipantType.CITIZEN, "", ParticipantRole.GUEST));
+                new CreateParticipant(ParticipantType.USER, "", ParticipantRole.GUEST));
         input.setParticipants(participants);
         var meeting = randomMeetingWithXParticipants(count);
         Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
@@ -924,7 +924,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsUuidParticipantsPost() {
         var uuid = UUID.randomUUID();
         var input = List.of(randomCreateParticipantInput(), randomCreateParticipantInput(), randomCreateParticipantInput());
-        var participants = List.of(new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST));
+        var participants = List.of(new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST));
 
         Mockito.when(participantService.createParticipants(Mockito.eq(uuid), Mockito.any())).thenReturn(participants);
 
@@ -959,7 +959,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsUuiParticipantsPutId() {
         var uuid = UUID.randomUUID();
         var updateParticipant = randomUpdateParticipant();
-        var participantModel = new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST);
+        var participantModel = new ParticipantModel(1l, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST);
 
         Mockito.when(participantService.updateParticipant(Mockito.eq(uuid), Mockito.eq(1l), Mockito.any())).thenReturn(participantModel);
 
