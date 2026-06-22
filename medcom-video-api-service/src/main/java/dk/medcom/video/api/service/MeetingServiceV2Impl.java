@@ -33,8 +33,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
-        int count = participantDao.findByMeeting(meeting).size();
-        return MeetingModel.from(meeting, shortLinkBaseUrl, count);
+        return MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount());
     }
 
     @Override

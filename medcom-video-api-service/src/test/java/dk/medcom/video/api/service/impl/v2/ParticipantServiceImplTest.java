@@ -115,7 +115,7 @@ public class ParticipantServiceImplTest {
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.CITIZEN, "ext-id", "org", ParticipantRole.GUEST)
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "org", ParticipantRole.GUEST)
         );
         var savedParticipant = new Participant(null, null, null, null, null, null, null);
         setupValidUserContext(organisation);

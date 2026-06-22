@@ -275,7 +275,7 @@ public class HelperMethods {
                 .externalId(randomString())
                 .organisation(randomString())
                 .role(ParticipantRole.GUEST)
-                .type(ParticipantType.CITIZEN);
+                .type(ParticipantType.USER);
     }
 
     public static UpdateParticipant randomUpdateParticipant() {
