@@ -1544,7 +1544,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     private static List<CreateParticipant> createParticipants() {
         return List.of(new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).externalId(randomString()),
                 new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).externalId(randomString()).organisation(randomString()),
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).organisation(randomString()).externalId(randomString()));
+                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).externalId(randomString()));
     }
 
 
@@ -1721,7 +1721,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).externalId(randomString());
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).externalId(randomString());
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
@@ -1746,7 +1746,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).externalId(randomString());
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).externalId(randomString());
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
         videoMeetingsV2Api.v2MeetingsUuidParticipantsIdDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getId());

@@ -116,5 +116,5 @@ insert into meeting_additional_info(id, meeting_id, info_key, info_value) values
 
 -- * participants *
 INSERT INTO participant (id, meeting_id, type, external_id, organisation, role) VALUES (1, 1, 'USER', 'ext-1', 'test-org', 'GUEST');
-INSERT INTO participant (id, meeting_id, type, external_id, organisation, role) VALUES (2, 1, 'CITIZEN', 'ext-2', 'test-org', 'HOST');
+INSERT INTO participant (id, meeting_id, type, external_id, organisation, role) VALUES (2, 1, 'USER', 'ext-2', 'test-org', 'HOST');
 INSERT INTO participant (id, meeting_id, type, external_id, organisation, role) VALUES (3, 2, 'USER', 'ext-3', 'another-test-org', 'GUEST');
