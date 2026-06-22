@@ -2475,7 +2475,6 @@ components:
         - ORGANISATION
         - USER
         - DEVICE
-        - CITIZEN
       example: USER
       description: The type of participant
 
