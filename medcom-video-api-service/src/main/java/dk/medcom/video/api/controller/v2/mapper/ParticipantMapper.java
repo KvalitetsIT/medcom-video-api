@@ -21,9 +21,11 @@ public class ParticipantMapper {
 
     public static Participant internalToExternal(ParticipantModel participantModel){
         var participant = new Participant();
+        participant.setUuid(participantModel.uuid());
         participant.setId(participantModel.id());
         participant.setExternalId(participantModel.externalId());
         participant.setRole(EnumMapper.internalToExternal(participantModel.role()));
+        participant.setOrganisation(participantModel.organisation());
         participant.setType(EnumMapper.internalToExternal(participantModel.type()));
         return participant;
     }

@@ -41,7 +41,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by start time, v2.");
         try {
             return meetingService.getMeetings(Date.from(fromStartTime.toInstant()), Date.from(toStartTime.toInstant()))
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount())).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -161,14 +161,13 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                 createMeeting.participants().forEach(p -> {
                     var participant = new Participant(
                             null,
+                            UUID.randomUUID(),
                             meeting.getId(),
                             meeting.getUuid(),
                             p.type(),
                             p.externalId(),
                             p.organisation(),
                             p.role());
-
-                    participantDao.save(participant);
 
                     participantDao.save(participant);
                 });

@@ -252,10 +252,10 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
-    public ResponseEntity<Void> v2MeetingsUuidParticipantsIdDelete(UUID uuid, Long id) {
-        logger.debug("Enter DELETE participant by meeting uuid: {} and participant id {1}, v2.", uuid, id);
+    public ResponseEntity<Void> v2MeetingsUuidParticipantsParticipantUuidDelete(UUID uuid, UUID participantUuid) {
+        logger.debug("Enter DELETE participant by meeting uuid: {} and participant id {1}, v2.", uuid, participantUuid);
         try {
-            participantService.deleteParticipant(uuid, id);
+            participantService.deleteParticipant(uuid, participantUuid);
         } catch (PermissionDeniedExceptionV2 e){
             throw new PermissionDeniedException(e.getMessage());
         } catch(ResourceNotFoundExceptionV2 e){
@@ -267,11 +267,11 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
-    public ResponseEntity<Participant> v2MeetingsUuidParticipantsIdPut(UUID uuid, Long id, UpdateParticipant updateParticipant) {
-        logger.debug("ENTER PUT participant by meeting uuid: {} and participant id: {}, v2.", uuid, id);
+    public ResponseEntity<Participant> v2MeetingsUuidParticipantsParticipantUuidPut(UUID uuid, UUID participantUuid, UpdateParticipant updateParticipant) {
+        logger.debug("ENTER PUT participant by meeting uuid: {} and participant id: {}, v2.", uuid, participantUuid);
         try {
             var participant = ParticipantMapper.externalToInternal(updateParticipant);
-            var result = participantService.updateParticipant(uuid, id, participant);
+            var result = participantService.updateParticipant(uuid, participantUuid, participant);
             return ResponseEntity.ok(ParticipantMapper.internalToExternal(result));
         } catch (PermissionDeniedExceptionV2 e) {
             throw new PermissionDeniedException(e.getMessage());
