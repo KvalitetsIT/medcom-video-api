@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ParticipantDaoImpl implements ParticipantDao {
     private final NamedParameterJdbcTemplate template;
@@ -22,7 +23,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
             new DataClassRowMapper<>(Participant.class);
 
     private static final String SELECT =
-            "select p.id, p.meeting_id, p.type, p.external_id, p.organisation, p.role, " +
+            "select p.id, p.uuid, p.meeting_id, p.type, p.external_id, p.organisation, p.role, " +
                     "m.uuid as meeting_uuid " +
                     "from participant p join meetings m on m.id = p.meeting_id ";
 
@@ -32,13 +33,18 @@ public class ParticipantDaoImpl implements ParticipantDao {
     }
 
     private Participant insert(Participant participant) {
-        var sql = "insert into participant(meeting_id, type, external_id, organisation, role) " +
-                "values(:meeting_id, :type, :external_id, :organisation, :role)";
+        var uuid = participant.uuid() != null ? participant.uuid() : UUID.randomUUID();
+
+        var sql = "insert into participant(uuid, meeting_id, type, external_id, organisation, role) " +
+                "values(:uuid, :meeting_id, :type, :external_id, :organisation, :role)";
+
         var keyHolder = new GeneratedKeyHolder();
-        template.update(sql, params(participant), keyHolder, new String[]{"id"});
+        template.update(sql, params(participant).addValue("uuid", uuid), keyHolder, new String[]{"id"});
         long newId = keyHolder.getKey().longValue();
+
         return new Participant(
                 newId,
+                uuid,
                 participant.meetingId(),
                 participant.meetingUuid(),
                 participant.type(),
@@ -65,9 +71,9 @@ public class ParticipantDaoImpl implements ParticipantDao {
     }
 
     @Override
-    public Optional<Participant> findById(Long id) {
-        return template.query(SELECT + "where p.id = :id",
-                new MapSqlParameterSource("id", id), rowMapper).stream().findFirst();
+    public Optional<Participant> findByUuId(UUID uuid) {
+        return template.query(SELECT + "where p.uuid = :uuid",
+                new MapSqlParameterSource("uuid", uuid), rowMapper).stream().findFirst();
     }
 
     @Override

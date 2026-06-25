@@ -71,9 +71,12 @@ public class HelperMethods {
                 randomString(),
                 GuestMicrophoneModel.muted,
                 randomBoolean(),
-                List.of(randomString(),
-                        randomString()),
-                randomAdditionalInformationModel(), 0);
+                List.of(randomString(), randomString()),
+                randomAdditionalInformationModel(), randomParticipantCount());
+    }
+
+    private static int randomParticipantCount() {
+        return new Random().nextInt(10);
     }
 
     public static SchedulingTemplateModel randomSchedulingTemplate() {
