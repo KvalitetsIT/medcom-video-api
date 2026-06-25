@@ -1,6 +1,7 @@
 CREATE TABLE participant
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    uuid varchar(40) NOT NULL UNIQUE,
     meeting_id   BIGINT                                             NOT NULL,
     type         ENUM ('ORGANISATION', 'USER', 'DEVICE', 'CITIZEN') NOT NULL,
     external_id  VARCHAR(255)                                       NOT NULL,

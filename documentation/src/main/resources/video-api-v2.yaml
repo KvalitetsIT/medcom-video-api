@@ -588,7 +588,7 @@ paths:
           $ref: '#/components/responses/500'
     post:
       security:
-        - keycloakOIDC: []
+        - keycloakOIDC: [ ]
       tags:
         - Video Meetings V2
       summary: adds a list of participants to a meeting
@@ -614,11 +614,11 @@ paths:
         '200':
           description: Ok
           content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/participant'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/participant'
         '400':
           $ref: '#/components/responses/400'
         '403':
@@ -628,7 +628,7 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
-  /v2/meetings/{uuid}/participants/{id}:
+  /v2/meetings/{uuid}/participants/{participantUuid}:
     put:
       security:
         - keycloakOIDC: [ ]
@@ -645,7 +645,7 @@ paths:
         * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/participantUuid'
       requestBody:
         required: true
         content:
@@ -683,20 +683,20 @@ paths:
         * meeting-provisioner-user
       parameters:
         - $ref: '#/components/parameters/uuid'
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/participantUuid'
       responses:
-          '204':
-            description: No content
-          '400':
-            $ref: '#/components/responses/400'
-          '401':
-            $ref: '#/components/responses/401'
-          '403':
-            $ref: '#/components/responses/403'
-          '404':
-            $ref: '#/components/responses/404'
-          '500':
-            $ref: '#/components/responses/500'
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
 
   /v2/scheduling-info:
     get:
@@ -1305,6 +1305,15 @@ components:
         type: integer
         format: int64
       example: 7
+    participantUuid:
+      name: participantUuid
+      in: path
+      description: the uuid of the participant
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
   responses:
     '400':
       description: >-
@@ -2469,6 +2478,7 @@ components:
       type: object
       required:
         - id
+        - uuid
         - type
         - externalId
         - role
@@ -2477,11 +2487,20 @@ components:
           type: integer
           format: int64
           description: The id of the participant
+        uuid:
+          type: string
+          format: uuid
+          description: The uuid of the participant
         type:
           $ref: '#/components/schemas/participantType'
         externalId:
           type: string
           maxLength: 255
           description: External id of the participant, e.g. an email address
+        organisation:
+          type: string
+          maxLength: 255
+          example: user-org
+          description: The organisation the participant belongs to
         role:
           $ref: '#/components/schemas/participantRole'

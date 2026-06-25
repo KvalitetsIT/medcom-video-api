@@ -3,7 +3,6 @@ package dk.medcom.video.api.service.impl.v2;
 import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Organisation;
@@ -44,7 +43,7 @@ public class ParticipantServiceImplTest {
         participantService = new ParticipantServiceImpl(participantDao, meetingRepository, userContextService, meetingUserService, organisationService);
     }
 
-    private void setupValidUserContext(Organisation organisation) {
+    private void setupValidUserContext() {
         var userContext = Mockito.mock(UserContext.class);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(organisationService.userIsPermittedForOrganisation(Mockito.any())).thenReturn(true);
@@ -61,8 +60,8 @@ public class ParticipantServiceImplTest {
     public void testGetParticipants() throws PermissionDeniedExceptionV2 {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
-        setupValidUserContext(meeting.getOrganisation());
-        var participants = List.of(new Participant(null, null, null, null, null, null, null), new Participant(null, null, null, null, null, null, null));
+        setupValidUserContext();
+        var participants = List.of(new Participant(null, null, null, null, null, null, null, null), new Participant(null, null, null,null, null, null, null, null));
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
 
@@ -117,8 +116,8 @@ public class ParticipantServiceImplTest {
         var createParticipants = List.of(
                 new CreateParticipantModel(ParticipantType.USER, "ext-id", "org", ParticipantRole.GUEST)
         );
-        var savedParticipant = new Participant(null, null, null, null, null, null, null);
-        setupValidUserContext(organisation);
+        var savedParticipant = new Participant(null, null, null,null, null, null, null, null);
+        setupValidUserContext();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
 
@@ -167,15 +166,16 @@ public class ParticipantServiceImplTest {
     @Test
     void testUpdateParticipant() throws PermissionDeniedExceptionV2 {
         var uuid = UUID.randomUUID();
+        var participantUuid = UUID.randomUUID();
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
-        setupValidUserContext(organisation);
+        setupValidUserContext();
         var updateParticipant = new UpdateParticipantModel(ParticipantRole.GUEST);
-        var savedParticipant = new Participant(null, meeting.getId(), meeting.getUuid(), null, null, null, null);
+        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), meeting.getUuid(), null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
-        Mockito.when(participantDao.findById(Mockito.any())).thenReturn(Optional.of(savedParticipant));
+        Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(savedParticipant));
         Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
-        var result = participantService.updateParticipant(uuid, 1L, updateParticipant);
+        var result = participantService.updateParticipant(uuid, participantUuid, updateParticipant);
         assertEquals(updateParticipant.role(), result.role());
     }
 
@@ -184,7 +184,7 @@ public class ParticipantServiceImplTest {
         var uuid = UUID.randomUUID();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
 
-        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.updateParticipant(uuid, 1L, Mockito.any()));
+        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class ParticipantServiceImplTest {
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
 
         assertThrows(PermissionDeniedExceptionV2.class, () ->
-                participantService.updateParticipant(uuid, 1L, Mockito.any()));
+                participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
     }
 
     @Test
@@ -215,20 +215,21 @@ public class ParticipantServiceImplTest {
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
 
         assertThrows(PermissionDeniedExceptionV2.class, () ->
-                participantService.updateParticipant(uuid, 1L, Mockito.any()));
+                participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
     }
 
     @Test
     void testDeleteParticipant() throws PermissionDeniedExceptionV2 {
         var uuid = UUID.randomUUID();
+        var participantUuid = UUID.randomUUID();
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
-        setupValidUserContext(organisation);
-        var participantToDelete = new Participant(null, meeting.getId(), meeting.getUuid(), null, null, null, null);
+        setupValidUserContext();
+        var participantToDelete = new Participant(null, participantUuid, meeting.getId(), meeting.getUuid(), null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
-        Mockito.when(participantDao.findById(Mockito.any())).thenReturn(Optional.of(participantToDelete));
+        Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(participantToDelete));
         Mockito.when(participantDao.save(Mockito.any())).thenReturn(participantToDelete);
-        participantService.deleteParticipant(uuid, participantToDelete.id());
+        participantService.deleteParticipant(uuid, participantUuid);
 
         Mockito.verify(participantDao).delete(participantToDelete);
     }
@@ -237,7 +238,7 @@ public class ParticipantServiceImplTest {
     void testDeleteParticipantMeetingNotFound() {
         var uuid = UUID.randomUUID();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
-        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.deleteParticipant(uuid, 1L));
+        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.deleteParticipant(uuid, UUID.randomUUID()));
     }
 
     @Test
@@ -251,7 +252,7 @@ public class ParticipantServiceImplTest {
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
 
         assertThrows(PermissionDeniedExceptionV2.class, () ->
-                participantService.deleteParticipant(uuid, 1L));
+                participantService.deleteParticipant(uuid, UUID.randomUUID()));
     }
 
     @Test
@@ -266,7 +267,7 @@ public class ParticipantServiceImplTest {
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
 
         assertThrows(PermissionDeniedExceptionV2.class, () ->
-                participantService.deleteParticipant(uuid, 1L));
+                participantService.deleteParticipant(uuid, UUID.randomUUID()));
     }
 
 }

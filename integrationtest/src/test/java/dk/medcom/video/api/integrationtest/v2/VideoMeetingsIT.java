@@ -232,83 +232,83 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfExpiredJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfInvalidIssuerJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfTamperedJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfMissingSignatureJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
     void errorIfDifferentSignedJwtToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidParticipantsIdPut(meeting301Uuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     // ---------- JWT errors - v2MeetingsUuidParticipantsIdDelete ----------
     @Test
     void errorIfNoJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfOnlyProvisionerRoleAtt_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfExpiredJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfInvalidIssuerJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfTamperedJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfMissingSignatureJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
     void errorIfDifferentSignedJwtToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidParticipantsIdDelete(meeting301Uuid(), 1L));
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
 
@@ -1675,7 +1675,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         assertNotNull(createdParticipants);
         assertEquals(createdParticipants.size(), participants.size());
-        createdParticipants.forEach(p -> assertNotNull(p.getId()));
+        createdParticipants.forEach(p -> assertNotNull(p.getUuid()));
 
         var meeting = videoMeetingsV2Api.v2MeetingsUuidGet(createdMeeting.getUuid());
         assertEquals(participants.size(), meeting.getKnownParticipants());
@@ -1726,12 +1726,12 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
-        var id = createdParticipants.getFirst().getId();
+        var uuid = createdParticipants.getFirst().getUuid();
 
         var updatedParticipant = new UpdateParticipant();
         updatedParticipant.setRole(ParticipantRole.HOST);
 
-        var createdUpdatedParticipant = videoMeetingsV2Api.v2MeetingsUuidParticipantsIdPut(createdMeeting.getUuid(), id, updatedParticipant);
+        var createdUpdatedParticipant = videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(createdMeeting.getUuid(), uuid, updatedParticipant);
 
         var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
 
@@ -1740,7 +1740,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testV2MeetingsUuidParticipantsIdPutForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsIdPut(otherOrgMeetingUuid(), 1L, new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(otherOrgMeetingUuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
@@ -1749,13 +1749,13 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).externalId(randomString());
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
-        videoMeetingsV2Api.v2MeetingsUuidParticipantsIdDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getId());
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getUuid());
         var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
         assertTrue(participants.isEmpty());
     }
 
     @Test
     void testV2MeetingsUuidParticipantsIdDeleteForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsIdDelete(otherOrgMeetingUuid(), 1L));
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(otherOrgMeetingUuid(), UUID.randomUUID()));
     }
 }

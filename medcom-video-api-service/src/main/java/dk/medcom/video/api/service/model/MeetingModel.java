@@ -30,9 +30,6 @@ public record MeetingModel(String subject,
                            List<AdditionalInformationModel> additionalInformation,
                            int knownParticipants) {
 
-    public static MeetingModel from(Meeting meeting, String shortLinkBaseUrl) {
-        return from(meeting, shortLinkBaseUrl, 0);
-    }
 
     public static MeetingModel from(Meeting meeting, String shortLinkBaseUrl, int knownParticipants) {
         if (meeting == null) {
