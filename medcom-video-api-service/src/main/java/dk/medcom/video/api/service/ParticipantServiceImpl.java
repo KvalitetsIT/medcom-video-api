@@ -23,13 +23,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantDao participantDao;
     private final MeetingUserService meetingUserService;
     private final MeetingRepository meetingRepository;
-    private final UserContextService userContextService;
     private final OrganisationService organisationService;
 
     public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
-        this.userContextService = userContextService;
         this.meetingUserService = meetingUserService;
         this.organisationService = organisationService;
     }
@@ -51,6 +49,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         var participants = createParticipantModel.stream().map(p -> {
             var participant = new Participant(
                     null,
+                    UUID.randomUUID(),
                     meeting.getId(),
                     meeting.getUuid(),
                     p.type(),
@@ -59,34 +58,35 @@ public class ParticipantServiceImpl implements ParticipantService {
                     p.role());
             return ParticipantModel.from(participantDao.save(participant));
         }).toList();
-        UpdateMeeting(meeting);
+        updateMeeting(meeting);
         return participants;
     }
 
     @Override
-    public void deleteParticipant(UUID meetingUuid, Long participantId) {
+    public void deleteParticipant(UUID meetingUuid, UUID participantId) {
         logger.debug("Delete participant {} for meeting {}.", participantId, meetingUuid);
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
-        var participant = participantDao.findById(participantId)
+        var participant = participantDao.findByUuId(participantId)
                 .orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
         if (!participant.meetingUuid().equals(meetingUuid.toString())) {
             throw new ResourceNotFoundExceptionV2("participant", "id");
         }
         participantDao.delete(participant);
-        UpdateMeeting(meeting);
+        updateMeeting(meeting);
     }
 
     @Override
-    public ParticipantModel updateParticipant(UUID uuid, Long id, UpdateParticipantModel updateParticipant) {
+    public ParticipantModel updateParticipant(UUID uuid, UUID id, UpdateParticipantModel updateParticipant) {
         var meeting = meetingRepository.findOneByUuid(uuid.toString());
         validateUser(meeting);
-        var participant = participantDao.findById(id).orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
+        var participant = participantDao.findByUuId(id).orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
         if (!participant.meetingUuid().equals(uuid.toString())) {
             throw new ResourceNotFoundExceptionV2("participant", "id");
         }
         var updated = new Participant(
                 participant.id(),
+                participant.uuid(),
                 participant.meetingId(),
                 participant.meetingUuid(),
                 participant.type(),
@@ -95,7 +95,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 updateParticipant.role());
         var saved = participantDao.save(updated);
 
-        UpdateMeeting(meeting);
+        updateMeeting(meeting);
 
         return ParticipantModel.from(saved);
     }
@@ -110,7 +110,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
 
-    private void UpdateMeeting(Meeting meeting) {
+    private void updateMeeting(Meeting meeting) {
         meeting.setUpdatedTime(new GregorianCalendar().getTime());
         try {
             meeting.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());

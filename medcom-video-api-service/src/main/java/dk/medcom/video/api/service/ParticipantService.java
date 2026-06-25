@@ -13,7 +13,7 @@ public interface ParticipantService {
 
     List<ParticipantModel> createParticipants(UUID meetingUuid, List<CreateParticipantModel> createParticipantModel);
 
-    void deleteParticipant(UUID meetingUuid, Long participantId);
+    void deleteParticipant(UUID meetingUuid, UUID participantId);
 
-    ParticipantModel updateParticipant(UUID uuid, Long id, UpdateParticipantModel updateParticipant);
+    ParticipantModel updateParticipant(UUID uuid, UUID id, UpdateParticipantModel updateParticipant);
 }
