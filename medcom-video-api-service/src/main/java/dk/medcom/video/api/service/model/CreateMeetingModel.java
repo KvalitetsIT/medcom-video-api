@@ -33,5 +33,6 @@ public record CreateMeetingModel(String subject,
                                  Integer hostPin,
                                  Integer guestPin,
                                  String callType,
-                                 List<AdditionalInformationModel> additionalInformation) {
+                                 List<AdditionalInformationModel> additionalInformation,
+                                 List<CreateParticipantModel> participants) {
 }

@@ -1,6 +1,7 @@
 package dk.medcom.video.api.service.impl.v2;
 
 import dk.medcom.video.api.controller.exceptions.*;
+import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
@@ -25,11 +26,13 @@ public class MeetingServiceV2ImplTest {
     private MeetingServiceV2 meetingServiceV2;
     private MeetingService meetingService;
     private final String shortLinkBaseUrl = "base.url";
-    
+
     @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
-        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl);
+        ParticipantDao p = Mockito.mock(ParticipantDao.class);
+        Mockito.when(p.findByMeeting(Mockito.any())).thenReturn(List.of());
+        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, p);
     }
 
     private void verifyNoMoreInteractions() {

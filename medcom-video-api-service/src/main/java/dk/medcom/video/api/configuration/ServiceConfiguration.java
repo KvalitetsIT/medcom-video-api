@@ -6,6 +6,7 @@ import java.util.List;
 import dk.medcom.video.api.converter.StringToViewTypeConverter;
 import dk.medcom.video.api.converter.StringToVmrQualityConverter;
 import dk.medcom.video.api.converter.StringToVmrTypeConverter;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OauthInterceptor;
 import dk.medcom.video.api.keycloak.KeycloakHttpClientService;
 import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
@@ -41,17 +42,6 @@ import dk.kvalitetsit.audit.client.AuditClient;
 import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
-import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
-import dk.medcom.video.api.dao.MeetingLabelRepository;
-import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
-import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.SchedulingStatusRepository;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import io.micrometer.core.instrument.Clock;
@@ -153,8 +143,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
-		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationTreeServiceClient) {
+		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationTreeServiceClient);
 	}
 
 	@Bean
@@ -191,8 +181,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService) {
-		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl);
+	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao) {
+		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao);
 	}
 
 	@Bean
@@ -368,6 +358,11 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		// The exporterProperties field is now mandatory, but if set to null,
 		// it behaves the same as the old constructor.
 		return new PrometheusScrapeEndpoint(prometheusRegistry, null);
+	}
+
+	@Bean
+	public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService){
+		return new ParticipantServiceImpl(participantDao, meetingRepository, userContextService, meetingUserService, organisationService);
 	}
 
 	@Override

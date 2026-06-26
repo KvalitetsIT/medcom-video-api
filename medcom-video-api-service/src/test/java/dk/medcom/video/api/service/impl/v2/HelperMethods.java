@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class HelperMethods {
     private static long count = 0;
+    private static final Random random = new Random();
 
     public static PoolInfoDto randomPoolInfo() throws PermissionDeniedException {
         var poolInfo = new PoolInfoDto();
@@ -207,7 +208,7 @@ public class HelperMethods {
                 (int) count++,
                 (int) count++,
                 randomString(),
-                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
+                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()), randomCreateParticipantModels());
     }
 
     public static UpdateMeetingModel randomUpdateMeetingModel() {
@@ -284,6 +285,26 @@ public class HelperMethods {
         additionalInfo.setCreatedTime(Instant.now());
 
         return additionalInfo;
+    }
+
+    private static List<CreateParticipantModel> randomCreateParticipantModels() {
+        var size = 1 + random.nextInt(5);
+        return java.util.stream.IntStream.range(0, size)
+                .mapToObj(i -> randomCreateParticipantModel())
+                .toList();
+    }
+
+    private static CreateParticipantModel randomCreateParticipantModel() {
+        return new CreateParticipantModel(
+                randomEnum(ParticipantType.class),
+                randomString(),
+                randomString(),
+                randomEnum(ParticipantRole.class));
+    }
+
+    private static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
+        var values = enumClass.getEnumConstants();
+        return values[random.nextInt(values.length)];
     }
 
     private static AdditionalInformationModel randomAdditionalInfoModel() {

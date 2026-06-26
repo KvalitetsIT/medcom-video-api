@@ -4,6 +4,8 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.service.exception.*;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
 import dk.medcom.video.api.service.model.CreateMeetingModel;
@@ -22,10 +24,16 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final Logger logger = LoggerFactory.getLogger(MeetingServiceV2Impl.class);
     private final MeetingService meetingService;
     private final String shortLinkBaseUrl;
+    private final ParticipantDao participantDao;
 
-    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl) {
+    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl, ParticipantDao participantDao) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
+        this.participantDao = participantDao;
+    }
+
+    private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
+        return MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount());
     }
 
     @Override
@@ -33,7 +41,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by start time, v2.");
         try {
             return meetingService.getMeetings(Date.from(fromStartTime.toInstant()), Date.from(toStartTime.toInstant()))
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount())).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -43,7 +51,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel getMeetingByShortIdV2(String shortId) {
         logger.debug("Get meeting by short id, v2.");
         try {
-            return MeetingModel.from(meetingService.getMeetingByShortId(shortId), shortLinkBaseUrl);
+            return toModel(meetingService.getMeetingByShortId(shortId));
         } catch (RessourceNotFoundException e) {
             throw new ResourceNotFoundExceptionV2(e.getRessource(), e.getField());
         } catch (PermissionDeniedException e) {
@@ -56,7 +64,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by subject, v2.");
         try {
             return meetingService.getMeetingsBySubject(subject)
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(this::toModel).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -67,7 +75,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by organized by, v2.");
         try {
             return meetingService.getMeetingsByOrganizedBy(organizedBy)
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(this::toModel).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -78,7 +86,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by uri with domain, v2.");
         try {
             return meetingService.getMeetingsByUriWithDomain(uriWithDomain)
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(this::toModel).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -90,9 +98,8 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         try {
             var fromStartTimeDate = fromStartTime != null ? Date.from(fromStartTime.toInstant()) : null;
             var toStartTimeDate = fromStartTime != null ? Date.from(toStartTime.toInstant()) : null;
-
             return meetingService.searchMeetings(search, fromStartTimeDate, toStartTimeDate)
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(this::toModel).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -102,7 +109,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel getMeetingsByUriWithDomainSingleV2(String uriWithDomain) {
         logger.debug("Get meeting by uri without domain, v2.");
         try {
-            return MeetingModel.from(meetingService.getMeetingsByUriWithDomainSingle(uriWithDomain), shortLinkBaseUrl);
+            return toModel(meetingService.getMeetingsByUriWithDomainSingle(uriWithDomain));
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         } catch (RessourceNotFoundException e) {
@@ -114,7 +121,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel getMeetingsByUriWithoutDomainV2(String uriWithoutDomain) {
         logger.debug("Get meetings by uri without domain, v2.");
         try {
-            return MeetingModel.from(meetingService.getMeetingsByUriWithoutDomain(uriWithoutDomain), shortLinkBaseUrl);
+            return toModel(meetingService.getMeetingsByUriWithoutDomain(uriWithoutDomain));
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         } catch (RessourceNotFoundException e) {
@@ -127,7 +134,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         logger.debug("Get meetings by label, v2.");
         try {
             return meetingService.getMeetingsByLabel(label)
-                    .stream().map(meeting -> MeetingModel.from(meeting, shortLinkBaseUrl)).toList();
+                    .stream().map(this::toModel).toList();
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         }
@@ -137,7 +144,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel getMeetingByUuidV2(UUID uuid) {
         logger.debug("Get meeting by uuid, v2.");
         try {
-            return MeetingModel.from(meetingService.getMeetingByUuid(uuid.toString()), shortLinkBaseUrl);
+            return toModel(meetingService.getMeetingByUuid(uuid.toString()));
         } catch (RessourceNotFoundException e) {
             throw new ResourceNotFoundExceptionV2(e.getRessource(), e.getField());
         } catch (PermissionDeniedException e) {
@@ -149,7 +156,23 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel createMeetingV2(CreateMeetingModel createMeeting) {
         logger.debug("Create meeting, v2.");
         try {
-            return MeetingModel.from(meetingService.createMeeting(MeetingMapper.modelToDto(createMeeting)), shortLinkBaseUrl);
+            var meeting = meetingService.createMeeting(MeetingMapper.modelToDto(createMeeting));
+            if (createMeeting.participants() != null) {
+                createMeeting.participants().forEach(p -> {
+                    var participant = new Participant(
+                            null,
+                            UUID.randomUUID(),
+                            meeting.getId(),
+                            meeting.getUuid(),
+                            p.type(),
+                            p.externalId(),
+                            p.organisation(),
+                            p.role());
+
+                    participantDao.save(participant);
+                });
+            }
+            return toModel(meeting);
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         } catch (NotAcceptableException e) {
@@ -163,7 +186,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel updateMeetingV2(UUID uuid, UpdateMeetingModel updateMeeting) {
         logger.debug("Update meeting, v2.");
         try {
-            return MeetingModel.from(meetingService.updateMeeting(uuid.toString(), MeetingMapper.modelToDto(updateMeeting)), shortLinkBaseUrl);
+            return toModel(meetingService.updateMeeting(uuid.toString(), MeetingMapper.modelToDto(updateMeeting)));
         } catch (RessourceNotFoundException e) {
             throw new ResourceNotFoundExceptionV2(e.getRessource(), e.getField());
         } catch (PermissionDeniedException e) {
@@ -193,7 +216,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     public MeetingModel patchMeetingV2(UUID uuid, PatchMeetingModel patchMeeting) {
         logger.debug("Patch meeting, v2.");
         try {
-            return MeetingModel.from(meetingService.patchMeeting(uuid, MeetingMapper.modelToDto(patchMeeting)), shortLinkBaseUrl);
+            return toModel(meetingService.patchMeeting(uuid, MeetingMapper.modelToDto(patchMeeting)));
         } catch (PermissionDeniedException e) {
             throw new PermissionDeniedExceptionV2();
         } catch (NotValidDataException e) {
@@ -204,5 +227,4 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
             throw new NotAcceptableExceptionV2(ExceptionMapper.fromNotAcceptable(e.getErrorCode()), e.getErrorText());
         }
     }
-
 }

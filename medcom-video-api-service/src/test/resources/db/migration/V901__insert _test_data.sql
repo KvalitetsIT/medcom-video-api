@@ -113,3 +113,8 @@ insert into meeting_labels(id, meeting_id, label) values(302, 7, 'second label')
 -- * meeting_additional_info *
 insert into meeting_additional_info(id, meeting_id, info_key, info_value) values(301, 7, 'first key', 'first value');
 insert into meeting_additional_info(id, meeting_id, info_key, info_value) values(302, 7, 'second key', 'second value');
+
+-- * participants *
+INSERT INTO participant (id, uuid, meeting_id, type, external_id, organisation, role) VALUES (1, uuid(), 1, 'USER', 'ext-1', 'test-org', 'GUEST');
+INSERT INTO participant (id, uuid, meeting_id, type, external_id, organisation, role) VALUES (2, uuid(), 1, 'USER', 'ext-2', 'test-org', 'HOST');
+INSERT INTO participant (id, uuid, meeting_id, type, external_id, organisation, role) VALUES (3, uuid(), 2, 'USER', 'ext-3', 'another-test-org', 'GUEST');

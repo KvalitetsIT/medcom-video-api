@@ -1,0 +1,25 @@
+package dk.medcom.video.api.service.model;
+
+import dk.medcom.video.api.dao.entity.Participant;
+import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.ParticipantType;
+
+import java.util.UUID;
+
+public record ParticipantModel(
+        Long id,
+        UUID uuid,
+        ParticipantType type,
+        String externalId,
+        String organisation,
+        ParticipantRole role) {
+    public static ParticipantModel from(Participant participant) {
+        return new ParticipantModel(
+                participant.id(),
+                participant.uuid(),
+                participant.type(),
+                participant.externalId(),
+                participant.organisation(),
+                participant.role());
+    }
+}
