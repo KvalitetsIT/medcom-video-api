@@ -700,7 +700,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 												Boolean guestsCanPresent,
 												Boolean forcePresenterIntoMain,
 												Boolean forceEncryption,
-												Boolean muteAllGuests) throws RessourceNotFoundException {
+												Boolean muteAllGuests,
+												String callType) throws RessourceNotFoundException {
 		var organisation = organisationRepository.findByOrganisationId(userContextService.getUserContext().getUserOrganisation());
 
 		var createMeetingDto = new CreateMeetingDto();
@@ -713,6 +714,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		createMeetingDto.setForcePresenterIntoMain(forcePresenterIntoMain);
 		createMeetingDto.setForceEncryption(forceEncryption);
 		createMeetingDto.setMuteAllGuests(muteAllGuests);
+		createMeetingDto.setCallType(callType);
 
 		var id = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto);
 

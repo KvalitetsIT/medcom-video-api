@@ -883,7 +883,8 @@ public class SchedulingInfoServiceImplTest {
                 true,
                 true,
                 false,
-                false);
+                false,
+                randomString());
         assertNotNull(result);
 
         Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
@@ -911,7 +912,8 @@ public class SchedulingInfoServiceImplTest {
                 true,
                 true,
                 false,
-                false));
+                false,
+                randomString()));
     }
 
     @Test
@@ -1303,5 +1305,9 @@ public class SchedulingInfoServiceImplTest {
 
     private OrganisationSimple createRandomOrganisationSimple() {
         return new OrganisationSimple(UUID.randomUUID().toString());
+    }
+
+    private String randomString() {
+        return UUID.randomUUID().toString();
     }
 }

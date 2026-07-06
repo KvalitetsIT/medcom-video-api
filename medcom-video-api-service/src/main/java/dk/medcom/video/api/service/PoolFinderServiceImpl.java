@@ -8,10 +8,10 @@ import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class PoolFinderServiceImpl implements PoolFinderService {
     private static final Logger logger = LoggerFactory.getLogger(PoolFinderServiceImpl.class);
@@ -26,54 +26,45 @@ public class PoolFinderServiceImpl implements PoolFinderService {
 
     @Override
     public Optional<SchedulingInfo> findPoolSubject(Organisation organisation, CreateMeetingDto createMeetingDto) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) - meetingMinimumAgeSec);
+        Instant provisionTimestampOlderThenInstant = Instant.now().minus(meetingMinimumAgeSec, ChronoUnit.SECONDS);
+        Date provisionTimestampOlderThen = Date.from(provisionTimestampOlderThenInstant);
 
-        logger.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus - Org: '{}' Time: '{}' VMR Type: '{}' HostView: '{}' GuestView: '{}' VmrQuality: '{}' EnableOverlayText: '{}' GuestsCanPresent: '{}' ForcePresenterIntoMain: '{}' ForceEncryption: '{}' MuteAllGuests: '{}'",
-                organisation.getId(),
-                cal.getTime(),
-                nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getVmrType()),
-                nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getHostView()),
-                nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getGuestView()),
-                nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getVmrQuality()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getEnableOverlayText()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getGuestsCanPresent()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForcePresenterIntoMain()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForceEncryption()),
-                nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()));
+        String vmrType = null, hostView = null, guestView = null, vmrQuality = null, callType = null;
+        Boolean enableOverlay = null, guestsPresent = null, forcePresenter = null, forceEncryption = null, muteGuests = null;
+
+        if (createMeetingDto != null) {
+            vmrType = createMeetingDto.getVmrType() != null ? createMeetingDto.getVmrType().name() : null;
+            hostView = createMeetingDto.getHostView() != null ? createMeetingDto.getHostView().name() : null;
+            guestView = createMeetingDto.getGuestView() != null ? createMeetingDto.getGuestView().name() : null;
+            vmrQuality = createMeetingDto.getVmrQuality() != null ? createMeetingDto.getVmrQuality().name() : null;
+
+            enableOverlay = createMeetingDto.getEnableOverlayText();
+            guestsPresent = createMeetingDto.getGuestsCanPresent();
+            forcePresenter = createMeetingDto.getForcePresenterIntoMain();
+            forceEncryption = createMeetingDto.getForceEncryption();
+            muteGuests = createMeetingDto.getMuteAllGuests();
+
+            callType = createMeetingDto.getCallType();
+        }
+
+        logger.debug("findByMeetingIsNullAndOrganisationAndProvisionStatus - " +
+                        "Org: '{}' Time: '{}' VMR Type: '{}' HostView: '{}' GuestView: '{}' " +
+                        "VmrQuality: '{}' EnableOverlayText: '{}' GuestsCanPresent: '{}' " +
+                        "ForcePresenterIntoMain: '{}' ForceEncryption: '{}' MuteAllGuests: '{}' CallType '{}'",
+                organisation != null ? organisation.getId() : null,
+                provisionTimestampOlderThen, vmrType, hostView, guestView,
+                vmrQuality, enableOverlay, guestsPresent, forcePresenter,
+                forceEncryption, muteGuests, callType);
 
         return schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                        organisation.getId(),
+                        organisation != null ? organisation.getId() : null,
                         ProvisionStatus.PROVISIONED_OK.name(),
-                        cal.getTime(),
-                        nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getVmrType()),
-                        nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getHostView()),
-                        nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getGuestView()),
-                        nullOrFieldValueString(createMeetingDto, () -> createMeetingDto.getVmrQuality()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getEnableOverlayText()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getGuestsCanPresent()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForcePresenterIntoMain()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getForceEncryption()),
-                        nullOrFieldValueBoolean(createMeetingDto, () -> createMeetingDto.getMuteAllGuests()))
+                        provisionTimestampOlderThen,
+                        vmrType, hostView, guestView, vmrQuality, callType,
+                        enableOverlay, guestsPresent, forcePresenter, forceEncryption, muteGuests
+                )
                 .stream()
                 .findFirst();
-    }
-
-    private String nullOrFieldValueString(Object o , Supplier<Enum<?>> input) {
-        if(o == null) {
-            return null;
-        }
-
-        return input.get() == null ? null : input.get().name();
-    }
-
-    private Boolean nullOrFieldValueBoolean(Object o, Supplier<Boolean> input) {
-        if(o == null) {
-            return null;
-        }
-
-        return input.get();
     }
 
 }
