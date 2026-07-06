@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ add-participants-db ]
+    branches: [ master ]
     tags:
       - 'v*.*.*'
 
