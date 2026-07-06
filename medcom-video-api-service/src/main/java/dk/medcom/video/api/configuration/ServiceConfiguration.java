@@ -365,8 +365,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService){
-		return new ParticipantServiceImpl(participantDao, meetingRepository, userContextService, meetingUserService, organisationService);
+	public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, OrganisationService organisationService){
+		return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, organisationService);
 	}
 
 	@Override

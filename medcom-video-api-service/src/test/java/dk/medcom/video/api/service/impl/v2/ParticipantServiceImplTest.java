@@ -40,7 +40,7 @@ public class ParticipantServiceImplTest {
         meetingRepository = Mockito.mock(MeetingRepository.class);
         userContextService = Mockito.mock(UserContextService.class);
         organisationService = Mockito.mock(OrganisationService.class);
-        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, userContextService, meetingUserService, organisationService);
+        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, organisationService);
     }
 
     private void setupValidUserContext() {

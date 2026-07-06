@@ -1,6 +1,5 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Meeting;
@@ -25,7 +24,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final MeetingRepository meetingRepository;
     private final OrganisationService organisationService;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, UserContextService userContextService, MeetingUserService meetingUserService, OrganisationService organisationService) {
+    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, OrganisationService organisationService) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.meetingUserService = meetingUserService;
@@ -77,11 +76,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public ParticipantModel updateParticipant(UUID uuid, UUID id, UpdateParticipantModel updateParticipant) {
-        var meeting = meetingRepository.findOneByUuid(uuid.toString());
+    public ParticipantModel updateParticipant(UUID meetingUuid, UUID participantId, UpdateParticipantModel updateParticipant) {
+        logger.debug("Update participant {} for meeting {}.", meetingUuid, participantId);
+        var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
-        var participant = participantDao.findByUuId(id).orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
-        if (!participant.meetingUuid().equals(uuid.toString())) {
+        var participant = participantDao.findByUuId(participantId).orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
+        if (!participant.meetingUuid().equals(meetingUuid.toString())) {
             throw new ResourceNotFoundExceptionV2("participant", "id");
         }
         var updated = new Participant(
