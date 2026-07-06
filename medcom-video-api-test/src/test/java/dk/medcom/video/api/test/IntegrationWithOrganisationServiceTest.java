@@ -152,6 +152,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("scheduling.template.default.uri.number.range.high", "9999")
 				.withEnv("scheduling.template.default.ivr.theme", "10")
 				.withEnv("scheduling.info.citizen.portal.template", "https://portal.vconf.dk/?conference=%uri-with-domain%&pin=%pin%&start_dato=%start-date%&muteMicrophone=%microphone%&join=1")
+				.withEnv("scheduling.info.citizen.portal.return.url", "return-url")
 				.withEnv("mapping.role.provisioner", "dk:medcom:role:provisioner")
 				.withEnv("mapping.role.admin", "dk:medcom:role:admin")
 				.withEnv("mapping.role.user", "dk:medcom:role:user")

@@ -84,7 +84,8 @@ services:
       - scheduling.template.default.uri.number.range.high=99990
       - scheduling.template.default.ivr.theme=10
 
-      - scheduling.info.citizen.portal=testuri
+      - scheduling.info.citizen.portal.template=testuri
+      - scheduling.info.citizen.portal.return.url=return
 
       - mapping.role.provisioner=meeting-provision
       - mapping.role.admin=meeting-admin

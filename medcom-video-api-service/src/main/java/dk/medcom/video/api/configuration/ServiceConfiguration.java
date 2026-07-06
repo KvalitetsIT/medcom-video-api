@@ -12,6 +12,7 @@ import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.PortalLinkBuilder;
+import dk.medcom.video.api.service.model.PortalLinkModel;
 import org.openapitools.model.ViewType;
 import org.openapitools.model.VmrQuality;
 import org.openapitools.model.VmrType;
@@ -212,7 +213,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	                                                   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
 	                                                   PoolFinderService poolFinderService,
 	                                                   OrganisationServiceClientV2 organisationServiceClientV2,
-	                                                   PortalLinkBuilder videoPortalParser) {
+	                                                   PortalLinkBuilder portalLinkBuilder) {
 		return new SchedulingInfoServiceImpl(
 				schedulingInfoRepository,
 				schedulingTemplateRepository,
@@ -230,12 +231,15 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				newProvisionerOrganisationFilter,
 				poolFinderService,
 				organisationServiceClientV2,
-				videoPortalParser
+				portalLinkBuilder
 		);
 	}
 
 	@Bean
-	public PortalLinkBuilder videoPortalParser(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate) {
+	public PortalLinkBuilder portalLinkBuilder(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate,
+	                                           @Value("${scheduling.info.citizen.portal.return.url}") String defaultReturnUrl) {
+		PortalLinkModel.setDefaultReturnUrl(defaultReturnUrl);
+
 		return new PortalLinkBuilder(portalLinkTemplate);
 	}
 
