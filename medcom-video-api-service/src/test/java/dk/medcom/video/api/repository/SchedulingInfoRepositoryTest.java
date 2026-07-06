@@ -1,7 +1,6 @@
 package dk.medcom.video.api.repository;
 
 
-import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
@@ -547,6 +546,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
+                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
@@ -587,6 +587,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 "lecture",
+                null,
                 null,
                 null,
                 null,
@@ -640,6 +641,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
+                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
@@ -665,30 +667,20 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
-        createMeetingDto.setVmrType(VmrType.lecture);
-        createMeetingDto.setHostView(ViewType.one_main_zero_pips);
-        createMeetingDto.setGuestView(ViewType.four_mains_zero_pips);
-        createMeetingDto.setVmrQuality(VmrQuality.fullhd);
-        createMeetingDto.setEnableOverlayText(false);
-        createMeetingDto.setGuestsCanPresent(false);
-        createMeetingDto.setForcePresenterIntoMain(false);
-        createMeetingDto.setForceEncryption(true);
-        createMeetingDto.setMuteAllGuests(true);
-
         List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(
                 organisation.getId(),
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
-                createMeetingDto.getVmrType().name(),
-                createMeetingDto.getHostView().name(),
-                createMeetingDto.getGuestView().name(),
-                createMeetingDto.getVmrQuality().name(),
-                createMeetingDto.getEnableOverlayText(),
-                createMeetingDto.getGuestsCanPresent(),
-                createMeetingDto.getForcePresenterIntoMain(),
-                createMeetingDto.getForceEncryption(),
-                createMeetingDto.getMuteAllGuests());
+                VmrType.lecture.name(),
+                ViewType.one_main_zero_pips.name(),
+                ViewType.four_mains_zero_pips.name(),
+                VmrQuality.fullhd.name(),
+                "call-type",
+                false,
+                false,
+                false,
+                true,
+                true);
         assertNotNull(schedulingInfos);
         assertEquals(1, schedulingInfos.size());
         assertEquals(211, schedulingInfos.getFirst().getId().intValue());
@@ -725,6 +717,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 null,
                 null,
                 null,
+                null,
                 null);
         assertNotNull(schedulingInfos);
         assertEquals(0, schedulingInfos.size());
@@ -738,6 +731,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 organisation.getId(),
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
+                null,
                 null,
                 null,
                 null,
@@ -765,6 +759,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
                 organisation.getId(),
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
+                null,
                 null,
                 null,
                 null,

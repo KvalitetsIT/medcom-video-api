@@ -56,7 +56,8 @@ public interface SchedulingInfoService {
                                          Boolean guestsCanPresent,
                                          Boolean forcePresenterIntoMain,
                                          Boolean forceEncryption,
-                                         Boolean muteAllGuests) throws RessourceNotFoundException;
+                                         Boolean muteAllGuests,
+                                         String callType) throws RessourceNotFoundException;
 
     SchedulingInfo getSchedulingInfoByReservation(UUID schedulingInfoReservationId) throws RessourceNotFoundException;
 }

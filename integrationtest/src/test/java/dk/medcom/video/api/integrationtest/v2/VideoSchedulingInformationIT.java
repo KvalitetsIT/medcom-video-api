@@ -266,7 +266,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
     void errorIfNoJwtToken_v2SchedulingInfoReserveGet() {
         assertStatus(401, () -> videoSchedulingInformationV2ApiNoHeader.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE, ViewType.ONE_MAIN_SEVEN_PIPS, ViewType.ONE_MAIN_SEVEN_PIPS, VmrQuality.SD,
-                true, false, true, false, true
+                true, false, true, false, true,
+                null
         ));
     }
 
@@ -281,7 +282,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -296,7 +298,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -311,7 +314,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -326,7 +330,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -341,7 +346,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -356,7 +362,8 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                null
         ));
     }
 
@@ -675,13 +682,15 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertEquals(Boolean.TRUE, createdSchedulingInfo.getForcePresenterIntoMain());
         assertEquals(Boolean.FALSE, createdSchedulingInfo.getForceEncryption());
         assertEquals(Boolean.TRUE, createdSchedulingInfo.getMuteAllGuests());
+        assertEquals("call_type_template", createdSchedulingInfo.getCallType());
     }
 
     @Test
     void testV2SchedulingInfoReserveGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
                 null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null,
+                null);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
 
@@ -697,13 +706,15 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertEquals(Boolean.TRUE, schedulingInfoResult.getForcePresenterIntoMain());
         assertEquals(Boolean.FALSE, schedulingInfoResult.getForceEncryption());
         assertEquals(Boolean.FALSE, schedulingInfoResult.getMuteAllGuests());
+        assertNull(schedulingInfoResult.getCallType());
     }
 
     @Test
     void testV2SchedulingInfoReserveGetThenV2SchedulingInfoReserveUuidGet() throws ApiException {
         var result = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGetWithHttpInfo(
                 VmrType.LECTURE, null, null, VmrQuality.FULLHD,
-                null, null, null, null, null);
+                null, null, null, null, null,
+                "call-type-reserve");
         assertNotNull(result);
         assertEquals(200, result.getStatusCode());
 
@@ -719,6 +730,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
         assertEquals(Boolean.TRUE, schedulingInfoResult.getForcePresenterIntoMain());
         assertEquals(Boolean.FALSE, schedulingInfoResult.getForceEncryption());
         assertEquals(Boolean.FALSE, schedulingInfoResult.getMuteAllGuests());
+        assertEquals("call-type-reserve", schedulingInfoResult.getCallType());
 
         var reservationId = schedulingInfoResult.getReservationId();
 
@@ -743,7 +755,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     @Test
     void testUseReservedSchedulingInfo() throws ApiException {
-        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGet(null, null, null, null, null, null, null, null, null);
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoReserveGet(null, null, null, null, null, null, null, null, null, null);
         assertNotNull(schedulingInfo);
         var reservationId = schedulingInfo.getReservationId();
 

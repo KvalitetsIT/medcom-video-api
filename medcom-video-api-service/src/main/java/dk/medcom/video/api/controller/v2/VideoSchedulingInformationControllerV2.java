@@ -109,13 +109,14 @@ public class VideoSchedulingInformationControllerV2 implements VideoSchedulingIn
     @Oauth
     @Override
     @PreAuthorize(adminRoleAtt)
-    public ResponseEntity<SchedulingInfo> v2SchedulingInfoReserveGet(VmrType vmrType, ViewType hostView, ViewType guestView, VmrQuality vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests) {
+    public ResponseEntity<SchedulingInfo> v2SchedulingInfoReserveGet(VmrType vmrType, ViewType hostView, ViewType guestView, VmrQuality vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests, String callType) {
         logger.debug("Enter GET scheduling info reserve, v2.");
         try {
             var schedulingInfo = schedulingInfoService.reserveSchedulingInfoV2(
                     EnumMapper.externalToInternal(vmrType), EnumMapper.externalToInternal(hostView),
                     EnumMapper.externalToInternal(guestView), EnumMapper.externalToInternal(vmrQuality),
-                    enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption, muteAllGuests);
+                    enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption, muteAllGuests,
+                    callType);
 
             return ResponseEntity.ok(VideoSchedulingMapper.internalToExternal(schedulingInfo));
         } catch (ResourceNotFoundExceptionV2 e) {

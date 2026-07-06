@@ -265,7 +265,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
 
-		var result = schedulingInfo.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
+		var result = schedulingInfo.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null, null);
 		assertNotNull(result);
 		assertNotNull(result.getReservationId());
 
@@ -284,7 +284,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		var schedulingInfo = new VideoSchedulingInformationApi(apiClient);
 
-		var result = schedulingInfo.schedulingInfoReserveGet(VmrType.LECTURE,null,null, VmrQuality.FULLHD,null,null,null,null,null);
+		var result = schedulingInfo.schedulingInfoReserveGet(VmrType.LECTURE,null,null, VmrQuality.FULLHD,null,null,null,null,null, null);
 		assertNotNull(result);
 		assertNotNull(result.getReservationId());
 
@@ -304,7 +304,7 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 		var videoMeetingApi = new VideoMeetingsApi(apiClient);
 		var schedulingInfoApi = new VideoSchedulingInformationApi(apiClient);
 
-		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null);
+		var schedulingInfo = schedulingInfoApi.schedulingInfoReserveGet(null,null,null,null,null,null,null,null,null, null);
 		assertNotNull(schedulingInfo);
 		var reservationId = schedulingInfo.getReservationId();
 

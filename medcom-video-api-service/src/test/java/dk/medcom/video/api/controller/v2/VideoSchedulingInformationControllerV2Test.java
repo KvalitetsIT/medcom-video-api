@@ -189,6 +189,7 @@ public class VideoSchedulingInformationControllerV2Test {
     @Test
     public void testV2SchedulingInfoReserveGet() {
         var schedulingInfo = randomSchedulingInfo();
+        var callType = randomString();
         Mockito.when(schedulingInfoService.reserveSchedulingInfoV2(VmrTypeModel.lecture,
                 ViewTypeModel.one_main_twentyone_pips,
                 ViewTypeModel.five_mains_seven_pips,
@@ -197,7 +198,8 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true)).thenReturn(schedulingInfo);
+                true,
+                callType)).thenReturn(schedulingInfo);
 
         var result = videoSchedulingInformationControllerV2.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE,
@@ -208,7 +210,8 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callType);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
 
@@ -223,12 +226,14 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callType);
         verifyNoMoreInteractions();
     }
 
     @Test
     public void testV2SchedulingInfoReserveGetResourceNotFound() {
+        var callType = randomString();
         Mockito.when(schedulingInfoService.reserveSchedulingInfoV2(VmrTypeModel.lecture,
                 ViewTypeModel.one_main_twentyone_pips,
                 ViewTypeModel.five_mains_seven_pips,
@@ -237,7 +242,8 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true)).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
+                true,
+                callType)).thenThrow(new ResourceNotFoundExceptionV2("Message1", "Message2"));
 
         var expectedException = assertThrows(ResourceNotFoundException.class, () -> videoSchedulingInformationControllerV2.v2SchedulingInfoReserveGet(
                 VmrType.LECTURE,
@@ -248,7 +254,8 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true));
+                true,
+                callType));
         assertNotNull(expectedException);
         assertEquals(404, expectedException.getHttpStatus().value());
         assertEquals("Resource: Message1 in field: Message2 not found.", expectedException.getErrorMessage());
@@ -261,7 +268,8 @@ public class VideoSchedulingInformationControllerV2Test {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callType);
         verifyNoMoreInteractions();
     }
 
