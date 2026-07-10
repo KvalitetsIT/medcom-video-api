@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ MA-1401-vdx-aftaleservice-video-api ]
+    branches: [ Master ]
     tags:
       - 'v*.*.*'
 
