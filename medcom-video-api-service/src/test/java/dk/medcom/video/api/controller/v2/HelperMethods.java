@@ -277,7 +277,7 @@ public class HelperMethods {
 
     public static CreateParticipant randomCreateParticipantInput() {
         return new CreateParticipant()
-                .externalId(randomString())
+                .participantId(randomString())
                 .organisation(randomString())
                 .role(ParticipantRole.GUEST)
                 .type(ParticipantType.USER);
