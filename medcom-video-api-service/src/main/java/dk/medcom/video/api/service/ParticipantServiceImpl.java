@@ -1,8 +1,10 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Meeting;
+import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
@@ -21,13 +23,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final Logger logger = LoggerFactory.getLogger(ParticipantServiceImpl.class);
     private final ParticipantDao participantDao;
     private final MeetingUserService meetingUserService;
+    private final MeetingUserRepository meetingUserRepository;
     private final MeetingRepository meetingRepository;
     private final OrganisationService organisationService;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, OrganisationService organisationService) {
+    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.meetingUserService = meetingUserService;
+        this.meetingUserRepository = meetingUserRepository;
         this.organisationService = organisationService;
     }
 
@@ -36,7 +40,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         logger.debug("Get participants for meeting {}.", meetingUuid);
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
-        return participantDao.findByMeeting(meeting).stream().map(ParticipantModel::from).toList();
+        return participantDao.findByMeeting(meeting).stream().map(this::toModel).toList();
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -45,17 +49,22 @@ public class ParticipantServiceImpl implements ParticipantService {
         logger.debug("Create participants for meeting {}.", meetingUuid);
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
+        var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
         var participants = createParticipantModel.stream().map(p -> {
             var participant = new Participant(
                     null,
                     UUID.randomUUID(),
                     meeting.getId(),
-                    meeting.getUuid(),
+                    UUID.fromString(meeting.getUuid()),
                     p.type(),
                     p.externalId(),
                     p.organisation(),
-                    p.role());
-            return ParticipantModel.from(participantDao.save(participant));
+                    p.role(),
+                    null,
+                    currentUser.getId(),
+                    null,
+                    currentUser.getId());
+            return toModel(participantDao.save(participant));
         }).toList();
         updateMeeting(meeting);
         return participants;
@@ -68,7 +77,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         validateUser(meeting);
         var participant = participantDao.findByUuId(participantId)
                 .orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
-        if (!participant.meetingUuid().equals(meetingUuid.toString())) {
+        if (!participant.meetingUuid().equals(meetingUuid)) {
             throw new ResourceNotFoundExceptionV2("participant", "id");
         }
         participantDao.delete(participant);
@@ -81,23 +90,38 @@ public class ParticipantServiceImpl implements ParticipantService {
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
         var participant = participantDao.findByUuId(participantId).orElseThrow(() -> new ResourceNotFoundExceptionV2("participant", "id"));
-        if (!participant.meetingUuid().equals(meetingUuid.toString())) {
+        if (!participant.meetingUuid().equals(meetingUuid)) {
             throw new ResourceNotFoundExceptionV2("participant", "id");
         }
+        var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
         var updated = new Participant(
                 participant.id(),
                 participant.uuid(),
                 participant.meetingId(),
                 participant.meetingUuid(),
                 participant.type(),
-                participant.externalId(),
+                participant.participantId(),
                 participant.organisation(),
-                updateParticipant.role());
+                updateParticipant.role(),
+                participant.createdAt(),
+                participant.createdBy(),
+                participant.updatedAt(),
+                currentUser.getId());
         var saved = participantDao.save(updated);
 
         updateMeeting(meeting);
 
-        return ParticipantModel.from(saved);
+        return toModel(saved);
+    }
+
+    private ParticipantModel toModel(Participant participant) {
+        MeetingUser createdByUser = participant.createdBy() != null
+                ? meetingUserRepository.findById(participant.createdBy()).orElse(null)
+                : null;
+        MeetingUser updatedByUser = participant.updatedBy() != null
+                ? meetingUserRepository.findById(participant.updatedBy()).orElse(null)
+                : null;
+        return ParticipantModel.from(participant, createdByUser, updatedByUser);
     }
 
     private void validateUser(Meeting meeting) {
