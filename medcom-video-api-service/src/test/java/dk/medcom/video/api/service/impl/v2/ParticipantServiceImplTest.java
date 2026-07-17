@@ -4,7 +4,9 @@ import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.dao.entity.ParticipantRole;
@@ -27,6 +29,7 @@ import java.util.UUID;
 public class ParticipantServiceImplTest {
     private ParticipantDao participantDao;
     private MeetingUserService meetingUserService;
+    private MeetingUserRepository meetingUserRepository;
     private MeetingRepository meetingRepository;
     private UserContextService userContextService;
     private OrganisationService organisationService;
@@ -37,16 +40,21 @@ public class ParticipantServiceImplTest {
     public void setup() {
         participantDao = Mockito.mock(ParticipantDao.class);
         meetingUserService = Mockito.mock(MeetingUserService.class);
+        meetingUserRepository = Mockito.mock(MeetingUserRepository.class);
         meetingRepository = Mockito.mock(MeetingRepository.class);
         userContextService = Mockito.mock(UserContextService.class);
         organisationService = Mockito.mock(OrganisationService.class);
-        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, organisationService);
+        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService);
     }
 
     private void setupValidUserContext() {
         var userContext = Mockito.mock(UserContext.class);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(organisationService.userIsPermittedForOrganisation(Mockito.any())).thenReturn(true);
+
+        var currentUser = Mockito.mock(MeetingUser.class);
+        Mockito.when(currentUser.getId()).thenReturn(1L);
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(currentUser);
     }
 
     private dk.medcom.video.api.dao.entity.Meeting createMeeting(UUID uuid, Organisation organisation) {
@@ -61,7 +69,9 @@ public class ParticipantServiceImplTest {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
         setupValidUserContext();
-        var participants = List.of(new Participant(null, null, null, null, null, null, null, null), new Participant(null, null, null,null, null, null, null, null));
+        var participants = List.of(
+                new Participant(null, null, null, null, null, null, null, null, null, null, null, null),
+                new Participant(null, null, null, null, null, null, null, null, null, null, null, null));
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
 
@@ -116,7 +126,7 @@ public class ParticipantServiceImplTest {
         var createParticipants = List.of(
                 new CreateParticipantModel(ParticipantType.USER, "ext-id", "org", ParticipantRole.GUEST)
         );
-        var savedParticipant = new Participant(null, null, null,null, null, null, null, null);
+        var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
         setupValidUserContext();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
@@ -171,7 +181,7 @@ public class ParticipantServiceImplTest {
         var meeting = createMeeting(uuid, organisation);
         setupValidUserContext();
         var updateParticipant = new UpdateParticipantModel(ParticipantRole.GUEST);
-        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), meeting.getUuid(), null, null, null, null);
+        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), null, null, null, null, null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(savedParticipant));
         Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -225,7 +235,7 @@ public class ParticipantServiceImplTest {
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
         setupValidUserContext();
-        var participantToDelete = new Participant(null, participantUuid, meeting.getId(), meeting.getUuid(), null, null, null, null);
+        var participantToDelete = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), null, null, null, null, null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(participantToDelete));
         Mockito.when(participantDao.save(Mockito.any())).thenReturn(participantToDelete);
