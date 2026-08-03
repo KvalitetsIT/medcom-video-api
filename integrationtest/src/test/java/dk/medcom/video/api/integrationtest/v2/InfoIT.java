@@ -55,7 +55,7 @@ class InfoIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2InfoGet() {
-        assertStatus(401, infoV2ApiNoRoleAtt::v2InfoGet);
+        assertStatus(403, infoV2ApiNoRoleAtt::v2InfoGet);
     }
 
     @Test

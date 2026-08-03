@@ -270,11 +270,7 @@ public class HelperMethods {
         assertEquals(expected.maxParticipants(), actual.getMaxParticipants(), 0);
         assertEquals(expected.endMeetingOnEndTime(), actual.getEndMeetingOnEndTime());
         assertEquals(expected.uriWithDomain(), actual.getUriWithDomain());
-        if (expected.uriWithoutDomain() == null) {
-            assertFalse(actual.getUriWithoutDomain().isPresent());
-        } else {
-            assertEquals(expected.uriWithoutDomain(), actual.getUriWithoutDomain().get());
-        }
+        assertEquals(expected.uriWithoutDomain(), actual.getUriWithoutDomain());
         assertEquals(expected.provisionStatus().toString(), actual.getProvisionStatus().toString());
         assertEquals(expected.provisionStatusDescription(), actual.getProvisionStatusDescription());
         assertEquals(expected.portalLink(), actual.getPortalLink());

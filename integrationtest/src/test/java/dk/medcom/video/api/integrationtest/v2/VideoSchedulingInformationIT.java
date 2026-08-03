@@ -119,7 +119,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingInfoGet() {
-        assertStatus(401, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoGet(
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
                 ProvisionStatus.AWAITS_PROVISION
@@ -409,7 +409,7 @@ class VideoSchedulingInformationIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingInfoUuidGet() {
-        assertStatus(401, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
+        assertStatus(403, () -> videoSchedulingInformationV2ApiNoRoleAtt.v2SchedulingInfoUuidGet(schedulingInfo405Uuid()));
     }
 
     @Test

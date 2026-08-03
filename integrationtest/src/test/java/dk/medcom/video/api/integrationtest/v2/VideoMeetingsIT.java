@@ -82,7 +82,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(randomString()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithDomainGet(randomString()));
     }
 
     @Test
@@ -117,7 +117,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsFindByUriWithoutDomainGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsFindByUriWithoutDomainGet(randomString()));
     }
 
     @Test
@@ -161,7 +161,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsGet(
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsGet(
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
                 randomString(),
@@ -250,7 +250,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsPost() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsPost(randomCreateMeeting()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsPost(randomCreateMeeting()));
     }
 
     @Test
@@ -290,7 +290,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidDelete(meeting301Uuid()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidDelete(meeting301Uuid()));
     }
 
     @Test
@@ -330,7 +330,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidGet(meeting301Uuid()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidGet(meeting301Uuid()));
     }
 
     @Test
@@ -365,7 +365,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidPatch() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPatch(meeting301Uuid(), randomPatchMeeting()));
     }
 
     @Test
@@ -405,7 +405,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidPut(meeting301Uuid(), randomUpdateMeeting()));
     }
 
     @Test
@@ -1048,11 +1048,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var runInDocker = Boolean.getBoolean("runInDocker");
         if (runInDocker) {
-            assertTrue(postResult.contains("\"startTime\":\"3025-11-02T13:00:00Z\""));
-            assertTrue(postResult.contains("\"endTime\":\"3025-11-02T13:00:00Z\""));
+            assertEquals("3025-11-02T13:00:00Z", postResultJson.getString("startTime"));
+            assertEquals("3025-11-02T13:00:00Z", postResultJson.getString("endTime"));
         } else {
-            assertTrue(postResult.contains("\"startTime\":\"3025-11-02T14:00:00+01:00\""));
-            assertTrue(postResult.contains("\"endTime\":\"3025-11-02T14:00:00+01:00\""));
+            assertEquals("3025-11-02T14:00:00+01:00", postResultJson.getString("startTime"));
+            assertEquals("3025-11-02T14:00:00+01:00", postResultJson.getString("endTime"));
         }
         assertFalse(postResult.contains("00:00.123456"));
         assertFalse(postResult.contains("00:00.987654"));
@@ -1079,11 +1079,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var putResultJson = new JSONObject(putResult);
 
         if (runInDocker) {
-            assertTrue(putResult.contains("\"startTime\":\"2025-10-02T13:00:00Z\""));
-            assertTrue(putResult.contains("\"endTime\":\"2025-10-02T15:00:00Z\""));
+            assertEquals("2025-10-02T13:00:00Z", postResultJson.getString("startTime"));
+            assertEquals("2025-10-02T15:00:00Z", postResultJson.getString("endTime"));
         } else {
-            assertTrue(putResult.contains("\"startTime\":\"2025-10-02T15:00:00+02:00\""));
-            assertTrue(putResult.contains("\"endTime\":\"2025-10-02T17:00:00+02:00\""));
+            assertEquals("2025-10-02T15:00:00+02:00", postResultJson.getString("startTime"));
+            assertEquals("2025-10-02T17:00:00+02:00", postResultJson.getString("endTime"));
         }
         assertFalse(putResult.contains("00:00.123456"));
         assertFalse(putResult.contains("00:00.987654"));

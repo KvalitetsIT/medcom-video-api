@@ -55,7 +55,7 @@ class PoolIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2PoolGetWithHttpInfo() {
-        assertStatus(401, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
+        assertStatus(403, poolV2ApiNoRoleAtt::v2PoolGetWithHttpInfo);
     }
 
     @Test
