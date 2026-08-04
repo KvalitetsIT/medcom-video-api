@@ -5,6 +5,7 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;

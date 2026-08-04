@@ -27,7 +27,7 @@ public record ParticipantModel(
                 participant.uuid(),
                 participant.type(),
                 participant.participantId(),
-                participant.organisation(),
+                participant.organisationId(),
                 participant.role(),
                 mapDate(participant.createdAt()),
                 MeetingUserModel.from(createdByUser),

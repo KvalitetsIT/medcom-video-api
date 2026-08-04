@@ -6,6 +6,7 @@ import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Participant;
+import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
 import dk.medcom.video.api.service.model.CreateParticipantModel;
@@ -50,15 +51,27 @@ public class ParticipantServiceImpl implements ParticipantService {
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
         var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
+
         var participants = createParticipantModel.stream().map(p -> {
+            String organisation = p.organisation();
+
+            if (p.type() == ParticipantType.ORGANISATION) {
+                var org = organisationService.getParticipantOrganisation(p.participantId());
+                if (org == null) {
+                    logger.info("Organisation participant references unknown organisation: {}", p.participantId());
+                    throw new ResourceNotFoundExceptionV2("organisation", "participantId");
+                }
+                organisation = org.getOrganisationId();
+            }
+
             var participant = new Participant(
                     null,
                     UUID.randomUUID(),
                     meeting.getId(),
                     UUID.fromString(meeting.getUuid()),
                     p.type(),
-                    p.externalId(),
-                    p.organisation(),
+                    p.participantId(),
+                    organisation,
                     p.role(),
                     null,
                     currentUser.getId(),
@@ -66,6 +79,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                     currentUser.getId());
             return toModel(participantDao.save(participant));
         }).toList();
+
         updateMeeting(meeting);
         return participants;
     }
@@ -101,7 +115,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 participant.meetingUuid(),
                 participant.type(),
                 participant.participantId(),
-                participant.organisation(),
+                participant.organisationId(),
                 updateParticipant.role(),
                 participant.createdAt(),
                 participant.createdBy(),

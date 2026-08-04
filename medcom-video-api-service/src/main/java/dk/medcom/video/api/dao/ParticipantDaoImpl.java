@@ -23,7 +23,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
             new DataClassRowMapper<>(Participant.class);
 
     private static final String SELECT =
-            "select p.id, p.uuid, p.meeting_id, p.type, p.participant_id, p.organisation, p.role, " +
+            "select p.id, p.uuid, p.meeting_id, p.type, p.participant_id, p.organisation as organisation_id, p.role, " +
                     "p.created_at, p.created_by, p.updated_at, p.updated_by, " +
                     "m.uuid as meeting_uuid " +
                     "from participant p join meetings m on m.id = p.meeting_id ";
@@ -40,7 +40,6 @@ public class ParticipantDaoImpl implements ParticipantDao {
         var keyHolder = new GeneratedKeyHolder();
         template.update(sql, params(participant).addValue("uuid", uuid), keyHolder, new String[]{"id"});
         long newId = keyHolder.getKey().longValue();
-
         return findByUuId(uuid).orElseThrow(() ->
                 new IllegalStateException("Participant with id " + newId + " could not be found after insert"));
     }
@@ -60,7 +59,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
                 .addValue("meeting_id", p.meetingId())
                 .addValue("type", p.type() != null ? p.type().name() : null)
                 .addValue("participant_id", p.participantId())
-                .addValue("organisation", p.organisation())
+                .addValue("organisation", p.organisationId())
                 .addValue("role", p.role() != null ? p.role().name() : null)
                 .addValue("created_by", p.createdBy())
                 .addValue("updated_by", p.updatedBy());

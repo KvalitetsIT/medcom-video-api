@@ -5,7 +5,7 @@ import dk.medcom.video.api.dao.entity.ParticipantType;
 
 public record CreateParticipantModel(
         ParticipantType type,
-        String externalId,
+        String participantId,
         String organisation,
         ParticipantRole role) {
 }
