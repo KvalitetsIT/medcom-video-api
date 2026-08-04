@@ -10,6 +10,8 @@ INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (2, 'not-u
 INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (3, 'new-provisioner-org', 'new provisioner org', 1);
 -- pool overflow org
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (4, 'overflow', 'overflow pool org', 10, 1);
+-- test-org for participant tests (ORGANISATION type participant)
+INSERT INTO organisation (id, organisation_id, name, group_id) VALUES (5, 'test-org', 'test-org organisation', 1);
 -- sub org of default user org
 INSERT INTO organisation (id, organisation_id, name, pool_size, group_id) VALUES (12, 'sub-user-org', 'sub default org', 5, 1);
 

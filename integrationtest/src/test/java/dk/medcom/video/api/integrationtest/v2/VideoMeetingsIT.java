@@ -1542,9 +1542,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     private static List<CreateParticipant> createParticipants() {
-        return List.of(new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString()),
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId(randomString()).organisation(randomString()),
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString()));
+        return List.of(
+                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString()),
+                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("test-org").organisation(randomString()),
+                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString())
+        );
     }
 
 
