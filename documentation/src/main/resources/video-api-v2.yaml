@@ -599,7 +599,11 @@ paths:
         * meeting-admin <br>
         * meeting-user <br>
         * meeting-planner <br>
-        * meeting-provisioner-user
+        * meeting-provisioner-user <br> <br>
+        When a participant has type ORGANISATION, participantId must reference an existing organisation;
+        the request fails with 404 if no organisation with that id exists. In that case the supplied
+        organisation field is ignored, and the participant's organisation is instead set to the
+        organisationId resolved from participantId.
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -1366,6 +1370,7 @@ components:
         * The uuid being requested has been deleted <br> 
         * The uuid being requested has never existed <br> 
         * The id (scheduling template) being requested does not exist <br>
+        * When adding a participant with type ORGANISATION, no organisation exists matching the given participantId <br>
         (See a possible detailed error message in the response.)
       content:
         application/json:
@@ -2356,7 +2361,7 @@ components:
               description: >-
                 Detailed error code. This could be a code describing an validation error. <br>
                 * 10: 'Input validation error.' <br>
-                * 11: 'Basic error.' <br>
+                * 11: 'Basic error. Also used when a participant of type ORGANISATION references a participantId for which no organisation exists.' <br>
                 * 12: 'Meeting must have status AWAITS_PROVISION (0)  or PROVISIONED_OK (3) in order to be updated' <br>
                 * 13: 'Meeting must have status AWAITS_PROVISION (0) in order to be deleted' <br>
                 * 14: 'The Uri assignment failed due to invalid setup on the template used' <br>
@@ -2447,12 +2452,17 @@ components:
           type: string
           maxLength: 255
           example: email@email.dk
-          description: External id of the participant, e.g. an email address
+          description: >-
+            External id of the participant, e.g. an email address. When type is ORGANISATION,
+            this must instead match an existing organisationId; if no matching organisation
+            exists the request is rejected with 404 (detailed_error_code 11).
         organisation:
           type: string
           maxLength: 255
           example: user-org
-          description: The organisation the participant belongs to
+          description: >-
+            The organisation the participant belongs to. When type is ORGANISATION, this field
+            is ignored on input and is instead set to the organisationId resolved from participantId.
         role:
           $ref: '#/components/schemas/participantRole'
 

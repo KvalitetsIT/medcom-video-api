@@ -1694,6 +1694,20 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void testV2MeetingsUuidParticipantsPostUnknownOrganisationParticipant() throws ApiException {
+        var createMeeting = randomCreateMeeting();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+        var participants = List.of(
+                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
+        );
+        var expectedException = assertThrows(ApiException.class, () ->
+                videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants));
+        assertEquals(404, expectedException.getCode());
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"11\""));
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error\":\"Resource: organisation in field: participantId not found.\""));
+    }
+
+    @Test
     void testV2MeetingsUuidParticipantsGet() throws ApiException {
         var createMeeting = randomCreateMeeting();
         var participantsModel = createParticipants();
