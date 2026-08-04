@@ -6,6 +6,7 @@ import java.util.List;
 import dk.medcom.video.api.converter.StringToViewTypeConverter;
 import dk.medcom.video.api.converter.StringToVmrQualityConverter;
 import dk.medcom.video.api.converter.StringToVmrTypeConverter;
+import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.interceptor.OauthInterceptor;
 import dk.medcom.video.api.keycloak.KeycloakHttpClientService;
 import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
@@ -42,17 +43,6 @@ import dk.kvalitetsit.audit.client.AuditClient;
 import dk.kvalitetsit.audit.client.messaging.MessagePublisher;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserContextServiceImpl;
-import dk.medcom.video.api.dao.EntitiesIvrThemeDao;
-import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
-import dk.medcom.video.api.dao.MeetingLabelRepository;
-import dk.medcom.video.api.dao.MeetingRepository;
-import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
-import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.SchedulingStatusRepository;
-import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.interceptor.OrganisationInterceptor;
 import dk.medcom.video.api.interceptor.UserSecurityInterceptor;
 import io.micrometer.core.instrument.Clock;
@@ -63,334 +53,339 @@ import io.prometheus.metrics.model.registry.PrometheusRegistry;
 @EnableAspectJAutoProxy
 @ComponentScan({"dk.medcom.video.api.service", "dk.medcom.video.api.controller", "dk.medcom.video.api.aspect", "dk.kvalitetsit.audit"})
 public class ServiceConfiguration implements WebMvcConfigurer {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
-	@Autowired
-	private OrganisationStrategy organisationStrategy;
+    @Autowired
+    private OrganisationStrategy organisationStrategy;
 
-	@Autowired
-	private OrganisationRepository organisationRepository;
+    @Autowired
+    private OrganisationRepository organisationRepository;
 
-	@Autowired
-	private OrganisationServiceClient organisationServiceClient;
+    @Autowired
+    private OrganisationServiceClient organisationServiceClient;
 
-	@Value("${ALLOWED_ORIGINS}")
-	private List<String> allowedOrigins;
+    @Value("${ALLOWED_ORIGINS}")
+    private List<String> allowedOrigins;
 
-	@Value("${short.link.base.url}")
-	private String shortLinkBaseUrl;
+    @Value("${short.link.base.url}")
+    private String shortLinkBaseUrl;
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		LOGGER.debug("Adding interceptors");
-		registry.addInterceptor(oauthInterceptor());
-		registry.addInterceptor(organisationInterceptor());
-		registry.addInterceptor(userSecurityInterceptor());
-	}
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        LOGGER.debug("Adding interceptors");
+        registry.addInterceptor(oauthInterceptor());
+        registry.addInterceptor(organisationInterceptor());
+        registry.addInterceptor(userSecurityInterceptor());
+    }
 
-	@Bean
-	CorsFilter corsFilter() {
-		CorsConfiguration config = new CorsConfiguration();
+    @Bean
+    CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
 
-		config.setAllowCredentials(true);
-		allowedOrigins.forEach(config::addAllowedOrigin);
-		config.addAllowedHeader("*");
-		config.addAllowedMethod("*");
+        config.setAllowCredentials(true);
+        allowedOrigins.forEach(config::addAllowedOrigin);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", config);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
 
-		return new CorsFilter(source);
-	}
+        return new CorsFilter(source);
+    }
 
-	@Bean
-	public SchedulingTemplateService schedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository,
-															   OrganisationService organisationService,
-															   MeetingUserService meetingUserService,
-															   OrganisationTreeServiceClient organisationTreeServiceClient,
-															   @Value("${scheduling.template.default.conferencing.sys.id}") Long conferencingSysId,
-															   @Value("${scheduling.template.default.uri.prefix}") String uriPrefix,
-															   @Value("${scheduling.template.default.uri.domain}") String uriDomain,
-															   @Value("${scheduling.template.default.host.pin.required}") boolean hostPinRequired,
-															   @Value("${scheduling.template.default.host.pin.range.low}") Long hostPinRangeLow,
-															   @Value("${scheduling.template.default.host.pin.range.high}") Long hostPinRangeHigh,
-															   @Value("${scheduling.template.default.guest.pin.required}") boolean guestPinRequired,
-															   @Value("${scheduling.template.default.guest.pin.range.low}") Long guestPinRangeLow,
-															   @Value("${scheduling.template.default.guest.pin.range.high}") Long guestPinRangeHigh,
-															   @Value("${scheduling.template.default.vmravailable.before}") int vMRAvailableBefore,
-															   @Value("${scheduling.template.default.max.participants}") int maxParticipants,
-															   @Value("${scheduling.template.default.end.meeting.on.end.time}") boolean endMeetingOnEndTime,
-															   @Value("${scheduling.template.default.uri.number.range.low}") Long uriNumberRangeLow,
-															   @Value("${scheduling.template.default.uri.number.range.high}") Long uriNumberRangeHigh,
-															   @Value("${scheduling.template.default.ivr.theme}") String ivrTheme) {
+    @Bean
+    public SchedulingTemplateService schedulingTemplateService(SchedulingTemplateRepository schedulingTemplateRepository,
+                                                               OrganisationService organisationService,
+                                                               MeetingUserService meetingUserService,
+                                                               OrganisationTreeServiceClient organisationTreeServiceClient,
+                                                               @Value("${scheduling.template.default.conferencing.sys.id}") Long conferencingSysId,
+                                                               @Value("${scheduling.template.default.uri.prefix}") String uriPrefix,
+                                                               @Value("${scheduling.template.default.uri.domain}") String uriDomain,
+                                                               @Value("${scheduling.template.default.host.pin.required}") boolean hostPinRequired,
+                                                               @Value("${scheduling.template.default.host.pin.range.low}") Long hostPinRangeLow,
+                                                               @Value("${scheduling.template.default.host.pin.range.high}") Long hostPinRangeHigh,
+                                                               @Value("${scheduling.template.default.guest.pin.required}") boolean guestPinRequired,
+                                                               @Value("${scheduling.template.default.guest.pin.range.low}") Long guestPinRangeLow,
+                                                               @Value("${scheduling.template.default.guest.pin.range.high}") Long guestPinRangeHigh,
+                                                               @Value("${scheduling.template.default.vmravailable.before}") int vMRAvailableBefore,
+                                                               @Value("${scheduling.template.default.max.participants}") int maxParticipants,
+                                                               @Value("${scheduling.template.default.end.meeting.on.end.time}") boolean endMeetingOnEndTime,
+                                                               @Value("${scheduling.template.default.uri.number.range.low}") Long uriNumberRangeLow,
+                                                               @Value("${scheduling.template.default.uri.number.range.high}") Long uriNumberRangeHigh,
+                                                               @Value("${scheduling.template.default.ivr.theme}") String ivrTheme) {
 
-		return new SchedulingTemplateServiceImpl(
-				schedulingTemplateRepository,
-				organisationService,
-				meetingUserService,
-				organisationTreeServiceClient,
-				conferencingSysId,
-				uriPrefix,
-				uriDomain,
-				hostPinRequired,
-				hostPinRangeLow,
-				hostPinRangeHigh,
-				guestPinRequired,
-				guestPinRangeLow,
-				guestPinRangeHigh,
-				vMRAvailableBefore,
-				maxParticipants,
-				endMeetingOnEndTime,
-				uriNumberRangeLow,
-				uriNumberRangeHigh,
-				ivrTheme
-		);
+        return new SchedulingTemplateServiceImpl(
+                schedulingTemplateRepository,
+                organisationService,
+                meetingUserService,
+                organisationTreeServiceClient,
+                conferencingSysId,
+                uriPrefix,
+                uriDomain,
+                hostPinRequired,
+                hostPinRangeLow,
+                hostPinRangeHigh,
+                guestPinRequired,
+                guestPinRangeLow,
+                guestPinRangeHigh,
+                vMRAvailableBefore,
+                maxParticipants,
+                endMeetingOnEndTime,
+                uriNumberRangeLow,
+                uriNumberRangeHigh,
+                ivrTheme
+        );
 
-	}
+    }
 
-	@Bean
-	public SchedulingTemplateServiceV2 schedulingTemplateServiceV2(SchedulingTemplateService schedulingTemplateService) {
-		return new SchedulingTemplateServiceV2Impl(schedulingTemplateService);
-	}
+    @Bean
+    public SchedulingTemplateServiceV2 schedulingTemplateServiceV2(SchedulingTemplateService schedulingTemplateService) {
+        return new SchedulingTemplateServiceV2Impl(schedulingTemplateService);
+    }
 
-	@Bean
-	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
-		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
-	}
+    @Bean
+    public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationTreeServiceClient) {
+        return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationTreeServiceClient);
+    }
 
-	@Bean
-	public MeetingUserService meetingUserService(MeetingUserRepository meetingUserRepository, UserContextService userContextService, OrganisationService organisationService) {
-		return new MeetingUserServiceImpl(meetingUserRepository, userContextService, organisationService);
-	}
+    @Bean
+    public MeetingUserService meetingUserService(MeetingUserRepository meetingUserRepository, UserContextService userContextService, OrganisationService organisationService) {
+        return new MeetingUserServiceImpl(meetingUserRepository, userContextService, organisationService);
+    }
 
-	@Bean
-	public MeetingService meetingService(MeetingRepository meetingRepository,
-										 MeetingUserService meetingUserService,
-										 SchedulingInfoService schedulingInfoService,
-										 SchedulingStatusService schedulingStatusService,
-										 OrganisationService organisationService,
-										 UserContextService userService,
-										 MeetingLabelRepository meetingLabelRepository,
-										 OrganisationRepository organisationProxy,
-										 OrganisationTreeServiceClient organisationTreeServiceClient,
-										 AuditService auditClient,
-										 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-										 MeetingAdditionalInfoRepository meetingAdditionalInfoRepository) {
-		return new MeetingServiceImpl(
-				meetingRepository,
-				meetingUserService,
-				schedulingInfoService,
-				schedulingStatusService,
-				organisationService,
-				userService,
-				meetingLabelRepository,
-				organisationProxy,
-				organisationTreeServiceClient,
-				auditClient,
-				schedulingInfoEventPublisher,
-				meetingAdditionalInfoRepository);
-	}
+    @Bean
+    public MeetingService meetingService(MeetingRepository meetingRepository,
+                                         MeetingUserService meetingUserService,
+                                         SchedulingInfoService schedulingInfoService,
+                                         SchedulingStatusService schedulingStatusService,
+                                         OrganisationService organisationService,
+                                         UserContextService userService,
+                                         MeetingLabelRepository meetingLabelRepository,
+                                         OrganisationRepository organisationProxy,
+                                         OrganisationTreeServiceClient organisationTreeServiceClient,
+                                         AuditService auditClient,
+                                         SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+                                         MeetingAdditionalInfoRepository meetingAdditionalInfoRepository) {
+        return new MeetingServiceImpl(
+                meetingRepository,
+                meetingUserService,
+                schedulingInfoService,
+                schedulingStatusService,
+                organisationService,
+                userService,
+                meetingLabelRepository,
+                organisationProxy,
+                organisationTreeServiceClient,
+                auditClient,
+                schedulingInfoEventPublisher,
+                meetingAdditionalInfoRepository);
+    }
 
-	@Bean
-	public MeetingServiceV2 meetingServiceV2(MeetingService meetingService) {
-		return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl);
-	}
+    @Bean
+    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao) {
+        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao);
+    }
 
-	@Bean
-	public SchedulingInfoService schedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
-	                                                   SchedulingTemplateRepository schedulingTemplateRepository,
-	                                                   SchedulingTemplateService schedulingTemplateService,
-	                                                   SchedulingStatusService schedulingStatusService,
-	                                                   MeetingUserService meetingUserService,
-	                                                   OrganisationRepository organisationRepository,
-	                                                   OrganisationStrategy organisationStrategy,
-	                                                   UserContextService userContextService,
-	                                                   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
-	                                                   OrganisationTreeServiceClient organisationTreeServiceClient,
-	                                                   AuditService auditService,
-	                                                   CustomUriValidator customUriValidator,
-	                                                   SchedulingInfoEventPublisher schedulingInfoEventPublisher,
-	                                                   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
-	                                                   PoolFinderService poolFinderService,
-	                                                   OrganisationServiceClientV2 organisationServiceClientV2,
-	                                                   PortalLinkBuilder portalLinkBuilder) {
-		return new SchedulingInfoServiceImpl(
-				schedulingInfoRepository,
-				schedulingTemplateRepository,
-				schedulingTemplateService,
-				schedulingStatusService,
-				meetingUserService,
-				organisationRepository,
-				organisationStrategy,
-				userContextService,
-				overflowPoolOrganisationId,
-				organisationTreeServiceClient,
-				auditService,
-				customUriValidator,
-				schedulingInfoEventPublisher,
-				newProvisionerOrganisationFilter,
-				poolFinderService,
-				organisationServiceClientV2,
-				portalLinkBuilder
-		);
-	}
+    @Bean
+    public SchedulingInfoService schedulingInfoService(SchedulingInfoRepository schedulingInfoRepository,
+                                                       SchedulingTemplateRepository schedulingTemplateRepository,
+                                                       SchedulingTemplateService schedulingTemplateService,
+                                                       SchedulingStatusService schedulingStatusService,
+                                                       MeetingUserService meetingUserService,
+                                                       OrganisationRepository organisationRepository,
+                                                       OrganisationStrategy organisationStrategy,
+                                                       UserContextService userContextService,
+                                                       @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
+                                                       OrganisationTreeServiceClient organisationTreeServiceClient,
+                                                       AuditService auditService,
+                                                       CustomUriValidator customUriValidator,
+                                                       SchedulingInfoEventPublisher schedulingInfoEventPublisher,
+                                                       NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+                                                       PoolFinderService poolFinderService,
+                                                       OrganisationServiceClientV2 organisationServiceClientV2,
+                                                       PortalLinkBuilder portalLinkBuilder) {
+        return new SchedulingInfoServiceImpl(
+                schedulingInfoRepository,
+                schedulingTemplateRepository,
+                schedulingTemplateService,
+                schedulingStatusService,
+                meetingUserService,
+                organisationRepository,
+                organisationStrategy,
+                userContextService,
+                overflowPoolOrganisationId,
+                organisationTreeServiceClient,
+                auditService,
+                customUriValidator,
+                schedulingInfoEventPublisher,
+                newProvisionerOrganisationFilter,
+                poolFinderService,
+                organisationServiceClientV2,
+                portalLinkBuilder
+        );
+    }
 
-	@Bean
-	public PortalLinkBuilder portalLinkBuilder(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate,
-	                                           @Value("${scheduling.info.citizen.portal.return.url}") String defaultReturnUrl) {
-		PortalLinkModel.setDefaultReturnUrl(defaultReturnUrl);
+    @Bean
+    public PortalLinkBuilder portalLinkBuilder(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate,
+                                               @Value("${scheduling.info.citizen.portal.return.url}") String defaultReturnUrl) {
+        PortalLinkModel.setDefaultReturnUrl(defaultReturnUrl);
 
-		return new PortalLinkBuilder(portalLinkTemplate);
-	}
+        return new PortalLinkBuilder(portalLinkTemplate);
+    }
 
-	@Bean
-	public SchedulingInfoServiceV2 schedulingInfoServiceV2(SchedulingInfoService schedulingInfoService) {
-		return new SchedulingInfoServiceV2Impl(schedulingInfoService, shortLinkBaseUrl);
-	}
+    @Bean
+    public SchedulingInfoServiceV2 schedulingInfoServiceV2(SchedulingInfoService schedulingInfoService) {
+        return new SchedulingInfoServiceV2Impl(schedulingInfoService, shortLinkBaseUrl);
+    }
 
-	@Bean
-	public SchedulingStatusService schedulingStatusService(SchedulingStatusRepository schedulingStatusRepository) {
-		return new SchedulingStatusServiceImpl(
-				schedulingStatusRepository
-		);
-	}
+    @Bean
+    public SchedulingStatusService schedulingStatusService(SchedulingStatusRepository schedulingStatusRepository) {
+        return new SchedulingStatusServiceImpl(
+                schedulingStatusRepository
+        );
+    }
 
-	@Bean
-	public PoolInfoService poolInfoService(OrganisationRepository organisationRepository,
-										   SchedulingInfoRepository schedulingInfoRepository,
-										   SchedulingTemplateRepository schedulingTemplateRepository,
-										   OrganisationStrategy organisationStrategy,
-										   PoolInfoRepository poolInfoRepository) {
-		return new PoolInfoServiceImpl(
-				organisationRepository,
-				schedulingInfoRepository,
-				schedulingTemplateRepository,
-				organisationStrategy,
-				poolInfoRepository
-		);
-	}
+    @Bean
+    public PoolInfoService poolInfoService(OrganisationRepository organisationRepository,
+                                           SchedulingInfoRepository schedulingInfoRepository,
+                                           SchedulingTemplateRepository schedulingTemplateRepository,
+                                           OrganisationStrategy organisationStrategy,
+                                           PoolInfoRepository poolInfoRepository) {
+        return new PoolInfoServiceImpl(
+                organisationRepository,
+                schedulingInfoRepository,
+                schedulingTemplateRepository,
+                organisationStrategy,
+                poolInfoRepository
+        );
+    }
 
-	@Bean
-	public PoolInfoServiceV2 poolInfoServiceV2(PoolInfoService poolInfoService) {
-		return new PoolInfoServiceV2Impl(poolInfoService, shortLinkBaseUrl);
-	}
+    @Bean
+    public PoolInfoServiceV2 poolInfoServiceV2(PoolInfoService poolInfoService) {
+        return new PoolInfoServiceV2Impl(poolInfoService, shortLinkBaseUrl);
+    }
 
-	@Bean
-	public PoolService poolService(SchedulingInfoService schedulingInfoService,
-								   MeetingUserRepository meetingUserRepository,
-								   OrganisationRepository organisationRepository,
-								   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
-								   @Value("${pool.fill.organisation}") String poolOrganisation,
-								   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
-		return new PoolServiceImpl(schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
-	}
+    @Bean
+    public PoolService poolService(SchedulingInfoService schedulingInfoService,
+                                   MeetingUserRepository meetingUserRepository,
+                                   OrganisationRepository organisationRepository,
+                                   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
+                                   @Value("${pool.fill.organisation}") String poolOrganisation,
+                                   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
+        return new PoolServiceImpl(schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
+    }
 
-	@Bean
-	public PoolFinderService poolFinderService(SchedulingInfoRepository schedulingInfoRepository, @Value("${pool.meeting.minimumAgeSec:60}") int minimumAgeSec) {
-		return new PoolFinderServiceImpl(schedulingInfoRepository, minimumAgeSec);
-	}
+    @Bean
+    public PoolFinderService poolFinderService(SchedulingInfoRepository schedulingInfoRepository, @Value("${pool.meeting.minimumAgeSec:60}") int minimumAgeSec) {
+        return new PoolFinderServiceImpl(schedulingInfoRepository, minimumAgeSec);
+    }
 
-	@Bean
-	public NewProvisionerOrganisationFilter organisationFilter(@Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
-		return new NewProvisionerOrganisationFilterImpl(filterOrganisations == null ? Collections.emptyList() : filterOrganisations);
-	}
+    @Bean
+    public NewProvisionerOrganisationFilter organisationFilter(@Value("${event.organisation.filter:#{null}}") List<String> filterOrganisations) {
+        return new NewProvisionerOrganisationFilterImpl(filterOrganisations == null ? Collections.emptyList() : filterOrganisations);
+    }
 
-	@Bean
-	public CustomUriValidator customUriValidator() {
-		return new CustomUriValidatorImpl();
-	}
+    @Bean
+    public CustomUriValidator customUriValidator() {
+        return new CustomUriValidatorImpl();
+    }
 
-	@Bean
-	public AuditService auditService(AuditClient auditClient) {
-		return new AuditServiceImpl(auditClient);
-	}
+    @Bean
+    public AuditService auditService(AuditClient auditClient) {
+        return new AuditServiceImpl(auditClient);
+    }
 
-	@Bean
-	public OrganisationInterceptor organisationInterceptor() {
-		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
-	}
+    @Bean
+    public OrganisationInterceptor organisationInterceptor() {
+        return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
+    }
 
-	@Bean
-	public OauthInterceptor oauthInterceptor() {
-		return new OauthInterceptor();
-	}
+    @Bean
+    public OauthInterceptor oauthInterceptor() {
+        return new OauthInterceptor();
+    }
 
-	@Bean
-	public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") MessagePublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
-		return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao);
-	}
+    @Bean
+    public SchedulingInfoEventPublisher schedulingInfoEventPublisher(@Qualifier("natsEventPublisher") MessagePublisher eventPublisher, EntitiesIvrThemeDao entitiesIvrThemeDao) {
+        return new SchedulingInfoEventPublisherImpl(eventPublisher, entitiesIvrThemeDao);
+    }
 
-	@Bean
-	public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
-		return new OrganisationTreeServiceClientImpl(endpoint);
-	}
+    @Bean
+    public OrganisationTreeServiceClient organisationTreeServiceClient(@Value("${organisationtree.service.endpoint}") String endpoint) {
+        return new OrganisationTreeServiceClientImpl(endpoint);
+    }
 
-	@Bean
-	public OrganisationServiceClientV2 organisationServiceClientV2(KeycloakHttpClientService keycloakHttpClientService,
+    @Bean
+    public OrganisationServiceClientV2 organisationServiceClientV2(KeycloakHttpClientService keycloakHttpClientService,
                                                                    @Value("${organisation.service.v2.endpoint}") String endpoint,
                                                                    RestClient.Builder restClientBuilder) {
-		return new OrganisationServiceClientV2Impl(keycloakHttpClientService, endpoint, restClientBuilder);
-	}
+        return new OrganisationServiceClientV2Impl(keycloakHttpClientService, endpoint, restClientBuilder);
+    }
 
-	@Bean
-	public KeycloakHttpClientService keycloakHttpClientService(@Value("${keycloak.service.endpoint}") String endpoint,
-	                                                           @Value("${keycloak.service.client}") String client,
-	                                                           @Value("${keycloak.service.clientsecret}") String clientSecret,
-	                                                           RestClient.Builder restClientBuilder) {
-		return new KeycloakHttpClientServiceImpl(endpoint, client, clientSecret, restClientBuilder);
-	}
+    @Bean
+    public KeycloakHttpClientService keycloakHttpClientService(@Value("${keycloak.service.endpoint}") String endpoint,
+                                                               @Value("${keycloak.service.client}") String client,
+                                                               @Value("${keycloak.service.clientsecret}") String clientSecret,
+                                                               RestClient.Builder restClientBuilder) {
+        return new KeycloakHttpClientServiceImpl(endpoint, client, clientSecret, restClientBuilder);
+    }
 
-	@Bean
-	public PoolHistoryService poolHistoryService(PoolInfoRepository poolInfoRepository, PoolHistoryDao PoolHistorydao) {
-		return new PoolHistoryServiceImpl(poolInfoRepository, PoolHistorydao);
-	}
+    @Bean
+    public PoolHistoryService poolHistoryService(PoolInfoRepository poolInfoRepository, PoolHistoryDao PoolHistorydao) {
+        return new PoolHistoryServiceImpl(poolInfoRepository, PoolHistorydao);
+    }
 
-	@Bean
-	public UserSecurityInterceptor userSecurityInterceptor() {
-		LOGGER.debug("Creating userSecurityInterceptor");
-		return new UserSecurityInterceptor();
-	}
+    @Bean
+    public UserSecurityInterceptor userSecurityInterceptor() {
+        LOGGER.debug("Creating userSecurityInterceptor");
+        return new UserSecurityInterceptor();
+    }
 
-	@Bean
-	@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
-	public UserContextService userContextService() {
-		return new UserContextServiceImpl();
-	}
+    @Bean
+    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
+    public UserContextService userContextService() {
+        return new UserContextServiceImpl();
+    }
 
-	@Autowired
-	private PrometheusConfig prometheusConfig;
+    @Autowired
+    private PrometheusConfig prometheusConfig;
 
-	@Autowired
-	private Clock clock;
+    @Autowired
+    private Clock clock;
 
-	@Autowired
-	private PrometheusRegistry prometheusRegistry;
+    @Autowired
+    private PrometheusRegistry prometheusRegistry;
 
-	@Bean
-	public PrometheusScrapeEndpoint prometheus() {
-		// Previously, the constructor took only the prometheusRegistry object.
-		// The exporterProperties field is now mandatory, but if set to null,
-		// it behaves the same as the old constructor.
-		return new PrometheusScrapeEndpoint(prometheusRegistry, null);
-	}
+    @Bean
+    public PrometheusScrapeEndpoint prometheus() {
+        // Previously, the constructor took only the prometheusRegistry object.
+        // The exporterProperties field is now mandatory, but if set to null,
+        // it behaves the same as the old constructor.
+        return new PrometheusScrapeEndpoint(prometheusRegistry, null);
+    }
 
-	@Override
-	public void configurePathMatch(PathMatchConfigurer configurer) {
-		configurer.setUseTrailingSlashMatch(true);
-	}
+    @Bean
+    public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService) {
+        return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService);
+    }
 
-	@Bean
-	public Converter<String, ViewType> stringViewTypeConverter() {
-		return new StringToViewTypeConverter();
-	}
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
+    }
 
-	@Bean
-	public Converter<String, VmrQuality> stringVmrQualityConverter() {
-		return new StringToVmrQualityConverter();
-	}
+    @Bean
+    public Converter<String, ViewType> stringViewTypeConverter() {
+        return new StringToViewTypeConverter();
+    }
 
-	@Bean
-	public Converter<String, VmrType> stringVmrTypeConverter() {
-		return new StringToVmrTypeConverter();
-	}
+    @Bean
+    public Converter<String, VmrQuality> stringVmrQualityConverter() {
+        return new StringToVmrQualityConverter();
+    }
+
+    @Bean
+    public Converter<String, VmrType> stringVmrTypeConverter() {
+        return new StringToVmrTypeConverter();
+    }
 }
