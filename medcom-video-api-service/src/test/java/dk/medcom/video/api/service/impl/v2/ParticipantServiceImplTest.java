@@ -5,7 +5,6 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
@@ -279,6 +278,43 @@ public class ParticipantServiceImplTest {
 
         assertThrows(PermissionDeniedExceptionV2.class, () ->
                 participantService.deleteParticipant(uuid, UUID.randomUUID()));
+    }
+
+    @Test
+    public void testCreateParticipantsOrganisationTypeParticipant() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var participantOrganisation = new Organisation();
+        participantOrganisation.setOrganisationId("resolved-org-id");
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "test-org", "ignored-input-org", ParticipantRole.HOST)
+        );
+        var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
+        setupValidUserContext();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(organisationService.getParticipantOrganisation("test-org")).thenReturn(participantOrganisation);
+        Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        assertEquals(1, result.size());
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "resolved-org-id".equals(p.organisationId())));
+    }
+
+    @Test
+    public void testCreateParticipantsOrganisationTypeParticipantNotFound() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "unknown-org", "ignored-input-org", ParticipantRole.HOST)
+        );
+        setupValidUserContext();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(organisationService.getParticipantOrganisation("unknown-org"))
+                .thenThrow(new ResourceNotFoundExceptionV2("organisation", "participantId"));
+
+        assertThrows(ResourceNotFoundExceptionV2.class, () ->
+                participantService.createParticipants(uuid, createParticipants));
     }
 
 }
