@@ -163,11 +163,15 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                             null,
                             UUID.randomUUID(),
                             meeting.getId(),
-                            meeting.getUuid(),
+                            UUID.fromString(meeting.getUuid()),
                             p.type(),
-                            p.externalId(),
+                            p.participantId(),
                             p.organisation(),
-                            p.role());
+                            p.role(),
+                            null,
+                            null,
+                            null,
+                            null);
 
                     participantDao.save(participant);
                 });

@@ -1542,9 +1542,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     private static List<CreateParticipant> createParticipants() {
-        return List.of(new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).externalId(randomString()),
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).externalId(randomString()).organisation(randomString()),
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).externalId(randomString()));
+        return List.of(
+                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString()),
+                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("test-org").organisation(randomString()),
+                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisation(randomString()).participantId(randomString())
+        );
     }
 
 
@@ -1692,6 +1694,20 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
+    void testV2MeetingsUuidParticipantsPostUnknownOrganisationParticipant() throws ApiException {
+        var createMeeting = randomCreateMeeting();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+        var participants = List.of(
+                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
+        );
+        var expectedException = assertThrows(ApiException.class, () ->
+                videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants));
+        assertEquals(404, expectedException.getCode());
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"11\""));
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error\":\"Resource: organisation in field: participantId not found.\""));
+    }
+
+    @Test
     void testV2MeetingsUuidParticipantsGet() throws ApiException {
         var createMeeting = randomCreateMeeting();
         var participantsModel = createParticipants();
@@ -1702,11 +1718,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         assertEquals(participants.size(), createdParticipants.size());
 
-        var sortedParticipantsCreated = createdParticipants.stream().sorted(Comparator.comparing(Participant::getExternalId)).toList();
-        var sortedParticipantsInput = participants.stream().sorted(Comparator.comparing(Participant::getExternalId)).toList();
+        var sortedParticipantsCreated = createdParticipants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
+        var sortedParticipantsInput = participants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
 
         for (int i = 0; i < sortedParticipantsCreated.size(); i++) {
-            assertEquals(sortedParticipantsInput.get(i).getExternalId(), sortedParticipantsCreated.get(i).getExternalId());
+            assertEquals(sortedParticipantsInput.get(i).getParticipantId(), sortedParticipantsCreated.get(i).getParticipantId());
             assertEquals(sortedParticipantsInput.get(i).getRole().name(), sortedParticipantsCreated.get(i).getRole().name());
             assertEquals(sortedParticipantsInput.get(i).getType().name(), sortedParticipantsCreated.get(i).getType().name());
         }
@@ -1721,7 +1737,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).externalId(randomString());
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
@@ -1746,7 +1762,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).externalId(randomString());
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
         videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getUuid());
