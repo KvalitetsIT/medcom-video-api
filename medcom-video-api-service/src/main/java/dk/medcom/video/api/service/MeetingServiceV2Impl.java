@@ -165,7 +165,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                             meeting.getId(),
                             UUID.fromString(meeting.getUuid()),
                             p.type(),
-                            p.externalId(),
+                            p.participantId(),
                             p.organisation(),
                             p.role(),
                             null,
