@@ -550,6 +550,101 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+  /v2/meeting-details:
+    get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: gets a list of meetings where an organisation is a participant
+      description: >-
+        Gets a list of meetings based on query parameters, where the given organisation 
+        is registered as a participant. 
+        If one is present the remaining are ignored. <br>
+        The query parameters are handled in order: <br>
+        * subject <br>
+        * label <br>
+        * search (also from-start-time and to-start-time if present) <br>
+        * from-start-time and to-start-time <br>
+        
+        Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
+        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br> 
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      parameters:
+        - name: organisationId
+          in: query
+          description: the organisation to match as a participant on the meeting
+          required: true
+          schema:
+            type: string
+          example: 'org-123'
+        - name: includeSubOrganisations
+          in: query
+          description: when true, meetings where a sub-organisation of organisationId is a participant are also included
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: from-start-time
+          in: query
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: to-start-time
+          in: query
+          description: to start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: subject
+          in: query
+          description: the subject of a meeting
+          required: false
+          schema:
+            type: string
+          example: subject
+        - name: label
+          in: query
+          description: the label of a meeting
+          required: false
+          schema:
+            type: string
+          example: label123
+        - name: search
+          in: query
+          description: common string
+          required: false
+          schema:
+            type: string
+          example: searching for this
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/meeting'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '500':
+          $ref: '#/components/responses/500'
+
   /v2/meetings/{uuid}/participants:
     get:
       security:
