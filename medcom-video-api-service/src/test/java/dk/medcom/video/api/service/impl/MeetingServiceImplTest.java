@@ -676,6 +676,28 @@ public class MeetingServiceImplTest {
 	}
 
 	@Test
+	public void testCreateMeetingPolicyServerEnabledSkipsPoolLookup() throws RessourceNotFoundException, PermissionDeniedException, NotValidDataException, NotAcceptableException {
+		UUID uuid = UUID.randomUUID();
+		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
+
+		meetingUser.getOrganisation().setPolicyServerEnabled(true);
+
+		CreateMeetingDto input = new CreateMeetingDto();
+		input.setDescription("This is a description");
+		input.setOrganizedByEmail("some@email.com");
+		input.setStartTime(new Date());
+		input.setUuid(uuid);
+		input.setEndTime(new Date());
+
+		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
+		Meeting result = meetingService.createMeeting(input);
+		assertNotNull(result);
+
+		Mockito.verify(schedulingInfoService, times(1)).createSchedulingInfo(Mockito.any(), Mockito.any());
+		Mockito.verify(schedulingInfoService, times(0)).attachMeetingToSchedulingInfo(Mockito.eq(result), Mockito.any(CreateMeetingDto.class));
+	}
+
+	@Test
 	public void testCanNotCreateMeetingWhenNoScheduleAvailable() throws RessourceNotFoundException, PermissionDeniedException {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);

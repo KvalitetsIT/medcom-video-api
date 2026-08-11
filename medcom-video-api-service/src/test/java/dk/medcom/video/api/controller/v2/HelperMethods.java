@@ -47,6 +47,7 @@ public class HelperMethods {
                 randomString(),
                 randomMeeting(),
                 DirectMediaModel.best_effort,
+                randomBoolean(),
                 randomString(),
                 randomString(),
                 randomString());
@@ -108,6 +109,7 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 DirectMediaModel.never,
+                randomBoolean(),
                 randomString(),
                 randomMeetingUser(),
                 randomMeetingUser(),

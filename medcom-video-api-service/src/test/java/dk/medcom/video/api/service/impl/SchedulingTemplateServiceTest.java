@@ -54,6 +54,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(meetingUser, true);
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
 		createSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
+		createSchedulingTemplateDto.setBreakoutRooms(true);
 
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
@@ -72,6 +73,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(createSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
 		assertEquals(createSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertEquals(createSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
+		assertTrue(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
 	}
 
 	@Test
@@ -91,9 +93,10 @@ public class SchedulingTemplateServiceTest {
 		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+		assertFalse(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
 	}
-	
-	@Test 
+
+	@Test
 	public void testUpdateSchedulingTemplate() throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		// Given
 		SchedulingTemplateServiceImpl schedulingTemplateService = schedulingTemplateServiceMocked(meetingUser, false);
@@ -103,7 +106,8 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setReturnUrl("return_url");
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
 		updateSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
-		
+		updateSchedulingTemplateDto.setBreakoutRooms(true);
+
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
 		
@@ -120,6 +124,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(updateSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
 		assertEquals(updateSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertEquals(updateSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
+		assertTrue(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
 	}
 
 	@Test
@@ -137,6 +142,7 @@ public class SchedulingTemplateServiceTest {
 		Mockito.verify(schedulingTemplateRepository).save(schedulingTemplateArgumentCaptor.capture());
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+		assertFalse(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
 	}
 
 	@Test

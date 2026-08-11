@@ -452,6 +452,83 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
         assertTrue(capturedSchedulingInfo.isNewProvisioner());
         assertEquals(schedulingTemplateIdOne.getCallType(), capturedSchedulingInfo.getCallType());
+        assertFalse(capturedSchedulingInfo.isPolicyManaged());
+        assertEquals(ProvisionStatus.AWAITS_PROVISION, capturedSchedulingInfo.getProvisionStatus());
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingPolicyManaged() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
+
+        Organisation organisation = new Organisation();
+        organisation.setPolicyServerEnabled(true);
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(organisation));
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+        meeting.setEndTime(new Date());
+        meeting.setOrganisation(organisation);
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+        schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertTrue(capturedSchedulingInfo.isPolicyManaged());
+        assertEquals(ProvisionStatus.PROVISIONED_OK, capturedSchedulingInfo.getProvisionStatus());
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(false));
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingBreakoutRoomsFromTemplateDefault() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        schedulingTemplateIdOne.setBreakoutRooms(true);
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+        meeting.setOrganisation(new Organisation());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+        schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertTrue(capturedSchedulingInfo.getBreakoutRooms());
+    }
+
+    @Test
+    public void testCreateSchedulingInfoMeetingBreakoutRoomsFromRequestOverridesTemplate() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+        schedulingTemplateIdOne.setBreakoutRooms(false);
+
+        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
+        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
+
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
+
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+        meeting.setOrganisation(new Organisation());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
+        createMeetingDto.setBreakoutRooms(true);
+        schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
+
+        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
+        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
+        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
+
+        assertTrue(capturedSchedulingInfo.getBreakoutRooms());
     }
 
     @Test
@@ -945,7 +1022,10 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo1.setId(1L);
         var schedulingInfo2 = createSchedulingInfo(false);
         schedulingInfo2.setId(2L);
-        Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
+        var schedulingInfo3 = createSchedulingInfo(false);
+        schedulingInfo3.setId(3L);
+        schedulingInfo3.setPolicyManaged(true);
+        Mockito.when(schedulingInfoRepository.findAllWithinStartAndEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.AWAITS_PROVISION))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2, schedulingInfo3));
 
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl());
 
@@ -958,7 +1038,9 @@ public class SchedulingInfoServiceImplTest {
     public void testGetSchedulingInfoAwaitsDeProvisionFilter() {
         var schedulingInfo1 = createSchedulingInfo(true);
         var schedulingInfo2 = createSchedulingInfo(false);
-        Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2));
+        var schedulingInfo3 = createSchedulingInfo(false);
+        schedulingInfo3.setPolicyManaged(true);
+        Mockito.when(schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(Mockito.any(), Mockito.eq(ProvisionStatus.PROVISIONED_OK))).thenReturn(Arrays.asList(schedulingInfo1, schedulingInfo2, schedulingInfo3));
 
         var schedulingInfoService = createSchedulingInfoService(new CustomUriValidatorImpl());
 

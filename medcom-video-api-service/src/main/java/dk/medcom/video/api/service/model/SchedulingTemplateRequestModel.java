@@ -30,5 +30,6 @@ public record SchedulingTemplateRequestModel(Long conferencingSysId,
                                              Boolean forceEncryption,
                                              Boolean muteAllGuests,
                                              DirectMediaModel directMedia,
+                                             Boolean breakoutRooms,
                                              String callType) {
 }

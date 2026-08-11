@@ -39,7 +39,8 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private boolean forceEncryption;
 	private boolean muteAllGuests;
 	private DirectMedia directMedia;
-	
+	private boolean breakoutRooms;
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;
 	private String provisionVmrId;
@@ -95,6 +96,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		customPortalHost = schedulingInfo.getCustomPortalHost();
 		returnUrl = schedulingInfo.getReturnUrl();
 		directMedia = schedulingInfo.getDirectMedia();
+		breakoutRooms = schedulingInfo.getBreakoutRooms();
 		callType = schedulingInfo.getCallType();
 
 		MeetingUser meetingUser = schedulingInfo.getMeetingUser();
@@ -356,6 +358,14 @@ public class SchedulingInfoDto extends RepresentationModel {
 
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
+	}
+
+	public boolean getBreakoutRooms() {
+		return breakoutRooms;
+	}
+
+	public void setBreakoutRooms(boolean breakoutRooms) {
+		this.breakoutRooms = breakoutRooms;
 	}
 
     public String getCallType() {

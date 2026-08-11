@@ -48,6 +48,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
+	private boolean breakoutRooms;
 
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;
@@ -97,6 +98,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		customPortalHost = schedulingTemplate.getCustomPortalHost();
 		returnUrl = schedulingTemplate.getReturnUrl();
 		directMedia = schedulingTemplate.getDirectMedia();
+		breakoutRooms = schedulingTemplate.getBreakoutRooms();
 		callType = schedulingTemplate.getCallType();
 
 		createdTime = schedulingTemplate.getCreatedTime();
@@ -408,6 +410,14 @@ public class SchedulingTemplateDto extends RepresentationModel {
 
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
+	}
+
+	public boolean getBreakoutRooms() {
+		return breakoutRooms;
+	}
+
+	public void setBreakoutRooms(boolean breakoutRooms) {
+		this.breakoutRooms = breakoutRooms;
 	}
 
     public String getCallType() {

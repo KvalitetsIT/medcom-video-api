@@ -79,6 +79,8 @@ public class CreateMeetingDto {
 
 	private String callType;
 
+	private Boolean breakoutRooms;
+
 	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
 	public List<String> getLabels() {
@@ -321,5 +323,13 @@ public class CreateMeetingDto {
 
     public void setCallType(String callType) {
         this.callType = callType;
+    }
+
+    public Boolean getBreakoutRooms() {
+        return breakoutRooms;
+    }
+
+    public void setBreakoutRooms(Boolean breakoutRooms) {
+        this.breakoutRooms = breakoutRooms;
     }
 }
