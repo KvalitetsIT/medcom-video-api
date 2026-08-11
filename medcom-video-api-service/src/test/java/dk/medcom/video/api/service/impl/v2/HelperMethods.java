@@ -174,6 +174,7 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 DirectMediaModel.never,
+                randomBoolean(),
                 randomString());
     }
 
@@ -198,6 +199,7 @@ public class HelperMethods {
                 ViewTypeModel.five_mains_seven_pips,
                 ViewTypeModel.one_main_seven_pips,
                 VmrQualityModel.sd,
+                randomBoolean(),
                 randomBoolean(),
                 randomBoolean(),
                 randomBoolean(),

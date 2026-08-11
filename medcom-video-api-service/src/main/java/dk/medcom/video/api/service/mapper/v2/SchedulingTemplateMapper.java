@@ -45,6 +45,7 @@ public class SchedulingTemplateMapper {
                 input.isForceEncryption(),
                 input.isMuteAllGuests(),
                 DirectMediaModel.from(input.getDirectMedia()),
+                input.getBreakoutRooms(),
                 input.getCallType(),
                 dtoToModel(input.getCreatedBy()),
                 dtoToModel(input.updatedBy),
@@ -81,6 +82,7 @@ public class SchedulingTemplateMapper {
         output.setCustomPortalHost(input.customPortalHost());
         output.setReturnUrl(input.returnUrl());
         output.setDirectMedia(EnumMapper.modelToEntity(input.directMedia()));
+        output.setBreakoutRooms(input.breakoutRooms());
         output.setIvrTheme(input.ivrTheme());
         output.setIsDefaultTemplate(input.isDefaultTemplate());
         output.setIsPoolTemplate(input.isPoolTemplate());
@@ -118,6 +120,7 @@ public class SchedulingTemplateMapper {
         output.setCustomPortalHost(input.customPortalHost());
         output.setReturnUrl(input.returnUrl());
         output.setDirectMedia(EnumMapper.modelToEntity(input.directMedia()));
+        output.setBreakoutRooms(input.breakoutRooms());
         output.setIvrTheme(input.ivrTheme());
         output.setIsDefaultTemplate(input.isDefaultTemplate());
         output.setIsPoolTemplate(input.isPoolTemplate());

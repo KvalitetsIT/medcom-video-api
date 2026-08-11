@@ -111,14 +111,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		LOGGER.debug("getSchedulingInfoAwaitsProvision found following ID's: {}.", schedulingInfos.stream().map(x -> x.getId().toString()).collect(Collectors.joining(",")));
 
-		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner() && !x.isPolicyManaged()).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<SchedulingInfo> getSchedulingInfoAwaitsDeProvision() {
 		var schedulingInfos = schedulingInfoRepository.findAllWithinEndTimeLessThenAndStatus(new Date(), ProvisionStatus.PROVISIONED_OK);
 
-		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner()).collect(Collectors.toList());
+		return schedulingInfos.stream().filter(x -> !x.isNewProvisioner() && !x.isPolicyManaged()).collect(Collectors.toList());
 	}
 
 	@Override
@@ -224,9 +224,15 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setOrganisation(meeting.getOrganisation());
+		schedulingInfo.setPolicyManaged(meeting.getOrganisation().getPolicyServerEnabled());
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+		if(createMeetingDto.getBreakoutRooms() != null) {
+			schedulingInfo.setBreakoutRooms(createMeetingDto.getBreakoutRooms());
+		} else {
+			schedulingInfo.setBreakoutRooms(schedulingTemplate.getBreakoutRooms());
+		}
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 
@@ -305,7 +311,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
-		schedulingInfo.setProvisionStatus(ProvisionStatus.AWAITS_PROVISION);
+		schedulingInfo.setProvisionStatus(schedulingInfo.isPolicyManaged() ? ProvisionStatus.PROVISIONED_OK : ProvisionStatus.AWAITS_PROVISION);
 
 		var meetingUserPerformance = new PerformanceLogger("Get or create current meeting user");
 		schedulingInfo.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
@@ -322,7 +328,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
-		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent, schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent, schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
@@ -440,7 +446,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 
@@ -455,7 +461,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE), schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 
 		LOGGER.debug("Exit deleteSchedulingInfo");
 	}
@@ -467,7 +473,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 
 		LOGGER.debug("Exit deleteSchedulingInfoPool");
 	}
@@ -549,6 +555,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+		schedulingInfo.setBreakoutRooms(schedulingTemplate.getBreakoutRooms());
 		schedulingInfo.setCallType(schedulingTemplate.getCallType());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
@@ -614,7 +621,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");

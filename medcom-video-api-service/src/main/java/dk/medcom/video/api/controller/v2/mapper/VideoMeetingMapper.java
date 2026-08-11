@@ -74,6 +74,7 @@ public class VideoMeetingMapper {
                 input.getForcePresenterIntoMain(),
                 input.getForceEncryption(),
                 input.getMuteAllGuests(),
+                input.getBreakoutRooms(),
                 input.getUriWithoutDomain(),
                 input.getHostPin(),
                 input.getGuestPin(),

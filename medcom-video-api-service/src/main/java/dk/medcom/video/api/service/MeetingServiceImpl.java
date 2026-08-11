@@ -215,7 +215,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("attachOrCreateSchedulingInfo. future meeting");
 
-		if(isFutureMeeting(createMeetingDto)) {
+		if(isFutureMeeting(createMeetingDto) || organisationService.getUserOrganisation().getPolicyServerEnabled()) {
 			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			return;
 		}
@@ -407,7 +407,7 @@ public class MeetingServiceImpl implements MeetingService {
 		}
 		else {
 			var event = SchedulingInfoEventMapper.map(schedulingInfo, MessageType.UPDATE);
-			schedulingInfoEventPublisher.publishEvent(event, schedulingInfo.isNewProvisioner());
+			schedulingInfoEventPublisher.publishEvent(event, schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
 		}
 
 		auditService.auditMeeting(meeting, "update");

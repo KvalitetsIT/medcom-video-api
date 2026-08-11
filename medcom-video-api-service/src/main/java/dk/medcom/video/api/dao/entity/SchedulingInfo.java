@@ -84,6 +84,8 @@ public class SchedulingInfo {
 	private DirectMedia directMedia;
 	private boolean newProvisioner;				//using the new (true) or old (false) provisioner service
 	private String callType;
+	private boolean policyManaged;			//if true, VMR is delivered by the VDX policy server instead of Pexip provisioning
+	private boolean breakoutRooms;
 
 	public Long getId() {
 		return id;
@@ -376,5 +378,21 @@ public class SchedulingInfo {
 
     public void setCallType(String callType) {
         this.callType = callType;
+    }
+
+    public boolean isPolicyManaged() {
+        return policyManaged;
+    }
+
+    public void setPolicyManaged(boolean policyManaged) {
+        this.policyManaged = policyManaged;
+    }
+
+    public boolean getBreakoutRooms() {
+        return breakoutRooms;
+    }
+
+    public void setBreakoutRooms(boolean breakoutRooms) {
+        this.breakoutRooms = breakoutRooms;
     }
 }
