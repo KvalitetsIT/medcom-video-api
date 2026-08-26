@@ -1,7 +1,10 @@
 package dk.medcom.video.api.service.impl.v2;
 
 import dk.medcom.video.api.controller.exceptions.*;
+import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.entity.ParticipantRole;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
@@ -16,6 +19,7 @@ import org.openapitools.model.DetailedError;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static dk.medcom.video.api.service.impl.v2.HelperMethods.*;
@@ -25,14 +29,19 @@ public class MeetingServiceV2ImplTest {
 
     private MeetingServiceV2 meetingServiceV2;
     private MeetingService meetingService;
+    private MeetingRepository meetingRepository;
+    private SchedulingInfoRepository schedulingInfoRepository;
+    private ParticipantDao participantDao;
     private final String shortLinkBaseUrl = "base.url";
 
     @BeforeEach
     public void setup() {
         meetingService = Mockito.mock(MeetingService.class);
-        ParticipantDao p = Mockito.mock(ParticipantDao.class);
-        Mockito.when(p.findByMeeting(Mockito.any())).thenReturn(List.of());
-        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, p);
+        participantDao = Mockito.mock(ParticipantDao.class);
+        meetingRepository = Mockito.mock(MeetingRepository.class);
+        schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
+        Mockito.when(participantDao.findByMeeting(Mockito.any())).thenReturn(List.of());
+        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository);
     }
 
     private void verifyNoMoreInteractions() {
@@ -726,6 +735,290 @@ public class MeetingServiceV2ImplTest {
         assertNull(expectedException.getMessage());
 
         Mockito.verify(meetingService).patchMeeting(Mockito.eq(uuid), Mockito.argThat(x -> assertPatchMeeting(input, x)));
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipations() {
+        var participantId = randomString();
+
+        var meeting1 = randomMeeting();
+        var meeting2 = randomMeeting();
+
+        var participant1 = randomParticipant(meeting1.getId());
+        var participant2 = randomParticipant(meeting2.getId());
+
+        var schedulingInfo1 = randomSchedulingInfo();
+        var schedulingInfo2 = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant1, participant2));
+        Mockito.when(meetingRepository.findById(meeting1.getId())).thenReturn(Optional.of(meeting1));
+        Mockito.when(meetingRepository.findById(meeting2.getId())).thenReturn(Optional.of(meeting2));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting1)).thenReturn(schedulingInfo1);
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting2)).thenReturn(schedulingInfo2);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        var res1 = result.stream().filter(x -> x.uuid().toString().equals(meeting1.getUuid())).findFirst().orElseThrow();
+        var res2 = result.stream().filter(x -> x.uuid().toString().equals(meeting2.getUuid())).findFirst().orElseThrow();
+
+        assertMeetingParticipation(meeting1, schedulingInfo1, participant1, 0, shortLinkBaseUrl, res1);
+        assertMeetingParticipation(meeting2, schedulingInfo2, participant2, 0, shortLinkBaseUrl, res2);
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting1.getId());
+        Mockito.verify(meetingRepository).findById(meeting2.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting1);
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting2);
+        Mockito.verify(participantDao).findByMeeting(meeting1);
+        Mockito.verify(participantDao).findByMeeting(meeting2);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredBySubject() {
+        var participantId = randomString();
+
+        var meeting1 = randomMeeting();
+        var meeting2 = randomMeeting();
+
+        var participant1 = randomParticipant(meeting1.getId());
+        var participant2 = randomParticipant(meeting2.getId());
+
+        var schedulingInfo1 = randomSchedulingInfo();
+        var schedulingInfo2 = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant1, participant2));
+        Mockito.when(meetingRepository.findById(meeting1.getId())).thenReturn(Optional.of(meeting1));
+        Mockito.when(meetingRepository.findById(meeting2.getId())).thenReturn(Optional.of(meeting2));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting1)).thenReturn(schedulingInfo1);
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting2)).thenReturn(schedulingInfo2);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, meeting1.getSubject(), null, null);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertMeetingParticipation(meeting1, schedulingInfo1, participant1, 0, shortLinkBaseUrl, result.getFirst());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting1.getId());
+        Mockito.verify(meetingRepository).findById(meeting2.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting1);
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting2);
+        Mockito.verify(participantDao).findByMeeting(meeting1);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredByOrganizedBy() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, meeting.getOrganizedByUser().getEmail(), null);
+        assertEquals(1, result.size());
+        assertMeetingParticipation(meeting, schedulingInfo, participant, 0, shortLinkBaseUrl, result.getFirst());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredByOrganizedByNoMatch() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, randomString(), null);
+        assertEquals(0, result.size());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredByLabel() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+        var existingLabel = meeting.getMeetingLabels().iterator().next().getLabel();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, existingLabel);
+        assertEquals(1, result.size());
+        assertMeetingParticipation(meeting, schedulingInfo, participant, 0, shortLinkBaseUrl, result.getFirst());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredByStartTimeInterval() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var meetingStart = meeting.getStartTime().toInstant().atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+        var fromStartTime = meetingStart.minusHours(1);
+        var toStartTime = meetingStart.plusHours(1);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, fromStartTime, toStartTime, null, null, null);
+        assertEquals(1, result.size());
+        assertMeetingParticipation(meeting, schedulingInfo, participant, 0, shortLinkBaseUrl, result.getFirst());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsFilteredByStartTimeIntervalNoMatch() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var fromStartTime = OffsetDateTime.now().plusDays(10);
+        var toStartTime = OffsetDateTime.now().plusDays(20);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, fromStartTime, toStartTime, null, null, null);
+        assertEquals(0, result.size());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsPinIsHostPinWhenParticipantIsHost() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId(), ParticipantRole.HOST);
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        assertEquals(1, result.size());
+        assertEquals(schedulingInfo.getHostPin().toString(), result.getFirst().pin());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsPinIsGuestPinWhenParticipantIsGuest() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId(), ParticipantRole.GUEST);
+        var schedulingInfo = randomSchedulingInfo();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(schedulingInfo);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        assertEquals(1, result.size());
+        assertEquals(schedulingInfo.getGuestPin().toString(), result.getFirst().pin());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsNoSchedulingInfo() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(meeting.getId())).thenReturn(Optional.of(meeting));
+        Mockito.when(schedulingInfoRepository.findOneByMeeting(meeting)).thenReturn(null);
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        assertEquals(1, result.size());
+        assertNull(result.getFirst().pin());
+        assertNull(result.getFirst().uriWithDomain());
+        assertNull(result.getFirst().portalLink());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(meeting.getId());
+        Mockito.verify(schedulingInfoRepository).findOneByMeeting(meeting);
+        Mockito.verify(participantDao).findByMeeting(meeting);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsMeetingNotFound() {
+        var participantId = randomString();
+        var participant = randomParticipant(999999L);
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findById(participant.meetingId())).thenReturn(Optional.empty());
+
+        var expectedException = assertThrows(ResourceNotFoundExceptionV2.class,
+                () -> meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null));
+        assertNotNull(expectedException);
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findById(participant.meetingId());
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsEmptyParticipantList() {
+        var participantId = randomString();
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of());
+
+        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
         verifyNoMoreInteractions();
     }
 }
