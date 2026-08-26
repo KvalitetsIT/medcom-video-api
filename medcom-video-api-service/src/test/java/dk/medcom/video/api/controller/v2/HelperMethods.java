@@ -614,4 +614,41 @@ public class HelperMethods {
             assertEquals(expected.get(i).value(), actual.get(i).getValue());
         }
     }
+
+    public static MeetingParticipationModel randomMeetingParticipationModel() {
+        return new MeetingParticipationModel(
+                UUID.randomUUID(),
+                randomString(),
+                randomString(),
+                OffsetDateTime.now(),
+                OffsetDateTime.now(),
+                randomMeetingUser(),
+                randomMeetingUser(),
+                OffsetDateTime.now(),
+                randomMeetingUser(),
+                (int) count++,
+                dk.medcom.video.api.dao.entity.ParticipantRole.HOST,
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString());
+    }
+
+    public static void assertMeetingParticipation(MeetingParticipationModel expected, MeetingParticipation actual) {
+        assertEquals(expected.uuid(), actual.getUuid());
+        assertEquals(expected.subject(), actual.getSubject());
+        assertEquals(expected.description(), actual.getDescription());
+        assertEquals(expected.startTime(), actual.getStartTime());
+        assertEquals(expected.endTime(), actual.getEndTime());
+        assertMeetingUser(expected.createdBy(), actual.getCreatedBy());
+        assertMeetingUser(expected.updatedBy(), actual.getUpdatedBy());
+        assertEquals(expected.updatedTime(), actual.getUpdatedTime());
+        assertMeetingUser(expected.organizedBy(), actual.getOrganizedBy());
+        assertEquals(expected.knownParticipants(), actual.getKnownParticipants(), 0);
+        assertEquals(expected.participantRole().toString(), actual.getParticipantRole().toString());
+        assertEquals(expected.pin(), actual.getPin());
+        assertEquals(expected.uriWithDomain(), actual.getUriWithDomain());
+        assertEquals(expected.shortLink(), actual.getShortLink());
+        assertEquals(expected.portalLink(), actual.getPortalLink());
+    }
 }

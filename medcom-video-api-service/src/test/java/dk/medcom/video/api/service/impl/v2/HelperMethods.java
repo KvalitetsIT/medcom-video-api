@@ -145,97 +145,19 @@ public class HelperMethods {
     }
 
     public static SchedulingTemplateRequestModel randomSchedulingTemplateRequestModel() {
-        return new SchedulingTemplateRequestModel(count++,
-                randomString(),
-                randomString(),
-                randomBoolean(),
-                count++,
-                count++,
-                randomBoolean(),
-                count++,
-                count++,
-                (int) count++,
-                (int) count++,
-                randomBoolean(),
-                count++,
-                count++,
-                randomString(),
-                randomBoolean(),
-                randomBoolean(),
-                randomString(),
-                randomString(),
-                randomString(),
-                VmrTypeModel.conference,
-                ViewTypeModel.nine_mains_zero_pips,
-                ViewTypeModel.sixteen_mains_zero_pips,
-                VmrQualityModel.sd,
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                DirectMediaModel.never,
-                randomString());
+        return new SchedulingTemplateRequestModel(count++, randomString(), randomString(), randomBoolean(), count++, count++, randomBoolean(), count++, count++, (int) count++, (int) count++, randomBoolean(), count++, count++, randomString(), randomBoolean(), randomBoolean(), randomString(), randomString(), randomString(), VmrTypeModel.conference, ViewTypeModel.nine_mains_zero_pips, ViewTypeModel.sixteen_mains_zero_pips, VmrQualityModel.sd, randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean(), DirectMediaModel.never, randomString());
     }
 
     public static CreateMeetingModel randomCreateMeetingModel() {
-        return new CreateMeetingModel(randomString(),
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
-                randomString(),
-                randomString(),
-                UUID.randomUUID(),
-                randomString(),
-                (int) count++,
-                randomBoolean(),
-                count++,
-                MeetingTypeModel.POOL,
-                UUID.randomUUID(),
-                List.of(randomString(), randomString()),
-                randomString(),
-                GuestMicrophoneModel.muted,
-                randomBoolean(),
-                VmrTypeModel.lecture,
-                ViewTypeModel.five_mains_seven_pips,
-                ViewTypeModel.one_main_seven_pips,
-                VmrQualityModel.sd,
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBoolean(),
-                randomString(),
-                (int) count++,
-                (int) count++,
-                randomString(),
-                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()), randomCreateParticipantModels());
+        return new CreateMeetingModel(randomString(), OffsetDateTime.now(), OffsetDateTime.now(), randomString(), randomString(), UUID.randomUUID(), randomString(), (int) count++, randomBoolean(), count++, MeetingTypeModel.POOL, UUID.randomUUID(), List.of(randomString(), randomString()), randomString(), GuestMicrophoneModel.muted, randomBoolean(), VmrTypeModel.lecture, ViewTypeModel.five_mains_seven_pips, ViewTypeModel.one_main_seven_pips, VmrQualityModel.sd, randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean(), randomBoolean(), randomString(), (int) count++, (int) count++, randomString(), List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()), randomCreateParticipantModels());
     }
 
     public static UpdateMeetingModel randomUpdateMeetingModel() {
-        return new UpdateMeetingModel(randomString(),
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
-                randomString(),
-                randomString(),
-                randomString(),
-                List.of(randomString(), randomString()),
-                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
+        return new UpdateMeetingModel(randomString(), OffsetDateTime.now(), OffsetDateTime.now(), randomString(), randomString(), randomString(), List.of(randomString(), randomString()), List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
     public static PatchMeetingModel randomPatchMeetingModel() {
-        return new PatchMeetingModel(randomString(),
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
-                randomString(),
-                randomString(),
-                randomString(),
-                List.of(randomString(), randomString()),
-                GuestMicrophoneModel.off,
-                randomBoolean(),
-                (int) count++,
-                (int) count++,
-                randomString(),
-                List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
+        return new PatchMeetingModel(randomString(), OffsetDateTime.now(), OffsetDateTime.now(), randomString(), randomString(), randomString(), List.of(randomString(), randomString()), GuestMicrophoneModel.off, randomBoolean(), (int) count++, (int) count++, randomString(), List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
     public static String randomString() {
@@ -289,17 +211,11 @@ public class HelperMethods {
 
     private static List<CreateParticipantModel> randomCreateParticipantModels() {
         var size = 1 + random.nextInt(5);
-        return java.util.stream.IntStream.range(0, size)
-                .mapToObj(i -> randomCreateParticipantModel())
-                .toList();
+        return java.util.stream.IntStream.range(0, size).mapToObj(i -> randomCreateParticipantModel()).toList();
     }
 
     private static CreateParticipantModel randomCreateParticipantModel() {
-        return new CreateParticipantModel(
-                randomEnum(ParticipantType.class),
-                randomString(),
-                randomString(),
-                randomEnum(ParticipantRole.class));
+        return new CreateParticipantModel(randomEnum(ParticipantType.class), randomString(), randomString(), randomEnum(ParticipantRole.class));
     }
 
     private static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
@@ -649,7 +565,7 @@ public class HelperMethods {
     private static void assertLabels(Set<MeetingLabel> expected, List<String> actual) {
         assertEquals(expected.size(), actual.size());
 
-        for (int i = 0; i < expected.size(); i ++) {
+        for (int i = 0; i < expected.size(); i++) {
             var actualLabel = actual.get(i);
             assertTrue(expected.stream().anyMatch(x -> x.getLabel().equals(actualLabel)));
         }
@@ -658,7 +574,7 @@ public class HelperMethods {
     private static void assertAdditionalInformation(Set<MeetingAdditionalInfo> expected, List<AdditionalInformationModel> actual) {
         assertEquals(expected.size(), actual.size());
 
-        for (int i = 0; i < expected.size(); i ++) {
+        for (int i = 0; i < expected.size(); i++) {
             var actualAddInfo = actual.get(i);
             assertTrue(expected.stream().anyMatch(x -> x.getInfoKey().equals(actualAddInfo.key()) && x.getInfoValue().equals(actualAddInfo.value())));
         }
@@ -670,7 +586,7 @@ public class HelperMethods {
             return;
         }
         assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i ++) {
+        for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i).key(), actual.get(i).key());
             assertEquals(expected.get(i).value(), actual.get(i).value());
         }
@@ -682,5 +598,35 @@ public class HelperMethods {
             return;
         }
         assertEquals(expected.toInstant().truncatedTo(ChronoUnit.SECONDS), actual.toInstant().truncatedTo(ChronoUnit.SECONDS));
+    }
+
+
+    public static Participant randomParticipant(Long meetingId) {
+        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), randomEnum(ParticipantRole.class), null, count++, null, count++);
+    }
+
+    public static Participant randomParticipant(Long meetingId, ParticipantRole role) {
+        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), role, null, count++, null, count++);
+    }
+
+    public static void assertMeetingParticipation(Meeting expectedMeeting, SchedulingInfo expectedSchedulingInfo, Participant expectedParticipant, int expectedKnownParticipants, String shortLinkBaseUrl, MeetingParticipationModel actual) {
+        assertEquals(expectedMeeting.getUuid(), actual.uuid().toString());
+        assertEquals(expectedMeeting.getSubject(), actual.subject());
+        assertEquals(expectedMeeting.getDescription(), actual.description());
+        assertEquals(expectedMeeting.getStartTime().toInstant(), actual.startTime().toInstant());
+        assertEquals(expectedMeeting.getEndTime().toInstant(), actual.endTime().toInstant());
+        assertMeetingUser(expectedMeeting.getMeetingUser(), actual.createdBy());
+        assertMeetingUser(expectedMeeting.getUpdatedByUser(), actual.updatedBy());
+        assertEquals(expectedMeeting.getUpdatedTime().toInstant(), actual.updatedTime().toInstant());
+        assertMeetingUser(expectedMeeting.getOrganizedByUser(), actual.organizedBy());
+        assertEquals(expectedKnownParticipants, actual.knownParticipants());
+        assertEquals(expectedParticipant.role(), actual.participantRole());
+
+        var expectedPin = expectedParticipant.role() == ParticipantRole.HOST ? expectedSchedulingInfo.getHostPin() : expectedSchedulingInfo.getGuestPin();
+        assertEquals(expectedPin.toString(), actual.pin());
+
+        assertEquals(expectedSchedulingInfo.getUriWithDomain(), actual.uriWithDomain());
+        assertEquals(shortLinkBaseUrl + expectedMeeting.getShortId(), actual.shortLink());
+        assertEquals(expectedSchedulingInfo.getPortalLink(), actual.portalLink());
     }
 }

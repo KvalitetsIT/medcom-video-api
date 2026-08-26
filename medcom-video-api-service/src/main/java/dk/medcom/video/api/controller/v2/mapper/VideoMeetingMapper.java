@@ -111,7 +111,7 @@ public class VideoMeetingMapper {
                 externalToInternal(input.getAdditionalInformation()));
     }
 
-    private static MeetingUser internalToExternal(MeetingUserModel input) {
+    public static MeetingUser internalToExternal(MeetingUserModel input) {
         if (input == null) {
             return new MeetingUser();
         }
