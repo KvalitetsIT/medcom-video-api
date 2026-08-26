@@ -2,6 +2,7 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.controller.v2.exception.*;
+import dk.medcom.video.api.controller.v2.mapper.MeetingParticipationMapper;
 import dk.medcom.video.api.controller.v2.mapper.ParticipantMapper;
 import dk.medcom.video.api.controller.v2.mapper.VideoMeetingMapper;
 import dk.medcom.video.api.interceptor.Oauth;
@@ -39,6 +40,40 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     public VideoMeetingsControllerV2(MeetingServiceV2 meetingService, ParticipantService participantService) {
         this.meetingService = meetingService;
         this.participantService = participantService;
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(anyRoleAtt)
+    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(String participantId, OffsetDateTime fromStartTime, OffsetDateTime toStartTime, String subject, String organizedBy, String label) {
+        logger.debug("Enter GET meeting participations, v2.");
+        try {
+            if (participantId == null || participantId.isEmpty()) {
+                logger.error("No participantId given.");
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._36, "Must set at least one query parameter, when searching for meeting.");
+            }
+
+            if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+            }
+
+            var meetingParticipations = meetingService.getMeetingParticipations(
+                    participantId, fromStartTime, toStartTime, subject, organizedBy, label);
+
+            var result = new MeetingParticipationList()
+                    .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));
+
+            return ResponseEntity.ok(result);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        } catch (NotValidDataExceptionV2 e) {
+            throw new NotValidDataException(e.getDetailedErrorCode(), e.getDetailedError());
+        } catch (Exception e) {
+            logger.error("Caught unexpected exception.", e);
+            throw new InternalServerErrorException("Unexpected exception caught. " + e);
+        }
     }
 
     @Oauth

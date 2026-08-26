@@ -93,4 +93,10 @@ public class ParticipantDaoImpl implements ParticipantDao {
     public void delete(Participant participant) {
         deleteById(participant.id());
     }
+
+    @Override
+    public List<Participant> findByParticipantId(String participantId) {
+        return template.query(SELECT + "where p.participant_id = :participant_id",
+                new MapSqlParameterSource("participant_id", participantId), rowMapper);
+    }
 }

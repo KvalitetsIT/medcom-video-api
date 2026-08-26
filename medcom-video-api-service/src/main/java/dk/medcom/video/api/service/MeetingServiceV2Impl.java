@@ -4,14 +4,17 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Participant;
+import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.service.filter.MeetingParticipationFilter;
 import dk.medcom.video.api.service.exception.*;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
-import dk.medcom.video.api.service.model.CreateMeetingModel;
-import dk.medcom.video.api.service.model.MeetingModel;
-import dk.medcom.video.api.service.model.PatchMeetingModel;
-import dk.medcom.video.api.service.model.UpdateMeetingModel;
+import dk.medcom.video.api.service.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +28,19 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final MeetingService meetingService;
     private final String shortLinkBaseUrl;
     private final ParticipantDao participantDao;
+    private final MeetingRepository meetingRepository;
+    private final SchedulingInfoRepository schedulingInfoRepository;
 
-    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl, ParticipantDao participantDao) {
+    public MeetingServiceV2Impl(MeetingService meetingService,
+                                String shortLinkBaseUrl,
+                                ParticipantDao participantDao,
+                                MeetingRepository meetingRepository,
+                                SchedulingInfoRepository schedulingInfoRepository) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
         this.participantDao = participantDao;
+        this.meetingRepository = meetingRepository;
+        this.schedulingInfoRepository = schedulingInfoRepository;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
@@ -230,5 +241,43 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         } catch (NotAcceptableException e) {
             throw new NotAcceptableExceptionV2(ExceptionMapper.fromNotAcceptable(e.getErrorCode()), e.getErrorText());
         }
+    }
+    @Override
+    public List<MeetingParticipationModel> getMeetingParticipations(String participantId,
+                                                                    OffsetDateTime fromStartTime,
+                                                                    OffsetDateTime toStartTime,
+                                                                    String subject,
+                                                                    String organizedBy,
+                                                                    String label) {
+        logger.debug("Get meeting participations for participant, v2.");
+
+        var participants = participantDao.findByParticipantId(participantId);
+        var result = new java.util.ArrayList<MeetingParticipationModel>();
+
+        for (var participant : participants) {
+            var meeting = meetingRepository.findById(participant.meetingId())
+                    .orElseThrow(() -> new ResourceNotFoundExceptionV2("meeting", "id"));
+
+            var schedulingInfo = schedulingInfoRepository.findOneByMeeting(meeting);
+
+            if (!MeetingParticipationFilter.matches(meeting, fromStartTime, toStartTime, subject, organizedBy, label)) {
+                continue;
+            }
+
+            Long pin = schedulingInfo == null ? null
+                    : participant.role() == ParticipantRole.HOST ? schedulingInfo.getHostPin() : schedulingInfo.getGuestPin();
+
+            var knownParticipants = participantDao.findByMeeting(meeting).size();
+
+            result.add(MeetingParticipationModel.from(
+                    meeting,
+                    schedulingInfo,
+                    knownParticipants,
+                    participant.role(),
+                    pin != null ? pin.toString() : null,
+                    shortLinkBaseUrl));
+        }
+
+        return result;
     }
 }

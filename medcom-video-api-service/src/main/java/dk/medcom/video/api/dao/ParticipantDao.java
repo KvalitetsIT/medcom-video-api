@@ -14,4 +14,5 @@ public interface ParticipantDao {
     long count();
     void deleteById(Long id);
     void delete(Participant participant);
+    List<Participant> findByParticipantId(String participantId);
 }
