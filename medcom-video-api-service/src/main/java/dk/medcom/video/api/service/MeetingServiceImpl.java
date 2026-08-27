@@ -103,11 +103,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException  {
 		var performanceLogger = new PerformanceLogger("create meeting convert");
-        LOGGER.info(" Start time: {}", createMeetingDto.getStartTime().getTime());
-        LOGGER.info(" Start time: {}", createMeetingDto.getEndTime().getTime());
 		Meeting meeting = convert(createMeetingDto);
-        LOGGER.info(" Start time: {}", meeting.getStartTime().getTime());
-        LOGGER.info(" Start time: {}", meeting.getEndTime().getTime());
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
 		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {

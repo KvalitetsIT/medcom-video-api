@@ -80,8 +80,6 @@ public class SchedulingTemplateController {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
-		LOGGER.debug("\n Updated::: vmrAvailableBefore = {}", schedulingTemplateDto.getVmrAvailableBefore());
-		LOGGER.debug("\n Updated::: vmrAvailableBefore = {}", resource.getContent().getVmrAvailableBefore());
 
 		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
 		return resource;
