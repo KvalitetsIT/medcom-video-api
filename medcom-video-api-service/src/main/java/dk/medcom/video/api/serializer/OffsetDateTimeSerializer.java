@@ -24,3 +24,4 @@ public class OffsetDateTimeSerializer extends StdSerializer<OffsetDateTime> {
         jsonGenerator.writeString(DATE_TIME_FORMATTER.format(value));
     }
 }
+

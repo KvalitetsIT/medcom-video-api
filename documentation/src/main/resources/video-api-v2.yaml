@@ -12,7 +12,7 @@ info:
     <h3>Versions:</h3>
     0.1.1 
     <Ul>
-      <Li> changed format for provisionVmrfId property on update-scheduling-info request to uuid format
+      <Li> changed format for provisionVmrId property on update-scheduling-info request to uuid format
       <Li> added meeting put and delete request
       <Li> removed "api" from each request path
       <Li> renamed ccsid to uuid (as the real API already are using) <br>
