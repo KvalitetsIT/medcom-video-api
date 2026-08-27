@@ -1,7 +1,7 @@
 package dk.medcom.video.api.api;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import dk.medcom.video.api.dao.entity.MeetingType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,6 +102,6 @@ public class CreateMeetingDtoTest {
                     "uuid": "123e4567-e89b-12d3-a456-426655440000"
                 }""";
 
-        assertThrows(JsonMappingException.class, () -> new ObjectMapper().readValue(input, CreateMeetingDto.class));
+        assertThrows(JacksonException.class, () -> new ObjectMapper().readValue(input, CreateMeetingDto.class));
     }
 }

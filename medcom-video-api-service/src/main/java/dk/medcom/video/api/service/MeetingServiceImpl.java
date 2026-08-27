@@ -103,7 +103,11 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public Meeting createMeeting(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotAcceptableException, NotValidDataException  {
 		var performanceLogger = new PerformanceLogger("create meeting convert");
+        LOGGER.info(" Start time: {}", createMeetingDto.getStartTime().getTime());
+        LOGGER.info(" Start time: {}", createMeetingDto.getEndTime().getTime());
 		Meeting meeting = convert(createMeetingDto);
+        LOGGER.info(" Start time: {}", meeting.getStartTime().getTime());
+        LOGGER.info(" Start time: {}", meeting.getEndTime().getTime());
 		meeting.setMeetingUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		
 		if (createMeetingDto.getOrganizedByEmail() != null && !createMeetingDto.getOrganizedByEmail().isEmpty() && userService.getUserContext().isOrganisationalMeetingAdministrator()) {
@@ -272,7 +276,7 @@ public class MeetingServiceImpl implements MeetingService {
 	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
 		validateDate(createMeetingDto.getStartTime());
 		validateDate(createMeetingDto.getEndTime());
-		
+
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		if(createMeetingDto.getUuid() != null) {
@@ -282,6 +286,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meeting.setUuid(UUID.randomUUID().toString());
 		}
 		meeting.setOrganisation(organisationService.getUserOrganisation());
+
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());

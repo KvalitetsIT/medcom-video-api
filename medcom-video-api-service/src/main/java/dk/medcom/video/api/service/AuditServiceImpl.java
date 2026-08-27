@@ -64,8 +64,8 @@ public class AuditServiceImpl implements AuditService {
         auditSchedulingInfo.setUuid(input.getUuid());
         auditSchedulingInfo.setHostPin(input.getHostPin());
         auditSchedulingInfo.setGuestPin(input.getGuestPin());
-        auditSchedulingInfo.setvMRAvailableBefore(input.getVMRAvailableBefore());
-        auditSchedulingInfo.setvMRStartTime(toOffsetDateTime(input.getvMRStartTime()));
+        auditSchedulingInfo.setVmrAvailableBefore(input.getVmrAvailableBefore());
+        auditSchedulingInfo.setVmrStartTime(toOffsetDateTime(input.getVmrStartTime()));
         auditSchedulingInfo.setMaxParticipants(input.getMaxParticipants());
         auditSchedulingInfo.setEndMeetingOnEndTime(input.getEndMeetingOnEndTime());
         auditSchedulingInfo.setUriWithDomain(input.getUriWithDomain());

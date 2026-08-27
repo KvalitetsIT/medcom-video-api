@@ -33,7 +33,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         // Given
         Long hostPin = 1010L;
         Long guestPin = 2010L;
-        int vMRAvailableBefore = 45;
+        int vmrAvailableBefore = 45;
         int maxParticipants = 20;
         boolean endMeetingOnEndTime = true;
         String uriWithDomain = "7777@test.dk";
@@ -61,7 +61,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         SchedulingInfo schedulingInfo = new SchedulingInfo();
         schedulingInfo.setHostPin(hostPin);
         schedulingInfo.setGuestPin(guestPin);
-        schedulingInfo.setVMRAvailableBefore(vMRAvailableBefore);
+        schedulingInfo.setVmrAvailableBefore(vmrAvailableBefore);
 
         schedulingInfo.setMaxParticipants(maxParticipants);
         schedulingInfo.setEndMeetingOnEndTime(endMeetingOnEndTime);
@@ -82,8 +82,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(meeting.getStartTime());
-        cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
-        schedulingInfo.setvMRStartTime(cal.getTime());
+        cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVmrAvailableBefore());
+        schedulingInfo.setVmrStartTime(cal.getTime());
 
         MeetingUser meetingUser = subjectMU.findById(meetingUserId).orElse(null);
         schedulingInfo.setMeetingUser(meetingUser);
@@ -116,8 +116,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertNotNull(schedulingInfo.getId());
         assertEquals(hostPin, schedulingInfo.getHostPin());
         assertEquals(guestPin, schedulingInfo.getGuestPin());
-        assertEquals(vMRAvailableBefore, schedulingInfo.getVMRAvailableBefore());
-        assertEquals(cal.getTime(), schedulingInfo.getvMRStartTime());
+        assertEquals(vmrAvailableBefore, schedulingInfo.getVmrAvailableBefore());
+        assertEquals(cal.getTime(), schedulingInfo.getVmrStartTime());
         assertEquals(maxParticipants, schedulingInfo.getMaxParticipants());
         assertEquals(endMeetingOnEndTime, schedulingInfo.getEndMeetingOnEndTime());
         assertEquals(uriWithDomain, schedulingInfo.getUriWithDomain());
@@ -181,7 +181,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(id, schedulingInfo.getId());
         assertEquals(1001L, schedulingInfo.getHostPin().longValue());
         assertEquals(2001L, schedulingInfo.getGuestPin().longValue());
-        assertEquals(15, schedulingInfo.getVMRAvailableBefore());
+        assertEquals(15, schedulingInfo.getVmrAvailableBefore());
         assertEquals(10, schedulingInfo.getMaxParticipants());
         assertEquals(ProvisionStatus.AWAITS_PROVISION, schedulingInfo.getProvisionStatus());
         assertEquals("all ok", schedulingInfo.getProvisionStatusDescription());

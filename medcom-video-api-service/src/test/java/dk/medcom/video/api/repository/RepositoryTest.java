@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -14,6 +16,8 @@ import dk.medcom.video.api.configuration.DatabaseConfiguration;
 import dk.medcom.video.api.configuration.TestConfiguration;
 import org.testcontainers.mariadb.MariaDBContainer;
 
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.TimeZone;
 
 @ExtendWith(SpringExtension.class)

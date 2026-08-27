@@ -12,7 +12,7 @@ info:
     <h3>Versions:</h3>
     0.1.1 
     <Ul>
-      <Li> changed format for provisionVmrId property on update-scheduling-info request to uuid format
+      <Li> changed format for provisionVmrfId property on update-scheduling-info request to uuid format
       <Li> added meeting put and delete request
       <Li> removed "api" from each request path
       <Li> renamed ccsid to uuid (as the real API already are using) <br>
@@ -1871,7 +1871,7 @@ components:
         - uriDomain
         - hostPinRequired
         - guestPinRequired
-        - vMRAvailableBefore
+        - vmrAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriNumberRangeLow
@@ -1920,7 +1920,7 @@ components:
           type: integer
           format: int64
           example: 9999
-        vMRAvailableBefore:
+        vmrAvailableBefore:
           type: integer
           format: int32
           example: 30
@@ -2068,7 +2068,7 @@ components:
           type: integer
           format: int64
           example: 9999
-        vMRAvailableBefore:
+        vmrAvailableBefore:
           type: integer
           format: int32
           example: 30

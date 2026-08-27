@@ -18,13 +18,13 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 
 	SchedulingInfo findOneByUriWithoutDomainAndUriDomain(String UriWithoutDomain, String uriDomain);
 	
-	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
+	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vmrStartTime > ?1 and s.vmrStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);
 
-	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3 AND s.organisation.organisationId IN (?4)")
+	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vmrStartTime > ?1 and s.vmrStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3 AND s.organisation.organisationId IN (?4)")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus, Set<String> organisationIds);
 
-	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE s.vMRStartTime <= ?1 AND m.endTime >= ?1 AND s.provisionStatus = ?2")
+	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE s.vmrStartTime <= ?1 AND m.endTime >= ?1 AND s.provisionStatus = ?2")
 	List<SchedulingInfo> findAllWithinStartAndEndTimeLessThenAndStatus(Date fromStartTime, ProvisionStatus provisionStatus);
 
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE m.endTime < ?1 AND s.provisionStatus = ?2")
