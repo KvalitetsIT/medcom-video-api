@@ -18,12 +18,16 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -165,10 +169,36 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		//Then
 		assertNotNull(result);
-		assertTrue(
-				result.contains("\"vmrType\":\"conference\",\"hostView\":\"one_main_seven_pips\",\"guestView\":\"one_main_seven_pips\",\"vmrQuality\":\"sd\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false"),
-				"The content does not contain:\n[\"vmrType\":\"conference\",\"hostView\":\"one_main_seven_pips\",\"guestView\":\"one_main_seven_pips\",\"vmrQuality\":\"sd\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false]\n\nContent: \"" + result + "\""
-				);
+
+		JsonNode json = new ObjectMapper().readTree(result);
+		JsonNode schedulingInfo = json.get("_embedded").get("schedulingInfoDtoList").get(2);
+
+		Consumer<String> assertHelperPropertyExists = targetProperty -> assertTrue(schedulingInfo.has(targetProperty), "\"" + targetProperty + "\" does not appear in content:\n" + schedulingInfo.toPrettyString());
+
+		assertHelperPropertyExists.accept("vmrType");
+		assertHelperPropertyExists.accept("hostView");
+		assertHelperPropertyExists.accept("guestView");
+		assertHelperPropertyExists.accept("vmrQuality");
+		assertHelperPropertyExists.accept("enableOverlayText");
+		assertHelperPropertyExists.accept("guestsCanPresent");
+		assertHelperPropertyExists.accept("forcePresenterIntoMain");
+		assertHelperPropertyExists.accept("forceEncryption");
+		assertHelperPropertyExists.accept("muteAllGuests");
+
+		assertEquals("conference", schedulingInfo.get("vmrType").asString());
+		assertEquals("one_main_seven_pips", schedulingInfo.get("hostView").asString());
+		assertEquals("one_main_seven_pips", schedulingInfo.get("guestView").asString());
+		assertEquals("sd", schedulingInfo.get("vmrQuality").asString());
+		assertTrue(schedulingInfo.get("enableOverlayText").asBoolean());
+		assertTrue(schedulingInfo.get("guestsCanPresent").asBoolean());
+		assertTrue(schedulingInfo.get("forcePresenterIntoMain").asBoolean());
+		assertFalse(schedulingInfo.get("forceEncryption").asBoolean());
+		assertFalse(schedulingInfo.get("muteAllGuests").asBoolean());
+    }
+
+	private String jsonErrorHelper(String target, String result) {
+		return "The content does not contain: [" + target + "]\n\nContent: \"" + result + "\"";
+
 	}
 
 	@Test
