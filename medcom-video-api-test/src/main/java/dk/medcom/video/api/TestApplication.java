@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 
 @EnableAutoConfiguration
 @Configuration
-@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration","dk.medcom.vdx.organisation"})
+@ComponentScan({ "dk.medcom.video.api.test", "dk.medcom.video.api.configuration", "dk.medcom.vdx.organisation"})
 public class TestApplication extends SpringBootServletInitializer {
     private static final Logger logger = LoggerFactory.getLogger(TestApplication.class);
     private static GenericContainer<?> testOrganisationFrontend;

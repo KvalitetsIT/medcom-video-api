@@ -27,9 +27,9 @@ public class TestDataHelper {
         schedulingInfo.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
         schedulingInfo.setProvisionVMRId("vmr id");
         schedulingInfo.setOrganisation(organization);
-        schedulingInfo.setvMRStartTime(new Date());
+        schedulingInfo.setVmrStartTime(new Date());
         schedulingInfo.setUuid(UUID.randomUUID().toString());
-        schedulingInfo.setVMRAvailableBefore(10);
+        schedulingInfo.setVmrAvailableBefore(10);
         schedulingInfo.setEndMeetingOnEndTime(true);
         schedulingInfo.setMaxParticipants(20);
         schedulingInfo.setMeetingUser(createMeetingUser(organization));

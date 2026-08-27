@@ -34,7 +34,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	private final boolean guestPinRequired;
 	private final Long guestPinRangeLow;
 	private final Long guestPinRangeHigh;
-	private final int vMRAvailableBefore;
+	private final int vmrAvailableBefore;
 	private final int maxParticipants;
 	private final boolean endMeetingOnEndTime;
 	private final Long uriNumberRangeLow;
@@ -58,7 +58,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 										 boolean guestPinRequired,
 										 Long guestPinRangeLow,
 										 Long guestPinRangeHigh,
-										 int vMRAvailableBefore,
+										 int vmrAvailableBefore,
 										 int maxParticipants,
 										 boolean endMeetingOnEndTime,
 										 Long uriNumberRangeLow,
@@ -77,7 +77,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		this.guestPinRequired = guestPinRequired;
 		this.guestPinRangeLow = guestPinRangeLow;
 		this.guestPinRangeHigh = guestPinRangeHigh;
-		this.vMRAvailableBefore = vMRAvailableBefore;
+		this.vmrAvailableBefore = vmrAvailableBefore;
 		this.maxParticipants = maxParticipants;
 		this.endMeetingOnEndTime = endMeetingOnEndTime;
 		this.uriNumberRangeLow = uriNumberRangeLow;
@@ -182,10 +182,10 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setGuestPinRequired(createSchedulingTemplateDto.isGuestPinRequired());
 		schedulingTemplate.setGuestPinRangeLow(createSchedulingTemplateDto.getGuestPinRangeLow());
 		schedulingTemplate.setGuestPinRangeHigh(createSchedulingTemplateDto.getGuestPinRangeHigh());
-//		if (createSchedulingTemplateDto.getvMRAvailableBefore() == null) {
+//		if (createSchedulingTemplateDto.getVmrAvailableBefore() == null) {
 //			
 //		}
-		schedulingTemplate.setVMRAvailableBefore(createSchedulingTemplateDto.getvMRAvailableBefore());
+		schedulingTemplate.setVmrAvailableBefore(createSchedulingTemplateDto.getVmrAvailableBefore());
 		schedulingTemplate.setMaxParticipants(createSchedulingTemplateDto.getMaxParticipants());
 		schedulingTemplate.setEndMeetingOnEndTime(createSchedulingTemplateDto.isEndMeetingOnEndTime());
 		schedulingTemplate.setUriNumberRangeLow(createSchedulingTemplateDto.getUriNumberRangeLow());
@@ -251,7 +251,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setGuestPinRequired(updateSchedulingTemplateDto.isGuestPinRequired());
 		schedulingTemplate.setGuestPinRangeLow(updateSchedulingTemplateDto.getGuestPinRangeLow());
 		schedulingTemplate.setGuestPinRangeHigh(updateSchedulingTemplateDto.getGuestPinRangeHigh());
-		schedulingTemplate.setVMRAvailableBefore(updateSchedulingTemplateDto.getvMRAvailableBefore());
+		schedulingTemplate.setVmrAvailableBefore(updateSchedulingTemplateDto.getVmrAvailableBefore());
 		schedulingTemplate.setMaxParticipants(updateSchedulingTemplateDto.getMaxParticipants());
 		schedulingTemplate.setEndMeetingOnEndTime(updateSchedulingTemplateDto.isEndMeetingOnEndTime());
 		schedulingTemplate.setUriNumberRangeLow(updateSchedulingTemplateDto.getUriNumberRangeLow());
@@ -348,7 +348,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		createSchedulingTemplateDto.setGuestPinRequired(guestPinRequired);
 		createSchedulingTemplateDto.setGuestPinRangeLow(guestPinRangeLow);
 		createSchedulingTemplateDto.setGuestPinRangeHigh(guestPinRangeHigh);
-		createSchedulingTemplateDto.setvMRAvailableBefore(vMRAvailableBefore);
+		createSchedulingTemplateDto.setVmrAvailableBefore(vmrAvailableBefore);
 		createSchedulingTemplateDto.setMaxParticipants(maxParticipants);
 		createSchedulingTemplateDto.setEndMeetingOnEndTime(endMeetingOnEndTime);
 		createSchedulingTemplateDto.setUriNumberRangeLow(uriNumberRangeLow);

@@ -1079,11 +1079,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var putResultJson = new JSONObject(putResult);
 
         if (runInDocker) {
-            assertEquals("2025-10-02T13:00:00Z", postResultJson.getString("startTime"));
-            assertEquals("2025-10-02T15:00:00Z", postResultJson.getString("endTime"));
+            assertEquals("2025-10-02T13:00:00Z", putResultJson.getString("startTime"));
+            assertEquals("2025-10-02T15:00:00Z", putResultJson.getString("endTime"));
         } else {
-            assertEquals("2025-10-02T15:00:00+02:00", postResultJson.getString("startTime"));
-            assertEquals("2025-10-02T17:00:00+02:00", postResultJson.getString("endTime"));
+            assertEquals("2025-10-02T15:00:00+02:00", putResultJson.getString("startTime"));
+            assertEquals("2025-10-02T17:00:00+02:00", putResultJson.getString("endTime"));
         }
         assertFalse(putResult.contains("00:00.123456"));
         assertFalse(putResult.contains("00:00.987654"));

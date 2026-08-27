@@ -7,8 +7,8 @@ public class SchedulingInfo {
     private String uuid;
     private Long hostPin;
     private Long guestPin;
-    private int vMRAvailableBefore;
-    private OffsetDateTime vMRStartTime;
+    private int vmrAvailableBefore;
+    private OffsetDateTime vmrStartTime;
     private int maxParticipants;
     private boolean endMeetingOnEndTime;
     private String uriWithDomain;
@@ -71,20 +71,18 @@ public class SchedulingInfo {
         this.guestPin = guestPin;
     }
 
-    public int getvMRAvailableBefore() {
-        return vMRAvailableBefore;
+    public int getVmrAvailableBefore() {
+        return vmrAvailableBefore;
     }
 
-    public void setvMRAvailableBefore(int vMRAvailableBefore) {
-        this.vMRAvailableBefore = vMRAvailableBefore;
+    public void setVmrAvailableBefore(int vmrAvailableBefore) {
+        this.vmrAvailableBefore = vmrAvailableBefore;
     }
 
-    public OffsetDateTime getvMRStartTime() {
-        return vMRStartTime;
-    }
+    public OffsetDateTime getVmrStartTime() { return vmrStartTime; }
 
-    public void setvMRStartTime(OffsetDateTime vMRStartTime) {
-        this.vMRStartTime = vMRStartTime;
+    public void setVmrStartTime(OffsetDateTime vmrStartTime) {
+        this.vmrStartTime = vmrStartTime;
     }
 
     public int getMaxParticipants() {

@@ -33,7 +33,7 @@ public class SchedulingTemplateMapper {
                 .guestPinRequired(input.guestPinRequired())
                 .guestPinRangeLow(input.guestPinRangeLow())
                 .guestPinRangeHigh(input.guestPinRangeHigh())
-                .vMRAvailableBefore(input.vMRAvailableBefore())
+                .vmrAvailableBefore(input.vmrAvailableBefore())
                 .maxParticipants(input.maxParticipants())
                 .endMeetingOnEndTime(input.endMeetingOnEndTime())
                 .uriNumberRangeLow(input.uriNumberRangeLow())
@@ -73,7 +73,7 @@ public class SchedulingTemplateMapper {
                 input.getGuestPinRequired(),
                 input.getGuestPinRangeLow(),
                 input.getGuestPinRangeHigh(),
-                input.getvMRAvailableBefore(),
+                input.getVmrAvailableBefore(),
                 input.getMaxParticipants(),
                 input.getEndMeetingOnEndTime(),
                 input.getUriNumberRangeLow(),

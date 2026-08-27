@@ -165,7 +165,10 @@ public class SchedulingInfoIT extends IntegrationWithOrganisationServiceTest {
 
 		//Then
 		assertNotNull(result);
-		assertTrue(result.contains("\"vmrType\":\"conference\",\"hostView\":\"one_main_seven_pips\",\"guestView\":\"one_main_seven_pips\",\"vmrQuality\":\"sd\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false"));
+		assertTrue(
+				result.contains("\"vmrType\":\"conference\",\"hostView\":\"one_main_seven_pips\",\"guestView\":\"one_main_seven_pips\",\"vmrQuality\":\"sd\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false"),
+				"The content does not contain:\n[\"vmrType\":\"conference\",\"hostView\":\"one_main_seven_pips\",\"guestView\":\"one_main_seven_pips\",\"vmrQuality\":\"sd\",\"enableOverlayText\":true,\"guestsCanPresent\":true,\"forcePresenterIntoMain\":true,\"forceEncryption\":false,\"muteAllGuests\":false]\n\nContent: \"" + result + "\""
+				);
 	}
 
 	@Test

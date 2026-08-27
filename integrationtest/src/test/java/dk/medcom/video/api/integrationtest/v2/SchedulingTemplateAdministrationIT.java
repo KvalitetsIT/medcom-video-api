@@ -384,7 +384,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertEquals("user-org-pool", schedulingTemplateResult.getOrganisationId());
 
         // Overwrites default values
-        assertEquals(input.getvMRAvailableBefore(), schedulingTemplateResult.getvMRAvailableBefore());
+        assertEquals(input.getVmrAvailableBefore(), schedulingTemplateResult.getVmrAvailableBefore());
         assertEquals(input.getMaxParticipants(), schedulingTemplateResult.getMaxParticipants());
         assertEquals(input.getEndMeetingOnEndTime(), schedulingTemplateResult.getEndMeetingOnEndTime());
         assertEquals(input.getIsDefaultTemplate(), schedulingTemplateResult.getIsDefaultTemplate());
@@ -452,7 +452,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertTrue(schedulingTemplateResult.getLinks().getSelf().getHref().getPath().contains(schedulingTemplateResult.getId().toString()));
 
         // Default values
-        assertEquals(0, schedulingTemplateResult.getvMRAvailableBefore(), 0);
+        assertEquals(0, schedulingTemplateResult.getVmrAvailableBefore(), 0);
         assertEquals(0, schedulingTemplateResult.getMaxParticipants(), 0);
         assertEquals(Boolean.FALSE, schedulingTemplateResult.getEndMeetingOnEndTime());
         assertEquals(Boolean.FALSE, schedulingTemplateResult.getIsDefaultTemplate());
@@ -721,7 +721,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
                 .guestPinRequired(randomBoolean())
                 .guestPinRangeLow(count++)
                 .guestPinRangeHigh(count++)
-                .vMRAvailableBefore((int) count++)
+                .vmrAvailableBefore((int) count++)
                 .maxParticipants((int) count++)
                 .endMeetingOnEndTime(randomBoolean())
                 .uriNumberRangeLow(count++ - 1000L)

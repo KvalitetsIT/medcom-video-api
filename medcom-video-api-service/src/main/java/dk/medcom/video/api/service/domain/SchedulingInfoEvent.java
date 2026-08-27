@@ -10,8 +10,8 @@ public class SchedulingInfoEvent {
     private String uuid;
     private Long hostPin;
     private Long guestPin;
-    private int VMRAvailableBefore;
-    private Instant vMRStartTime;
+    private int vmrAvailableBefore;
+    private Instant vmrStartTime;
     private String ivrTheme;
     private String uriWithoutDomain;
     private String uriDomain;
@@ -64,20 +64,20 @@ public class SchedulingInfoEvent {
         return guestPin;
     }
 
-    public void setVMRAvailableBefore(int vmrAvailableBefore) {
-        this.VMRAvailableBefore = vmrAvailableBefore;
+    public void setVmrAvailableBefore(int vmrAvailableBefore) {
+        this.vmrAvailableBefore = vmrAvailableBefore;
     }
 
-    public int getVMRAvailableBefore() {
-        return VMRAvailableBefore;
+    public int getVmrAvailableBefore() {
+        return vmrAvailableBefore;
     }
 
-    public void setvMRStartTime(Instant vMRStartTime) {
-        this.vMRStartTime = vMRStartTime;
+    public void setVmrStartTime(Instant vmrStartTime) {
+        this.vmrStartTime = vmrStartTime;
     }
 
-    public Instant getvMRStartTime() {
-        return vMRStartTime;
+    public Instant getVmrStartTime() {
+        return vmrStartTime;
     }
 
     public void setIvrTheme(String ivrTheme) {

@@ -8,12 +8,18 @@ import dk.medcom.video.api.dao.entity.MeetingAdditionalInfo;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import jakarta.annotation.Resource;
+
+import javax.sql.DataSource;
+import java.sql.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;

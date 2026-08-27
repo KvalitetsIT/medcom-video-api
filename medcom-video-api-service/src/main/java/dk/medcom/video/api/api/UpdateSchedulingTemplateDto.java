@@ -37,7 +37,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private Long guestPinRangeHigh;
 	
 	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
-	private int vMRAvailableBefore;
+	private int vmrAvailableBefore;
 	
 	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
 	private int maxParticipants;
@@ -144,13 +144,9 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 		this.guestPinRangeHigh = guestPinRangeHigh;
 	}
 
-	public int getvMRAvailableBefore() {
-		return vMRAvailableBefore;
-	}
+	public int getVmrAvailableBefore() { return vmrAvailableBefore; }
 
-	public void setvMRAvailableBefore(int vMRAvailableBefore) {
-		this.vMRAvailableBefore = vMRAvailableBefore;
-	}
+	public void setVmrAvailableBefore(int vmrAvailableBefore) { this.vmrAvailableBefore = vmrAvailableBefore; }
 
 	public int getMaxParticipants() {
 		return maxParticipants;
