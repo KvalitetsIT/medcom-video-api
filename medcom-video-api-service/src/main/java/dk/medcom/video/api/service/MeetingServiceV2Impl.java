@@ -242,42 +242,54 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
             throw new NotAcceptableExceptionV2(ExceptionMapper.fromNotAcceptable(e.getErrorCode()), e.getErrorText());
         }
     }
+
     @Override
     public List<MeetingParticipationModel> getMeetingParticipations(String participantId,
                                                                     OffsetDateTime fromStartTime,
-                                                                    OffsetDateTime toStartTime,
-                                                                    String subject,
-                                                                    String organizedBy,
-                                                                    String label) {
+                                                                    OffsetDateTime toStartTime) {
         logger.debug("Get meeting participations for participant, v2.");
-
         var participants = participantDao.findByParticipantId(participantId);
-        var result = new java.util.ArrayList<MeetingParticipationModel>();
+        if (participants.isEmpty()) {
+            return List.of();
+        }
 
+        var meetingIds = participants.stream().map(Participant::meetingId).toList();
+        var meetingsById = new java.util.HashMap<Long, Meeting>();
+        meetingRepository.findAllById(meetingIds).forEach(m -> meetingsById.put(m.getId(), m));
+
+        var participantAndMeetingMap = new java.util.LinkedHashMap<Participant, Meeting>();
         for (var participant : participants) {
-            var meeting = meetingRepository.findById(participant.meetingId())
-                    .orElseThrow(() -> new ResourceNotFoundExceptionV2("meeting", "id"));
-
-            var schedulingInfo = schedulingInfoRepository.findOneByMeeting(meeting);
-
-            if (!MeetingParticipationFilter.matches(meeting, fromStartTime, toStartTime, subject, organizedBy, label)) {
-                continue;
+            var meeting = meetingsById.get(participant.meetingId());
+            if (meeting == null) {
+                throw new ResourceNotFoundExceptionV2("meeting", "id");
             }
+            if (MeetingParticipationFilter.matches(meeting, fromStartTime, toStartTime)) {
+                participantAndMeetingMap.put(participant, meeting);
+            }
+        }
+
+        var filteredMeetings = participantAndMeetingMap.values().stream().toList();
+        var schedulingInfoByMeetingId = new java.util.LinkedHashMap<Long, SchedulingInfo>();
+        schedulingInfoRepository.findByMeetingIn(filteredMeetings)
+                .forEach(si -> schedulingInfoByMeetingId.put(si.getMeeting().getId(), si));
+
+        var result = new java.util.ArrayList<MeetingParticipationModel>();
+        for (var entry : participantAndMeetingMap.entrySet()) {
+            var participant = entry.getKey();
+            var meeting = entry.getValue();
+            var schedulingInfo = schedulingInfoByMeetingId.get(meeting.getId());
 
             Long pin = schedulingInfo == null ? null
                     : participant.role() == ParticipantRole.HOST ? schedulingInfo.getHostPin() : schedulingInfo.getGuestPin();
 
-            var knownParticipants = participantDao.findByMeeting(meeting).size();
-
             result.add(MeetingParticipationModel.from(
                     meeting,
                     schedulingInfo,
-                    knownParticipants,
+                    meeting.getParticipantCount(),
                     participant.role(),
-                    pin != null ? pin.toString() : null,
+                    pin != null ? Integer.parseInt(pin.toString()) : 0,
                     shortLinkBaseUrl));
         }
-
         return result;
     }
 }

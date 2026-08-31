@@ -1500,6 +1500,277 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         }
     }
 
+    @Test
+    void testV2MeetingsPostThenV2MeetingsUuidParticipantsPost() throws ApiException {
+
+        var createMeeting = randomCreateMeeting();
+        var participants = createParticipants();
+
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants);
+
+        assertNotNull(createdParticipants);
+        assertEquals(createdParticipants.size(), participants.size());
+        createdParticipants.forEach(p -> assertNotNull(p.getUuid()));
+
+        var meeting = videoMeetingsV2Api.v2MeetingsUuidGet(createdMeeting.getUuid());
+        assertEquals(participants.size(), meeting.getKnownParticipants());
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsPostForbiddenForOtherOrganisation() {
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(otherOrgMeetingUuid(), createParticipants()));
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsPostNonExistingMeeting() {
+        assertStatus(404, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(UUID.randomUUID(), createParticipants()));
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsPostUnknownOrganisationParticipant() throws ApiException {
+        var createMeeting = randomCreateMeeting();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+        var participants = List.of(
+                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
+        );
+        var expectedException = assertThrows(ApiException.class, () ->
+                videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants));
+        assertEquals(404, expectedException.getCode());
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"11\""));
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error\":\"Resource: organisation in field: participantId not found.\""));
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsGet() throws ApiException {
+        var createMeeting = randomCreateMeeting();
+        var participantsModel = createParticipants();
+
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participantsModel);
+        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
+
+        assertEquals(participants.size(), createdParticipants.size());
+
+        var sortedParticipantsCreated = createdParticipants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
+        var sortedParticipantsInput = participants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
+
+        for (int i = 0; i < sortedParticipantsCreated.size(); i++) {
+            assertEquals(sortedParticipantsInput.get(i).getParticipantId(), sortedParticipantsCreated.get(i).getParticipantId());
+            assertEquals(sortedParticipantsInput.get(i).getRole().name(), sortedParticipantsCreated.get(i).getRole().name());
+            assertEquals(sortedParticipantsInput.get(i).getType().name(), sortedParticipantsCreated.get(i).getType().name());
+        }
+
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsGetForbiddenForOtherOrganisation() {
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(otherOrgMeetingUuid()));
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
+        var meeting = randomCreateMeeting();
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
+
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
+        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+
+        var uuid = createdParticipants.getFirst().getUuid();
+
+        var updatedParticipant = new UpdateParticipant();
+        updatedParticipant.setRole(ParticipantRole.HOST);
+
+        var createdUpdatedParticipant = videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(createdMeeting.getUuid(), uuid, updatedParticipant);
+
+        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
+
+        assertEquals(participants.getFirst().getRole(), createdUpdatedParticipant.getRole());
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsIdPutForbiddenForOtherOrganisation() {
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(otherOrgMeetingUuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
+    }
+
+    @Test
+    void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
+        var meeting = randomCreateMeeting();
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
+        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getUuid());
+        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
+        assertTrue(participants.isEmpty());
+    }
+
+    @Test
+    void testV2MeetingsUuidParticipantsIdDeleteForbiddenForOtherOrganisation() {
+        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(otherOrgMeetingUuid(), UUID.randomUUID()));
+    }
+
+    // ================================================================
+    // ---------- Tests flyttet fra VideoMeetingParticipationsIT ----------
+    // (getMeetingParticipations - bruger samme videoMeetingsV2Api-klienter
+    //  og videoSchedulingInformationV2Api som resten af klassen ovenfor)
+    // ================================================================
+
+    @Test
+    void errorIfNoJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfNoRoleAttInToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_getMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.getMeetingParticipations(randomString(), null, null));
+    }
+
+    @Test
+    void testGetMeetingParticipations() throws ApiException {
+        var participantId = randomString();
+        var createMeeting = randomCreateMeetingForParticipations();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+
+        var participant = new CreateParticipant()
+                .role(ParticipantRole.HOST)
+                .type(ParticipantType.USER)
+                .participantId(participantId);
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
+
+        assertNotNull(result);
+        assertNotNull(result.getMeetingParticipations());
+        assertEquals(1, result.getMeetingParticipations().size());
+
+        var participation = result.getMeetingParticipations().getFirst();
+        assertEquals(createdMeeting.getUuid(), participation.getUuid());
+        assertEquals(createMeeting.getSubject(), participation.getSubject());
+        assertEquals(createMeeting.getDescription(), participation.getDescription());
+        assertEquals(ParticipantRole.HOST, participation.getParticipantRole());
+        assertNotNull(participation.getPin());
+        assertNotNull(participation.getShortLink());
+    }
+
+    @Test
+    void testGetMeetingParticipationsPinIsHostPinForHostRole() throws ApiException {
+        var participantId = randomString();
+        var createMeeting = randomCreateMeetingForParticipations();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+
+        var participant = new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.USER).participantId(participantId);
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
+
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
+        var participation = result.getMeetingParticipations().getFirst();
+
+        assertEquals(schedulingInfo.getHostPin(), participation.getPin());
+    }
+
+    @Test
+    void testGetMeetingParticipationsPinIsGuestPinForGuestRole() throws ApiException {
+        var participantId = randomString();
+        var createMeeting = randomCreateMeetingForParticipations();
+        createMeeting.setGuestPinRequired(true);
+        createMeeting.setGuestPin(1234);
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+
+        var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
+
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
+        var participation = result.getMeetingParticipations().getFirst();
+
+        assertNotNull(schedulingInfo.getGuestPin());
+        assertEquals(schedulingInfo.getGuestPin(), participation.getPin());
+    }
+
+    @Test
+    void testGetMeetingParticipationsFilteredByStartTimeInterval() throws ApiException {
+        var participantId = randomString();
+        var createMeeting = randomCreateMeetingForParticipations();
+        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
+
+        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
+        videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
+
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId,
+                createMeeting.getStartTime().minusHours(1),
+                createMeeting.getStartTime().plusHours(1));
+
+        assertEquals(1, result.getMeetingParticipations().size());
+    }
+
+    @Test
+    void testGetMeetingParticipationsNoMatchingParticipant() throws ApiException {
+        var result = videoMeetingsV2Api.getMeetingParticipations(randomString(), null, null);
+
+        assertNotNull(result);
+        assertNotNull(result.getMeetingParticipations());
+        assertTrue(result.getMeetingParticipations().isEmpty());
+    }
+
+    @Test
+    void testGetMeetingParticipationsOnlyFromStartTimeGiven() {
+        var expectedException = assertThrows(ApiException.class, () ->
+                videoMeetingsV2Api.getMeetingParticipations(randomString(), OffsetDateTime.now(), null));
+        assertEquals(400, expectedException.getCode());
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
+    }
+
+    @Test
+    void testGetMeetingParticipationsOnlyToStartTimeGiven() {
+        var expectedException = assertThrows(ApiException.class, () ->
+                videoMeetingsV2Api.getMeetingParticipations(randomString(), null, OffsetDateTime.now()));
+        assertEquals(400, expectedException.getCode());
+        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
+    }
+
+    /**
+     * Bruges kun af testene under "flyttet fra VideoMeetingParticipationsIT".
+     * Adskilt fra {@link #randomCreateMeeting()} fordi participation-testene
+     * kræver en startTime i FREMTIDEN (participations filtreres bl.a. på
+     * startTime-interval omkring "nu"), mens randomCreateMeeting() bevidst
+     * bruger tider i fortiden til resten af klassens tests.
+     */
+    private static CreateMeeting randomCreateMeetingForParticipations() {
+        return new CreateMeeting()
+                .subject(randomString())
+                .startTime(OffsetDateTime.now().plusHours(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().plusHours(2).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .description(randomString())
+                .organizedByEmail(randomString());
+    }
+
     //-------- test data help ---------
     private UUID meeting301Uuid() {
         return UUID.fromString("7cc82183-0d47-439a-a00c-38f7a5a01fc8");
@@ -1664,114 +1935,5 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertEquals(200, responseSchedulingInfo.statusCode());
         assertNotNull(responseSchedulingInfo.body());
         assertTrue(responseSchedulingInfo.body().matches("\\{\"uuid\":\"" + schedulingInfoUuid + "\".*\"meetingDetails\":.*\"uuid\":\"" + meetingUuid + "\".*}"));
-    }
-
-    @Test
-    void testV2MeetingsPostThenV2MeetingsUuidParticipantsPost() throws ApiException {
-
-        var createMeeting = randomCreateMeeting();
-        var participants = createParticipants();
-
-        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
-        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants);
-
-        assertNotNull(createdParticipants);
-        assertEquals(createdParticipants.size(), participants.size());
-        createdParticipants.forEach(p -> assertNotNull(p.getUuid()));
-
-        var meeting = videoMeetingsV2Api.v2MeetingsUuidGet(createdMeeting.getUuid());
-        assertEquals(participants.size(), meeting.getKnownParticipants());
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsPostForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(otherOrgMeetingUuid(), createParticipants()));
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsPostNonExistingMeeting() {
-        assertStatus(404, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(UUID.randomUUID(), createParticipants()));
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsPostUnknownOrganisationParticipant() throws ApiException {
-        var createMeeting = randomCreateMeeting();
-        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
-        var participants = List.of(
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
-        );
-        var expectedException = assertThrows(ApiException.class, () ->
-                videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants));
-        assertEquals(404, expectedException.getCode());
-        assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"11\""));
-        assertTrue(expectedException.getResponseBody().contains("\"detailed_error\":\"Resource: organisation in field: participantId not found.\""));
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsGet() throws ApiException {
-        var createMeeting = randomCreateMeeting();
-        var participantsModel = createParticipants();
-
-        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
-        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participantsModel);
-        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
-
-        assertEquals(participants.size(), createdParticipants.size());
-
-        var sortedParticipantsCreated = createdParticipants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
-        var sortedParticipantsInput = participants.stream().sorted(Comparator.comparing(Participant::getParticipantId)).toList();
-
-        for (int i = 0; i < sortedParticipantsCreated.size(); i++) {
-            assertEquals(sortedParticipantsInput.get(i).getParticipantId(), sortedParticipantsCreated.get(i).getParticipantId());
-            assertEquals(sortedParticipantsInput.get(i).getRole().name(), sortedParticipantsCreated.get(i).getRole().name());
-            assertEquals(sortedParticipantsInput.get(i).getType().name(), sortedParticipantsCreated.get(i).getType().name());
-        }
-
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsGetForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(otherOrgMeetingUuid()));
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
-        var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
-
-        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
-        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
-
-        var uuid = createdParticipants.getFirst().getUuid();
-
-        var updatedParticipant = new UpdateParticipant();
-        updatedParticipant.setRole(ParticipantRole.HOST);
-
-        var createdUpdatedParticipant = videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(createdMeeting.getUuid(), uuid, updatedParticipant);
-
-        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
-
-        assertEquals(participants.getFirst().getRole(), createdUpdatedParticipant.getRole());
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsIdPutForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidPut(otherOrgMeetingUuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
-    }
-
-    @Test
-    void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
-        var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
-        var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
-        var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
-        videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getUuid());
-        var participants = videoMeetingsV2Api.v2MeetingsUuidParticipantsGet(createdMeeting.getUuid());
-        assertTrue(participants.isEmpty());
-    }
-
-    @Test
-    void testV2MeetingsUuidParticipantsIdDeleteForbiddenForOtherOrganisation() {
-        assertStatus(403, () -> videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(otherOrgMeetingUuid(), UUID.randomUUID()));
     }
 }
