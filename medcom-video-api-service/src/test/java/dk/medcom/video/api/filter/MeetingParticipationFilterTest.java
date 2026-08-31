@@ -15,92 +15,19 @@ public class MeetingParticipationFilterTest {
     @Test
     public void testMatchesWhenNoFiltersGiven() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
 
-        var result = MeetingParticipationFilter.matches(meeting, null, null, null, null, null);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testMatchesSubject() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, meeting.getSubject(), null, null);
+        var result = MeetingParticipationFilter.matches(meeting, null, null);
 
         assertTrue(result);
     }
 
-    @Test
-    public void testDoesNotMatchSubject() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, "non-matching-subject", null, null);
-
-        assertFalse(result);
-    }
-
-    @Test
-    public void testMatchesSubjectSubstring() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-        var partialSubject = meeting.getSubject().substring(0, meeting.getSubject().length() - 2);
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, partialSubject, null, null);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testMatchesOrganizedBy() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, null, meeting.getOrganizedByUser().getEmail(), null);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDoesNotMatchOrganizedBy() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, null, "non-matching@email.dk", null);
-
-        assertFalse(result);
-    }
-
-    @Test
-    public void testMatchesLabel() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-        var existingLabel = meeting.getMeetingLabels().iterator().next().getLabel();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, null, null, existingLabel);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDoesNotMatchLabel() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-
-        var result = MeetingParticipationFilter.matches(meeting, null, null, null, null, "non-matching-label");
-
-        assertFalse(result);
-    }
 
     @Test
     public void testMatchesWhenStartTimeWithinInterval() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
         var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        var result = MeetingParticipationFilter.matches(meeting, meetingStart.minusHours(1), meetingStart.plusHours(1), null, null, null);
+        var result = MeetingParticipationFilter.matches(meeting, meetingStart.minusHours(1), meetingStart.plusHours(1));
 
         assertTrue(result);
     }
@@ -108,10 +35,9 @@ public class MeetingParticipationFilterTest {
     @Test
     public void testDoesNotMatchWhenStartTimeBeforeInterval() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
         var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        var result = MeetingParticipationFilter.matches(meeting, meetingStart.plusHours(1), meetingStart.plusHours(2), null, null, null);
+        var result = MeetingParticipationFilter.matches(meeting, meetingStart.plusHours(1), meetingStart.plusHours(2));
 
         assertFalse(result);
     }
@@ -119,10 +45,9 @@ public class MeetingParticipationFilterTest {
     @Test
     public void testDoesNotMatchWhenStartTimeAfterInterval() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
         var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        var result = MeetingParticipationFilter.matches(meeting, meetingStart.minusHours(2), meetingStart.minusHours(1), null, null, null);
+        var result = MeetingParticipationFilter.matches(meeting, meetingStart.minusHours(2), meetingStart.minusHours(1));
 
         assertFalse(result);
     }
@@ -130,10 +55,9 @@ public class MeetingParticipationFilterTest {
     @Test
     public void testIgnoresStartTimeIntervalWhenOnlyFromGiven() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
         var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        var result = MeetingParticipationFilter.matches(meeting, meetingStart.plusHours(5), null, null, null, null);
+        var result = MeetingParticipationFilter.matches(meeting, meetingStart.plusHours(5), null);
 
         assertTrue(result);
     }
@@ -141,38 +65,10 @@ public class MeetingParticipationFilterTest {
     @Test
     public void testIgnoresStartTimeIntervalWhenOnlyToGiven() {
         var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
         var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        var result = MeetingParticipationFilter.matches(meeting, null, meetingStart.minusHours(5), null, null, null);
+        var result = MeetingParticipationFilter.matches(meeting, null, meetingStart.minusHours(5));
 
         assertTrue(result);
-    }
-
-    @Test
-    public void testMatchesAllFiltersCombined() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-        var existingLabel = meeting.getMeetingLabels().iterator().next().getLabel();
-        var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
-
-        var result = MeetingParticipationFilter.matches(meeting,
-                meetingStart.minusHours(1), meetingStart.plusHours(1),
-                meeting.getSubject(), meeting.getOrganizedByUser().getEmail(), existingLabel);
-
-        assertTrue(result);
-    }
-
-    @Test
-    public void testDoesNotMatchWhenOneOfSeveralFiltersFails() {
-        var meeting = randomMeeting();
-        var schedulingInfo = randomSchedulingInfo();
-        var existingLabel = meeting.getMeetingLabels().iterator().next().getLabel();
-
-        var result = MeetingParticipationFilter.matches(meeting,
-                null, null,
-                meeting.getSubject(), "non-matching@email.dk", existingLabel);
-
-        assertFalse(result);
     }
 }

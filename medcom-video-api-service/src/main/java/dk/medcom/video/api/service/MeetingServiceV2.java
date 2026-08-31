@@ -1,8 +1,6 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.service.model.*;
-import org.openapitools.model.MeetingParticipationList;
-import org.springframework.http.ResponseEntity;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -39,8 +37,5 @@ public interface MeetingServiceV2 {
 
     List<MeetingParticipationModel> getMeetingParticipations(String participantId,
                                                              OffsetDateTime fromStartTime,
-                                                             OffsetDateTime toStartTime,
-                                                             String subject,
-                                                             String organizedBy,
-                                                             String label);
+                                                             OffsetDateTime toStartTime);
 }

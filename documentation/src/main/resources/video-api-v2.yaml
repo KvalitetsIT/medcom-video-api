@@ -710,7 +710,7 @@ paths:
         - Video Meetings V2
       summary: gets a list of meeting participations for a participant
       description: >-
-        Gets a list of meetings the given participant is in, based on query parameters.
+        Gets a list of meeting participations the given participant is in, based on query parameters.
         All provided query parameters are combined (AND) to filter the result. <br> <br>
         Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
         When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br>
@@ -744,27 +744,6 @@ paths:
             type: string
             format: date-time
           example: '2023-03-31T11:25:44Z'
-        - name: subject
-          in: query
-          description: the subject of a meeting
-          required: false
-          schema:
-            type: string
-          example: subject
-        - name: organizedBy
-          in: query
-          description: the organizer of a meeting
-          required: false
-          schema:
-            type: string
-          example: organizer
-        - name: label
-          in: query
-          description: the label of a meeting
-          required: false
-          schema:
-            type: string
-          example: label123
       responses:
         '200':
           description: Ok
@@ -2575,16 +2554,11 @@ components:
     participant:
       type: object
       required:
-        - id
         - uuid
         - type
         - participantId
         - role
       properties:
-        id:
-          type: integer
-          format: int64
-          description: The id of the participant
         uuid:
           type: string
           format: uuid
@@ -2665,7 +2639,10 @@ components:
         participantRole:
           $ref: '#/components/schemas/participantRole'
         pin:
-          type: string
+          type: integer
+          format: int32
+          minimum: 1000
+          maximum: 999999999
           description: Host pin if participantRole is HOST, guest pin if participantRole is GUEST. Not present if the meeting does not have a pin assigned for that role.
           example: "1234"
         uriWithDomain:

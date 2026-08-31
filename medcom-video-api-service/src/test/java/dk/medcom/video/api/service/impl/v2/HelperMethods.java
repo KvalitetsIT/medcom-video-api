@@ -6,6 +6,7 @@ import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.service.model.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -606,7 +607,11 @@ public class HelperMethods {
     }
 
     public static Participant randomParticipant(Long meetingId, ParticipantRole role) {
-        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), role, null, count++, null, count++);
+        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), role, randomLocalDateTime(), count++, randomLocalDateTime(), count++);
+    }
+
+    public static LocalDateTime randomLocalDateTime() {
+        return LocalDateTime.now().minusSeconds((long) (Math.random() * 1_000_000));
     }
 
     public static void assertMeetingParticipation(Meeting expectedMeeting, SchedulingInfo expectedSchedulingInfo, Participant expectedParticipant, int expectedKnownParticipants, String shortLinkBaseUrl, MeetingParticipationModel actual) {
@@ -623,7 +628,7 @@ public class HelperMethods {
         assertEquals(expectedParticipant.role(), actual.participantRole());
 
         var expectedPin = expectedParticipant.role() == ParticipantRole.HOST ? expectedSchedulingInfo.getHostPin() : expectedSchedulingInfo.getGuestPin();
-        assertEquals(expectedPin.toString(), actual.pin());
+        assertEquals(expectedPin, actual.pin());
 
         assertEquals(expectedSchedulingInfo.getUriWithDomain(), actual.uriWithDomain());
         assertEquals(shortLinkBaseUrl + expectedMeeting.getShortId(), actual.shortLink());

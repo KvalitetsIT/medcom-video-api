@@ -9,32 +9,11 @@ public class MeetingParticipationFilter {
 
     public static boolean matches(Meeting meeting,
                                   OffsetDateTime fromStartTime,
-                                  OffsetDateTime toStartTime,
-                                  String subject,
-                                  String organizedBy,
-                                  String label) {
+                                  OffsetDateTime toStartTime) {
 
         if (fromStartTime != null && toStartTime != null) {
             var meetingStart = meeting.getStartTime().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
-            if (meetingStart.isBefore(fromStartTime) || meetingStart.isAfter(toStartTime)) {
-                return false;
-            }
-        }
-
-        if (subject != null && !meeting.getSubject().contains(subject)) {
-            return false;
-        }
-
-        if (organizedBy != null && (meeting.getOrganizedByUser() == null || !organizedBy.equals(meeting.getOrganizedByUser().getEmail()))) {
-            return false;
-        }
-
-        if (label != null) {
-            var hasLabel = meeting.getMeetingLabels().stream()
-                    .anyMatch(l -> label.equals(l.getLabel()));
-            if (!hasLabel) {
-                return false;
-            }
+            return !meetingStart.isBefore(fromStartTime) && !meetingStart.isAfter(toStartTime);
         }
 
         return true;
