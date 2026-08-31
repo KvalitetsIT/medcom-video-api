@@ -935,7 +935,6 @@ public class VideoMeetingsControllerV2Test {
         var result = videoMeetingsControllerV2.v2MeetingsUuidParticipantsPost(uuid, input);
 
         assertSame(ParticipantRole.GUEST, result.getBody().getFirst().getRole());
-        assertEquals(1l, (long) result.getBody().getFirst().getId());
     }
 
     @Test
@@ -1033,10 +1032,10 @@ public class VideoMeetingsControllerV2Test {
         var participantId = randomString();
         var meetingParticipations = List.of(randomMeetingParticipationModel(), randomMeetingParticipationModel());
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null, null, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
                 .thenReturn(meetingParticipations);
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
 
@@ -1052,7 +1051,7 @@ public class VideoMeetingsControllerV2Test {
         assertMeetingParticipation(meetingParticipations.getFirst(), res1);
         assertMeetingParticipation(meetingParticipations.getLast(), res2);
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null, null, null, null);
+        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
         verifyNoMoreInteractions();
     }
 
@@ -1061,21 +1060,18 @@ public class VideoMeetingsControllerV2Test {
         var participantId = randomString();
         var fromStartTime = OffsetDateTime.now().minusHours(5);
         var toStartTime = OffsetDateTime.now();
-        var subject = randomString();
-        var organizedBy = randomString();
-        var label = randomString();
         var meetingParticipations = List.of(randomMeetingParticipationModel());
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, fromStartTime, toStartTime, subject, organizedBy, label))
+        Mockito.when(meetingService.getMeetingParticipations(participantId, fromStartTime, toStartTime))
                 .thenReturn(meetingParticipations);
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, toStartTime, subject, organizedBy, label);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, toStartTime);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
         assertEquals(1, result.getBody().getMeetingParticipations().size());
         assertMeetingParticipation(meetingParticipations.getFirst(), result.getBody().getMeetingParticipations().getFirst());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, fromStartTime, toStartTime, subject, organizedBy, label);
+        Mockito.verify(meetingService).getMeetingParticipations(participantId, fromStartTime, toStartTime);
         verifyNoMoreInteractions();
     }
 
@@ -1083,16 +1079,16 @@ public class VideoMeetingsControllerV2Test {
     public void testGetMeetingParticipationsEmptyResult() {
         var participantId = randomString();
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null, null, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
                 .thenReturn(List.of());
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null, null, null, null);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
         assertNotNull(result.getBody().getMeetingParticipations());
         assertEquals(0, result.getBody().getMeetingParticipations().size());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null, null, null, null);
+        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
         verifyNoMoreInteractions();
     }
 
@@ -1100,39 +1096,16 @@ public class VideoMeetingsControllerV2Test {
     public void testGetMeetingParticipationsResourceNotFound() {
         var participantId = randomString();
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null, null, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
                 .thenThrow(new ResourceNotFoundExceptionV2("meeting", "id"));
 
         var expectedException = assertThrows(ResourceNotFoundException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null, null, null, null));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null));
         assertNotNull(expectedException);
         assertEquals(404, expectedException.getHttpStatus().value());
         assertEquals("Resource: meeting in field: id not found.", expectedException.getErrorMessage());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null, null, null, null);
-        verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void testGetMeetingParticipationsNoParticipantId() {
-        var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(null, null, null, null, null, null));
-        assertNotNull(expectedException);
-        assertEquals(400, expectedException.getHttpStatus().value());
-        assertEquals(DetailedError.DetailedErrorCodeEnum._36, expectedException.getDetailedErrorCode());
-        assertEquals("Must set at least one query parameter, when searching for meeting.", expectedException.getDetailedError());
-
-        verifyNoMoreInteractions();
-    }
-
-    @Test
-    public void testGetMeetingParticipationsEmptyParticipantId() {
-        var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations("", null, null, null, null, null));
-        assertNotNull(expectedException);
-        assertEquals(400, expectedException.getHttpStatus().value());
-        assertEquals(DetailedError.DetailedErrorCodeEnum._36, expectedException.getDetailedErrorCode());
-
+        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
         verifyNoMoreInteractions();
     }
 
@@ -1142,7 +1115,7 @@ public class VideoMeetingsControllerV2Test {
         var fromStartTime = OffsetDateTime.now().minusHours(5);
 
         var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, null, null, null, null));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, null));
         assertNotNull(expectedException);
         assertEquals(400, expectedException.getHttpStatus().value());
         assertEquals(DetailedError.DetailedErrorCodeEnum._28, expectedException.getDetailedErrorCode());
@@ -1157,7 +1130,7 @@ public class VideoMeetingsControllerV2Test {
         var toStartTime = OffsetDateTime.now();
 
         var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, toStartTime, null, null, null));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, toStartTime));
         assertNotNull(expectedException);
         assertEquals(400, expectedException.getHttpStatus().value());
         assertEquals(DetailedError.DetailedErrorCodeEnum._28, expectedException.getDetailedErrorCode());

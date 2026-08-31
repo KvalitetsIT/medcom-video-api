@@ -20,7 +20,7 @@ public record MeetingParticipationModel(UUID uuid,
                                         MeetingUserModel organizedBy,
                                         int knownParticipants,
                                         ParticipantRole participantRole,
-                                        String pin,
+                                        int pin,
                                         String uriWithDomain,
                                         String shortLink,
                                         String portalLink) {
@@ -28,7 +28,7 @@ public record MeetingParticipationModel(UUID uuid,
                                                  SchedulingInfo schedulingInfo,
                                                  int knownParticipants,
                                                  ParticipantRole participantRole,
-                                                 String pin,
+                                                 int pin,
                                                  String shortLinkBaseUrl) {
         if (meeting == null) {
             return null;

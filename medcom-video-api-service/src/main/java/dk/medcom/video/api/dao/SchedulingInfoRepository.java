@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,6 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query("SELECT s FROM SchedulingInfo s WHERE s.provisionStatus = ?2 AND s.uriWithDomain IN (?1)")
 	List<SchedulingInfo> findAllByUriWithDomainAndProvisionStatusOk(List<String> uri, ProvisionStatus provisionStatus);
 
-	SchedulingInfo findOneByMeeting(Meeting meeting);
+	List<SchedulingInfo> findByMeetingIn(Collection<Meeting> meetings);
 }
 
