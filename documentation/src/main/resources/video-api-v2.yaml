@@ -1595,7 +1595,7 @@ components:
       type: object
       required:
         - uuid
-        - vMRAvailableBefore
+        - vmrAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriWithDomain

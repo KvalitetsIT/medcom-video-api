@@ -316,7 +316,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -519,8 +519,8 @@
 									"pm.test(\"guestPinRangeHigh is as given input\", function () {",
 									"    pm.expect(pm.response.json().guestPinRangeHigh).to.eql(pm.globals.get(\"guest_pin_range_high\"));",
 									"});",
-									"pm.test(\"vmrAvailableBefore is as given input\", function () {",
-									"    pm.expect(pm.response.json().vmrAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
+									"pm.test(\"vMRAvailableBefore is as given input\", function () {",
+									"    pm.expect(pm.response.json().vMRAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
 									"});",
 									"pm.test(\"maxParticipants is as given input\", function () {",
 									"    pm.expect(pm.response.json().maxParticipants).to.eql(pm.globals.get(\"max_participants\"));",
@@ -555,7 +555,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -634,8 +634,8 @@
 									"pm.test(\"guestPinRangeHigh is as given input\", function () {",
 									"    pm.expect(pm.response.json().guestPinRangeHigh).to.eql(pm.globals.get(\"guest_pin_range_high\"));",
 									"});",
-									"pm.test(\"vmrAvailableBefore is as given input\", function () {",
-									"    pm.expect(pm.response.json().vmrAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
+									"pm.test(\"vMRAvailableBefore is as given input\", function () {",
+									"    pm.expect(pm.response.json().vMRAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
 									"});",
 									"pm.test(\"maxParticipants is as given input\", function () {",
 									"    pm.expect(pm.response.json().maxParticipants).to.eql(pm.globals.get(\"max_participants\"));",
@@ -670,7 +670,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -873,8 +873,8 @@
 									"pm.test(\"guestPinRangeHigh is as given input\", function () {",
 									"    pm.expect(pm.response.json().guestPinRangeHigh).to.eql(pm.globals.get(\"guest_pin_range_high\"));",
 									"});",
-									"pm.test(\"vmrAvailableBefore is as given input\", function () {",
-									"    pm.expect(pm.response.json().vmrAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
+									"pm.test(\"vMRAvailableBefore is as given input\", function () {",
+									"    pm.expect(pm.response.json().vMRAvailableBefore).to.eql(pm.globals.get(\"vmr_available_before\"));",
 									"});",
 									"pm.test(\"maxParticipants is as given input\", function () {",
 									"    pm.expect(pm.response.json().maxParticipants).to.eql(pm.globals.get(\"max_participants\"));",
@@ -909,7 +909,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1098,7 +1098,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1336,7 +1336,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1405,7 +1405,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1518,7 +1518,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates/{{previous_scheduling_template_id}}",
@@ -1677,7 +1677,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1760,7 +1760,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
@@ -1828,7 +1828,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates/{{last_scheduling_template_id}}",
@@ -2031,7 +2031,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vmrAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
+							"raw": "{\n\"conferencingSysId\": \"{{conferencing_sys_id}}\",\n\"uriPrefix\": \"{{uri_prefix}}\",\n\"uriDomain\": \"{{uri_domain}}\",\n\"hostPinRequired\": \"{{host_pin_required}}\",\n\"hostPinRangeLow\": \"{{host_pin_range_low}}\",\n\"hostPinRangeHigh\": \"{{host_pin_range_high}}\",\n\"guestPinRequired\": \"{{guest_pin_required}}\",\n\"guestPinRangeLow\": \"{{guest_pin_range_low}}\",\n\"guestPinRangeHigh\": \"{{guest_pin_range_high}}\",\n\"vMRAvailableBefore\": \"{{vmr_available_before}}\",\n\"maxParticipants\": \"{{max_participants}}\",\n\"endMeetingOnEndTime\": \"{{end_meeting_on_end_time}}\",\n\"uriNumberRangeLow\": \"{{uri_number_range_low}}\",\n\"uriNumberRangeHigh\": \"{{uri_number_range_high}}\",\n\"ivrTheme\": \"{{ivr_theme}}\",\n\"isDefaultTemplate\": \"{{is_default_template}}\"\n}"
 						},
 						"url": {
 							"raw": "{{host-admin}}/scheduling-templates",
