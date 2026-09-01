@@ -1,6 +1,7 @@
 package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.medcom.video.api.controller.v1.SchedulingTemplateController;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -27,6 +28,9 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private boolean guestPinRequired;
 	private Long guestPinRangeLow;			
 	private Long guestPinRangeHigh;
+	// Hence the name-scheme was not properly accounted for in the creation of the field: 'vMRAvailableBefore' (should have been 'vmrAvailableBefore')
+	// , we now have to add the @JsonProperty (and @JsonIgnore to the get-/set-methods) to preserve backward-compatibility.
+	@JsonProperty("vMRAvailableBefore")
 	private int vMRAvailableBefore;
 	private int maxParticipants;			
 	private boolean endMeetingOnEndTime;	
@@ -208,11 +212,10 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	public void setGuestPinRangeHigh(Long guestPinRangeHigh) {
 		this.guestPinRangeHigh = guestPinRangeHigh;
 	}
+	@JsonIgnore
+	public int getvMRAvailableBefore() { return vMRAvailableBefore; }
 
-	public int getvMRAvailableBefore() {
-		return vMRAvailableBefore;
-	}
-
+	@JsonIgnore
 	public void setvMRAvailableBefore(int vMRAvailableBefore) {
 		this.vMRAvailableBefore = vMRAvailableBefore;
 	}
