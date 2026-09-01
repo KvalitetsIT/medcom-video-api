@@ -15,7 +15,7 @@ public class SchedulingInfoEventMapper {
         schedulingInfoEvent.setUuid(schedulingInfo.getUuid());
         schedulingInfoEvent.setHostPin(schedulingInfo.getHostPin());
         schedulingInfoEvent.setGuestPin(schedulingInfo.getGuestPin());
-        schedulingInfoEvent.setVmrAvailableBefore(schedulingInfo.getVmrAvailableBefore());
+        schedulingInfoEvent.setVMRAvailableBefore(schedulingInfo.getVMRAvailableBefore());
 
         schedulingInfoEvent.setIvrTheme(schedulingInfo.getIvrTheme());
         schedulingInfoEvent.setUriWithoutDomain(schedulingInfo.getUriWithoutDomain());
@@ -52,8 +52,8 @@ public class SchedulingInfoEventMapper {
         if(schedulingInfo.getMeeting() != null) {
             schedulingInfoEvent.setMeetingEndTime(schedulingInfo.getMeeting().getEndTime().toInstant());
         }
-        if(schedulingInfo.getVmrStartTime() != null) {
-            schedulingInfoEvent.setVmrStartTime(schedulingInfo.getVmrStartTime().toInstant());
+        if(schedulingInfo.getvMRStartTime() != null) {
+            schedulingInfoEvent.setvMRStartTime(schedulingInfo.getvMRStartTime().toInstant());
         }
         schedulingInfoEvent.setDirectMedia(schedulingInfo.getDirectMedia().toString());
         schedulingInfoEvent.setProvisionVMRId(schedulingInfo.getProvisionVMRId());

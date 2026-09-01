@@ -87,7 +87,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setEnableOverlayText(false);
         create.setDirectMedia(DirectMedia.BEST_EFFORT);
         create.setIvrTheme("ivr_theme");
-        create.setVmrAvailableBefore(10);
+        create.setvMRAvailableBefore(10);
         create.setCallType("call_type");
 
         //When
@@ -100,7 +100,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getHostView().toString(), result.getHostView().toString());
         assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
         assertEquals(create.getDirectMedia(), result.getDirectMedia());
-        assertEquals(create.getVmrAvailableBefore(), result.getVmrAvailableBefore());
+        assertEquals(create.getvMRAvailableBefore(), result.getvMRAvailableBefore());
         assertEquals(create.getCallType(), result.getCallType());
     }
 
@@ -133,7 +133,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
         updateSchedulingTemplate.setDirectMedia(DirectMedia.BEST_EFFORT);
         updateSchedulingTemplate.setIvrTheme("ivr_theme");
-        updateSchedulingTemplate.setVmrAvailableBefore(15);
+        updateSchedulingTemplate.setvMRAvailableBefore(15);
         updateSchedulingTemplate.setCallType("call-type");
 
         //When
@@ -151,7 +151,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(updateSchedulingTemplate.getReturnUrl(), result.getReturnUrl());
         assertFalse(result.getIsPoolTemplate());
         assertEquals(DirectMedia.BEST_EFFORT, result.getDirectMedia());
-        assertEquals(updateSchedulingTemplate.getVmrAvailableBefore(), result.getVmrAvailableBefore());
+        assertEquals(updateSchedulingTemplate.getvMRAvailableBefore(), result.getvMRAvailableBefore());
         assertEquals(updateSchedulingTemplate.getCallType(), result.getCallType());
     }
 

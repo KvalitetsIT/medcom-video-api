@@ -57,8 +57,8 @@ public class HelperMethods {
         schedulingInfo.setUuid(randomString());
         schedulingInfo.setHostPin(count++);
         schedulingInfo.setGuestPin(count++);
-        schedulingInfo.setVmrAvailableBefore((int) count++);
-        schedulingInfo.setVmrStartTime(Date.from(Instant.now().minusSeconds(count++)));
+        schedulingInfo.setVMRAvailableBefore((int) count++);
+        schedulingInfo.setvMRStartTime(Date.from(Instant.now().minusSeconds(count++)));
         schedulingInfo.setMaxParticipants((int) count++);
         schedulingInfo.setEndMeetingOnEndTime(randomBoolean());
         schedulingInfo.setUriWithDomain(randomString());
@@ -111,7 +111,7 @@ public class HelperMethods {
         schedulingTemplate.setGuestPinRequired(randomBoolean());
         schedulingTemplate.setGuestPinRangeLow(count++);
         schedulingTemplate.setGuestPinRangeHigh(count++);
-        schedulingTemplate.setVmrAvailableBefore((int) count++);
+        schedulingTemplate.setVMRAvailableBefore((int) count++);
         schedulingTemplate.setMaxParticipants((int) count++);
         schedulingTemplate.setEndMeetingOnEndTime(randomBoolean());
         schedulingTemplate.setUriNumberRangeLow(count++);
@@ -427,7 +427,7 @@ public class HelperMethods {
         assertEquals(expected.getUuid(), actual.uuid().toString());
         assertEquals(expected.getHostPin(), actual.hostPin(), 0);
         assertEquals(expected.getGuestPin(), actual.guestPin(), 0);
-        assertEquals(expected.getVmrAvailableBefore(), actual.vmrAvailableBefore(), 0);
+        assertEquals(expected.getVMRAvailableBefore(), actual.vmrAvailableBefore(), 0);
         assertEquals(expected.getMaxParticipants(), actual.maxParticipants(), 0);
         assertEquals(expected.getEndMeetingOnEndTime(), actual.endMeetingOnEndTime());
         assertEquals(expected.getUriWithDomain(), actual.uriWithDomain());
@@ -475,7 +475,7 @@ public class HelperMethods {
         assertEquals(expected.getGuestPinRequired(), actual.guestPinRequired());
         assertEquals(expected.getGuestPinRangeLow(), actual.guestPinRangeLow());
         assertEquals(expected.getGuestPinRangeHigh(), actual.guestPinRangeHigh());
-        assertEquals(expected.getVmrAvailableBefore(), actual.vmrAvailableBefore(), 0);
+        assertEquals(expected.getVMRAvailableBefore(), actual.vMRAvailableBefore(), 0);
         assertEquals(expected.getMaxParticipants(), actual.maxParticipants(), 0);
         assertEquals(expected.getEndMeetingOnEndTime(), actual.endMeetingOnEndTime());
         assertEquals(expected.getUriNumberRangeLow(), actual.uriNumberRangeLow());
@@ -515,7 +515,7 @@ public class HelperMethods {
         assertEquals(expected.isGuestPinRequired(), actual.guestPinRequired());
         assertEquals(expected.getGuestPinRangeLow(), actual.guestPinRangeLow());
         assertEquals(expected.getGuestPinRangeHigh(), actual.guestPinRangeHigh());
-        assertEquals(expected.getVmrAvailableBefore(), actual.vmrAvailableBefore(), 0);
+        assertEquals(expected.getvMRAvailableBefore(), actual.vMRAvailableBefore(), 0);
         assertEquals(expected.getMaxParticipants(), actual.maxParticipants(), 0);
         assertEquals(expected.isEndMeetingOnEndTime(), actual.endMeetingOnEndTime());
         assertEquals(expected.getUriNumberRangeLow(), actual.uriNumberRangeLow());
@@ -553,7 +553,7 @@ public class HelperMethods {
         assertEquals(expected.guestPinRequired(), actual.isGuestPinRequired());
         assertEquals(expected.guestPinRangeLow(), actual.getGuestPinRangeLow());
         assertEquals(expected.guestPinRangeHigh(), actual.getGuestPinRangeHigh());
-        assertEquals(expected.vmrAvailableBefore(), actual.getVmrAvailableBefore(), 0);
+        assertEquals(expected.vMRAvailableBefore(), actual.getvMRAvailableBefore(), 0);
         assertEquals(expected.maxParticipants(), actual.getMaxParticipants(), 0);
         assertEquals(expected.endMeetingOnEndTime(), actual.isEndMeetingOnEndTime());
         assertEquals(expected.uriNumberRangeLow(), actual.getUriNumberRangeLow());
@@ -589,7 +589,7 @@ public class HelperMethods {
         assertEquals(expected.guestPinRequired(), actual.isGuestPinRequired());
         assertEquals(expected.guestPinRangeLow(), actual.getGuestPinRangeLow());
         assertEquals(expected.guestPinRangeHigh(), actual.getGuestPinRangeHigh());
-        assertEquals(expected.vmrAvailableBefore(), actual.getVmrAvailableBefore(), 0);
+        assertEquals(expected.vMRAvailableBefore(), actual.getvMRAvailableBefore(), 0);
         assertEquals(expected.maxParticipants(), actual.getMaxParticipants(), 0);
         assertEquals(expected.endMeetingOnEndTime(), actual.isEndMeetingOnEndTime());
         assertEquals(expected.uriNumberRangeLow(), actual.getUriNumberRangeLow());

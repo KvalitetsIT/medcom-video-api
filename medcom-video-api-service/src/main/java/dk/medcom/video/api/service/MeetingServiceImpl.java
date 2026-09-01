@@ -282,7 +282,6 @@ public class MeetingServiceImpl implements MeetingService {
 			meeting.setUuid(UUID.randomUUID().toString());
 		}
 		meeting.setOrganisation(organisationService.getUserOrganisation());
-
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());

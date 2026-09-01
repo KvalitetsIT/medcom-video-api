@@ -298,7 +298,7 @@ public class PoolInfoServiceTest {
         schedulingTemplate.setUriNumberRangeHigh(9000L);
         schedulingTemplate.setUriNumberRangeLow(8000L);
         schedulingTemplate.setUriPrefix("uri prefix");
-        schedulingTemplate.setVmrAvailableBefore(10);
+        schedulingTemplate.setVMRAvailableBefore(10);
         schedulingTemplate.setId(2L);
 
         return schedulingTemplate;
@@ -321,7 +321,7 @@ public class PoolInfoServiceTest {
         schedulingTemplate.setUriNumberRangeHigh(9000L);
         schedulingTemplate.setUriNumberRangeLow(8000L);
         schedulingTemplate.setUriPrefix("uri prefix");
-        schedulingTemplate.setVmrAvailableBefore(10);
+        schedulingTemplate.setVMRAvailableBefore(10);
         schedulingTemplate.setId(2L);
 
         return schedulingTemplate;

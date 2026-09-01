@@ -27,7 +27,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private boolean guestPinRequired;
 	private Long guestPinRangeLow;			
 	private Long guestPinRangeHigh;
-	private int vmrAvailableBefore;
+	private int vMRAvailableBefore;
 	private int maxParticipants;			
 	private boolean endMeetingOnEndTime;	
 	private Long uriNumberRangeLow;			
@@ -76,7 +76,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		guestPinRequired = schedulingTemplate.getHostPinRequired();
 		guestPinRangeLow = schedulingTemplate.getGuestPinRangeLow();
 		guestPinRangeHigh = schedulingTemplate.getGuestPinRangeHigh();
-		vmrAvailableBefore = schedulingTemplate.getVmrAvailableBefore();
+		vMRAvailableBefore = schedulingTemplate.getVMRAvailableBefore();
 		maxParticipants = schedulingTemplate.getMaxParticipants();
 		endMeetingOnEndTime = schedulingTemplate.getEndMeetingOnEndTime();
 		uriNumberRangeLow = schedulingTemplate.getUriNumberRangeLow();
@@ -209,12 +209,12 @@ public class SchedulingTemplateDto extends RepresentationModel {
 		this.guestPinRangeHigh = guestPinRangeHigh;
 	}
 
-	public int getVmrAvailableBefore() {
-		return vmrAvailableBefore;
+	public int getvMRAvailableBefore() {
+		return vMRAvailableBefore;
 	}
 
-	public void setVmrAvailableBefore(int vmrAvailableBefore) {
-		this.vmrAvailableBefore = vmrAvailableBefore;
+	public void setvMRAvailableBefore(int vMRAvailableBefore) {
+		this.vMRAvailableBefore = vMRAvailableBefore;
 	}
 
 	public int getMaxParticipants() {

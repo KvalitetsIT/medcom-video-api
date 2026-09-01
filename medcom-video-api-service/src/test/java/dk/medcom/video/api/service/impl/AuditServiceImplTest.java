@@ -95,8 +95,8 @@ public class AuditServiceImplTest {
         assertThat(schedulingInfo.getUuid()).isEqualTo(input.getUuid());
         assertThat(schedulingInfo.getHostPin()).isEqualTo(input.getHostPin());
         assertThat(schedulingInfo.getGuestPin()).isEqualTo(input.getGuestPin());
-        assertThat(schedulingInfo.getVmrAvailableBefore()).isEqualTo(input.getVmrAvailableBefore());
-        assertThat(schedulingInfo.getVmrStartTime().toInstant()).isEqualTo(input.getVmrStartTime().toInstant());
+        assertThat(schedulingInfo.getvMRAvailableBefore()).isEqualTo(input.getVMRAvailableBefore());
+        assertThat(schedulingInfo.getvMRStartTime().toInstant()).isEqualTo(input.getvMRStartTime().toInstant());
         assertThat(schedulingInfo.getMaxParticipants()).isEqualTo(input.getMaxParticipants());
         assertThat(schedulingInfo.isEndMeetingOnEndTime()).isEqualTo(input.getEndMeetingOnEndTime());
         assertThat(schedulingInfo.getUriWithDomain()).isEqualTo(input.getUriWithDomain());
@@ -133,8 +133,8 @@ public class AuditServiceImplTest {
         schedulingInfo.setUuid(UUID.randomUUID().toString());
         schedulingInfo.setHostPin(321L);
         schedulingInfo.setGuestPin(543L);
-        schedulingInfo.setVmrAvailableBefore(10);
-        schedulingInfo.setVmrStartTime(new Date());
+        schedulingInfo.setVMRAvailableBefore(10);
+        schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setMaxParticipants(12);
         schedulingInfo.setEndMeetingOnEndTime(true);
         schedulingInfo.setMeeting(new Meeting());

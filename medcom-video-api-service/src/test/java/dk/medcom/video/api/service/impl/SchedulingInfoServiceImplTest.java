@@ -150,7 +150,7 @@ public class SchedulingInfoServiceImplTest {
         var callType = "call-type";
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
@@ -177,13 +177,13 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin, callType);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertEquals(calculatedStartTime, capturedSchedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
@@ -201,7 +201,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
@@ -229,13 +229,13 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null, null);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertEquals(calculatedStartTime, capturedSchedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
@@ -252,7 +252,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
@@ -285,7 +285,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), input);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
@@ -304,7 +304,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         var userContext = new UserContextImpl("test-org", "test@test.dk", List.of(UserRole.PROVISIONER, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
@@ -337,7 +337,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), input);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
@@ -356,7 +356,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
@@ -368,13 +368,13 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(input);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
-        assertNull(capturedSchedulingInfo.getVmrStartTime());
+        assertNull(capturedSchedulingInfo.getvMRStartTime());
         assertEquals("some theme", capturedSchedulingInfo.getIvrTheme());
         assertNull(capturedSchedulingInfo.getPortalLink());
         assertEquals(createOrganisation().getId(), capturedSchedulingInfo.getOrganisation().getId());
@@ -390,7 +390,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());
         assertTrue(capturedSchedulingInfo.getEndMeetingOnEndTime());
         assertEquals(10, capturedSchedulingInfo.getMaxParticipants());
-        assertEquals(10, capturedSchedulingInfo.getVmrAvailableBefore());
+        assertEquals(10, capturedSchedulingInfo.getVMRAvailableBefore());
         assertNotNull(capturedSchedulingInfo.getGuestPin());
         assertNotNull(capturedSchedulingInfo.getHostPin());
         assertEquals(schedulingTemplateIdOne.getCustomPortalGuest(), capturedSchedulingInfo.getCustomPortalGuest());
@@ -410,7 +410,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
@@ -425,7 +425,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
@@ -462,7 +462,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
@@ -483,7 +483,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
         assertNotNull(schedulingInfo);
-        assertEquals(calculatedStartTime, schedulingInfo.getVmrStartTime());
+        assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
@@ -519,7 +519,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
@@ -558,7 +558,7 @@ public class SchedulingInfoServiceImplTest {
         Date calculatedStartTime = calendar.getTime();
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        expectedSchedulingInfo.setVmrStartTime(calculatedStartTime);
+        expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
 
         Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
 
@@ -638,7 +638,7 @@ public class SchedulingInfoServiceImplTest {
 
         assertNotNull(result);
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
-        assertEquals(vmrStartTime, result.getVmrStartTime());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
     }
@@ -679,7 +679,7 @@ public class SchedulingInfoServiceImplTest {
 
         assertNotNull(result);
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
-        assertEquals(vmrStartTime, result.getVmrStartTime());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
     }
@@ -829,7 +829,7 @@ public class SchedulingInfoServiceImplTest {
 
         assertNotNull(result);
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off&join=1", result.getPortalLink());
-        assertEquals(vmrStartTime, result.getVmrStartTime());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
     @Test
@@ -860,7 +860,7 @@ public class SchedulingInfoServiceImplTest {
 
         assertNotNull(result);
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted&join=1", result.getPortalLink());
-        assertEquals(vmrStartTime, result.getVmrStartTime());
+        assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
     @Test
@@ -1175,7 +1175,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setUriNumberRangeHigh(2000L);
         schedulingTemplate.setUriPrefix("uri_prefix");
         schedulingTemplate.setUriDomain("test_domain");
-        schedulingTemplate.setVmrAvailableBefore(10);
+        schedulingTemplate.setVMRAvailableBefore(10);
         schedulingTemplate.setMaxParticipants(10);
         schedulingTemplate.setIvrTheme("some theme");
         schedulingTemplate.setHostPinRequired(true);
@@ -1216,7 +1216,7 @@ public class SchedulingInfoServiceImplTest {
 
     private SchedulingInfo createSchedulingInfo() {
         SchedulingInfo schedulingInfo = new SchedulingInfo();
-        schedulingInfo.setVmrAvailableBefore(10);
+        schedulingInfo.setVMRAvailableBefore(10);
         schedulingInfo.setUuid(schedulingInfoUuid.toString());
         schedulingInfo.setOrganisation(createOrganisation());
         schedulingInfo.setUriWithoutDomain("random_uri");
@@ -1232,7 +1232,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setMeetingUser(meetingUser);
         schedulingInfo.setCreatedTime(new Date());
         schedulingInfo.setSchedulingTemplate(schedulingTemplateIdOne);
-        schedulingInfo.setVmrStartTime(new Date());
+        schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(true);
         schedulingInfo.setUriWithDomain("uri-with-domain");

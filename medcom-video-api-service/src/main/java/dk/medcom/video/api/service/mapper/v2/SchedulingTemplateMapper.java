@@ -27,7 +27,7 @@ public class SchedulingTemplateMapper {
                 input.isGuestPinRequired(),
                 input.getGuestPinRangeLow(),
                 input.getGuestPinRangeHigh(),
-                input.getVmrAvailableBefore(),
+                input.getvMRAvailableBefore(),
                 input.getMaxParticipants(),
                 input.isEndMeetingOnEndTime(),
                 input.getUriNumberRangeLow(),
@@ -63,7 +63,7 @@ public class SchedulingTemplateMapper {
         output.setGuestPinRequired(input.guestPinRequired());
         output.setGuestPinRangeLow(input.guestPinRangeLow());
         output.setGuestPinRangeHigh(input.guestPinRangeHigh());
-        output.setVmrAvailableBefore(input.vmrAvailableBefore());
+        output.setvMRAvailableBefore(input.vMRAvailableBefore());
         output.setMaxParticipants(input.maxParticipants());
         output.setEndMeetingOnEndTime(input.endMeetingOnEndTime());
         output.setUriNumberRangeLow(input.uriNumberRangeLow());
@@ -100,7 +100,7 @@ public class SchedulingTemplateMapper {
         output.setGuestPinRequired(input.guestPinRequired());
         output.setGuestPinRangeLow(input.guestPinRangeLow());
         output.setGuestPinRangeHigh(input.guestPinRangeHigh());
-        output.setVmrAvailableBefore(input.vmrAvailableBefore());
+        output.setvMRAvailableBefore(input.vMRAvailableBefore());
         output.setMaxParticipants(input.maxParticipants());
         output.setEndMeetingOnEndTime(input.endMeetingOnEndTime());
         output.setUriNumberRangeLow(input.uriNumberRangeLow());

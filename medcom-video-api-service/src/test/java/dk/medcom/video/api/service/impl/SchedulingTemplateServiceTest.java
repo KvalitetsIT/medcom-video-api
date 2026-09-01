@@ -349,7 +349,7 @@ public class SchedulingTemplateServiceTest {
 		createSchedulingTemplateDto.setGuestPinRequired(true);
 		createSchedulingTemplateDto.setGuestPinRangeLow(100L);
 		createSchedulingTemplateDto.setGuestPinRangeHigh(999L);
-		createSchedulingTemplateDto.setVmrAvailableBefore(15);
+		createSchedulingTemplateDto.setvMRAvailableBefore(15);
 		createSchedulingTemplateDto.setMaxParticipants(10);
 		createSchedulingTemplateDto.setEndMeetingOnEndTime(true);
 		createSchedulingTemplateDto.setUriNumberRangeLow(1000L);
@@ -376,7 +376,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setGuestPinRequired(true);
 		updateSchedulingTemplateDto.setGuestPinRangeLow(100L);
 		updateSchedulingTemplateDto.setGuestPinRangeHigh(999L);
-		updateSchedulingTemplateDto.setVmrAvailableBefore(15);
+		updateSchedulingTemplateDto.setvMRAvailableBefore(15);
 		updateSchedulingTemplateDto.setMaxParticipants(10);
 		updateSchedulingTemplateDto.setEndMeetingOnEndTime(true);
 		updateSchedulingTemplateDto.setUriNumberRangeLow(1000L);
@@ -402,7 +402,7 @@ public class SchedulingTemplateServiceTest {
 		schedulingTemplate.setGuestPinRequired(true);
 		schedulingTemplate.setGuestPinRangeLow(100L);
 		schedulingTemplate.setGuestPinRangeHigh(999L);
-		schedulingTemplate.setVmrAvailableBefore(15);
+		schedulingTemplate.setVMRAvailableBefore(15);
 		schedulingTemplate.setMaxParticipants(10);
 		schedulingTemplate.setEndMeetingOnEndTime(true);
 		schedulingTemplate.setUriNumberRangeLow(1000L);
