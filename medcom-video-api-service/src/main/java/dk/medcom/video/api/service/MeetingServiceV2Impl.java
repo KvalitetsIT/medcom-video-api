@@ -287,7 +287,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                     schedulingInfo,
                     meeting.getParticipantCount(),
                     participant.role(),
-                    pin != null ? Integer.parseInt(pin.toString()) : 0,
+                    pin != null ? pin.intValue() : 0,
                     shortLinkBaseUrl));
         }
         return result;

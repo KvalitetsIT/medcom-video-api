@@ -628,7 +628,7 @@ public class HelperMethods {
                 randomMeetingUser(),
                 (int) count++,
                 dk.medcom.video.api.dao.entity.ParticipantRole.HOST,
-                1,
+                (int)count,
                 randomString(),
                 randomString(),
                 randomString());

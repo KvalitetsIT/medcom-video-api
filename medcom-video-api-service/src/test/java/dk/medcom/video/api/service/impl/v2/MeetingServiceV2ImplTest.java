@@ -44,10 +44,7 @@ public class MeetingServiceV2ImplTest {
     }
 
     private void verifyNoMoreInteractions() {
-        Mockito.verifyNoMoreInteractions(meetingService);
-        Mockito.verifyNoMoreInteractions(participantDao);
-        Mockito.verifyNoMoreInteractions(schedulingInfoRepository);
-        Mockito.verifyNoMoreInteractions(meetingRepository);
+        Mockito.verifyNoMoreInteractions(meetingService, participantDao, schedulingInfoRepository, meetingRepository);
     }
 
     @Test
