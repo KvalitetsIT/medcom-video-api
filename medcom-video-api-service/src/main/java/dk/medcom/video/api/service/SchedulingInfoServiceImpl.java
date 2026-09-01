@@ -192,11 +192,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
 		}
 
-		schedulingInfo.setVmrAvailableBefore(schedulingTemplate.getVmrAvailableBefore());
+		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meeting.getStartTime());
-		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVmrAvailableBefore());
-		schedulingInfo.setVmrStartTime(cal.getTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());  //example: /api/admin/configuration/v1/ivr_theme/10/
 
@@ -426,8 +426,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		Calendar cal = Calendar.getInstance();
 
 		cal.setTime(startTime);
-		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVmrAvailableBefore());
-		schedulingInfo.setVmrStartTime(cal.getTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(startTime, schedulingInfo));
 
@@ -512,7 +512,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setHostPin(createHostPin(schedulingTemplate));
 		schedulingInfo.setGuestPin(createGuestPin(schedulingTemplate));
-		schedulingInfo.setVmrAvailableBefore(schedulingTemplate.getVmrAvailableBefore());
+		schedulingInfo.setVMRAvailableBefore(schedulingTemplate.getVMRAvailableBefore());
 		schedulingInfo.setIvrTheme(schedulingTemplate.getIvrTheme());
 
 		String randomUri = generateUriWithoutDomain(schedulingTemplate);
@@ -602,8 +602,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(meeting.getStartTime());
-		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVmrAvailableBefore());
-		schedulingInfo.setVmrStartTime(cal.getTime());
+		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
+		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		if(!meeting.getOrganisation().getOrganisationId().equals(organisationFromSchedulingInfo)) {

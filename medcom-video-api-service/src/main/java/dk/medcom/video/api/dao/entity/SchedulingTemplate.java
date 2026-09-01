@@ -25,7 +25,7 @@ public class SchedulingTemplate {
 	private Long guestPinRangeLow;			//when random generating
 	private Long guestPinRangeHigh;			//when random generating
 	@Column(name = "vmravailable_before")
-	private int vmrAvailableBefore;			//how many minutes before meeting should the meeting room be availabe
+	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be availabe
 	private int maxParticipants;			//Locked when max i reached
 	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
 	private Long uriNumberRangeLow;			//when random generating
@@ -138,9 +138,11 @@ public class SchedulingTemplate {
 	public void setGuestPinRangeHigh(Long guestPinRangeHigh) {
 		this.guestPinRangeHigh = guestPinRangeHigh;
 	}
-	public int getVmrAvailableBefore() { return vmrAvailableBefore; }
-	public void setVmrAvailableBefore(int vmrAvailableBefore) {
-		this.vmrAvailableBefore = vmrAvailableBefore;
+	public int getVMRAvailableBefore() {
+		return vMRAvailableBefore;
+	}
+	public void setVMRAvailableBefore(int vMRAvailableBefore) {
+		this.vMRAvailableBefore = vMRAvailableBefore;
 	}
 	public int getMaxParticipants() {
 		return maxParticipants;
@@ -226,7 +228,7 @@ public class SchedulingTemplate {
 				+ conferencingSysId + ", uriPrefix=" + uriPrefix + ", uriDomain=" + uriDomain + ", hostPinRequired="
 				+ hostPinRequired + ", hostPinRangeLow=" + hostPinRangeLow + ", hostPinRangeHigh=" + hostPinRangeHigh
 				+ ", guestPinRequired=" + guestPinRequired + ", guestPinRangeLow=" + guestPinRangeLow
-				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vmrAvailableBefore=" + vmrAvailableBefore
+				+ ", guestPinRangeHigh=" + guestPinRangeHigh + ", vMRAvailableBefore=" + vMRAvailableBefore
 				+ ", maxParticipants=" + maxParticipants + ", endMeetingOnEndTime=" + endMeetingOnEndTime
 				+ ", uriNumberRangeLow=" + uriNumberRangeLow + ", uriNumberRangeHigh=" + uriNumberRangeHigh
 				+ ", ivrTheme=" + ivrTheme + ", isDefaultTemplate=" + isDefaultTemplate + ", isPoolTemplate="

@@ -1595,7 +1595,7 @@ components:
       type: object
       required:
         - uuid
-        - vmrAvailableBefore
+        - vMRAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriWithDomain
@@ -1871,7 +1871,7 @@ components:
         - uriDomain
         - hostPinRequired
         - guestPinRequired
-        - vmrAvailableBefore
+        - vMRAvailableBefore
         - maxParticipants
         - endMeetingOnEndTime
         - uriNumberRangeLow
@@ -1920,7 +1920,7 @@ components:
           type: integer
           format: int64
           example: 9999
-        vmrAvailableBefore:
+        vMRAvailableBefore:
           type: integer
           format: int32
           example: 30
@@ -2068,7 +2068,7 @@ components:
           type: integer
           format: int64
           example: 9999
-        vmrAvailableBefore:
+        vMRAvailableBefore:
           type: integer
           format: int32
           example: 30

@@ -67,7 +67,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 		uuid = schedulingInfo.getUuid();
 		hostPin = schedulingInfo.getHostPin();
 		guestPin = schedulingInfo.getGuestPin();
-		vmrAvailableBefore = schedulingInfo.getVmrAvailableBefore();
+		vmrAvailableBefore = schedulingInfo.getVMRAvailableBefore();
 		maxParticipants = schedulingInfo.getMaxParticipants();
 		endMeetingOnEndTime = schedulingInfo.getEndMeetingOnEndTime();
 		uriWithDomain = schedulingInfo.getUriWithDomain();
