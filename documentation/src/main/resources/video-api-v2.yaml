@@ -702,6 +702,66 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+  /v2/meeting-participations/{participantId}:
+    get:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: gets a list of meeting participations for a participant
+      description: >-
+        Gets a list of meeting participations the given participant is in, based on query parameters.
+        All provided query parameters are combined (AND) to filter the result. <br> <br>
+        Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
+        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br>
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user
+      operationId: getMeetingParticipations
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          description: the id of the participant to find meeting participations for
+          schema:
+            type: string
+        - name: from-start-time
+          in: query
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+        - name: to-start-time
+          in: query
+          description: to start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          required: false
+          schema:
+            type: string
+            format: date-time
+          example: '2023-03-31T11:25:44Z'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/meetingParticipationList'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
   /v2/scheduling-info:
     get:
       security:
@@ -2494,16 +2554,11 @@ components:
     participant:
       type: object
       required:
-        - id
         - uuid
         - type
         - participantId
         - role
       properties:
-        id:
-          type: integer
-          format: int64
-          description: The id of the participant
         uuid:
           type: string
           format: uuid
@@ -2535,3 +2590,77 @@ components:
           type: string
           format: date-time
           example: 2019-10-02T15:00:00Z
+
+    meetingParticipation:
+      type: object
+      required:
+        - uuid
+        - subject
+        - startTime
+        - endTime
+        - createdBy
+        - organizedBy
+        - participantRole
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          example: 46b46a1e-a4d3-4387-87ee-a67dcaa222cb
+        subject:
+          type: string
+          maxLength: 100
+          example: Short talk about hiring new people
+        description:
+          type: string
+          maxLength: 500
+          example: We need to agree on the process should be. And what deadlines we have during the next 14 days.
+        startTime:
+          type: string
+          format: date-time
+          example: 2019-10-02T15:00:00Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2019-10-02T15:00:00Z
+        createdBy:
+          $ref: '#/components/schemas/meetingUser'
+        updatedBy:
+          $ref: '#/components/schemas/meetingUser'
+        updatedTime:
+          type: string
+          format: date-time
+          example: 2019-10-02T15:00:00Z
+        organizedBy:
+          $ref: '#/components/schemas/meetingUser'
+        knownParticipants:
+          type: integer
+          format: int32
+          example: 5
+        participantRole:
+          $ref: '#/components/schemas/participantRole'
+        pin:
+          type: integer
+          format: int32
+          minimum: 1000
+          maximum: 999999999
+          description: Host pin if participantRole is HOST, guest pin if participantRole is GUEST. Not present if the meeting does not have a pin assigned for that role.
+          example: "1234"
+        uriWithDomain:
+          type: string
+          maxLength: 100
+          example: 1782@test.dk
+        shortLink:
+          type: string
+          example: https://m.vconf.dk/abcdefghijkl
+        portalLink:
+          type: string
+          example: 'https://portal.vconf.dk/?url=4618@test.dk&pin=9180&start_dato=2018-11-01T11:15:00'
+          maxLength: 200
+
+    meetingParticipationList:
+      type: object
+      properties:
+        meetingParticipations:
+          type: array
+          items:
+            $ref: '#/components/schemas/meetingParticipation'

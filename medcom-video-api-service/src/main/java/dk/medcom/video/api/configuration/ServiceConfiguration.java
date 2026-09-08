@@ -182,8 +182,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao) {
-        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao);
+    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao, MeetingRepository meetingRepository, SchedulingInfoRepository schedulingInfoRepository) {
+        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository);
     }
 
     @Bean

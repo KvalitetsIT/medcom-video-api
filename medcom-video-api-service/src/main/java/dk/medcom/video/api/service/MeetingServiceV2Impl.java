@@ -4,14 +4,17 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
+import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.SchedulingInfoRepository;
+import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Participant;
+import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.service.filter.MeetingParticipationFilter;
 import dk.medcom.video.api.service.exception.*;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
-import dk.medcom.video.api.service.model.CreateMeetingModel;
-import dk.medcom.video.api.service.model.MeetingModel;
-import dk.medcom.video.api.service.model.PatchMeetingModel;
-import dk.medcom.video.api.service.model.UpdateMeetingModel;
+import dk.medcom.video.api.service.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +28,19 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final MeetingService meetingService;
     private final String shortLinkBaseUrl;
     private final ParticipantDao participantDao;
+    private final MeetingRepository meetingRepository;
+    private final SchedulingInfoRepository schedulingInfoRepository;
 
-    public MeetingServiceV2Impl(MeetingService meetingService, String shortLinkBaseUrl, ParticipantDao participantDao) {
+    public MeetingServiceV2Impl(MeetingService meetingService,
+                                String shortLinkBaseUrl,
+                                ParticipantDao participantDao,
+                                MeetingRepository meetingRepository,
+                                SchedulingInfoRepository schedulingInfoRepository) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
         this.participantDao = participantDao;
+        this.meetingRepository = meetingRepository;
+        this.schedulingInfoRepository = schedulingInfoRepository;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
@@ -230,5 +241,55 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         } catch (NotAcceptableException e) {
             throw new NotAcceptableExceptionV2(ExceptionMapper.fromNotAcceptable(e.getErrorCode()), e.getErrorText());
         }
+    }
+
+    @Override
+    public List<MeetingParticipationModel> getMeetingParticipations(String participantId,
+                                                                    OffsetDateTime fromStartTime,
+                                                                    OffsetDateTime toStartTime) {
+        logger.debug("Get meeting participations for participant, v2.");
+        var participants = participantDao.findByParticipantId(participantId);
+        if (participants.isEmpty()) {
+            return List.of();
+        }
+
+        var meetingIds = participants.stream().map(Participant::meetingId).toList();
+        var meetingsById = new java.util.HashMap<Long, Meeting>();
+        meetingRepository.findAllById(meetingIds).forEach(m -> meetingsById.put(m.getId(), m));
+
+        var participantAndMeetingMap = new java.util.LinkedHashMap<Participant, Meeting>();
+        for (var participant : participants) {
+            var meeting = meetingsById.get(participant.meetingId());
+            if (meeting == null) {
+                throw new ResourceNotFoundExceptionV2("meeting", "id");
+            }
+            if (MeetingParticipationFilter.matches(meeting, fromStartTime, toStartTime)) {
+                participantAndMeetingMap.put(participant, meeting);
+            }
+        }
+
+        var filteredMeetings = participantAndMeetingMap.values().stream().toList();
+        var schedulingInfoByMeetingId = new java.util.LinkedHashMap<Long, SchedulingInfo>();
+        schedulingInfoRepository.findByMeetingIn(filteredMeetings)
+                .forEach(si -> schedulingInfoByMeetingId.put(si.getMeeting().getId(), si));
+
+        var result = new java.util.ArrayList<MeetingParticipationModel>();
+        for (var entry : participantAndMeetingMap.entrySet()) {
+            var participant = entry.getKey();
+            var meeting = entry.getValue();
+            var schedulingInfo = schedulingInfoByMeetingId.get(meeting.getId());
+
+            Long pin = schedulingInfo == null ? null
+                    : participant.role() == ParticipantRole.HOST ? schedulingInfo.getHostPin() : schedulingInfo.getGuestPin();
+
+            result.add(MeetingParticipationModel.from(
+                    meeting,
+                    schedulingInfo,
+                    meeting.getParticipantCount(),
+                    participant.role(),
+                    pin != null ? pin.intValue() : 0,
+                    shortLinkBaseUrl));
+        }
+        return result;
     }
 }

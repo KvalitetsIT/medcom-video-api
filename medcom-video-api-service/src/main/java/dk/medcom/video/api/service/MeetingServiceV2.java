@@ -1,9 +1,6 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.service.model.CreateMeetingModel;
-import dk.medcom.video.api.service.model.MeetingModel;
-import dk.medcom.video.api.service.model.PatchMeetingModel;
-import dk.medcom.video.api.service.model.UpdateMeetingModel;
+import dk.medcom.video.api.service.model.*;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -37,4 +34,8 @@ public interface MeetingServiceV2 {
     void deleteMeetingV2(UUID uuid);
 
     MeetingModel patchMeetingV2(UUID uuid, PatchMeetingModel patchMeeting);
+
+    List<MeetingParticipationModel> getMeetingParticipations(String participantId,
+                                                             OffsetDateTime fromStartTime,
+                                                             OffsetDateTime toStartTime);
 }
