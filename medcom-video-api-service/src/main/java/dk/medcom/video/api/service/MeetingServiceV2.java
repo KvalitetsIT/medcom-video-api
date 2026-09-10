@@ -38,4 +38,7 @@ public interface MeetingServiceV2 {
     List<MeetingParticipationModel> getMeetingParticipations(String participantId,
                                                              OffsetDateTime fromStartTime,
                                                              OffsetDateTime toStartTime);
+    List<MeetingParticipationModel> getCitizenMeetingParticipations(String participantId,
+                                                                    OffsetDateTime fromStartTime,
+                                                                    OffsetDateTime toStartTime);
 }

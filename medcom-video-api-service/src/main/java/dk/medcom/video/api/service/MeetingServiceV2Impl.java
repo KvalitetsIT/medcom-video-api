@@ -13,6 +13,7 @@ import dk.medcom.video.api.dao.entity.ParticipantRole;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.filter.MeetingParticipationFilter;
 import dk.medcom.video.api.service.exception.*;
+import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
 import dk.medcom.video.api.service.model.*;
 import org.slf4j.Logger;
@@ -30,21 +31,73 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final ParticipantDao participantDao;
     private final MeetingRepository meetingRepository;
     private final SchedulingInfoRepository schedulingInfoRepository;
+    private final CprHasher cprHasher;
 
     public MeetingServiceV2Impl(MeetingService meetingService,
                                 String shortLinkBaseUrl,
                                 ParticipantDao participantDao,
                                 MeetingRepository meetingRepository,
-                                SchedulingInfoRepository schedulingInfoRepository) {
+                                SchedulingInfoRepository schedulingInfoRepository, CprHasher cprHasher) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.schedulingInfoRepository = schedulingInfoRepository;
+        this.cprHasher = cprHasher;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
         return MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount());
+    }
+
+    @Override
+    public List<MeetingParticipationModel> getCitizenMeetingParticipations(String participantId,
+                                                                           OffsetDateTime fromStartTime,
+                                                                           OffsetDateTime toStartTime) {
+        logger.debug("Get citizen meeting participations for participant, v2.");
+        var participants = participantDao.findByParticipantId(participantId);
+        if (participants.isEmpty()) {
+            return List.of();
+        }
+
+        var meetingIds = participants.stream().map(Participant::meetingId).toList();
+        var meetingsById = new java.util.HashMap<Long, Meeting>();
+        meetingRepository.findAllById(meetingIds).forEach(m -> meetingsById.put(m.getId(), m));
+
+        var participantAndMeetingMap = new java.util.LinkedHashMap<Participant, Meeting>();
+        for (var participant : participants) {
+            var meeting = meetingsById.get(participant.meetingId());
+            if (meeting == null) {
+                throw new ResourceNotFoundExceptionV2("meeting", "id");
+            }
+            if (MeetingParticipationFilter.matches(meeting, fromStartTime, toStartTime)) {
+                participantAndMeetingMap.put(participant, meeting);
+            }
+        }
+
+        var filteredMeetings = participantAndMeetingMap.values().stream().toList();
+        var schedulingInfoByMeetingId = new java.util.LinkedHashMap<Long, SchedulingInfo>();
+        schedulingInfoRepository.findByMeetingIn(filteredMeetings)
+                .forEach(si -> schedulingInfoByMeetingId.put(si.getMeeting().getId(), si));
+
+        var result = new java.util.ArrayList<MeetingParticipationModel>();
+        for (var entry : participantAndMeetingMap.entrySet()) {
+            var participant = entry.getKey();
+            var meeting = entry.getValue();
+            var schedulingInfo = schedulingInfoByMeetingId.get(meeting.getId());
+
+            Long pin = schedulingInfo == null ? null
+                    : participant.role() == ParticipantRole.HOST ? schedulingInfo.getHostPin() : schedulingInfo.getGuestPin();
+
+            result.add(MeetingParticipationModel.from(
+                    meeting,
+                    schedulingInfo,
+                    meeting.getParticipantCount(),
+                    participant.role(),
+                    pin != null ? pin.intValue() : 0,
+                    shortLinkBaseUrl));
+        }
+        return result;
     }
 
     @Override
