@@ -7,11 +7,14 @@ import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.dao.entity.ParticipantType;
+import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.CreateParticipantModel;
 import dk.medcom.video.api.service.model.ParticipantModel;
 import dk.medcom.video.api.service.model.UpdateParticipantModel;
+import org.openapitools.model.DetailedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +30,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final MeetingUserRepository meetingUserRepository;
     private final MeetingRepository meetingRepository;
     private final OrganisationService organisationService;
+    private final CprHasher cprHasher;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService) {
+    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, CprHasher cprHasher) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.meetingUserService = meetingUserService;
         this.meetingUserRepository = meetingUserRepository;
         this.organisationService = organisationService;
+        this.cprHasher = cprHasher;
     }
 
     @Override
@@ -126,6 +131,43 @@ public class ParticipantServiceImpl implements ParticipantService {
         updateMeeting(meeting);
 
         return toModel(saved);
+    }
+
+    @Transactional(rollbackFor = Throwable.class)
+    @Override
+    public List<ParticipantModel> createCitizenParticipants(UUID meetingUuid, List<CreateParticipantModel> createParticipantModel) {
+        logger.debug("Create citizen participants for meeting {}.", meetingUuid);
+        var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
+        validateUser(meeting);
+
+        for (var p : createParticipantModel) {
+            if (p.type() != ParticipantType.CITIZEN) {
+                logger.info("Citizen endpoint used with non-citizen participant type: {}", p.type());
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._10, "Only participants of type CITIZEN can be added through this endpoint.");
+            }
+        }
+
+        var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
+
+        var participants = createParticipantModel.stream().map(p -> {
+            var participant = new Participant(
+                    null,
+                    UUID.randomUUID(),
+                    meeting.getId(),
+                    UUID.fromString(meeting.getUuid()),
+                    p.type(),
+                    p.participantId(),
+                    p.organisation(),
+                    p.role(),
+                    null,
+                    currentUser.getId(),
+                    null,
+                    currentUser.getId());
+            return toModel(participantDao.save(participant));
+        }).toList();
+
+        updateMeeting(meeting);
+        return participants;
     }
 
     private ParticipantModel toModel(Participant participant) {
