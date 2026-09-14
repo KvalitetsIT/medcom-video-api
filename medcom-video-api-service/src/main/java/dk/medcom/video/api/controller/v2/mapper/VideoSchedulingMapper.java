@@ -53,6 +53,7 @@ public class VideoSchedulingMapper {
                 .customPortalGuest(input.customPortalGuest())
                 .customPortalHost(input.customPortalHost())
                 .returnUrl(input.returnUrl())
+                .callType(input.callType())
                 .links(new SchedulingInfoLinks().self(schedulingInfoLinksSelf));
     }
 

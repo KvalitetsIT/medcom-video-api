@@ -44,6 +44,7 @@ public class MeetingMapper {
         output.setUriWithoutDomain(input.uriWithoutDomain());
         output.setHostPin(input.hostPin());
         output.setGuestPin(input.guestPin());
+        output.setCallType(input.callType());
         if (input.additionalInformation() != null) {
             output.setAdditionalInformation(modelToDto(input.additionalInformation()));
         }
@@ -101,6 +102,9 @@ public class MeetingMapper {
         }
         if (input.guestPin() != null) {
             output.setGuestPin(input.guestPin());
+        }
+        if (input.callType() != null) {
+            output.setCallType(input.callType());
         }
         if (input.additionalInformation() != null) {
             output.setAdditionalInformation(modelToDto(input.additionalInformation()));

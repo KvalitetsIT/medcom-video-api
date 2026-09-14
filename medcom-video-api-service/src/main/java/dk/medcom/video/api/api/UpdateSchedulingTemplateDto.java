@@ -1,5 +1,7 @@
 package dk.medcom.video.api.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.dao.entity.ViewType;
 import dk.medcom.video.api.dao.entity.VmrQuality;
@@ -37,6 +39,9 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private Long guestPinRangeHigh;
 	
 	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
+	// Hence the name-scheme was not properly accounted for in the creation of the field: 'vMRAvailableBefore' (should have been 'vmrAvailableBefore')
+	// , we now have to add the @JsonProperty (and @JsonIgnore to the get-/set-methods) to preserve backward-compatibility.
+	@JsonProperty("vMRAvailableBefore")
 	private int vMRAvailableBefore;
 	
 	//@NotNull - even though required by database not required in call. Will have the value 0 when not included in call.
@@ -70,6 +75,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
+	private String callType;
 
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -142,11 +148,11 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	public void setGuestPinRangeHigh(Long guestPinRangeHigh) {
 		this.guestPinRangeHigh = guestPinRangeHigh;
 	}
-
+	@JsonIgnore
 	public int getvMRAvailableBefore() {
 		return vMRAvailableBefore;
 	}
-
+	@JsonIgnore
 	public void setvMRAvailableBefore(int vMRAvailableBefore) {
 		this.vMRAvailableBefore = vMRAvailableBefore;
 	}
@@ -310,4 +316,12 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

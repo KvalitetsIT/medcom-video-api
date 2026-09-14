@@ -1,6 +1,6 @@
 package dk.medcom.video.api.api;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import dk.medcom.video.api.dao.entity.*;
 import jakarta.validation.constraints.Max;
@@ -76,6 +76,8 @@ public class CreateMeetingDto {
 	@Max(value = 999999999, message = "guestPin should not be larger than 999999999.")
 	@Min(value = 1000, message = "guestPin should not be less than 1000.")
 	private Integer guestPin;
+
+	private String callType;
 
 	private List<AdditionalInformationType> additionalInformation = new ArrayList<>();
 
@@ -312,4 +314,12 @@ public class CreateMeetingDto {
 	public void setAdditionalInformation(List<AdditionalInformationType> additionalInformation) {
 		this.additionalInformation = additionalInformation;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

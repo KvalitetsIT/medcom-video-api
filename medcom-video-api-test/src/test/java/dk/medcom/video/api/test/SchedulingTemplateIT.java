@@ -88,6 +88,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         create.setDirectMedia(DirectMedia.BEST_EFFORT);
         create.setIvrTheme("ivr_theme");
         create.setvMRAvailableBefore(10);
+        create.setCallType("call_type");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -100,6 +101,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertEquals(create.getEnableOverlayText(), result.getEnableOverlayText());
         assertEquals(create.getDirectMedia(), result.getDirectMedia());
         assertEquals(create.getvMRAvailableBefore(), result.getvMRAvailableBefore());
+        assertEquals(create.getCallType(), result.getCallType());
     }
 
     @Test
@@ -132,6 +134,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         updateSchedulingTemplate.setDirectMedia(DirectMedia.BEST_EFFORT);
         updateSchedulingTemplate.setIvrTheme("ivr_theme");
         updateSchedulingTemplate.setvMRAvailableBefore(15);
+        updateSchedulingTemplate.setCallType("call-type");
 
         //When
         SchedulingTemplate resultCreate = schedulingTemplate.schedulingTemplatesPost(create);
@@ -149,6 +152,7 @@ public class SchedulingTemplateIT extends IntegrationWithOrganisationServiceTest
         assertFalse(result.getIsPoolTemplate());
         assertEquals(DirectMedia.BEST_EFFORT, result.getDirectMedia());
         assertEquals(updateSchedulingTemplate.getvMRAvailableBefore(), result.getvMRAvailableBefore());
+        assertEquals(updateSchedulingTemplate.getCallType(), result.getCallType());
     }
 
     @Test

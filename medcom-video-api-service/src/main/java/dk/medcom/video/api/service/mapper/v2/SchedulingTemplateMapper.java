@@ -45,6 +45,7 @@ public class SchedulingTemplateMapper {
                 input.isForceEncryption(),
                 input.isMuteAllGuests(),
                 DirectMediaModel.from(input.getDirectMedia()),
+                input.getCallType(),
                 dtoToModel(input.getCreatedBy()),
                 dtoToModel(input.updatedBy),
                 mapDate(input.getCreatedTime()),
@@ -83,6 +84,7 @@ public class SchedulingTemplateMapper {
         output.setIvrTheme(input.ivrTheme());
         output.setIsDefaultTemplate(input.isDefaultTemplate());
         output.setIsPoolTemplate(input.isPoolTemplate());
+        output.setCallType(input.callType());
 
         return output;
     }
@@ -119,6 +121,7 @@ public class SchedulingTemplateMapper {
         output.setIvrTheme(input.ivrTheme());
         output.setIsDefaultTemplate(input.isDefaultTemplate());
         output.setIsPoolTemplate(input.isPoolTemplate());
+        output.setCallType(input.callType());
 
         return output;
     }

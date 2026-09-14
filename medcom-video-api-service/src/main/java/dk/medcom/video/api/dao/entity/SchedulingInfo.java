@@ -15,7 +15,9 @@ public class SchedulingInfo {
 	private Long hostPin; 		
 	private Long guestPin;
 
+	@Column(name = "vmravailable_before")
 	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be available
+	@Column(name = "vmrstart_time")
 	private Date vMRStartTime;          	//meeting startTime with vMRAvailableBefore subtracted
 	private int maxParticipants;			//Locked when max is reached
 	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
@@ -83,6 +85,7 @@ public class SchedulingInfo {
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
 	private boolean newProvisioner;				//using the new (true) or old (false) provisioner service
+	private String callType;
 
 	public Long getId() {
 		return id;
@@ -368,4 +371,12 @@ public class SchedulingInfo {
 	public void setNewProvisioner(boolean newProvisioner) {
 		this.newProvisioner = newProvisioner;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

@@ -93,6 +93,7 @@ public class HelperMethods {
         schedulingInfo.setReturnUrl(randomString());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(randomBoolean());
+        schedulingInfo.setCallType(randomString());
 
         return schedulingInfo;
     }
@@ -137,6 +138,7 @@ public class HelperMethods {
         schedulingTemplate.setCustomPortalGuest(randomString());
         schedulingTemplate.setCustomPortalHost(randomString());
         schedulingTemplate.setReturnUrl(randomString());
+        schedulingTemplate.setCallType(randomString());
 
         return schedulingTemplate;
     }
@@ -171,7 +173,8 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 randomBoolean(),
-                DirectMediaModel.never);
+                DirectMediaModel.never,
+                randomString());
     }
 
     public static CreateMeetingModel randomCreateMeetingModel() {
@@ -203,6 +206,7 @@ public class HelperMethods {
                 randomString(),
                 (int) count++,
                 (int) count++,
+                randomString(),
                 List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
@@ -229,6 +233,7 @@ public class HelperMethods {
                 randomBoolean(),
                 (int) count++,
                 (int) count++,
+                randomString(),
                 List.of(randomAdditionalInfoModel(), randomAdditionalInfoModel()));
     }
 
@@ -361,6 +366,7 @@ public class HelperMethods {
         assertEquals(expected.uriWithoutDomain(), actual.getUriWithoutDomain());
         assertEquals(expected.hostPin(), actual.getHostPin());
         assertEquals(expected.guestPin(), actual.getGuestPin());
+        assertEquals(expected.callType(), actual.getCallType());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
 
         return true;
@@ -409,6 +415,8 @@ public class HelperMethods {
         assertEquals(expected.guestPin() != null, actual.isGuestPinSet());
         assertEquals(expected.hostPin(), actual.getHostPin());
         assertEquals(expected.hostPin() != null, actual.isHostPinSet());
+        assertEquals(expected.callType(), actual.getCallType());
+        assertEquals(expected.callType() != null, actual.isCallTypeSet());
         assertAdditionalInformation(expected.additionalInformation(), actual.getAdditionalInformation());
         assertEquals(expected.additionalInformation() != null, actual.isAdditionalInfoSet());
 
@@ -451,6 +459,7 @@ public class HelperMethods {
         assertEquals(expected.getDirectMedia().toString(), actual.directMedia().toString());
         assertEquals(shortLinkBaseUrl + expected.getMeeting().getShortId(), actual.shortLink());
         assertEquals(shortLinkBaseUrl + expected.getMeeting().getShortId(), actual.shortlink());
+        assertEquals(expected.getCallType(), actual.callType());
     }
 
 
@@ -487,6 +496,7 @@ public class HelperMethods {
         assertEquals(expected.getForceEncryption(), actual.forceEncryption());
         assertEquals(expected.getMuteAllGuests(), actual.muteAllGuests());
         assertEquals(expected.getDirectMedia().toString(), actual.directMedia().toString());
+        assertEquals(expected.getCallType(), actual.callType());
         assertMeetingUser(expected.getCreatedBy(), actual.createdBy());
         assertMeetingUser(expected.getUpdatedBy(), actual.updatedBy());
         assertTime(actual.createdTime(), expected.getCreatedTime());
@@ -530,6 +540,7 @@ public class HelperMethods {
         assertMeetingUserDto(expected.getUpdatedBy(), actual.updatedBy());
         assertTime(actual.createdTime(), expected.getCreatedTime());
         assertTime(actual.updatedTime(), expected.getUpdatedTime());
+        assertEquals(expected.getCallType(), actual.callType());
     }
 
     public static boolean assertSchedulingTemplateRequest(SchedulingTemplateRequestModel expected, UpdateSchedulingTemplateDto actual) {
@@ -563,6 +574,7 @@ public class HelperMethods {
         assertEquals(expected.customPortalHost(), actual.getCustomPortalHost());
         assertEquals(expected.returnUrl(), actual.getReturnUrl());
         assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
+        assertEquals(expected.callType(), actual.getCallType());
 
         return true;
     }
@@ -598,6 +610,7 @@ public class HelperMethods {
         assertEquals(expected.customPortalHost(), actual.getCustomPortalHost());
         assertEquals(expected.returnUrl(), actual.getReturnUrl());
         assertEquals(expected.directMedia().toString(), actual.getDirectMedia().toString());
+        assertEquals(expected.callType(), actual.getCallType());
 
         return true;
     }

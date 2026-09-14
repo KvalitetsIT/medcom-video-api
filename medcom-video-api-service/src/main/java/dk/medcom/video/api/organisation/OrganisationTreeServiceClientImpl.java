@@ -22,15 +22,4 @@ public class OrganisationTreeServiceClientImpl implements OrganisationTreeServic
                 .request()
                 .get(OrganisationTree.class);
     }
-
-    @Override
-    public OrganisationTree getOrganisationTreeChildren(String organisationCode) {
-        return baseTarget
-                .path("services")
-                .path("v1")
-                .path("organisationtree-children")
-                .queryParam("organisationCode", organisationCode)
-                .request()
-                .get(OrganisationTree.class);
-    }
 }

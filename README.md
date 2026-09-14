@@ -57,7 +57,18 @@ Værdierne af userservice.token.attribute.userrole er ikke konfigurable. Der er 
 
 ## Drift
 ### Environment variables
-Video api'et afvikles i docker. Følgende environment variable kan sættes op:
+Video api'et afvikles i docker. 
+
+Environment variablen `scheduling.info.citizen.portal.template` kan have følgende værdier som placeholders:
+* `__pin__`, mappes til guestPin, hvis ikke null, ellers hostPin, hvis ikke null, og ellers til en tom string.
+* `__uri-with-domain__`, mappes til uriWithDomain på scheduling info.
+* `__uri-domain__`, mappes til uriDomain på scheduling info.
+* `__start-date__`, sættes til start-dato på tilknyttede møde
+* `__return-url__`, mappes til returnUrl på scheduling info.
+* `__microphone__`, hvis scheduling info har tilknyttet møde med guestMicrophone sat til `off` eller `muted` sættes til hhv. `off`, `muted`, og ellers sættes den ikke.
+* `__call-type__`, sættes til callType på scheduling info.
+
+Følgende environment variable kan sættes op:
 
 | Environment variable                                  | Beskrivelse                                                                                                                                                                 | Krævet / Default             |
 |-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------|
@@ -98,13 +109,15 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | scheduling.template.default.uri.number.range.low      | Default værdi for scheduling template uri_number_range_low, long.                                                                                                           | Yes                          |
 | scheduling.template.default.uri.number.range.high     | Default værdi for scheduling template uri_number_range_high, long.                                                                                                          | Yes                          |
 | scheduling.template.default.ivr.theme                 | Default værdi for scheduling template ivr_theme, string.                                                                                                                    | Yes                          |
-| scheduling.info.citizen.portal                        | URL til citizen portal link.                                                                                                                                                | Yes                          |
+| scheduling.info.citizen.portal.template               | URL skabelon til citizen portal link.                                                                                                                                       | Yes                          |
+| scheduling.info.citizen.portal.return.url             | Default URL til portal link return-url.                                                                                                                                     | Yes                          |
 | mapping.role.provisioner                              | Navn på provisioner role.                                                                                                                                                   | Yes                          |
 | mapping.role.admin                                    | Navn på admin role                                                                                                                                                          | Yes                          |
 | mapping.role.user                                     | Navn på user role                                                                                                                                                           | Yes                          |
 | mapping.role.meeting_planner                          | Navn på meeting-planner role.                                                                                                                                               | Yes                          |
 | organisation.service.enabled                          | Hvis denne er sat til true kaldes Organisationsservicen for at hente organisationsinformation.                                                                              | No / Default: "false"        |
 | organisation.service.endpoint                         | Endpoint URL på organisations servicen. Påkrævet, hvis organisation.service.enabled er sat til 'true'.                                                                      | Depends                      |
+| organisation.service.v2.endpoint                      | Endpoint URL på organisations servicens v2 endpoints.                                                                                                                       | Yes                          |
 | organisationtree.service.endpoint                     | Endpoint URL på organisation tree servicen.                                                                                                                                 | Yes                          |
 | short.link.base.url                                   | Base URL to prefix short id with.                                                                                                                                           | Yes                          |
 | overflow.pool.organisation.id                         | Organisation id to use for pool overflow.                                                                                                                                   | Yes                          |
@@ -116,4 +129,7 @@ Video api'et afvikles i docker. Følgende environment variable kan sættes op:
 | pool.meeting.minimumAgeSec                            | Minimum age of possible pool meetings.                                                                                                                                      | No / 60                      |
 | spring.security.oauth2.resourceserver.jwt.issuer-uri  | Keycloak path + /realms/<KEYCLOAK_REALM>                                                                                                                                    | Yes                          |
 | spring.security.oauth2.resourceserver.jwt.jwk-set-uri | Keycloak path + /realms/<KEYCLOAK_REALM>/protocol/openid-connect/certs                                                                                                      | No                           |
+| keycloak.service.endpoint                             | Keycloak path + /realms/<KEYCLOAK_REALM>                                                                                                                                    | Yes                          |
+| keycloak.service.client                               | Keycloak video API client, for authentication when making internal service-to-service requests.                                                                             | Yes                          |
+| keycloak.service.clientsecret                         | Keycloak video API client secret, for authentication when making internal service-to-service requests.                                                                      | Yes                          |
 | baseline.flyway                                       | Set to true once when migrating Flyway from 6 to 10 to create new flyway baseline starting from version 86. Table flyway_schema_history should be renamed before migrating. | No                           |

@@ -13,10 +13,13 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.helper.TestDataHelper;
+import dk.medcom.video.api.organisation.OrganisationServiceClientV2;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.PortalLinkBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,6 +60,8 @@ public class SchedulingInfoServiceImplTest {
     private AuditService auditService;
     private SchedulingInfoEventPublisher schedulingInfoEventPublisher;
     private PoolFinderService poolFinderService;
+    private OrganisationServiceClientV2 organisationServiceClientV2;
+    private PortalLinkBuilder videoPortalParser;
 
     @BeforeEach
     public void setupMocks() throws RessourceNotFoundException, PermissionDeniedException {
@@ -103,6 +108,10 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
 
         poolFinderService = Mockito.mock(PoolFinderService.class);
+
+        organisationServiceClientV2 = Mockito.mock(OrganisationServiceClientV2.class);
+
+        videoPortalParser = new PortalLinkBuilder("http://citizen_portal/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1");
     }
 
     @Test
@@ -122,9 +131,10 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                organisationServiceClientV2,
+                videoPortalParser);
 
-        assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L));
+        assertThrows(RessourceNotFoundException.class, () -> schedulingInfoService.updateSchedulingInfo(UUID.randomUUID().toString(), new Date(), 12345L, 2341L, "call-type"));
     }
 
     @Test
@@ -137,6 +147,7 @@ public class SchedulingInfoServiceImplTest {
 
         var hostPin = 1234L;
         var guestPin = 4321L;
+        var callType = "call-type";
 
         SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
         expectedSchedulingInfo.setvMRStartTime(calculatedStartTime);
@@ -160,9 +171,10 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal");
+                organisationServiceClientV2,
+                videoPortalParser);
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, hostPin, guestPin, callType);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -172,15 +184,16 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertEquals(hostPin, capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(guestPin, capturedSchedulingInfo.getGuestPin().longValue());
+        assertEquals(callType, capturedSchedulingInfo.getCallType());
 
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
 
     @Test
-    public void testUpdateSchedulingInfoNullPin() throws RessourceNotFoundException, PermissionDeniedException {
+    public void testUpdateSchedulingInfoNullPinCallType() throws RessourceNotFoundException, PermissionDeniedException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         Date startTime = calendar.getTime();
@@ -210,9 +223,10 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "citizen_portal");
+                organisationServiceClientV2,
+                videoPortalParser);
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null);
+        SchedulingInfo schedulingInfo = schedulingInfoService.updateSchedulingInfo(schedulingInfoUuid.toString(), startTime, null, null, null);
 
         assertNotNull(schedulingInfo);
         assertEquals(calculatedStartTime, schedulingInfo.getvMRStartTime());
@@ -222,9 +236,10 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
 
         assertEquals(calculatedStartTime, capturedSchedulingInfo.getvMRStartTime());
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-10T09:00:00", capturedSchedulingInfo.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-10T09:00:00&join=1", capturedSchedulingInfo.getPortalLink());
         assertNull(capturedSchedulingInfo.getHostPin());
         assertNull(capturedSchedulingInfo.getGuestPin());
+        assertNull(capturedSchedulingInfo.getCallType());
 
         Mockito.verify(auditService, times(1)).auditSchedulingInformation(expectedSchedulingInfo, "update");
     }
@@ -259,7 +274,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                organisationServiceClientV2,
+                videoPortalParser);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.DEPROVISION_OK);
@@ -310,7 +326,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                organisationServiceClientV2,
+                videoPortalParser);
 
         UpdateSchedulingInfoDto input = new UpdateSchedulingInfoDto();
         input.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
@@ -434,10 +451,11 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(schedulingTemplateIdOne.getReturnUrl(), capturedSchedulingInfo.getReturnUrl());
         assertEquals(schedulingTemplateIdOne.getDirectMedia(), capturedSchedulingInfo.getDirectMedia());
         assertTrue(capturedSchedulingInfo.isNewProvisioner());
+        assertEquals(schedulingTemplateIdOne.getCallType(), capturedSchedulingInfo.getCallType());
     }
 
     @Test
-    public void testCreateSchedulingInfoMeetingCustomUriWithDomainAndPin() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
+    public void testCreateSchedulingInfoMeetingCustomUriWithDomainPinAndCallType() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 10, 9, 0, 0);
         calendar.add(Calendar.MINUTE, -10);
@@ -460,6 +478,7 @@ public class SchedulingInfoServiceImplTest {
         createMeetingDto.setUriWithoutDomain("573489");
         createMeetingDto.setHostPin(1234);
         createMeetingDto.setGuestPin(4321);
+        createMeetingDto.setCallType("this-call-type");
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
         SchedulingInfo schedulingInfo = schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
@@ -473,6 +492,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(createMeetingDto.getHostPin().longValue(), capturedSchedulingInfo.getHostPin().longValue());
         assertEquals(createMeetingDto.getGuestPin().longValue(), capturedSchedulingInfo.getGuestPin().longValue());
         assertNotNull(capturedSchedulingInfo.getUriWithoutDomain());
+        assertEquals(createMeetingDto.getCallType(), capturedSchedulingInfo.getCallType());
 
         assertEquals(capturedSchedulingInfo.getUriWithoutDomain() + '@' + schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriWithDomain());
         assertEquals(schedulingTemplateIdOne.getUriDomain(), capturedSchedulingInfo.getUriDomain());
@@ -617,7 +637,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -658,7 +678,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
         assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
@@ -746,7 +766,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                organisationServiceClientV2,
+                videoPortalParser);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
     }
@@ -773,7 +794,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 null,
                 null,
-                "");
+                organisationServiceClientV2,
+                videoPortalParser);
 
         assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(input));
         Mockito.verifyNoMoreInteractions(auditService);
@@ -806,7 +828,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=off", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=off&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -837,7 +859,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
         assertNotNull(result);
-        assertEquals("citizen_portal/?url=null&pin=&start_dato=2019-10-07T12:00:00&microphone=muted", result.getPortalLink());
+        assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&muteMicrophone=muted&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
     }
 
@@ -861,7 +883,8 @@ public class SchedulingInfoServiceImplTest {
                 true,
                 true,
                 false,
-                false);
+                false,
+                randomString());
         assertNotNull(result);
 
         Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
@@ -889,7 +912,8 @@ public class SchedulingInfoServiceImplTest {
                 true,
                 true,
                 false,
-                false));
+                false,
+                randomString()));
     }
 
     @Test
@@ -958,7 +982,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -980,7 +1004,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -995,9 +1019,10 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree(schedInfoOrg.getOrganisationId())), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+
+        var organisationDescendants = List.of(createRandomOrganisationSimple(), new OrganisationSimple(schedInfoOrg.getOrganisationId()), createRandomOrganisationSimple());
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setOrganisation(schedInfoOrg);
@@ -1006,7 +1031,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userOrganisation);
     }
 
     @ParameterizedTest
@@ -1021,16 +1046,16 @@ public class SchedulingInfoServiceImplTest {
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
-        var organisationTree = createOrganisationTree(userOrganisation, createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+        var organisationDescendants = List.of(createRandomOrganisationSimple(), createRandomOrganisationSimple(), createRandomOrganisationSimple());
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setOrganisation(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
-        Mockito.verify(organisationTreeServiceClient).getOrganisationTreeChildren(userOrganisation);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userOrganisation);
     }
 
     @ParameterizedTest
@@ -1052,7 +1077,7 @@ public class SchedulingInfoServiceImplTest {
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
         assertEquals(schedulingInfo, result);
 
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1072,7 +1097,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
-        Mockito.verifyNoInteractions(organisationTreeServiceClient);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1091,6 +1116,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     @ParameterizedTest
@@ -1102,9 +1128,9 @@ public class SchedulingInfoServiceImplTest {
         var status = ProvisionStatus.PROVISIONED_OK;
         var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-        var organisationTree = createOrganisationTree("A", createOrganisationTree("B", createOrganisationTree("C")), createOrganisationTree("D"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
+        var organisationDescendants = List.of(new OrganisationSimple("A"), new OrganisationSimple("B"), new OrganisationSimple("C"), new OrganisationSimple("D"));
+        Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
+                .thenReturn(organisationDescendants);
         var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
         Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A", "B", "C", "D")))
                 .thenReturn(expectedSchedulingInfo);
@@ -1112,6 +1138,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
+        Mockito.verify(organisationServiceClientV2).getDescendantsOfOrganisation(userContext.getUserOrganisation());
     }
 
     @ParameterizedTest
@@ -1123,9 +1150,6 @@ public class SchedulingInfoServiceImplTest {
         var status = ProvisionStatus.PROVISIONED_OK;
         var userContext = new UserContextImpl("A", "test@test.dk", List.of(userRole), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-        var organisationTree = createOrganisationTree("A", createOrganisationTree("B"));
-        Mockito.when(organisationTreeServiceClient.getOrganisationTreeChildren(userContext.getUserOrganisation()))
-                .thenReturn(organisationTree);
         var expectedSchedulingInfo = List.of(Mockito.mock(SchedulingInfo.class));
         Mockito.when(schedulingInfoRepository.findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(from, to, status, Set.of("A")))
                 .thenReturn(expectedSchedulingInfo);
@@ -1133,13 +1157,8 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = schedulingInfoService.getSchedulingInfo(from, to, status);
 
         assertEquals(expectedSchedulingInfo, schedulingInfo);
-    }
 
-    private OrganisationTree createOrganisationTree(String code, OrganisationTree ... children) {
-        var organisationTree = new OrganisationTree();
-        organisationTree.setCode(code);
-        organisationTree.setChildren(Arrays.asList(children));
-        return organisationTree;
+        Mockito.verifyNoInteractions(organisationServiceClientV2);
     }
 
     private SchedulingInfo createSchedulingInfo(boolean newProvisioner) {
@@ -1182,6 +1201,7 @@ public class SchedulingInfoServiceImplTest {
         schedulingTemplate.setReturnUrl("some_return_url");
         schedulingTemplate.setVmrType(VmrType.conference);
         schedulingTemplate.setDirectMedia(DirectMedia.best_effort);
+        schedulingTemplate.setCallType("template_call-type");
 
         return schedulingTemplate;
     }
@@ -1215,6 +1235,8 @@ public class SchedulingInfoServiceImplTest {
         schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setDirectMedia(DirectMedia.best_effort);
         schedulingInfo.setNewProvisioner(true);
+        schedulingInfo.setUriWithDomain("uri-with-domain");
+        schedulingInfo.setCallType("some_call-type");
 
         return schedulingInfo;
     }
@@ -1244,7 +1266,8 @@ public class SchedulingInfoServiceImplTest {
                 schedulingInfoEventPublisher,
                 excludeOrganisationsFilter,
                 poolFinderService,
-                "citizen_portal");
+                organisationServiceClientV2,
+                videoPortalParser);
     }
 
 
@@ -1278,5 +1301,13 @@ public class SchedulingInfoServiceImplTest {
 
     private Organisation createOverflowPool() {
         return createOrganisation(true, OVERFLOW_POOL, 3);
+    }
+
+    private OrganisationSimple createRandomOrganisationSimple() {
+        return new OrganisationSimple(UUID.randomUUID().toString());
+    }
+
+    private String randomString() {
+        return UUID.randomUUID().toString();
     }
 }

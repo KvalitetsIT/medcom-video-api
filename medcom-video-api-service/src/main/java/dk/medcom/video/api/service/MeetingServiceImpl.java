@@ -272,7 +272,7 @@ public class MeetingServiceImpl implements MeetingService {
 	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
 		validateDate(createMeetingDto.getStartTime());
 		validateDate(createMeetingDto.getEndTime());
-		
+
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		if(createMeetingDto.getUuid() != null) {
@@ -402,7 +402,8 @@ public class MeetingServiceImpl implements MeetingService {
 			schedulingInfoService.updateSchedulingInfo(uuid,
 					meeting.getStartTime(),
 					updateMeetingDto.getHostPin() != null ? updateMeetingDto.getHostPin().longValue() : null,
-					updateMeetingDto.getGuestPin() != null ? updateMeetingDto.getGuestPin().longValue() : null);
+					updateMeetingDto.getGuestPin() != null ? updateMeetingDto.getGuestPin().longValue() : null,
+					updateMeetingDto.getCallType());
 		}
 		else {
 			var event = SchedulingInfoEventMapper.map(schedulingInfo, MessageType.UPDATE);

@@ -2,6 +2,7 @@ package dk.medcom.video.api.integrationtest;
 
 import dk.medcom.video.api.Application;
 import dk.medcom.video.api.organisation.model.Organisation;
+import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import io.nats.client.JetStreamApiException;
 import io.nats.client.Nats;
@@ -33,6 +34,7 @@ public class ServiceStarter {
     private static final Logger organisationLogger = LoggerFactory.getLogger("organisation");
     private static final Logger jetStreamLogger = LoggerFactory.getLogger("jetstream");
     private static final Logger keycloakLogger = LoggerFactory.getLogger("keycloak");
+    private static final Logger keycloakMockLogger = LoggerFactory.getLogger("keycloak-mock");
 
     protected static Network dockerNetwork;
     private static String jetStreamPath;
@@ -43,6 +45,9 @@ public class ServiceStarter {
     private static final String jdbcPass = "secret1234";
     private static String organisationPath;
     private static String keycloakUrl;
+    private static final String videoApiClient = "video-api-client";
+    private static final String videoApiClientSecret = "video-api-client-secret";
+    private static String keycloakMockPath;
 
     private static boolean firstStart = true;
 
@@ -54,6 +59,7 @@ public class ServiceStarter {
         setupMockOrganisationService();
         setupJetStream();
         setupKeycloak();
+        setupMockKeycloakService();
 
         System.setProperty("jdbc.url", jdbcUrl);
         System.setProperty("jdbc.user", jdbcUser);
@@ -82,7 +88,8 @@ public class ServiceStarter {
         System.setProperty("scheduling.template.default.uri.number.range.high", "9999");
         System.setProperty("scheduling.template.default.ivr.theme", "10");
 
-        System.setProperty("scheduling.info.citizen.portal", "https://portal.vconf.dk");
+        System.setProperty("scheduling.info.citizen.portal.template", "https://portal.vconf.dk/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1");
+        System.setProperty("scheduling.info.citizen.portal.return.url", "return-url");
 
         System.setProperty("mapping.role.provisioner", "dk:medcom:role:provisioner");
         System.setProperty("mapping.role.admin", "dk:medcom:role:admin");
@@ -93,7 +100,12 @@ public class ServiceStarter {
 
         System.setProperty("organisation.service.enabled", "true");
         System.setProperty("organisation.service.endpoint", organisationPath + "/services");
+        System.setProperty("organisation.service.v2.endpoint", organisationPath);
         System.setProperty("organisationtree.service.endpoint", organisationPath);
+
+        System.setProperty("keycloak.service.endpoint", keycloakMockPath + "/realms/broker");
+        System.setProperty("keycloak.service.client", videoApiClient);
+        System.setProperty("keycloak.service.clientsecret", videoApiClientSecret);
 
         System.setProperty("short.link.base.url", "https://video.link/");
 
@@ -124,6 +136,7 @@ public class ServiceStarter {
             setupMockOrganisationService();
             setupJetStream();
             setupKeycloak();
+            setupMockKeycloakService();
         }
 
         GenericContainer<?> service;
@@ -159,7 +172,8 @@ public class ServiceStarter {
                 .withEnv("scheduling.template.default.uri.number.range.high", "9999")
                 .withEnv("scheduling.template.default.ivr.theme", "10")
 
-                .withEnv("scheduling.info.citizen.portal", "https://portal.vconf.dk")
+                .withEnv("scheduling.info.citizen.portal.template", "https://portal.vconf.dk/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1")
+                .withEnv("scheduling.info.citizen.portal.return.url", "return-url")
 
                 .withEnv("mapping.role.provisioner", "dk:medcom:role:provisioner")
                 .withEnv("mapping.role.admin", "dk:medcom:role:admin")
@@ -173,9 +187,14 @@ public class ServiceStarter {
 
                 .withEnv("organisation.service.enabled", "true")
                 .withEnv("organisation.service.endpoint", "http://organisation:1080/services")
+                .withEnv("organisation.service.v2.endpoint", "http://organisation:1080")
                 .withEnv("organisationtree.service.endpoint", "http://organisation:1080")
                 .withEnv("short.link.base.url", "https://video.link/")
                 .withEnv("overflow.pool.organisation.id", "overflow")
+
+                .withEnv("keycloak.service.endpoint", "http://keycloak-mock:1080/realms/broker")
+                .withEnv("keycloak.service.client", videoApiClient)
+                .withEnv("keycloak.service.clientsecret", videoApiClientSecret)
 
                 .withEnv("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200")
 
@@ -227,9 +246,36 @@ public class ServiceStarter {
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v1/organisationtree-children").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationTreeServiceResponseWithChildren());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
 
         organisationPath = "http://localhost:" + organisationService.getMappedPort(1080);
         attachLogger(organisationService, organisationLogger);
+    }
+
+    private void setupMockKeycloakService() {
+        // Keycloak mock server
+        var organisationService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0")).
+                withNetwork(dockerNetwork).
+                withNetworkAliases("keycloak-mock");
+        organisationService.start();
+
+        var mockServerClient = new MockServerClient(organisationService.getHost(), organisationService.getMappedPort(1080));
+        mockServerClient.when(HttpRequest.request().withMethod("POST").withPath("/realms/broker/protocol/openid-connect/token").withBody("grant_type=client_credentials&client_id=" + videoApiClient + "&client_secret=" + videoApiClientSecret))
+                .respond(accessTokenResponse());
+
+        keycloakMockPath = "http://localhost:" + organisationService.getMappedPort(1080);
+        attachLogger(organisationService, keycloakMockLogger);
+    }
+
+    private static HttpResponse accessTokenResponse() {
+        return new HttpResponse().withBody("{\"access_token\":\"mock-access-token\"}").withHeaders(new Header("Content-Type", "application/json")).withStatusCode(200);
+    }
+
+    private static HttpResponse organisationSimpleResponse() {
+        var org = new OrganisationSimple("user-org-pool");
+        var org2 = new OrganisationSimple("sub-user-org");
+
+        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(List.of(org2, org), MediaType.JSON_UTF_8));
     }
 
     private static HttpResponse organisationTreeServiceResponse() {

@@ -31,7 +31,7 @@ public interface SchedulingInfoService {
 
     //used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
     @Transactional(rollbackFor = Throwable.class)
-    SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException;
+    SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin, String callType) throws RessourceNotFoundException, PermissionDeniedException;
 
     @Transactional(rollbackFor = Throwable.class)
     void deleteSchedulingInfo(String uuid) throws RessourceNotFoundException, PermissionDeniedException;
@@ -56,7 +56,8 @@ public interface SchedulingInfoService {
                                          Boolean guestsCanPresent,
                                          Boolean forcePresenterIntoMain,
                                          Boolean forceEncryption,
-                                         Boolean muteAllGuests) throws RessourceNotFoundException;
+                                         Boolean muteAllGuests,
+                                         String callType) throws RessourceNotFoundException;
 
     SchedulingInfo getSchedulingInfoByReservation(UUID schedulingInfoReservationId) throws RessourceNotFoundException;
 }
