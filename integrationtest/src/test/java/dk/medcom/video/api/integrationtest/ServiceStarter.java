@@ -89,6 +89,7 @@ public class ServiceStarter {
         System.setProperty("scheduling.template.default.ivr.theme", "10");
 
         System.setProperty("scheduling.info.citizen.portal.template", "https://portal.vconf.dk/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1");
+        System.setProperty("scheduling.info.citizen.portal.return.url", "return-url");
 
         System.setProperty("mapping.role.provisioner", "dk:medcom:role:provisioner");
         System.setProperty("mapping.role.admin", "dk:medcom:role:admin");
@@ -172,6 +173,7 @@ public class ServiceStarter {
                 .withEnv("scheduling.template.default.ivr.theme", "10")
 
                 .withEnv("scheduling.info.citizen.portal.template", "https://portal.vconf.dk/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1")
+                .withEnv("scheduling.info.citizen.portal.return.url", "return-url")
 
                 .withEnv("mapping.role.provisioner", "dk:medcom:role:provisioner")
                 .withEnv("mapping.role.admin", "dk:medcom:role:admin")

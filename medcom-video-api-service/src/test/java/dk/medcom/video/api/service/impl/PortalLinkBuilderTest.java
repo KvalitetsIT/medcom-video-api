@@ -4,6 +4,7 @@ import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.PortalLinkBuilder;
+import dk.medcom.video.api.service.model.PortalLinkModel;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ public class PortalLinkBuilderTest {
 
     @Test
     void testParserAllValuesPresent() {
+        PortalLinkModel.setDefaultReturnUrl("default-return-url");
         var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1";
 
         Calendar calendar = Calendar.getInstance();
@@ -41,6 +43,7 @@ public class PortalLinkBuilderTest {
 
     @Test
     void testParserNoValuesPresent() {
+        PortalLinkModel.setDefaultReturnUrl("default-return-url");
         var template = "http://citizen/?pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1#pin=__pin__&conference=__uri-with-domain__&microphone=__microphone__&start_dato=__start-date__&domain=__uri-domain__&redirectTo=__return-url__&callType=__call-type__&join=1";
 
         Calendar calendar = Calendar.getInstance();
@@ -52,7 +55,7 @@ public class PortalLinkBuilderTest {
         var portalParser = new PortalLinkBuilder(template);
 
         var result = portalParser.buildPortalLink(startTime, schedulingInfo);
-        assertEquals("http://citizen/?pin=&start_dato=2019-10-10T09:00:00&join=1#pin=&conference=&microphone=&start_dato=2019-10-10T09:00:00&domain=&redirectTo=&callType=&join=1", result);
+        assertEquals("http://citizen/?pin=&start_dato=2019-10-10T09:00:00&redirectTo=default-return-url&join=1#pin=&conference=&microphone=&start_dato=2019-10-10T09:00:00&domain=&redirectTo=default-return-url&callType=&join=1", result);
     }
 
     @Test

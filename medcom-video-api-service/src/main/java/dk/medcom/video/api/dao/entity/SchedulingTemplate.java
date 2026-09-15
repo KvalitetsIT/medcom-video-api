@@ -24,6 +24,7 @@ public class SchedulingTemplate {
 	private boolean guestPinRequired;
 	private Long guestPinRangeLow;			//when random generating
 	private Long guestPinRangeHigh;			//when random generating
+	@Column(name = "vmravailable_before")
 	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be availabe
 	private int maxParticipants;			//Locked when max i reached
 	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends

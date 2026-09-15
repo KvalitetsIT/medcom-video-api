@@ -16,6 +16,12 @@ public record PortalLinkModel(String videoPortal,
                               List<QueryParameter> queryParameters,
                               String fragment) {
 
+    private static String defaultReturnUrl;
+
+    public static void setDefaultReturnUrl(String returnUrl) {
+        defaultReturnUrl = returnUrl;
+    }
+
     public record QueryParameter(String key, QueryParameterValue value) {
         public static QueryParameter fromKeyValue(String key, String value) {
             return new QueryParameter(key, QueryParameterValue.fromString(value));
@@ -103,7 +109,8 @@ public record PortalLinkModel(String videoPortal,
         }
 
         private static Optional<String> mapReturnUrl(Date startTime, SchedulingInfo schedulingInfo) {
-            return Optional.ofNullable(schedulingInfo.getReturnUrl());
+            return Optional.ofNullable(schedulingInfo.getReturnUrl())
+                    .or(() -> Optional.ofNullable(defaultReturnUrl));
         }
 
         private static Optional<String> mapStartDate(Date startTime, SchedulingInfo schedulingInfo) {

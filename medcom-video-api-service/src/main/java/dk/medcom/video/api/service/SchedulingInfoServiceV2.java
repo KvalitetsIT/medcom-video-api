@@ -27,7 +27,8 @@ public interface SchedulingInfoServiceV2 {
                                                 Boolean guestsCanPresent,
                                                 Boolean forcePresenterIntoMain,
                                                 Boolean forceEncryption,
-                                                Boolean muteAllGuests);
+                                                Boolean muteAllGuests,
+                                                String callType);
 
     SchedulingInfoModel getSchedulingInfoByReservationV2(UUID schedulingInfoReservationId);
 }

@@ -89,12 +89,12 @@ public class SchedulingInfoServiceV2Impl implements SchedulingInfoServiceV2 {
     }
 
     @Override
-    public SchedulingInfoModel reserveSchedulingInfoV2(VmrTypeModel vmrType, ViewTypeModel hostView, ViewTypeModel guestView, VmrQualityModel vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests) {
+    public SchedulingInfoModel reserveSchedulingInfoV2(VmrTypeModel vmrType, ViewTypeModel hostView, ViewTypeModel guestView, VmrQualityModel vmrQuality, Boolean enableOverlayText, Boolean guestsCanPresent, Boolean forcePresenterIntoMain, Boolean forceEncryption, Boolean muteAllGuests, String callType) {
         logger.debug("Reserve scheduling info, v2.");
         try {
             return SchedulingInfoModel.from(schedulingInfoService.reserveSchedulingInfo(EnumMapper.modelToEntity(vmrType), EnumMapper.modelToEntity(hostView),
                     EnumMapper.modelToEntity(guestView), EnumMapper.modelToEntity(vmrQuality), enableOverlayText, guestsCanPresent,
-                    forcePresenterIntoMain, forceEncryption, muteAllGuests), shortLinkBaseUrl);
+                    forcePresenterIntoMain, forceEncryption, muteAllGuests, callType), shortLinkBaseUrl);
         } catch (RessourceNotFoundException e) {
             throw new ResourceNotFoundExceptionV2(e.getRessource(), e.getField());
         }

@@ -829,6 +829,13 @@ paths:
           schema:
             type: boolean
           example: 'false'
+        - name: callType
+          in: query
+          description: 'Default Pexip call type'
+          required: false
+          schema:
+            type: string
+          example: 'AudioSendRecvVideoSendRecvPresentationSendRecv'
       responses:
         '200':
           description: Ok

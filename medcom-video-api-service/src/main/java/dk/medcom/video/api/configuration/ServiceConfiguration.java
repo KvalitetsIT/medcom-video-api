@@ -12,6 +12,7 @@ import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.PortalLinkBuilder;
+import dk.medcom.video.api.service.model.PortalLinkModel;
 import org.openapitools.model.ViewType;
 import org.openapitools.model.VmrQuality;
 import org.openapitools.model.VmrType;
@@ -20,21 +21,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.Ordered;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.filter.UrlHandlerFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import dk.kvalitetsit.audit.client.AuditClient;
@@ -212,7 +215,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	                                                   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
 	                                                   PoolFinderService poolFinderService,
 	                                                   OrganisationServiceClientV2 organisationServiceClientV2,
-	                                                   PortalLinkBuilder videoPortalParser) {
+	                                                   PortalLinkBuilder portalLinkBuilder) {
 		return new SchedulingInfoServiceImpl(
 				schedulingInfoRepository,
 				schedulingTemplateRepository,
@@ -230,12 +233,15 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				newProvisionerOrganisationFilter,
 				poolFinderService,
 				organisationServiceClientV2,
-				videoPortalParser
+				portalLinkBuilder
 		);
 	}
 
 	@Bean
-	public PortalLinkBuilder videoPortalParser(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate) {
+	public PortalLinkBuilder portalLinkBuilder(@Value("${scheduling.info.citizen.portal.template}") String portalLinkTemplate,
+	                                           @Value("${scheduling.info.citizen.portal.return.url}") String defaultReturnUrl) {
+		PortalLinkModel.setDefaultReturnUrl(defaultReturnUrl);
+
 		return new PortalLinkBuilder(portalLinkTemplate);
 	}
 
@@ -370,9 +376,15 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 		return new PrometheusScrapeEndpoint(prometheusRegistry, null);
 	}
 
-	@Override
-	public void configurePathMatch(PathMatchConfigurer configurer) {
-		configurer.setUseTrailingSlashMatch(true);
+	@Bean
+    public FilterRegistrationBean<UrlHandlerFilter> urlHandlerFilterRegistration() {
+		// Preserve trailing-slash matching removed in Spring Framework 7.0 (replaces the deprecated
+		// PathMatchConfigurer.setUseTrailingSlashMatch(true)). Ordered ahead of the security filter
+		// chain so routing and security resolve the same path.
+		FilterRegistrationBean<UrlHandlerFilter> registration = new FilterRegistrationBean<>(
+				UrlHandlerFilter.trailingSlashHandler("/**").wrapRequest().build());
+		registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		return registration;
 	}
 
 	@Bean

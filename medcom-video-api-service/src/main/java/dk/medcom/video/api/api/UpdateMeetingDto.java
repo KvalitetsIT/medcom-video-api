@@ -1,6 +1,6 @@
 package dk.medcom.video.api.api;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
