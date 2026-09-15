@@ -69,7 +69,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingTemplatesGet() {
-        assertStatus(401, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
+        assertStatus(403, schedulingTemplateAdministrationV2ApiNoRoleAtt::v2SchedulingTemplatesGet);
     }
 
     @Test
@@ -139,7 +139,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2SchedulingTemplatesIdGet() {
-        assertStatus(401, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
+        assertStatus(403, () -> schedulingTemplateAdministrationV2ApiNoRoleAtt.v2SchedulingTemplatesIdGet(201L));
     }
 
     @Test
