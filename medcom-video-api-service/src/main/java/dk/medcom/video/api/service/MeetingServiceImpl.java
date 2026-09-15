@@ -7,6 +7,7 @@ import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.domain.MessageType;
@@ -33,7 +34,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final OrganisationService organisationService;
 	private final UserContextService userService;
 	private final MeetingLabelRepository meetingLabelRepository;
-	private final OrganisationRepository organisationRepository;
+	private final OrganisationStrategy organisationStrategy;
 	private final OrganisationTreeServiceClient organisationTreeServiceClient;
 	private final AuditService auditService;
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
@@ -46,7 +47,7 @@ public class MeetingServiceImpl implements MeetingService {
 							  OrganisationService organisationService,
 							  UserContextService userService,
 							  MeetingLabelRepository meetingLabelRepository,
-							  OrganisationRepository organisationRepository,
+							  OrganisationStrategy organisationStrategy,
 							  OrganisationTreeServiceClient organisationTreeServiceClient,
 							  AuditService auditClient,
 							  SchedulingInfoEventPublisher schedulingInfoEventPublisher,
@@ -58,7 +59,7 @@ public class MeetingServiceImpl implements MeetingService {
 	 	this.organisationService = organisationService;
 	 	this.userService = userService;
 		this.meetingLabelRepository = meetingLabelRepository;
-		this.organisationRepository = organisationRepository;
+		this.organisationStrategy = organisationStrategy;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
 		this.auditService = auditClient;
 		this.schedulingInfoEventPublisher = schedulingInfoEventPublisher;
@@ -74,7 +75,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return meetingRepository.findByOrganizedByAndStartTimeBetween(meetingUserService.getOrCreateCurrentMeetingUser(), fromStartTime, toStartTime);
 		} else {
 			LOGGER.debug("Finding meetings using findByOrganisationAndStartTimeBetween");
-			return meetingRepository.findByOrganisationAndStartTimeBetween(organisationService.getUserOrganisation(), fromStartTime, toStartTime);	
+			return meetingRepository.findByOrganisationCodeAndStartTimeBetween(organisationService.getUserOrganisation().getCode(), fromStartTime, toStartTime);
 		}
 	}
 
@@ -85,17 +86,17 @@ public class MeetingServiceImpl implements MeetingService {
 			LOGGER.debug("The meeting was not found. UUID: " + uuid );
 			throw new RessourceNotFoundException("meeting", "uuid");
 		}
-		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
+		if (!meeting.getOrganisationCode().equals(organisationService.getUserOrganisation().getCode())) {
 			LOGGER.debug("The user does not have the same organization as the meeting: ");
-			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getOrganisationId() + ", + meetingOrganizing user" + meeting.getOrganisation().getOrganisationId());
+			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getCode() + ", + meetingOrganizing user" + meeting.getOrganisationCode());
 			throw new PermissionDeniedException();
 		}
-		
+
 		if (userService.getUserContext().hasOnlyRole(UserRole.USER) && !(meeting.getOrganizedByUser() == meetingUserService.getOrCreateCurrentMeetingUser())) {
 			LOGGER.debug("The user only has the role USER and cannot see meetings not organized by this user. Calling user: " + meetingUserService.getOrCreateCurrentMeetingUser().getEmail() + ", + meetingOrganizing user" + meeting.getOrganizedByUser().getEmail());
 			throw new PermissionDeniedException();
-		} 
-		
+		}
+
 		return meeting;
 	}
 
@@ -125,7 +126,7 @@ public class MeetingServiceImpl implements MeetingService {
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			boolean isPoolOrganisation = isPoolOrganisation(userService.getUserContext().getUserOrganisation());
 			if(!isPoolOrganisation) {
-				throw new NotValidDataException(NotValidDataErrors.NON_AD_HOC_ORGANIZATION, meeting.getOrganisation().getOrganisationId());
+				throw new NotValidDataException(NotValidDataErrors.NON_AD_HOC_ORGANIZATION, meeting.getOrganisationCode());
 			}
 		}
 
@@ -150,7 +151,7 @@ public class MeetingServiceImpl implements MeetingService {
 		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisationCode);
 
 		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisationCode, organisationTree);
-		Organisation o = organisationRepository.findByOrganisationId(poolOrganisation.getCode());
+		var o = organisationStrategy.findOrganisationByCode(poolOrganisation.getCode());
 		return o.getPoolSize() != null && o.getPoolSize() > 0;
 	}
 
@@ -185,13 +186,13 @@ public class MeetingServiceImpl implements MeetingService {
 		// Custom URI
 		if(createMeetingDto.getUriWithoutDomain() != null) {
 			if(organisationService.getUserOrganisation().getAllowCustomUriWithoutDomain()) {
-				LOGGER.info("Using custom uriWithoutDomain for meeting in organisation {}", organisationService.getUserOrganisation().getOrganisationId());
+				LOGGER.info("Using custom uriWithoutDomain for meeting in organisation {}", organisationService.getUserOrganisation().getCode());
 				schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 				return;
 			}
 			else {
 				LOGGER.info("Organisation not configured to allow custom uri without domain. Organisation: {}, uriWithoutDomain: {}.",
-							organisationService.getUserOrganisation().getOrganisationId(),
+							organisationService.getUserOrganisation().getCode(),
 							createMeetingDto.getUriWithoutDomain()
 				);
 				throw new NotValidDataException(NotValidDataErrors.CUSTOM_MEETING_ADDRESS_NOT_ALLOWED);
@@ -228,7 +229,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.reset("attachOrCreateSchedulingInfo.scheduling info create");
 		if(createMeetingDto.getMeetingType() == MeetingType.POOL) {
 			if(schedulingInfo == null) {
-				throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_NOT_FOUND_ORGANISATION, meeting.getOrganisation().getOrganisationId());
+				throw new NotValidDataException(NotValidDataErrors.SCHEDULING_INFO_NOT_FOUND_ORGANISATION, meeting.getOrganisationCode());
 			}
 		}
 		else {
@@ -245,8 +246,8 @@ public class MeetingServiceImpl implements MeetingService {
 		try {
 			var schedulingInfo = schedulingInfoService.getSchedulingInfoByReservation(createMeetingDto.getSchedulingInfoReservationId());
 
-			if(!schedulingInfo.getOrganisation().getOrganisationId().equals(userService.getUserContext().getUserOrganisation())) {
-				LOGGER.info("ReservationId {} belongs to organisation {} and user organisation is {}.", createMeetingDto.getSchedulingInfoReservationId(), schedulingInfo.getOrganisation().getOrganisationId(), userService.getUserContext().getUserOrganisation());
+			if(!schedulingInfo.getOrganisationCode().equals(userService.getUserContext().getUserOrganisation())) {
+				LOGGER.info("ReservationId {} belongs to organisation {} and user organisation is {}.", createMeetingDto.getSchedulingInfoReservationId(), schedulingInfo.getOrganisationCode(), userService.getUserContext().getUserOrganisation());
 				throw new NotValidDataException(NotValidDataErrors.INVALID_RESERVATION_ID, createMeetingDto.getSchedulingInfoReservationId().toString());
 			}
 
@@ -281,7 +282,7 @@ public class MeetingServiceImpl implements MeetingService {
 		else {
 			meeting.setUuid(UUID.randomUUID().toString());
 		}
-		meeting.setOrganisation(organisationService.getUserOrganisation());
+		meeting.setOrganisationCode(organisationService.getUserOrganisation().getCode());
 		meeting.setStartTime(createMeetingDto.getStartTime());
 		meeting.setEndTime(createMeetingDto.getEndTime());
 		meeting.setDescription(createMeetingDto.getDescription());
@@ -333,7 +334,7 @@ public class MeetingServiceImpl implements MeetingService {
 		}
 		
 		validateDate(updateMeetingDto.getEndTime());
-		Integer poolSize = organisationService.getPoolSizeForOrganisation(schedulingInfo.getOrganisation().getOrganisationId());
+		Integer poolSize = organisationService.getPoolSizeForOrganisation(schedulingInfo.getOrganisationCode());
 		if (schedulingInfo.getProvisionStatus() == ProvisionStatus.AWAITS_PROVISION ||
 				(schedulingInfo.getProvisionStatus() == ProvisionStatus.PROVISIONED_OK && poolSize != null)) {  //only when this status must all but endTime be updated
 			validateDate(updateMeetingDto.getStartTime());
@@ -459,7 +460,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return meetingRepository.findByOrganizedByAndSubject(meetingUserService.getOrCreateCurrentMeetingUser(),subject);
 		} else {
 			LOGGER.debug("Finding meetings using findByOrganisationAndStartTimeBetween");
-			return meetingRepository.findByOrganisationAndSubject(organisationService.getUserOrganisation(),subject);
+			return meetingRepository.findByOrganisationCodeAndSubject(organisationService.getUserOrganisation().getCode(),subject);
 		}
 	}
 
@@ -469,7 +470,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return meetingRepository.findByOrganizedByAndSubjectLikeOrDescriptionLike(meetingUserService.getOrCreateCurrentMeetingUser(), searchString, searchString);
 		} else {
 			LOGGER.debug("Finding meetings using findByOrganisationAndSubjectLike");
-			return meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(organisationService.getUserOrganisation(), searchString, searchString);
+			return meetingRepository.findByOrganisationCodeAndSubjectLikeOrDescriptionLike(organisationService.getUserOrganisation().getCode(), searchString, searchString);
 		}
 	}
 
@@ -488,7 +489,7 @@ public class MeetingServiceImpl implements MeetingService {
 		} else {
 			LOGGER.debug("Finding meetings using findByOrganisationAndOrganizedBy");
 			MeetingUser meetingUser = meetingUserService.getOrCreateCurrentMeetingUser(organizedBy);
-			return meetingRepository.findByOrganisationAndOrganizedBy(organisationService.getUserOrganisation(), meetingUser);
+			return meetingRepository.findByOrganisationCodeAndOrganizedBy(organisationService.getUserOrganisation().getCode(), meetingUser);
 		}
 	}
 
@@ -503,7 +504,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return meetingRepository.findByUriWithDomainAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), uriWithDomain);
 		} else {
 			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganisation");
-			return meetingRepository.findByUriWithDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithDomain);
+			return meetingRepository.findByUriWithDomainAndOrganisationCode(organisationService.getUserOrganisation().getCode(), uriWithDomain);
 		}
 	}
 
@@ -520,7 +521,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return result;
 		} else {
 			LOGGER.debug("Finding meetings using findByUriWithDomainAndOrganisation");
-			var result = meetingRepository.findOneByUriWithDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithDomain);
+			var result = meetingRepository.findOneByUriWithDomainAndOrganisationCode(organisationService.getUserOrganisation().getCode(), uriWithDomain);
 
 			if(result == null) {
 				throw new RessourceNotFoundException("meeting", "uriWithDomain");
@@ -544,7 +545,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 		} else {
 			LOGGER.debug("Finding meetings using findByUriWithoutDomainAndOrganisation");
-			var result =  meetingRepository.findOneByUriWithoutDomainAndOrganisation(organisationService.getUserOrganisation(), uriWithoutDomain);
+			var result =  meetingRepository.findOneByUriWithoutDomainAndOrganisationCode(organisationService.getUserOrganisation().getCode(), uriWithoutDomain);
 
 			if(result == null) {
 				throw new RessourceNotFoundException("meeting", "uriWithDomain");
@@ -561,7 +562,7 @@ public class MeetingServiceImpl implements MeetingService {
 			return meetingRepository.findByLabelAndOrganizedBy(meetingUserService.getOrCreateCurrentMeetingUser(), label);
 		} else {
 			LOGGER.debug("Finding meetings using findByLabelAndOrganisation");
-			return meetingRepository.findByLabelAndOrganisation(organisationService.getUserOrganisation(), label);
+			return meetingRepository.findByLabelAndOrganisationCode(organisationService.getUserOrganisation().getCode(), label);
 		}
 	}
 
@@ -603,9 +604,9 @@ public class MeetingServiceImpl implements MeetingService {
 			return meeting;
 		}
 
-		if (!meeting.getOrganisation().equals(organisationService.getUserOrganisation())) {
+		if (!meeting.getOrganisationCode().equals(organisationService.getUserOrganisation().getCode())) {
 			LOGGER.debug("The user does not have the same organization as the meeting: ");
-			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getOrganisationId() + ", + meetingOrganizing user" + meeting.getOrganisation().getOrganisationId());
+			LOGGER.debug("The user does not have the same organization as the meeting. Calling user organization: " + organisationService.getUserOrganisation().getCode() + ", + meetingOrganizing user" + meeting.getOrganisationCode());
 			throw new PermissionDeniedException();
 		}
 

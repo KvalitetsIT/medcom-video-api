@@ -8,7 +8,6 @@ import dk.medcom.video.api.context.UserContext;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
@@ -36,7 +35,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final SchedulingTemplateService schedulingTemplateService;
 	private final SchedulingStatusService schedulingStatusService;
 	private final MeetingUserService meetingUserService;
-	private final OrganisationRepository organisationRepository;
 	private final OrganisationStrategy organisationStrategy;
 	private final UserContextService userContextService;
 	private final String overflowPoolOrganisationId;
@@ -54,7 +52,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
                                      SchedulingTemplateService schedulingTemplateService,
                                      SchedulingStatusService schedulingStatusService,
                                      MeetingUserService meetingUserService,
-                                     OrganisationRepository organisationRepository,
                                      OrganisationStrategy organisationStrategy,
                                      UserContextService userContextService,
                                      String overflowPoolOrganisationId,
@@ -71,7 +68,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		this.schedulingTemplateService = schedulingTemplateService;
 		this.schedulingStatusService = schedulingStatusService;
 		this.meetingUserService = meetingUserService;
-		this.organisationRepository = organisationRepository;
 		this.organisationStrategy = organisationStrategy;
 		this.userContextService = userContextService;
 		this.organisationTreeServiceClient = organisationTreeServiceClient;
@@ -131,19 +127,19 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			LOGGER.debug("SchedulingInfo was null");
 			throw new RessourceNotFoundException("schedulingInfo", "uuid");
 		}
-		validateOrganisationAccess(schedulingInfo.getOrganisation());
+		validateOrganisationAccess(schedulingInfo.getOrganisationCode());
 		LOGGER.debug("Exit getSchedulingInfoByUuid");
 		return schedulingInfo;
 	}
 
-	private void validateOrganisationAccess(Organisation organisation) throws PermissionDeniedException {
+	private void validateOrganisationAccess(String organisationCode) throws PermissionDeniedException {
 		UserContext userContext = userContextService.getUserContext();
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.PROVISIONER, UserRole.PROVISIONER_USER))) return;
-		if (organisation.getOrganisationId().equals(userContext.getUserOrganisation())) return;
+		if (organisationCode.equals(userContext.getUserOrganisation())) return;
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.ADMIN, UserRole.MEETING_PLANNER))) {
 			Set<String> userOrganisationAndChildOrganisations = organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation())
 					.stream().map(OrganisationSimple::code).collect(Collectors.toSet());
-			if (userOrganisationAndChildOrganisations.contains(organisation.getOrganisationId())) return;
+			if (userOrganisationAndChildOrganisations.contains(organisationCode)) return;
 		}
 		LOGGER.debug("User does not have access to the organisation of the scheduling info");
 		throw new PermissionDeniedException();
@@ -223,12 +219,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		schedulingInfo.setMeeting(meeting);
-		schedulingInfo.setOrganisation(meeting.getOrganisation());
+		schedulingInfo.setOrganisationCode(meeting.getOrganisationCode());
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
-		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisationCode()));
 
 		//Overwrite template value with input parameters
 		if (createMeetingDto.getMaxParticipants() > 0) {
@@ -503,7 +499,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND, createSchedulingInfoDto.getSchedulingTemplateId().toString());
 		}
 
-		if(schedulingTemplate.getOrganisation() != null && !schedulingTemplate.getOrganisation().getOrganisationId().equals(createSchedulingInfoDto.getOrganizationId())) {
+		if(schedulingTemplate.getOrganisationCode() != null && !schedulingTemplate.getOrganisationCode().equals(createSchedulingInfoDto.getOrganizationId())) {
 			LOGGER.debug(String.format("Scheduling template %s does not belong to organisation %s.", createSchedulingInfoDto.getSchedulingTemplateId(), createSchedulingInfoDto.getOrganizationId()));
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION, createSchedulingInfoDto.getSchedulingTemplateId().toString(), createSchedulingInfoDto.getOrganizationId());
 		}
@@ -531,7 +527,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setCreatedTime(new Date());
 
-		schedulingInfo.setOrganisation(ensureOrganisationCreated(createSchedulingInfoDto.getOrganizationId()));
+		schedulingInfo.setOrganisationCode(ensureOrganisationCreated(createSchedulingInfoDto.getOrganizationId()));
 		schedulingInfo.setUuid(UUID.randomUUID().toString());
 
 		schedulingInfo.setPool(true);
@@ -551,7 +547,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 		schedulingInfo.setCallType(schedulingTemplate.getCallType());
 
-		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
+		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisationCode()));
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE), schedulingInfo.isNewProvisioner());
@@ -562,19 +558,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return schedulingInfo;
 	}
 
-	private Organisation ensureOrganisationCreated(String organisationCode) {
-		Organisation dbOrganisation = organisationRepository.findByOrganisationId(organisationCode);
-		if(dbOrganisation == null) {
-			dbOrganisation = new Organisation();
-			dbOrganisation.setOrganisationId(organisationCode);
-
-			dbOrganisation = organisationRepository.save(dbOrganisation);
-		}
-
-		return dbOrganisation;
+	private String ensureOrganisationCreated(String organisationCode) {
+		var organisation = organisationServiceClientV2.ensureOrganisationExists(organisationCode);
+		return organisation.getCode();
 	}
 
-	private Long getUnusedSchedulingInfoForOrganisation(Organisation organisation, CreateMeetingDto createMeetingDto) {
+	private Long getUnusedSchedulingInfoForOrganisation(dk.medcom.video.api.organisation.model.Organisation organisation, CreateMeetingDto createMeetingDto) {
 		var schedulingInfo = poolFinderService.findPoolSubject(organisation, createMeetingDto);
 
 		if(schedulingInfo.isEmpty()) {
@@ -584,7 +573,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		LOGGER.info("findByMeetingIsNullAndOrganisationAndProvisionStatus Result '{}'- Org: '{}'.",
 				schedulingInfo.get().getId(),
-				organisation.getId());
+				organisation.getCode());
 		return schedulingInfo.get().getId();
 	}
 
@@ -592,7 +581,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, SchedulingInfo schedulingInfo, boolean fromOverflow) {
 		var performanceLogger = new PerformanceLogger("Attach meeting to sched info");
 
-		var organisationFromSchedulingInfo = schedulingInfo.getOrganisation().getOrganisationId();
+		var organisationFromSchedulingInfo = schedulingInfo.getOrganisationCode();
 
 		schedulingInfo.setMeetingUser(meeting.getMeetingUser());
 		schedulingInfo.setUpdatedTime(new Date());
@@ -606,8 +595,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
-		if(!meeting.getOrganisation().getOrganisationId().equals(organisationFromSchedulingInfo)) {
-			schedulingInfo.setOrganisation(meeting.getOrganisation());
+		if(!meeting.getOrganisationCode().equals(organisationFromSchedulingInfo)) {
+			schedulingInfo.setOrganisationCode(meeting.getOrganisationCode());
 		}
 		if(fromOverflow) {
 			schedulingInfo.setPoolOverflow(true);
@@ -628,8 +617,9 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	public SchedulingInfo attachMeetingToSchedulingInfo(Meeting meeting, CreateMeetingDto createMeetingDto) {
 		var performanceLogger = new PerformanceLogger("SchedulingInfoServiceImpl.attachMeetingToSchedulingInfo");
 		boolean fromOverflow = false;
-		long organisationId = findPoolOrganisation(meeting.getOrganisation());
-		Organisation organisation = organisationRepository.findById(organisationId).orElseThrow(RuntimeException::new);
+		var meetingOrganisation = organisationStrategy.findOrganisationByCode(meeting.getOrganisationCode());
+		String poolOrganisationCode = findPoolOrganisation(meetingOrganisation);
+		var organisation = organisationStrategy.findOrganisationByCode(poolOrganisationCode);
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("get unused scheduling info for org");
@@ -659,26 +649,25 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return attachMeetingToSchedulingInfo(meeting, schedulingInfo, fromOverflow);
 	}
 
-	private Long findPoolOrganisation(Organisation organisation) {
+	private String findPoolOrganisation(dk.medcom.video.api.organisation.model.Organisation organisation) {
 		var performanceLogger = new PerformanceLogger("SchedulingInfoServiceImpl.findPoolOrganisation");
 		if(organisation.getPoolSize() != null && organisation.getPoolSize() > 0) {
-			return organisation.getId();
+			return organisation.getCode();
 		}
 
-		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId());
+		OrganisationTree organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getCode());
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("find pool organisation");
 
-		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisation.getOrganisationId(), organisationTree);
-		var result =  organisationRepository.findByOrganisationId(poolOrganisation.getCode()).getId();
+		var poolOrganisation = new OrganisationFinder().findPoolOrganisation(organisation.getCode(), organisationTree);
 		performanceLogger.logTimeSinceCreation();
 
-		return result;
+		return poolOrganisation.getCode();
 	}
 
 	private Long getSchedulingInfoFromOverflowPool(CreateMeetingDto createMeetingDto) {
 		LOGGER.info("Organisation {} is using scheduling info from overflow pool organisation {}.", userContextService.getUserContext().getUserOrganisation(), overflowPoolOrganisationId);
-		var organisation = organisationRepository.findByOrganisationId(overflowPoolOrganisationId);
+		var organisation = organisationStrategy.findOrganisationByCode(overflowPoolOrganisationId);
 		LOGGER.debug("Organisation found: {}", organisation != null);
 
 		if (createMeetingDto == null) {
@@ -702,7 +691,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 												Boolean forceEncryption,
 												Boolean muteAllGuests,
 												String callType) throws RessourceNotFoundException {
-		var organisation = organisationRepository.findByOrganisationId(userContextService.getUserContext().getUserOrganisation());
+		var organisation = organisationStrategy.findOrganisationByCode(userContextService.getUserContext().getUserOrganisation());
 
 		var createMeetingDto = new CreateMeetingDto();
 		createMeetingDto.setVmrType(vmrType);

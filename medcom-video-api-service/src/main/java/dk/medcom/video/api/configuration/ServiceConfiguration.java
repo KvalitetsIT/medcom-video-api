@@ -49,9 +49,7 @@ import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
 import dk.medcom.video.api.dao.MeetingLabelRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingStatusRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
@@ -69,9 +67,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Autowired
 	private OrganisationStrategy organisationStrategy;
-
-	@Autowired
-	private OrganisationRepository organisationRepository;
 
 	@Autowired
 	private OrganisationServiceClient organisationServiceClient;
@@ -156,8 +151,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy) {
-		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy);
+	public OrganisationService organisationService(UserContextService userContextService, OrganisationStrategy organisationStrategy) {
+		return new OrganisationServiceImpl(userContextService, organisationStrategy);
 	}
 
 	@Bean
@@ -173,7 +168,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 										 OrganisationService organisationService,
 										 UserContextService userService,
 										 MeetingLabelRepository meetingLabelRepository,
-										 OrganisationRepository organisationProxy,
+										 OrganisationStrategy organisationStrategy,
 										 OrganisationTreeServiceClient organisationTreeServiceClient,
 										 AuditService auditClient,
 										 SchedulingInfoEventPublisher schedulingInfoEventPublisher,
@@ -186,7 +181,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				organisationService,
 				userService,
 				meetingLabelRepository,
-				organisationProxy,
+				organisationStrategy,
 				organisationTreeServiceClient,
 				auditClient,
 				schedulingInfoEventPublisher,
@@ -204,7 +199,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	                                                   SchedulingTemplateService schedulingTemplateService,
 	                                                   SchedulingStatusService schedulingStatusService,
 	                                                   MeetingUserService meetingUserService,
-	                                                   OrganisationRepository organisationRepository,
 	                                                   OrganisationStrategy organisationStrategy,
 	                                                   UserContextService userContextService,
 	                                                   @Value("${overflow.pool.organisation.id}") String overflowPoolOrganisationId,
@@ -222,7 +216,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 				schedulingTemplateService,
 				schedulingStatusService,
 				meetingUserService,
-				organisationRepository,
 				organisationStrategy,
 				userContextService,
 				overflowPoolOrganisationId,
@@ -258,17 +251,13 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PoolInfoService poolInfoService(OrganisationRepository organisationRepository,
-										   SchedulingInfoRepository schedulingInfoRepository,
+	public PoolInfoService poolInfoService(SchedulingInfoRepository schedulingInfoRepository,
 										   SchedulingTemplateRepository schedulingTemplateRepository,
-										   OrganisationStrategy organisationStrategy,
-										   PoolInfoRepository poolInfoRepository) {
+										   OrganisationStrategy organisationStrategy) {
 		return new PoolInfoServiceImpl(
-				organisationRepository,
 				schedulingInfoRepository,
 				schedulingTemplateRepository,
-				organisationStrategy,
-				poolInfoRepository
+				organisationStrategy
 		);
 	}
 
@@ -280,11 +269,10 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	@Bean
 	public PoolService poolService(SchedulingInfoService schedulingInfoService,
 								   MeetingUserRepository meetingUserRepository,
-								   OrganisationRepository organisationRepository,
 								   NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
 								   @Value("${pool.fill.organisation}") String poolOrganisation,
 								   @Value("${pool.fill.organisation.user}") String poolOrganisationUser) {
-		return new PoolServiceImpl(schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
+		return new PoolServiceImpl(schedulingInfoService, meetingUserRepository, newProvisionerOrganisationFilter, poolOrganisation, poolOrganisationUser);
 	}
 
 	@Bean
@@ -309,7 +297,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 
 	@Bean
 	public OrganisationInterceptor organisationInterceptor() {
-		return new OrganisationInterceptor(organisationStrategy, organisationRepository, organisationServiceClient);
+		return new OrganisationInterceptor(organisationStrategy, organisationServiceClient);
 	}
 
 	@Bean
@@ -343,8 +331,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PoolHistoryService poolHistoryService(PoolInfoRepository poolInfoRepository, PoolHistoryDao PoolHistorydao) {
-		return new PoolHistoryServiceImpl(poolInfoRepository, PoolHistorydao);
+	public PoolHistoryService poolHistoryService(PoolInfoService poolInfoService, PoolHistoryDao PoolHistorydao) {
+		return new PoolHistoryServiceImpl(poolInfoService, PoolHistorydao);
 	}
 
 	@Bean

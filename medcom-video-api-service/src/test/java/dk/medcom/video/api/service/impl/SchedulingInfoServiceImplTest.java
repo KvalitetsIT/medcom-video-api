@@ -8,7 +8,6 @@ import dk.medcom.video.api.context.UserContextImpl;
 import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.times;
 public class SchedulingInfoServiceImplTest {
     private static final String OVERFLOW_POOL = "overflow";
     private SchedulingInfoRepository schedulingInfoRepository;
-    private OrganisationRepository organizationRepository;
     private SchedulingTemplateRepository schedulingTemplateRepository;
 
     private UUID schedulingInfoUuid;
@@ -83,13 +81,6 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(schedulingInfoRepository.findById(Mockito.eq(123L))).thenReturn(Optional.of(schedulingInfo));
         meetingUserService = Mockito.mock(MeetingUserService.class);
 
-        organizationRepository = Mockito.mock(OrganisationRepository.class);
-        Mockito.when(organizationRepository.findByOrganisationId(NON_POOL_ORG)).thenReturn(createNonPoolOrganisation());
-        Mockito.when(organizationRepository.findById(createNonPoolOrganisation().getId())).thenReturn(Optional.of(createNonPoolOrganisation()));
-        Mockito.when(organizationRepository.findByOrganisationId(POOL_ORG)).thenReturn(createOrganisation());
-        Mockito.when(organizationRepository.findById(createOrganisation().getId())).thenReturn(Optional.of(createOrganisation()));
-        Mockito.when(organizationRepository.findByOrganisationId(OVERFLOW_POOL)).thenReturn(createOverflowPool());
-
         schedulingTemplateService = Mockito.mock(SchedulingTemplateServiceImpl.class);
         Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
 
@@ -102,6 +93,7 @@ public class SchedulingInfoServiceImplTest {
         organisationStrategy = Mockito.mock(OrganisationStrategy.class);
         Mockito.when(organisationStrategy.findOrganisationByCode(NON_POOL_ORG)).thenReturn(createNonPoolStrategyOrganisation());
         Mockito.when(organisationStrategy.findOrganisationByCode(POOL_ORG)).thenReturn(createStrategyOrganisation());
+        Mockito.when(organisationStrategy.findOrganisationByCode(OVERFLOW_POOL)).thenReturn(createOverflowPoolStrategyOrganisation());
 
         userContextService = Mockito.mock(UserContextService.class);
 
@@ -110,6 +102,11 @@ public class SchedulingInfoServiceImplTest {
         poolFinderService = Mockito.mock(PoolFinderService.class);
 
         organisationServiceClientV2 = Mockito.mock(OrganisationServiceClientV2.class);
+        Mockito.when(organisationServiceClientV2.ensureOrganisationExists(Mockito.anyString())).thenAnswer(i -> {
+            var organisation = new dk.medcom.video.api.organisation.model.Organisation();
+            organisation.setCode(i.getArgument(0));
+            return organisation;
+        });
 
         videoPortalParser = new PortalLinkBuilder("http://citizen_portal/?conference=__uri-with-domain__&pin=__pin__&start_dato=__start-date__&muteMicrophone=__microphone__&join=1");
     }
@@ -121,7 +118,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 null,
                 null,
-                organizationRepository,
                 null,
                 userContextService,
                 "overflow",
@@ -161,7 +157,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 null,
                 meetingUserService,
-                organizationRepository,
                 null,
                 userContextService,
                 "overflow",
@@ -213,7 +208,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 null,
                 meetingUserService,
-                organizationRepository,
                 null,
                 userContextService,
                 "overflow",
@@ -264,7 +258,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 schedulingStatusService,
                 meetingUserService,
-                organizationRepository,
                 null,
                 userContextService,
                 "overflow",
@@ -316,7 +309,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 schedulingStatusService,
                 meetingUserService,
-                organizationRepository,
                 null,
                 userContextService,
                 "overflow",
@@ -377,7 +369,7 @@ public class SchedulingInfoServiceImplTest {
         assertNull(capturedSchedulingInfo.getvMRStartTime());
         assertEquals("some theme", capturedSchedulingInfo.getIvrTheme());
         assertNull(capturedSchedulingInfo.getPortalLink());
-        assertEquals(createOrganisation().getId(), capturedSchedulingInfo.getOrganisation().getId());
+        assertEquals(createOrganisation(), capturedSchedulingInfo.getOrganisationCode());
         assertNull(capturedSchedulingInfo.getProvisionVMRId());
 //        assertEquals("", capturedSchedulingInfo.getProvisionTimestamp());
         assertNull(capturedSchedulingInfo.getProvisionTimestamp());
@@ -418,7 +410,6 @@ public class SchedulingInfoServiceImplTest {
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
-        meeting.setOrganisation(new Organisation());
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
@@ -472,7 +463,6 @@ public class SchedulingInfoServiceImplTest {
 
         Meeting meeting = new Meeting();
         meeting.setStartTime(new Date());
-        meeting.setOrganisation(new Organisation());
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setUriWithoutDomain("573489");
@@ -617,7 +607,7 @@ public class SchedulingInfoServiceImplTest {
 
         var poolSchedulingInfo = new SchedulingInfo();
         poolSchedulingInfo.setId(123L);
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(poolSchedulingInfo));
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(poolSchedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -629,7 +619,7 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createOrganisation());
+        meeting.setOrganisationCode(createOrganisation());
         meeting.setMeetingUser(createMeetingUser(createOrganisation()));
         meeting.setEndTime(new Date());
 
@@ -640,7 +630,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertFalse(result.getPoolOverflow());
-        assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
+        assertEquals(meeting.getOrganisationCode(), result.getOrganisationCode());
     }
 
     @Test
@@ -653,8 +643,8 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfo = new SchedulingInfo();
         schedulingInfo.setId(123L);
 
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.empty());
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.empty());
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x != null && x.getCode().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -666,22 +656,23 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createOrganisation());
-        meeting.getOrganisation().setOrganisationId("some_other_id");
+        meeting.setOrganisationCode(createOrganisation());
+        meeting.setOrganisationCode("some_other_id");
+        Mockito.when(organisationStrategy.findOrganisationByCode("some_other_id")).thenReturn(createStrategyOrganisation());
         meeting.setMeetingUser(createMeetingUser(createOrganisation()));
         meeting.setEndTime(new Date());
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNotNull(result);
         assertEquals("http://citizen_portal/?conference=uri-with-domain&pin=&start_dato=2019-10-07T12:00:00&join=1", result.getPortalLink());
         assertEquals(vmrStartTime, result.getvMRStartTime());
         assertTrue(result.getPoolOverflow());
-        assertEquals(meeting.getOrganisation().getOrganisationId(), result.getOrganisation().getOrganisationId());
+        assertEquals(meeting.getOrganisationCode(), result.getOrganisationCode());
     }
 
     @Test
@@ -698,13 +689,13 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createOrganisation());
+        meeting.setOrganisationCode(createOrganisation());
 
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(OVERFLOW_POOL)), Mockito.any());
 
         assertNull(result);
     }
@@ -723,8 +714,7 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createNonPoolOrganisation());
-        meeting.getOrganisation().setPoolSize(null);
+        meeting.setOrganisationCode(createNonPoolOrganisation());
 
         OrganisationTree organisationTree = new OrganisationTree();
         organisationTree.setPoolSize(0);
@@ -736,7 +726,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
         SchedulingInfo result = schedulingInfoService.attachMeetingToSchedulingInfo(meeting, null);
 
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(NON_POOL_ORG)), Mockito.any());
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(NON_POOL_ORG)), Mockito.any());
 
         Mockito.verify(organisationTreeServiceClient, times(1)).getOrganisationTree(NON_POOL_ORG);
 
@@ -756,7 +746,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 null,
                 meetingUserService,
-                organizationRepository,
                 organisationStrategy,
                 userContextService,
                 "overflow",
@@ -784,7 +773,6 @@ public class SchedulingInfoServiceImplTest {
                 null,
                 null,
                 meetingUserService,
-                organizationRepository,
                 organisationStrategy,
                 userContextService,
                 "overflow",
@@ -807,7 +795,7 @@ public class SchedulingInfoServiceImplTest {
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setId(123L);
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -819,7 +807,7 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createOrganisation());
+        meeting.setOrganisationCode(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.off);
         meeting.setMeetingUser(createMeetingUser(createOrganisation()));
         meeting.setEndTime(new Date());
@@ -838,7 +826,7 @@ public class SchedulingInfoServiceImplTest {
 
         var schedulingInfo = createSchedulingInfo();
         schedulingInfo.setId(123L);
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(2019, Calendar.OCTOBER, 7, 12, 0, 0);
@@ -850,7 +838,7 @@ public class SchedulingInfoServiceImplTest {
         meeting.setStartTime(startTime);
         meeting.setId(1L);
         meeting.setUuid(UUID.randomUUID().toString());
-        meeting.setOrganisation(createOrganisation());
+        meeting.setOrganisationCode(createOrganisation());
         meeting.setGuestMicrophone(GuestMicrophone.muted);
         meeting.setMeetingUser(createMeetingUser(createOrganisation()));
         meeting.setEndTime(new Date());
@@ -870,7 +858,7 @@ public class SchedulingInfoServiceImplTest {
 
         var schedulingInfo = new SchedulingInfo();
         schedulingInfo.setId(123L);
-        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
+        Mockito.when(poolFinderService.findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any())).thenReturn(Optional.of(schedulingInfo));
 
         var schedulingInfoService = createSchedulingInfoService();
 
@@ -887,8 +875,8 @@ public class SchedulingInfoServiceImplTest {
                 randomString());
         assertNotNull(result);
 
-        Mockito.verify(organizationRepository, times(1)).findByOrganisationId("poolOrg");
-        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getOrganisationId().equalsIgnoreCase(POOL_ORG)), Mockito.any());
+        Mockito.verify(organisationStrategy, times(1)).findOrganisationByCode("poolOrg");
+        Mockito.verify(poolFinderService, times(1)).findPoolSubject(Mockito.argThat(x -> x.getCode().equalsIgnoreCase(POOL_ORG)), Mockito.any());
         var schedulingInfoCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
         Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoCaptor.capture());
         assertNotNull(schedulingInfoCaptor.getValue());
@@ -991,14 +979,13 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService();
         var input = UUID.randomUUID().toString();
         var userOrganisation = "test-org";
-        var schedInfoOrg = createOrganisation();
-        schedInfoOrg.setOrganisationId(userOrganisation);
+        var schedInfoOrg = userOrganisation;
 
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfo = createSchedulingInfo();
-        schedulingInfo.setOrganisation(schedInfoOrg);
+        schedulingInfo.setOrganisationCode(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
@@ -1013,19 +1000,18 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService();
         var input = UUID.randomUUID().toString();
         var userOrganisation = "test-org";
-        var schedInfoOrg = createOrganisation();
-        schedInfoOrg.setOrganisationId("sched-info-org");
+        var schedInfoOrg = "sched-info-org";
 
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
 
-        var organisationDescendants = List.of(createRandomOrganisationSimple(), new OrganisationSimple(schedInfoOrg.getOrganisationId()), createRandomOrganisationSimple());
+        var organisationDescendants = List.of(createRandomOrganisationSimple(), new OrganisationSimple(schedInfoOrg), createRandomOrganisationSimple());
         Mockito.when(organisationServiceClientV2.getDescendantsOfOrganisation(userContext.getUserOrganisation()))
                 .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
-        schedulingInfo.setOrganisation(schedInfoOrg);
+        schedulingInfo.setOrganisationCode(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
@@ -1040,8 +1026,7 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService();
         var input = UUID.randomUUID().toString();
         var userOrganisation = "test-org";
-        var schedInfoOrg = createOrganisation();
-        schedInfoOrg.setOrganisationId("sched-info-org");
+        var schedInfoOrg = "sched-info-org";
 
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
@@ -1051,7 +1036,7 @@ public class SchedulingInfoServiceImplTest {
                 .thenReturn(organisationDescendants);
 
         var schedulingInfo = createSchedulingInfo();
-        schedulingInfo.setOrganisation(schedInfoOrg);
+        schedulingInfo.setOrganisationCode(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
@@ -1064,14 +1049,13 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService();
         var input = UUID.randomUUID().toString();
         var userOrganisation = "test-org";
-        var schedInfoOrg = createOrganisation();
-        schedInfoOrg.setOrganisationId(userOrganisation);
+        var schedInfoOrg = userOrganisation;
 
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfo = createSchedulingInfo();
-        schedulingInfo.setOrganisation(schedInfoOrg);
+        schedulingInfo.setOrganisationCode(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         var result = schedulingInfoService.getSchedulingInfoByUuid(input);
@@ -1086,14 +1070,13 @@ public class SchedulingInfoServiceImplTest {
         var schedulingInfoService = createSchedulingInfoService();
         var input = UUID.randomUUID().toString();
         var userOrganisation = "test-org";
-        var schedInfoOrg = createOrganisation();
-        schedInfoOrg.setOrganisationId("sched-info-org");
+        var schedInfoOrg = "sched-info-org";
 
         var userContext = new UserContextImpl(userOrganisation, "test@test.dk", List.of(userRole, UserRole.USER), null);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
 
         var schedulingInfo = createSchedulingInfo();
-        schedulingInfo.setOrganisation(schedInfoOrg);
+        schedulingInfo.setOrganisationCode(schedInfoOrg);
         Mockito.when(schedulingInfoRepository.findOneByUuid(input)).thenReturn(schedulingInfo);
 
         assertThrows(PermissionDeniedException.class, () -> schedulingInfoService.getSchedulingInfoByUuid(input));
@@ -1209,7 +1192,7 @@ public class SchedulingInfoServiceImplTest {
     private SchedulingTemplate createSchedulingTemplateOtherOrg() {
 
         SchedulingTemplate schedulingTemplate = createSchedulingTemplate(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
-        schedulingTemplate.setOrganisation(createOrganisation(false, "some org id", 10L));
+        schedulingTemplate.setOrganisationCode("some org id");
 
         return schedulingTemplate;
     }
@@ -1218,7 +1201,7 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfo schedulingInfo = new SchedulingInfo();
         schedulingInfo.setVMRAvailableBefore(10);
         schedulingInfo.setUuid(schedulingInfoUuid.toString());
-        schedulingInfo.setOrganisation(createOrganisation());
+        schedulingInfo.setOrganisationCode(createOrganisation());
         schedulingInfo.setUriWithoutDomain("random_uri");
         schedulingInfo.setUriDomain("some_domain");
         schedulingInfo.setMeeting(new Meeting());
@@ -1256,7 +1239,6 @@ public class SchedulingInfoServiceImplTest {
                 schedulingTemplateService,
                 null,
                 meetingUserService,
-                organizationRepository,
                 organisationStrategy,
                 userContextService,
                 OVERFLOW_POOL,
@@ -1271,12 +1253,8 @@ public class SchedulingInfoServiceImplTest {
     }
 
 
-    private Organisation createNonPoolOrganisation()  {
-        return createOrganisation(false, NON_POOL_ORG, 2);
-    }
-
-    private Organisation createOrganisation(boolean poolEnabled, String orgId, long id)  {
-        return TestDataHelper.createOrganisation(poolEnabled, orgId, id);
+    private String createNonPoolOrganisation()  {
+        return NON_POOL_ORG;
     }
 
     private dk.medcom.video.api.organisation.model.Organisation createNonPoolStrategyOrganisation() {
@@ -1295,12 +1273,20 @@ public class SchedulingInfoServiceImplTest {
         return organisation;
     }
 
-    private Organisation createOrganisation() {
-        return createOrganisation(true, POOL_ORG, 1);
+    private dk.medcom.video.api.organisation.model.Organisation createOverflowPoolStrategyOrganisation() {
+        dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
+        organisation.setPoolSize(10);
+        organisation.setCode(OVERFLOW_POOL);
+
+        return organisation;
     }
 
-    private Organisation createOverflowPool() {
-        return createOrganisation(true, OVERFLOW_POOL, 3);
+    private String createOrganisation() {
+        return POOL_ORG;
+    }
+
+    private String createOverflowPool() {
+        return OVERFLOW_POOL;
     }
 
     private OrganisationSimple createRandomOrganisationSimple() {

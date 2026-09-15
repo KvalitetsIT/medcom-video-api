@@ -87,20 +87,14 @@ where
         and (entities.deleted_time = '0001-01-01'));
 
 -- * view groups *
+-- Organisation data is no longer stored locally (video-api was decoupled from the
+-- organisation database, MA-1168), so this view no longer joins the local
+-- organisation table and always uses the group's own name.
 CREATE OR REPLACE VIEW view_groups AS
 select
     groups.group_id AS group_id,
     groups.parent_id AS parent_id,
-    if((not(exists(
-    select
-        organisation.id
-    from
-        organisation
-    where
-        (groups.group_id = organisation.group_id)))),
-    groups.group_name,
-    convert(organisation.name
-        using utf8mb4)) AS group_name,
+    groups.group_name AS group_name,
     groups.group_type AS group_type,
     if((groups.group_type = 1),
     'group',
@@ -112,8 +106,8 @@ select
     if((groups.deleted_time > '0001-01-01'),
     1,
     0) AS Deleted,
-    organisation.id AS organisation_id,
-    organisation.organisation_id AS organisation_id_name,
+    cast(null as unsigned) AS organisation_id,
+    cast(null as char(250)) AS organisation_id_name,
     groups.created_time AS created_time,
     groups.created_by AS created_by,
     groups.updated_time AS updated_time,
@@ -121,9 +115,7 @@ select
     groups.deleted_time AS deleted_time,
     groups.deleted_by AS deleted_by
 from
-    (groups
-left join organisation on
-    ((groups.group_id = organisation.group_id)))
+    groups
 order by
     groups.group_id;
 

@@ -48,12 +48,12 @@ public class AuditServiceImplTest {
         assertEquals("meeting", auditEvent.getResource());
         assertEquals("video-api", auditEvent.getSource());
         assertEquals(input.getUpdatedByUser().getEmail(), auditEvent.getUser());
-        assertEquals(input.getOrganisation().getOrganisationId(), auditEvent.getOrganisationCode());
+        assertEquals(input.getOrganisationCode(), auditEvent.getOrganisationCode());
 
         assertEquals(input.getId(), auditEvent.getAuditData().getId());
         assertEquals(input.getUuid(), auditEvent.getAuditData().getUuid());
         assertEquals(input.getSubject(), auditEvent.getAuditData().getSubject());
-        assertEquals(input.getOrganisation().getOrganisationId(), auditEvent.getAuditData().getOrganisation());
+        assertEquals(input.getOrganisationCode(), auditEvent.getAuditData().getOrganisation());
         assertEquals(input.getMeetingUser().getEmail(), auditEvent.getAuditData().getCreatedBy());
         assertEquals(input.getCreatedTime().toInstant(), auditEvent.getAuditData().getCreatedTime().toInstant());
         assertEquals(input.getUpdatedByUser().getEmail(), auditEvent.getAuditData().getUpdatedBy());
@@ -88,7 +88,7 @@ public class AuditServiceImplTest {
         assertEquals("schedulingInfo", auditEvent.getResource());
         assertEquals("video-api", auditEvent.getSource());
         assertEquals(input.getUpdatedByUser().getEmail(), auditEvent.getUser());
-        assertEquals(input.getOrganisation().getOrganisationId(), auditEvent.getOrganisationCode());
+        assertEquals(input.getOrganisationCode(), auditEvent.getOrganisationCode());
 
         var schedulingInfo = auditEvent.getAuditData();
         assertThat(schedulingInfo.getId()).isEqualTo(input.getId());
@@ -117,7 +117,7 @@ public class AuditServiceImplTest {
         assertThat(schedulingInfo.getProvisionStatusDescription()).isEqualTo(input.getProvisionStatusDescription());
         assertThat(schedulingInfo.getProvisionTimestamp().toInstant()).isEqualTo(input.getProvisionTimestamp().toInstant());
         assertThat(schedulingInfo.getProvisionVMRId()).isEqualTo(input.getProvisionVMRId());
-        assertThat(schedulingInfo.getOrganisation()).isEqualTo(input.getOrganisation().getOrganisationId());
+        assertThat(schedulingInfo.getOrganisation()).isEqualTo(input.getOrganisationCode());
         assertThat(schedulingInfo.getPortalLink()).isEqualTo(input.getPortalLink());
         assertThat(schedulingInfo.getIvrTheme()).isEqualTo(input.getIvrTheme());
         assertThat(schedulingInfo.getCreatedBy()).isEqualTo(input.getMeetingUser().getEmail());
@@ -151,7 +151,7 @@ public class AuditServiceImplTest {
         schedulingInfo.setCreatedTime(new Date());
         schedulingInfo.setUpdatedByUser(new MeetingUser());
         schedulingInfo.setUpdatedTime(new Date());
-        schedulingInfo.setOrganisation(new Organisation());
+        schedulingInfo.setOrganisationCode("scheduling_org");
         schedulingInfo.setReservationId("reservation_id");
         schedulingInfo.setPoolOverflow(true);
         schedulingInfo.setPool(true);
@@ -174,10 +174,7 @@ public class AuditServiceImplTest {
         meeting.setId(2L);
         meeting.setUuid(UUID.randomUUID().toString());
         meeting.setSubject("subject");
-        var organisation = new Organisation();
-        organisation.setOrganisationId("some_id");
-        organisation.setId(123L);
-        meeting.setOrganisation(organisation);
+        meeting.setOrganisationCode("some_id");
         var meetingUser = new MeetingUser();
         meetingUser.setEmail("some_email");
         meeting.setMeetingUser(meetingUser);

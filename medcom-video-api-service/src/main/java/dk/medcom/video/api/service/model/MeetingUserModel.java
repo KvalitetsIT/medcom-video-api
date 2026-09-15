@@ -9,7 +9,7 @@ public record MeetingUserModel(String organisationId,
             return null;
         }
         return new MeetingUserModel(
-                meetingUser.getOrganisation().getOrganisationId(),
+                meetingUser.getOrganisationCode(),
                 meetingUser.getEmail());
     }
 }

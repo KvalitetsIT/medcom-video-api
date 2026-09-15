@@ -3,11 +3,9 @@ package dk.medcom.video.api.repository;
 import dk.medcom.video.api.dao.MeetingAdditionalInfoRepository;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingAdditionalInfo;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -28,9 +26,6 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
 
     @Resource
     private MeetingUserRepository meetingUserRepository;
-
-    @Resource
-    private OrganisationRepository organisationRepository;
 
     @Test
     public void testSaveAllAndDelete() {
@@ -107,15 +102,14 @@ public class MeetingAdditionalInfoRepositoryTest extends RepositoryTest {
     private Meeting setupMeeting() {
         String uuid = UUID.randomUUID().toString();
         Long meetingUserId = 101L;
-        Long organisationId = 5L;
+        String organisationCode = "test-org";
         String projectCode = "PROJECT1";
 
         Meeting meeting = new Meeting();
         meeting.setSubject("Test meeting");
         meeting.setUuid(uuid);
 
-        Organisation organisation = organisationRepository.findById(organisationId).orElse(null);
-        meeting.setOrganisation(organisation);
+        meeting.setOrganisationCode(organisationCode);
 
         MeetingUser meetingUser = meetingUserRepository.findById(meetingUserId).orElse(null);
         meeting.setMeetingUser(meetingUser);

@@ -45,7 +45,7 @@ public record SchedulingTemplateModel(Long id,
                                       OffsetDateTime updatedTime) {
     public static SchedulingTemplateModel from(SchedulingTemplate schedulingTemplate) {
         return new SchedulingTemplateModel(schedulingTemplate.getId(),
-                schedulingTemplate.getOrganisation().getOrganisationId(),
+                schedulingTemplate.getOrganisationCode(),
                 schedulingTemplate.getConferencingSysId(),
                 schedulingTemplate.getUriPrefix(),
                 schedulingTemplate.getUriDomain(),

@@ -31,12 +31,12 @@ public class MeetingUserServiceImpl implements MeetingUserService {
 	public MeetingUser getOrCreateCurrentMeetingUser(String email) throws PermissionDeniedException {
 		LOGGER.debug("Entry getOrCreateCurrentMeetingUser email is required and is: " + email);
 		LOGGER.debug("Entry getOrCreateCurrentMeetingUser organisation is required  and is: " + organisationService.getUserOrganisation());
-		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationAndEmail(organisationService.getUserOrganisation(), email);
+		MeetingUser meetingUser = meetingUserRepository.findOneByOrganisationCodeAndEmail(organisationService.getUserOrganisation().getCode(), email);
 		if (meetingUser == null) {
 			LOGGER.debug("Creating meeting user");
 			meetingUser = new MeetingUser();
 			meetingUser.setEmail(email);
-			meetingUser.setOrganisation(organisationService.getUserOrganisation());
+			meetingUser.setOrganisationCode(organisationService.getUserOrganisation().getCode());
 			meetingUser = meetingUserRepository.save(meetingUser);
 		}
 		return meetingUser;

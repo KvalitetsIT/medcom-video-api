@@ -12,31 +12,31 @@ import dk.medcom.video.api.context.UserContextService;
 import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.UnauthorizedException;
-import dk.medcom.video.api.dao.entity.Organisation;
-import dk.medcom.video.api.dao.OrganisationRepository;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.model.Organisation;
 
 public class UserSecurityInterceptor implements HandlerInterceptor {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserSecurityInterceptor.class);
-	
+
 	@Autowired
 	UserContextService userService;
-	
+
 	@Autowired
-	OrganisationRepository organisationRepository;
-	
+	OrganisationStrategy organisationStrategy;
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		LOGGER.debug("Entry of preHandle method");
-		
+
 		String userOrganisationId = userService.getUserContext().getUserOrganisation();
 		Organisation organisation = null;
 		if ((userOrganisationId != null) && (!userOrganisationId.isEmpty())) {
-			organisation = organisationRepository.findByOrganisationId(userOrganisationId);
+			organisation = organisationStrategy.findOrganisationByCode(userOrganisationId);
 			if (organisation == null) {
-				LOGGER.debug("organisation is not found using findByOrganisationId(userOrganisationId). userOrganisationId: " + userOrganisationId );
+				LOGGER.debug("organisation is not found using findOrganisationByCode(userOrganisationId). userOrganisationId: " + userOrganisationId );
 				throw new PermissionDeniedException();
-			}			
+			}
 		}
 		
 		String userEmail = userService.getUserContext().getUserEmail();
@@ -55,7 +55,7 @@ public class UserSecurityInterceptor implements HandlerInterceptor {
 
 		String organisationId = null;
 		if(organisation != null) {
-			organisationId = organisation.getOrganisationId();
+			organisationId = organisation.getCode();
 		}
 		LOGGER.info("User information: organisation: {}, email: {}, roles: {}", organisationId, userEmail, userService.getUserContext().getUserRoles());
 

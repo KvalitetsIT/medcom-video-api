@@ -17,9 +17,7 @@ public class Meeting {
 	private String uuid;
 	private String subject;
 	
-	@ManyToOne
-    @JoinColumn(name="organisation_id")
-	private Organisation organisation;
+	private String organisationCode;
 
 	@ManyToOne
     @JoinColumn(name="created_by")
@@ -81,12 +79,12 @@ public class Meeting {
 		this.subject = subject;
 	}
 
-	public Organisation getOrganisation() {
-		return organisation;
+	public String getOrganisationCode() {
+		return organisationCode;
 	}
 
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setOrganisationCode(String organisationCode) {
+		this.organisationCode = organisationCode;
 	}
 	
 	public MeetingUser getMeetingUser() {

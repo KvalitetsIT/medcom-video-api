@@ -1,7 +1,7 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.organisation.model.Organisation;
 
 public interface OrganisationService {
     Organisation getUserOrganisation() throws PermissionDeniedException;

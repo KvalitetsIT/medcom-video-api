@@ -3,8 +3,8 @@ package dk.medcom.video.api.service;
 import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
+import dk.medcom.video.api.organisation.model.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,13 +51,13 @@ public class PoolFinderServiceImpl implements PoolFinderService {
                         "Org: '{}' Time: '{}' VMR Type: '{}' HostView: '{}' GuestView: '{}' " +
                         "VmrQuality: '{}' EnableOverlayText: '{}' GuestsCanPresent: '{}' " +
                         "ForcePresenterIntoMain: '{}' ForceEncryption: '{}' MuteAllGuests: '{}' CallType '{}'",
-                organisation != null ? organisation.getId() : null,
+                organisation != null ? organisation.getCode() : null,
                 provisionTimestampOlderThen, vmrType, hostView, guestView,
                 vmrQuality, enableOverlay, guestsPresent, forcePresenter,
                 forceEncryption, muteGuests, callType);
 
         return schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                        organisation != null ? organisation.getId() : null,
+                        organisation != null ? organisation.getCode() : null,
                         ProvisionStatus.PROVISIONED_OK.name(),
                         provisionTimestampOlderThen,
                         vmrType, hostView, guestView, vmrQuality, callType,

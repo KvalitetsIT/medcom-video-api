@@ -11,9 +11,7 @@ public class SchedulingTemplate {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne
-    @JoinColumn(name="organisation_id")
-	private Organisation organisation;
+	private String organisationCode;
 	
 	private Long conferencingSysId;			//id on conference system
 	private String uriPrefix;  				//prefix before uri @
@@ -78,11 +76,11 @@ public class SchedulingTemplate {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Organisation getOrganisation() {
-		return organisation;
+	public String getOrganisationCode() {
+		return organisationCode;
 	}
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setOrganisationCode(String organisationCode) {
+		this.organisationCode = organisationCode;
 	}
 	public Long getConferencingSysId() {
 		return conferencingSysId;
@@ -224,7 +222,7 @@ public class SchedulingTemplate {
 	}
 	@Override
 	public String toString() {
-		return "SchedulingTemplate [id=" + id + ", organisation=" + organisation + ", conferencingSysId="
+		return "SchedulingTemplate [id=" + id + ", organisationCode=" + organisationCode + ", conferencingSysId="
 				+ conferencingSysId + ", uriPrefix=" + uriPrefix + ", uriDomain=" + uriDomain + ", hostPinRequired="
 				+ hostPinRequired + ", hostPinRangeLow=" + hostPinRangeLow + ", hostPinRangeHigh=" + hostPinRangeHigh
 				+ ", guestPinRequired=" + guestPinRequired + ", guestPinRangeLow=" + guestPinRangeLow

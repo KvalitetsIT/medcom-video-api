@@ -4,13 +4,10 @@ import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
-import dk.medcom.video.api.dao.entity.PoolInfoEntity;
 import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
 
@@ -22,20 +19,11 @@ public class PoolInfoServiceImpl implements PoolInfoService {
     private final OrganisationStrategy organisationStrategy;
     private final SchedulingInfoRepository schedulingInfoRepository;
     private final SchedulingTemplateRepository schedulingTemplateRepository;
-    private final OrganisationRepository organisationRepository;
-    private final PoolInfoRepository poolInfoRepository;
 
-    public PoolInfoServiceImpl(OrganisationRepository organisationRepository, SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy, PoolInfoRepository poolInfoRepository) {
+    public PoolInfoServiceImpl(SchedulingInfoRepository schedulingInfoRepository, SchedulingTemplateRepository schedulingTemplateRepository, OrganisationStrategy organisationStrategy) {
         this.organisationStrategy = organisationStrategy;
         this.schedulingInfoRepository = schedulingInfoRepository;
         this.schedulingTemplateRepository = schedulingTemplateRepository;
-        this.organisationRepository = organisationRepository;
-        this.poolInfoRepository = poolInfoRepository;
-    }
-
-    @Override
-    public List<PoolInfoEntity> getAllPoolInfo() {
-    	return poolInfoRepository.getPoolInfos();
     }
 
     @Override
@@ -52,29 +40,26 @@ public class PoolInfoServiceImpl implements PoolInfoService {
             poolInfo.setDesiredPoolSize(o.getPoolSize());
             poolInfo.setOrganizationId(o.getCode());
 
-            poolInfo.setAvailablePoolSize((int) schedulingInfos.stream().filter(x -> x.getOrganisation().getOrganisationId().equals(o.getCode())).count());
+            poolInfo.setAvailablePoolSize((int) schedulingInfos.stream().filter(x -> x.getOrganisationCode().equals(o.getCode())).count());
 
             poolInfo.setSchedulingTemplate(getSchedulingTemplate(o));
 
-            poolInfo.setSchedulingInfoList(schedulingInfos.stream().filter(x -> x.getOrganisation().getOrganisationId().equals(o.getCode())).sorted(Comparator.comparing(SchedulingInfo::getCreatedTime).reversed()).toList());
+            poolInfo.setSchedulingInfoList(schedulingInfos.stream().filter(x -> x.getOrganisationCode().equals(o.getCode())).sorted(Comparator.comparing(SchedulingInfo::getCreatedTime).reversed()).toList());
 
             return poolInfo;
         }).collect(Collectors.toList());
     }
 
     private SchedulingTemplateDto getSchedulingTemplate(Organisation o) {
-        dk.medcom.video.api.dao.entity.Organisation org = organisationRepository.findByOrganisationId(o.getCode());
-        if(org != null) {
-            List<SchedulingTemplate> schedulingTemplatesPool = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(org, true);
-            if (schedulingTemplatesPool != null && !schedulingTemplatesPool.isEmpty()) {
-                return mapSchedulingTemplate(schedulingTemplatesPool.getFirst());
-            }
+        List<SchedulingTemplate> schedulingTemplatesPool = schedulingTemplateRepository.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(o.getCode(), true);
+        if (schedulingTemplatesPool != null && !schedulingTemplatesPool.isEmpty()) {
+            return mapSchedulingTemplate(schedulingTemplatesPool.getFirst());
+        }
 
-            List<SchedulingTemplate> schedulingTemplatesDefault = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(org, true);
+        List<SchedulingTemplate> schedulingTemplatesDefault = schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(o.getCode(), true);
 
-            if(schedulingTemplatesDefault != null && !schedulingTemplatesDefault.isEmpty()) {
-                return mapSchedulingTemplate(schedulingTemplatesDefault.getFirst());
-            }
+        if(schedulingTemplatesDefault != null && !schedulingTemplatesDefault.isEmpty()) {
+            return mapSchedulingTemplate(schedulingTemplatesDefault.getFirst());
         }
 
         return null;

@@ -98,7 +98,6 @@ public class ServiceStarter {
 
         System.setProperty("LOG_LEVEL", "DEBUG");
 
-        System.setProperty("organisation.service.enabled", "true");
         System.setProperty("organisation.service.endpoint", organisationPath + "/services");
         System.setProperty("organisation.service.v2.endpoint", organisationPath);
         System.setProperty("organisationtree.service.endpoint", organisationPath);
@@ -247,6 +246,10 @@ public class ServiceStarter {
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationServiceResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/new-provisioner-org").withHeader("Authorization", "Bearer mock-access-token")).respond(newProvisionerOrganisationServiceResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("PUT").withPath("/services/v2/organisation/user-org-pool/ensure").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationServiceResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("PUT").withPath("/services/v2/organisation/new-provisioner-org/ensure").withHeader("Authorization", "Bearer mock-access-token")).respond(newProvisionerOrganisationServiceResponse());
 
         organisationPath = "http://localhost:" + organisationService.getMappedPort(1080);
         attachLogger(organisationService, organisationLogger);
@@ -308,6 +311,14 @@ public class ServiceStarter {
         Organisation t = new Organisation();
         t.setPoolSize(10);
         t.setCode("user-org-pool");
+
+        return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
+    }
+
+    private static HttpResponse newProvisionerOrganisationServiceResponse() {
+        Organisation t = new Organisation();
+        t.setPoolSize(9);
+        t.setCode("new-provisioner-org");
 
         return HttpResponse.response().withHeaders(new Header("content-type", "application/json")).withBody(JsonBody.json(t, MediaType.JSON_UTF_8));
     }

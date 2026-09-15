@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,12 +14,10 @@ public class MeetingUser {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-    @JoinColumn(name="organisation_id")
-	private Organisation organisation;
-	
+	private String organisationCode;
+
 	private String email;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -30,12 +26,12 @@ public class MeetingUser {
 		this.id = id;
 	}
 
-	public Organisation getOrganisation() {
-		return organisation;
+	public String getOrganisationCode() {
+		return organisationCode;
 	}
 
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setOrganisationCode(String organisationCode) {
+		this.organisationCode = organisationCode;
 	}
 	public String getEmail() {
 		return email;

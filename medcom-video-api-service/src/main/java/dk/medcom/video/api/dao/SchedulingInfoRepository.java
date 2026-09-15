@@ -21,7 +21,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatus(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus);
 
-	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3 AND s.organisation.organisationId IN (?4)")
+	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE ((s.vMRStartTime > ?1 and s.vMRStartTime < ?2) OR (m.endTime > ?1 and m.endTime < ?2)) AND s.provisionStatus = ?3 AND s.organisationCode IN (?4)")
 	List<SchedulingInfo> findAllWithinAdjustedTimeIntervalAndStatusAndOrganisations(Date fromStartTime, Date toEndTime, ProvisionStatus provisionStatus, Set<String> organisationIds);
 
 	@Query("SELECT s FROM SchedulingInfo s INNER JOIN s.meeting m WHERE s.vMRStartTime <= ?1 AND m.endTime >= ?1 AND s.provisionStatus = ?2")
@@ -32,7 +32,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
 
 	@Query(value = """
             SELECT * FROM scheduling_info s \
-             WHERE (s.organisation_id = :organisationId\s
+             WHERE (s.organisation_code = :organisationCode\s
                AND s.provision_status = :provisionStatus\s
                AND s.meetings_id IS NULL\s
                AND ifnull(:vmrType, '__UNDEFINED__') in ('__UNDEFINED__', s.vmr_type)\s
@@ -48,7 +48,7 @@ public interface SchedulingInfoRepository extends CrudRepository<SchedulingInfo,
                and s.reservation_id is null\s
                and s.provision_timestamp < :provisionTimestampOlderThen LIMIT 1 FOR UPDATE""", nativeQuery = true)
 	List<SchedulingInfo> findByMeetingIsNullAndOrganisationAndProvisionStatus(
-			@Param("organisationId") Long organisationId,
+			@Param("organisationCode") String organisationCode,
 			@Param("provisionStatus") String provisionStatus,
 			@Param("provisionTimestampOlderThen") Date provisionTimestampOlderThen,
 			@Param("vmrType") String vmrType,

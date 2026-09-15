@@ -6,9 +6,7 @@ import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.MeetingUserRepository;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,6 @@ public class PoolServiceImplTest {
     private PoolServiceImpl poolService;
     private SchedulingInfoService schedulingInfoService;
     private MeetingUserRepository meetingUserRepository;
-    private OrganisationRepository organisationRepository;
     private NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 
     private final String poolOrganisation = "POOL_ORG";
@@ -33,10 +30,9 @@ public class PoolServiceImplTest {
     public void setup() {
         schedulingInfoService = Mockito.mock(SchedulingInfoService.class);
         meetingUserRepository = Mockito.mock(MeetingUserRepository.class);
-        organisationRepository = Mockito.mock(OrganisationRepository.class);
         newProvisionerOrganisationFilter = Mockito.mock(NewProvisionerOrganisationFilter.class);
 
-        poolService = new PoolServiceImpl(schedulingInfoService, meetingUserRepository, organisationRepository, newProvisionerOrganisationFilter, poolOrganisation, poolEmail);
+        poolService = new PoolServiceImpl(schedulingInfoService, meetingUserRepository, newProvisionerOrganisationFilter, poolOrganisation, poolEmail);
     }
 
     @Test
@@ -75,10 +71,8 @@ public class PoolServiceImplTest {
         poolInfo.setSchedulingTemplate(new SchedulingTemplateDto());
         poolInfo.setAvailablePoolSize(10);
         Mockito.when(newProvisionerOrganisationFilter.newProvisioner("org1")).thenReturn(true);
-        var organisation = new Organisation();
-        Mockito.when(organisationRepository.findByOrganisationId(poolOrganisation)).thenReturn(organisation);
         var meetingUser = new MeetingUser();
-        Mockito.when(meetingUserRepository.findOneByOrganisationAndEmail(organisation, poolEmail)).thenReturn(meetingUser);
+        Mockito.when(meetingUserRepository.findOneByOrganisationCodeAndEmail(poolOrganisation, poolEmail)).thenReturn(meetingUser);
 
         poolService.fillOrDeletePool(poolInfo);
 
@@ -96,11 +90,9 @@ public class PoolServiceImplTest {
         poolInfo.setSchedulingTemplate(new SchedulingTemplateDto());
         poolInfo.setAvailablePoolSize(10);
         Mockito.when(newProvisionerOrganisationFilter.newProvisioner("org1")).thenReturn(true);
-        var organisation = new Organisation();
-        Mockito.when(organisationRepository.findByOrganisationId(poolOrganisation)).thenReturn(organisation);
-        Mockito.when(meetingUserRepository.findOneByOrganisationAndEmail(organisation, poolEmail)).thenReturn(null);
+        Mockito.when(meetingUserRepository.findOneByOrganisationCodeAndEmail(poolOrganisation, poolEmail)).thenReturn(null);
         var savedMeetingUser = Mockito.mock(MeetingUser.class);
-        Mockito.when(meetingUserRepository.save(Mockito.argThat(user -> poolEmail.equals(user.getEmail()) && organisation.equals(user.getOrganisation()))))
+        Mockito.when(meetingUserRepository.save(Mockito.argThat(user -> poolEmail.equals(user.getEmail()) && poolOrganisation.equals(user.getOrganisationCode()))))
                 .thenReturn(savedMeetingUser);
 
         poolService.fillOrDeletePool(poolInfo);

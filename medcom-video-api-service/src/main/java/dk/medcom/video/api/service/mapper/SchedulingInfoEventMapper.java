@@ -21,7 +21,7 @@ public class SchedulingInfoEventMapper {
         schedulingInfoEvent.setUriWithoutDomain(schedulingInfo.getUriWithoutDomain());
         schedulingInfoEvent.setUriDomain(schedulingInfo.getUriDomain());
         schedulingInfoEvent.setUriWithDomain(schedulingInfo.getUriWithDomain());
-        schedulingInfoEvent.setOrganisationCode(schedulingInfo.getOrganisation().getOrganisationId());
+        schedulingInfoEvent.setOrganisationCode(schedulingInfo.getOrganisationCode());
         schedulingInfoEvent.setPortalLink(schedulingInfo.getPortalLink());
         schedulingInfoEvent.setMaxParticipants(schedulingInfo.getMaxParticipants());
         schedulingInfoEvent.setEndMeetingOnEndTime(schedulingInfo.getEndMeetingOnEndTime());

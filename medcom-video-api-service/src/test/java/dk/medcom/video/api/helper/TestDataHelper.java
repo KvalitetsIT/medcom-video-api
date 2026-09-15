@@ -2,7 +2,6 @@ package dk.medcom.video.api.helper;
 
 import dk.medcom.video.api.dao.entity.DirectMedia;
 import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
@@ -11,30 +10,20 @@ import java.util.Date;
 import java.util.UUID;
 
 public class TestDataHelper {
-    public static Organisation createOrganisation(boolean poolEnabled, String orgId, long id)  {
-        Organisation organisation = new Organisation();
-        organisation.setId(id);
-        organisation.setName("this is a name");
-        organisation.setOrganisationId(orgId);
-        organisation.setPoolSize(poolEnabled ? 10 : null);
-
-        return organisation;
-    }
-
-    public static SchedulingInfo createSchedulingInfo(Organisation organization) {
+    public static SchedulingInfo createSchedulingInfo(String organisationCode) {
         SchedulingInfo schedulingInfo = new SchedulingInfo();
         schedulingInfo.setProvisionStatusDescription("provisions status description");
         schedulingInfo.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
         schedulingInfo.setProvisionVMRId("vmr id");
-        schedulingInfo.setOrganisation(organization);
+        schedulingInfo.setOrganisationCode(organisationCode);
         schedulingInfo.setvMRStartTime(new Date());
         schedulingInfo.setUuid(UUID.randomUUID().toString());
         schedulingInfo.setVMRAvailableBefore(10);
         schedulingInfo.setEndMeetingOnEndTime(true);
         schedulingInfo.setMaxParticipants(20);
-        schedulingInfo.setMeetingUser(createMeetingUser(organization));
+        schedulingInfo.setMeetingUser(createMeetingUser(organisationCode));
         schedulingInfo.setPortalLink("portal link");
-        schedulingInfo.setUpdatedByUser(createMeetingUser(organization));
+        schedulingInfo.setUpdatedByUser(createMeetingUser(organisationCode));
         schedulingInfo.setCreatedTime(new Date());
         schedulingInfo.setGuestPin(4324L);
         schedulingInfo.setHostPin(473892L);
@@ -49,9 +38,9 @@ public class TestDataHelper {
         return schedulingInfo;
     }
 
-    public static MeetingUser createMeetingUser(Organisation org) {
+    public static MeetingUser createMeetingUser(String organisationCode) {
         MeetingUser meetingUser = new MeetingUser();
-        meetingUser.setOrganisation(org);
+        meetingUser.setOrganisationCode(organisationCode);
         meetingUser.setEmail("jpe@kvalitetsit.dk");
         meetingUser.setId(2L);
 

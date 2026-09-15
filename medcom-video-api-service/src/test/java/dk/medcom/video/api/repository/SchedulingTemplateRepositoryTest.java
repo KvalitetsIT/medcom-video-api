@@ -1,9 +1,7 @@
 package dk.medcom.video.api.repository;
 
 import dk.medcom.video.api.dao.entity.DirectMedia;
-import dk.medcom.video.api.dao.OrganisationRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import org.junit.jupiter.api.Test;
 
@@ -17,21 +15,18 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 	@Resource
     private SchedulingTemplateRepository subject;
-	
-	@Resource
-    private OrganisationRepository subjectO;
-	
+
 	@Test
 	public void testCreateSchedulingTemplate() {
 		// Given
-		Long organisationId = 1L; 
-		Long conferencingSysId = 7L; 
+		String organisationCode = "company 1";
+		Long conferencingSysId = 7L;
 		String uriPrefix = "abcd";
-		String uriDomain = "test7.dk"; 
-		boolean hostPinRequired = true; 
+		String uriDomain = "test7.dk";
+		boolean hostPinRequired = true;
 		Long hostPinRangeLow = 7L;
 		Long hostPinRangeHigh = 97L;
-		boolean guestPinRequired = false; 
+		boolean guestPinRequired = false;
 		Long guestPinRangeLow = 107L;
 		Long guestPinRangeHigh = 997L;
 		int vMRAvailableBefore = 10;
@@ -45,10 +40,8 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		String returnUrl = UUID.randomUUID().toString();
 		String callType = UUID.randomUUID().toString();
 
-		Organisation organisation = subjectO.findById(organisationId).orElse(null);
-		
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
-		schedulingTemplate.setOrganisation(organisation);
+		schedulingTemplate.setOrganisationCode(organisationCode);
 		schedulingTemplate.setConferencingSysId(conferencingSysId);
 		schedulingTemplate.setUriPrefix(uriPrefix);
 		schedulingTemplate.setUriDomain(uriDomain);
@@ -72,11 +65,11 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 		// When
 		schedulingTemplate = subject.save(schedulingTemplate);
-		
+
 		// Then
 		assertNotNull(schedulingTemplate);
 		assertNotNull(schedulingTemplate.getId());
-		assertEquals(organisation, schedulingTemplate.getOrganisation());
+		assertEquals(organisationCode, schedulingTemplate.getOrganisationCode());
 		assertEquals(conferencingSysId, schedulingTemplate.getConferencingSysId());
 		assertEquals(uriPrefix, schedulingTemplate.getUriPrefix());
 		assertEquals(uriDomain, schedulingTemplate.getUriDomain());
@@ -102,10 +95,10 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindAllSchedulingTemplate() {
 		// Given
-		
+
 		// When
 		Iterable<SchedulingTemplate> schedulingTemplates = subject.findAll();
-		
+
 		// Then
 		assertNotNull(schedulingTemplates);
 		int numberOfSchedulingTemplates = 0;
@@ -115,18 +108,18 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		}
 		assertEquals(8, numberOfSchedulingTemplates);
 	}
-	
+
 	@Test
 	public void testFindSchedulingTemplateWithExistingId() {
 		// Given
 		Long id = 1L;
-		
+
 		// When
 		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
-		
+
 		// Then
 		assertNotNull(schedulingTemplate);
-		assertEquals(1L, schedulingTemplate.getOrganisation().getId().longValue());
+		assertEquals("company 1", schedulingTemplate.getOrganisationCode());
 		assertEquals(id, schedulingTemplate.getId());
 		assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		assertEquals("abc", schedulingTemplate.getUriPrefix());
@@ -153,36 +146,36 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	public void testFindSchedulingTemplateWithNonExistingId() {
 		// Given
 		Long id = 1999L;
-		
+
 		// When
 		SchedulingTemplate schedulingTemplate = subject.findById(id).orElse(null);
-		
+
 		// Then
 		assertNull(schedulingTemplate);
 	}
 	@Test
 	public void testFindSchedulingTemplateWithExistingOrganisation() {
 		// Given
-		Organisation organisation = subjectO.findById(1L).orElse(null);
-		
-		// When	
-		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndDeletedTimeIsNull(organisation); 
-		
+		String organisationCode = "company 1";
+
+		// When
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationCodeAndDeletedTimeIsNull(organisationCode);
+
 		// Then
 		assertNotNull(schedulingTemplates);
 		assertEquals(1, schedulingTemplates.size());
 	}
-	
+
 	@Test
 	public void testFindSchedulingTemplateWithOrganisationNull() {
 		// Given
-		Long conferencingSysId = 7L; 
+		Long conferencingSysId = 7L;
 		String uriPrefix = "abcd";
-		String uriDomain = "test7.dk"; 
-		boolean hostPinRequired = true; 
+		String uriDomain = "test7.dk";
+		boolean hostPinRequired = true;
 		Long hostPinRangeLow = 7L;
 		Long hostPinRangeHigh = 97L;
-		boolean guestPinRequired = false; 
+		boolean guestPinRequired = false;
 		Long guestPinRangeLow = 107L;
 		Long guestPinRangeHigh = 997L;
 		int vMRAvailableBefore = 10;
@@ -194,13 +187,13 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 
 		// When
 		// Then
-		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
+		Iterable<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationCodeIsNullAndDeletedTimeIsNull();
 		int numberOfSchedulingTemplates = 0;
 		for (SchedulingTemplate schedulingTemplate : schedulingTemplates) {
-			assertNull(schedulingTemplate.getOrganisation());
+			assertNull(schedulingTemplate.getOrganisationCode());
 			numberOfSchedulingTemplates++;
 		}
-		
+
 		if (numberOfSchedulingTemplates < 1) {
 			SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
 			schedulingTemplate.setConferencingSysId(conferencingSysId);
@@ -221,13 +214,13 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 			schedulingTemplate.setDirectMedia(DirectMedia.best_effort);
 
 			subject.save(schedulingTemplate);
-			schedulingTemplates = subject.findByOrganisationIsNullAndDeletedTimeIsNull();
-			
+			schedulingTemplates = subject.findByOrganisationCodeIsNullAndDeletedTimeIsNull();
+
 			assertNotNull(schedulingTemplates);
 			numberOfSchedulingTemplates = 0;
 			for (SchedulingTemplate schedulingTemplate2 : schedulingTemplates) {
 				assertNotNull(schedulingTemplate2);
-				assertNull(schedulingTemplate2.getOrganisation());
+				assertNull(schedulingTemplate2.getOrganisationCode());
 				numberOfSchedulingTemplates++;
 			}
 			assertEquals(1, numberOfSchedulingTemplates);
@@ -237,43 +230,43 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindSchedulingTemplateWithExistingOrganisationAndIsDefault() {
 		// Given
-		Organisation organisation = subjectO.findById(3L).orElse(null);
-		
-		// When	
-		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true); 
-		
+		String organisationCode = "company 3";
+
+		// When
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(organisationCode, true);
+
 		// Then
 		assertNotNull(schedulingTemplates);
 		assertEquals(1, schedulingTemplates.size());
 	}
-	
+
 	@Test
 	public void testFindSchedulingTemplateWithExistingOrganisationAndId() {
 		// Given
-		Organisation organisation = subjectO.findById(3L).orElse(null);
+		String organisationCode = "company 3";
 		Long id = 5L;
-		
-		// When	
-		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
-		
+
+		// When
+		SchedulingTemplate schedulingTemplate = subject.findByOrganisationCodeAndIdAndDeletedTimeIsNull(organisationCode, id);
+
 		// Then
 		assertNotNull(schedulingTemplate);
 		assertEquals(id, schedulingTemplate.getId());
-	
+
 	}
-	
+
 	@Test
 	public void testFindSchedulingTemplateWithExistingOrganisationAndIdNotFound() {
 		// Given
-		Organisation organisation = subjectO.findById(3L).orElse(null);
+		String organisationCode = "company 3";
 		Long id = 777L;
-		
-		// When	
-		SchedulingTemplate schedulingTemplate = subject.findByOrganisationAndIdAndDeletedTimeIsNull(organisation, id); 
-		
+
+		// When
+		SchedulingTemplate schedulingTemplate = subject.findByOrganisationCodeAndIdAndDeletedTimeIsNull(organisationCode, id);
+
 		// Then
 		assertNull(schedulingTemplate);
-	
+
 	}
 
 	@Test
@@ -287,10 +280,10 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 	@Test
 	public void testFindByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull() {
 		// Given
-		Organisation organisation = subjectO.findById(8L).orElse(null);
+		String organisationCode = "pool-test-org2";
 
 		// When
-		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisation, true);
+		List<SchedulingTemplate> schedulingTemplates = subject.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(organisationCode, true);
 
 		// Then
 		assertNotNull(schedulingTemplates);
@@ -299,7 +292,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		var schedulingTemplate = schedulingTemplates.getFirst();
 		assertNotNull(schedulingTemplate);
 		assertEquals(7L, schedulingTemplate.getId().longValue());
-		assertEquals(8L, schedulingTemplate.getOrganisation().getId().longValue());
+		assertEquals(organisationCode, schedulingTemplate.getOrganisationCode());
 		assertEquals(22L, schedulingTemplate.getConferencingSysId().longValue());
 		assertEquals("abc3c", schedulingTemplate.getUriPrefix());
 		assertEquals("test.dk", schedulingTemplate.getUriDomain());

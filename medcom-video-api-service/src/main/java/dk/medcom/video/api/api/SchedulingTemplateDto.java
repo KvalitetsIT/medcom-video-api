@@ -67,8 +67,8 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	public SchedulingTemplateDto(SchedulingTemplate schedulingTemplate) throws PermissionDeniedException {
 		
 		templateId = schedulingTemplate.getId();
-		if(schedulingTemplate.getOrganisation() != null) {
-			organisationId = schedulingTemplate.getOrganisation().getOrganisationId();
+		if(schedulingTemplate.getOrganisationCode() != null) {
+			organisationId = schedulingTemplate.getOrganisationCode();
 		}
 
 		conferencingSysId = schedulingTemplate.getConferencingSysId();

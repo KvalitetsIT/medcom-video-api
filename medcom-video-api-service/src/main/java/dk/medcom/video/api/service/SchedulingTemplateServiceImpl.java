@@ -8,6 +8,7 @@ import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.*;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.Organisation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,15 +92,15 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		List<SchedulingTemplate> schedulingTemplates;
 		if (organisation != null) {
 			//first try: find default template for organization. Use list just in case.
-			schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisation, true);
+			schedulingTemplates = schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(organisation.getCode(), true);
 			if (!schedulingTemplates.isEmpty()) {
                 LOGGER.debug("Template found using default organization template: {}", schedulingTemplates.getFirst().toString());
 				return schedulingTemplates.getFirst();
 			}
 
 			// Find in tree
-			var organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getOrganisationId());
-			var parent = organisationFinder.findParentOrganisation(organisation.getOrganisationId(), organisationTree);
+			var organisationTree = organisationTreeServiceClient.getOrganisationTree(organisation.getCode());
+			var parent = organisationFinder.findParentOrganisation(organisation.getCode(), organisationTree);
 			while(parent.isPresent()) {
 				var schedulingTemplateFromTree = schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull(parent.get().getCode());
 				if(schedulingTemplateFromTree != null && !schedulingTemplateFromTree.isEmpty()) {
@@ -110,7 +111,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 			}
 
 			//second try: find shared default template, where organization is null
-			schedulingTemplates = schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull();
+			schedulingTemplates = schedulingTemplateRepository.findByOrganisationCodeIsNullAndDeletedTimeIsNull();
 			if (!schedulingTemplates.isEmpty()) {
                 LOGGER.debug("Template found using shared default template: {}", schedulingTemplates.getFirst().toString());
 				return schedulingTemplates.getFirst();
@@ -131,7 +132,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 
 	@Override
 	public SchedulingTemplate getSchedulingTemplateFromOrganisationAndId(Long schedulingTemplateId) throws PermissionDeniedException, RessourceNotFoundException {
-		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(organisationService.getUserOrganisation(), schedulingTemplateId);
+		SchedulingTemplate schedulingTemplate = schedulingTemplateRepository.findByOrganisationCodeAndIdAndDeletedTimeIsNull(organisationService.getUserOrganisation().getCode(), schedulingTemplateId);
 		
 		if (schedulingTemplate == null) {
             LOGGER.info("scheduleTemplate not found. Id: {}. Organisation: {}", schedulingTemplateId, organisationService.getUserOrganisation().toString());
@@ -142,7 +143,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	
 	@Override
 	public List<SchedulingTemplate> getSchedulingTemplates() throws PermissionDeniedException  {
-		return schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(organisationService.getUserOrganisation()) ;
+		return schedulingTemplateRepository.findByOrganisationCodeAndDeletedTimeIsNull(organisationService.getUserOrganisation().getCode()) ;
 	}
 
 	@Override
@@ -171,7 +172,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		
 		//then create the new template
 		if (includeOrganisation) {
-			schedulingTemplate.setOrganisation(organisationService.getUserOrganisation());	
+			schedulingTemplate.setOrganisationCode(organisationService.getUserOrganisation().getCode());
 		}
 		schedulingTemplate.setConferencingSysId(createSchedulingTemplateDto.getConferencingSysId());
 		schedulingTemplate.setUriPrefix(createSchedulingTemplateDto.getUriPrefix());
@@ -300,7 +301,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 
 	private boolean checkIfDefaultTemplateExistAndRemove() throws PermissionDeniedException {
-		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true); 
+		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation().getCode(), true);
 		//cannot return "same" record as being return, because compare on	 isDefaultTemplate has been made in call method. 	
 
 		if (schedulingTemplates.isEmpty()) {
@@ -318,7 +319,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		}
 		
 		//double check just to be sure that the reset was completed
-		schedulingTemplates = schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);	
+		schedulingTemplates = schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation().getCode(), true);
 
 		if (schedulingTemplates.isEmpty()) {
             LOGGER.debug("Existing default template has been reset as non-default for organization: {}", organisationService.getUserOrganisation().toString());
@@ -331,7 +332,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 	}
 
 	private boolean checkIfPoolTemplateAlreadyExists() throws PermissionDeniedException {
-		List<SchedulingTemplate> poolTemplates = schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation(), true);
+		List<SchedulingTemplate> poolTemplates = schedulingTemplateRepository.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(organisationService.getUserOrganisation().getCode(), true);
 
 		return poolTemplates.size() == 1;
 	}
