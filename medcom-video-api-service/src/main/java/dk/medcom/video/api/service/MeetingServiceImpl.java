@@ -272,7 +272,7 @@ public class MeetingServiceImpl implements MeetingService {
 	public Meeting convert(CreateMeetingDto createMeetingDto) throws PermissionDeniedException, NotValidDataException {
 		validateDate(createMeetingDto.getStartTime());
 		validateDate(createMeetingDto.getEndTime());
-		
+
 		Meeting meeting = new Meeting();
 		meeting.setSubject(createMeetingDto.getSubject());
 		if(createMeetingDto.getUuid() != null) {

@@ -34,7 +34,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		boolean guestPinRequired = false; 
 		Long guestPinRangeLow = 107L;
 		Long guestPinRangeHigh = 997L;
-		int vMRAvailableBefore = 10; 
+		int vMRAvailableBefore = 10;
 		int maxParticipants = 17;
 		boolean endMeetingOnEndTime = true;
 		Long uriNumberRangeLow = 1007L;
@@ -185,7 +185,7 @@ public class SchedulingTemplateRepositoryTest extends RepositoryTest{
 		boolean guestPinRequired = false; 
 		Long guestPinRangeLow = 107L;
 		Long guestPinRangeHigh = 997L;
-		int vMRAvailableBefore = 10; 
+		int vMRAvailableBefore = 10;
 		int maxParticipants = 17;
 		boolean endMeetingOnEndTime = true;
 		Long uriNumberRangeLow = 1007L;

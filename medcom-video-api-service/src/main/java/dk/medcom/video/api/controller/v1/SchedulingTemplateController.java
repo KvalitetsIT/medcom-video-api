@@ -80,11 +80,11 @@ public class SchedulingTemplateController {
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
 		EntityModel <SchedulingTemplateDto> resource = EntityModel.of(schedulingTemplateDto);
-		
+
 		LOGGER.debug("Exit of /scheduling-template.post resource: " + resource);
 		return resource;
 
-	}	
+	}
 	@APISecurityAnnotation({UserRole.ADMIN})
 	@RequestMapping(value = "/scheduling-templates/{id}", method = RequestMethod.PUT)
 	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
