@@ -1465,10 +1465,6 @@ components:
           type: boolean
           example: false
           description: controls whether to mute guests when they first join the conference
-        breakoutRooms:
-          type: boolean
-          example: false
-          description: When included it will override any value from the scheduling template
         uriWithoutDomain:
           type: string
           example: 574893
@@ -2007,6 +2003,7 @@ components:
         breakoutRooms:
           type: boolean
           example: false
+          default: false
           description: If true, new scheduling infos created from this template default to breakout rooms enabled.
         callType:
           type: string
@@ -2164,6 +2161,7 @@ components:
         breakoutRooms:
           type: boolean
           example: false
+          default: false
           description: If true, new scheduling infos created from this template default to breakout rooms enabled.
         callType:
           type: string

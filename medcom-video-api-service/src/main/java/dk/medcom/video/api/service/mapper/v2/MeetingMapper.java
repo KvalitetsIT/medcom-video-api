@@ -41,7 +41,6 @@ public class MeetingMapper {
         output.setForcePresenterIntoMain(input.forcePresenterIntoMain());
         output.setForceEncryption(input.forceEncryption());
         output.setMuteAllGuests(input.muteAllGuests());
-        output.setBreakoutRooms(input.breakoutRooms());
         output.setUriWithoutDomain(input.uriWithoutDomain());
         output.setHostPin(input.hostPin());
         output.setGuestPin(input.guestPin());

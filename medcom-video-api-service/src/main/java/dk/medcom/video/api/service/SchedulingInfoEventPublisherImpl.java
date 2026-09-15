@@ -21,9 +21,9 @@ public class SchedulingInfoEventPublisherImpl implements SchedulingInfoEventPubl
     }
 
     @Override
-    public void publishEvent(SchedulingInfoEvent schedulingInfoEvent, boolean newProvisioner) {
-        if(!newProvisioner) {
-            logger.info("Not publishing event due to new_provisioner is false. Organisation is: {}.", schedulingInfoEvent.getOrganisationCode());
+    public void publishEvent(SchedulingInfoEvent schedulingInfoEvent, boolean newProvisioner, boolean policyManaged) {
+        if(!newProvisioner || policyManaged) {
+            logger.info("Not publishing event due to new_provisioner is false or policy_managed is true. Organisation is: {}.", schedulingInfoEvent.getOrganisationCode());
             return;
         }
 

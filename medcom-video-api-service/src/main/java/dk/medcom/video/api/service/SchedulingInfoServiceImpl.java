@@ -228,11 +228,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
-		if(createMeetingDto.getBreakoutRooms() != null) {
-			schedulingInfo.setBreakoutRooms(createMeetingDto.getBreakoutRooms());
-		} else {
-			schedulingInfo.setBreakoutRooms(schedulingTemplate.getBreakoutRooms());
-		}
+		schedulingInfo.setBreakoutRooms(schedulingTemplate.getBreakoutRooms());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 
@@ -328,7 +324,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
 		var schedulingInfoEvent = createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE);
-		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent, schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
+		schedulingInfoEventPublisher.publishEvent(schedulingInfoEvent, schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("audit create scheduling info");
@@ -446,7 +442,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		auditService.auditSchedulingInformation(schedulingInfo, "update");
 
@@ -461,7 +457,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.DELETE), schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		LOGGER.debug("Exit deleteSchedulingInfo");
 	}
@@ -473,7 +469,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		SchedulingInfo schedulingInfo = schedulingInfoRepository.findOneByUuid(uuid);
 		schedulingInfoRepository.delete(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.POOL_DELETE), schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		LOGGER.debug("Exit deleteSchedulingInfoPool");
 	}
@@ -561,7 +557,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE), schedulingInfo.isNewProvisioner());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(schedulingInfo, MessageType.CREATE), schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
@@ -621,7 +617,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		}
 
 		var resultingSchedulingInfo = schedulingInfoRepository.save(schedulingInfo);
-		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner() && !schedulingInfo.isPolicyManaged());
+		schedulingInfoEventPublisher.publishEvent(createSchedulingInfoEvent(resultingSchedulingInfo, MessageType.UPDATE), schedulingInfo.isNewProvisioner(), schedulingInfo.isPolicyManaged());
 
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("Attach meeting to sched info audit");

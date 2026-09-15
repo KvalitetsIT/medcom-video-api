@@ -207,7 +207,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalHost(createSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(createSchedulingTemplateDto.getReturnUrl());
 		schedulingTemplate.setDirectMedia(createSchedulingTemplateDto.getDirectMedia() != null ? createSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
-		schedulingTemplate.setBreakoutRooms(createSchedulingTemplateDto.getBreakoutRooms() != null ? createSchedulingTemplateDto.getBreakoutRooms() : false);
+		schedulingTemplate.setBreakoutRooms(createSchedulingTemplateDto.getBreakoutRooms());
 		schedulingTemplate.setCallType(createSchedulingTemplateDto.getCallType());
 
 		schedulingTemplate.setCreatedBy(meetingUserService.getOrCreateCurrentMeetingUser());
@@ -274,7 +274,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setCustomPortalHost(updateSchedulingTemplateDto.getCustomPortalHost());
 		schedulingTemplate.setReturnUrl(updateSchedulingTemplateDto.getReturnUrl());
 		schedulingTemplate.setDirectMedia(updateSchedulingTemplateDto.getDirectMedia() != null ? updateSchedulingTemplateDto.getDirectMedia() : DirectMedia.never);
-		schedulingTemplate.setBreakoutRooms(updateSchedulingTemplateDto.getBreakoutRooms() != null ? updateSchedulingTemplateDto.getBreakoutRooms() : false);
+		schedulingTemplate.setBreakoutRooms(updateSchedulingTemplateDto.getBreakoutRooms());
 		schedulingTemplate.setCallType(updateSchedulingTemplateDto.getCallType());
 
 		schedulingTemplate.setUpdatedBy(meetingUserService.getOrCreateCurrentMeetingUser());

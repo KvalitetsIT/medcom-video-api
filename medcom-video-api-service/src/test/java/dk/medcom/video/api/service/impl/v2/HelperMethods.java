@@ -204,7 +204,6 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 randomBoolean(),
-                randomBoolean(),
                 randomString(),
                 (int) count++,
                 (int) count++,

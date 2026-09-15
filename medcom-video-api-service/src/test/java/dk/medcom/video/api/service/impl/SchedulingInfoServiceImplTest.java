@@ -399,7 +399,7 @@ public class SchedulingInfoServiceImplTest {
         assertEquals(DirectMedia.best_effort, capturedSchedulingInfo.getDirectMedia());
         assertTrue(capturedSchedulingInfo.isNewProvisioner());
 
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(true));
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(true), Mockito.eq(false));
     }
 
     @Test
@@ -479,7 +479,7 @@ public class SchedulingInfoServiceImplTest {
 
         assertTrue(capturedSchedulingInfo.isPolicyManaged());
         assertEquals(ProvisionStatus.PROVISIONED_OK, capturedSchedulingInfo.getProvisionStatus());
-        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(false));
+        Mockito.verify(schedulingInfoEventPublisher, times(1)).publishEvent(Mockito.any(), Mockito.eq(true), Mockito.eq(true));
     }
 
     @Test
@@ -497,31 +497,6 @@ public class SchedulingInfoServiceImplTest {
 
         CreateMeetingDto createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
-        schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
-
-        ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
-        Mockito.verify(schedulingInfoRepository, times(1)).save(schedulingInfoServiceArgumentCaptor.capture());
-        SchedulingInfo capturedSchedulingInfo = schedulingInfoServiceArgumentCaptor.getValue();
-
-        assertTrue(capturedSchedulingInfo.getBreakoutRooms());
-    }
-
-    @Test
-    public void testCreateSchedulingInfoMeetingBreakoutRoomsFromRequestOverridesTemplate() throws PermissionDeniedException, NotAcceptableException, NotValidDataException {
-        schedulingTemplateIdOne.setBreakoutRooms(false);
-
-        SchedulingInfo expectedSchedulingInfo = createSchedulingInfo();
-        Mockito.when(schedulingInfoRepository.save(Mockito.any(SchedulingInfo.class))).thenReturn(expectedSchedulingInfo);
-
-        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
-
-        Meeting meeting = new Meeting();
-        meeting.setStartTime(new Date());
-        meeting.setOrganisation(new Organisation());
-
-        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
-        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID);
-        createMeetingDto.setBreakoutRooms(true);
         schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 
         ArgumentCaptor<SchedulingInfo> schedulingInfoServiceArgumentCaptor = ArgumentCaptor.forClass(SchedulingInfo.class);
