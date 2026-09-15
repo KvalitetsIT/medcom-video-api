@@ -215,7 +215,7 @@ public class MeetingServiceImpl implements MeetingService {
 		performanceLogger.logTimeSinceCreation();
 		performanceLogger.reset("attachOrCreateSchedulingInfo. future meeting");
 
-		if(isFutureMeeting(createMeetingDto) || organisationService.getUserOrganisation().getPolicyServerEnabled()) {
+		if(isFutureMeeting(createMeetingDto) || organisationService.isPolicyServerEnabledForUserOrganisation()) {
 			schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto);
 			return;
 		}

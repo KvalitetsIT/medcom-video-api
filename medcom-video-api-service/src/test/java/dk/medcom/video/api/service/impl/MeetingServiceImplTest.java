@@ -48,6 +48,7 @@ public class MeetingServiceImplTest {
 	private SchedulingInfo schedulingInfo;
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
 	private OrganisationRepository organisationRepository;
+	private OrganisationService organisationService;
     private MeetingAdditionalInfoRepository meetingAdditionalInfoRepository;
 
 	@BeforeEach
@@ -134,7 +135,7 @@ public class MeetingServiceImplTest {
 		MeetingUserServiceImpl meetingUserService = Mockito.mock(MeetingUserServiceImpl.class);
 		schedulingInfoService = Mockito.mock(SchedulingInfoServiceImpl.class);
 		SchedulingStatusServiceImpl schedulingStatusService = Mockito.mock(SchedulingStatusServiceImpl.class);
-		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
+		organisationService = Mockito.mock(OrganisationService.class);
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
 		organisationRepository = Mockito.mock(OrganisationRepository.class);
 		organisationTreeServiceClient = Mockito.mock(OrganisationTreeServiceClient.class);
@@ -181,6 +182,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
 		Mockito.when(organisationService.getPoolSizeForOrganisation("org")).thenReturn(null);
 		Mockito.when(organisationService.getPoolSizeForUserOrganisation()).thenReturn(userOrganistionPoolSize);
+		Mockito.when(organisationService.isPolicyServerEnabledForUserOrganisation()).thenReturn(false);
 
 		Meeting meetingInService = getMeetingWithDefaultValues(meetingUser, meetingUuid);
 		SchedulingInfo schedulingInfoInService = new SchedulingInfo();
@@ -680,8 +682,6 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setPolicyServerEnabled(true);
-
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
 		input.setOrganizedByEmail("some@email.com");
@@ -690,6 +690,7 @@ public class MeetingServiceImplTest {
 		input.setEndTime(new Date());
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
+		Mockito.when(organisationService.isPolicyServerEnabledForUserOrganisation()).thenReturn(true);
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
 

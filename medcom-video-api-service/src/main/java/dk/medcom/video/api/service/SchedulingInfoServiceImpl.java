@@ -224,7 +224,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setOrganisation(meeting.getOrganisation());
-		schedulingInfo.setPolicyManaged(meeting.getOrganisation().getPolicyServerEnabled());
+		schedulingInfo.setPolicyManaged(isPolicyServerEnabled(meeting.getOrganisation().getOrganisationId()));
 
 		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
@@ -336,6 +336,11 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 	private SchedulingInfoEvent createSchedulingInfoEvent(SchedulingInfo schedulingInfo, MessageType messageType) {
 		return SchedulingInfoEventMapper.map(schedulingInfo, messageType);
+	}
+
+	private boolean isPolicyServerEnabled(String organisationId) {
+		var organisation = organisationServiceClientV2.getOrganisationByCode(organisationId);
+		return organisation != null && organisation.isPolicyServerEnabled();
 	}
 
 	private String generateUriWithoutDomain(SchedulingTemplate schedulingTemplate) throws NotAcceptableException {

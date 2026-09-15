@@ -48,6 +48,7 @@ public class SchedulingInfoServiceImplTest {
 
     private static final String NON_POOL_ORG = "nonPoolOrg";
     private static final String POOL_ORG = "poolOrg";
+    private static final String POLICY_MANAGED_ORG = "policyManagedOrg";
 
     private static final long SCHEDULING_TEMPLATE_ID = 1L;
     private static final long SCHEDULING_TEMPLATE_ID_OTHER_ORG = 2L;
@@ -461,7 +462,8 @@ public class SchedulingInfoServiceImplTest {
         SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
 
         Organisation organisation = new Organisation();
-        organisation.setPolicyServerEnabled(true);
+        organisation.setOrganisationId(POLICY_MANAGED_ORG);
+        Mockito.when(organisationServiceClientV2.getOrganisationByCode(POLICY_MANAGED_ORG)).thenReturn(createPolicyManagedStrategyOrganisation());
         Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(createMeetingUser(organisation));
 
         Meeting meeting = new Meeting();
@@ -1348,6 +1350,14 @@ public class SchedulingInfoServiceImplTest {
         dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
         organisation.setPoolSize(10);
         organisation.setCode(POOL_ORG);
+
+        return organisation;
+    }
+
+    private dk.medcom.video.api.organisation.model.Organisation createPolicyManagedStrategyOrganisation() {
+        dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
+        organisation.setCode(POLICY_MANAGED_ORG);
+        organisation.setPolicyServerEnabled(true);
 
         return organisation;
     }

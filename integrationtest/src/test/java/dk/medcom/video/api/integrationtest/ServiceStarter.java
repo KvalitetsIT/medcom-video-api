@@ -247,6 +247,7 @@ public class ServiceStarter {
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "user-org-pool")).respond(organisationServiceResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation")).respond(organisationServiceListResponse());
         mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
+        mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/user-org-pool").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationServiceResponse());
 
         organisationPath = "http://localhost:" + organisationService.getMappedPort(1080);
         attachLogger(organisationService, organisationLogger);
