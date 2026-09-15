@@ -9,4 +9,8 @@ public interface OrganisationService {
     Integer getPoolSizeForOrganisation(String organisationId);
 
     Integer getPoolSizeForUserOrganisation();
+
+    boolean isPolicyServerEnabledForOrganisation(String organisationId);
+
+    boolean isPolicyServerEnabledForUserOrganisation();
 }

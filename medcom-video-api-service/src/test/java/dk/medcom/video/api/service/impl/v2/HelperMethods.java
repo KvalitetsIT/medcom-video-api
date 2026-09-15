@@ -174,6 +174,7 @@ public class HelperMethods {
                 randomBoolean(),
                 randomBoolean(),
                 DirectMediaModel.never,
+                randomBoolean(),
                 randomString());
     }
 

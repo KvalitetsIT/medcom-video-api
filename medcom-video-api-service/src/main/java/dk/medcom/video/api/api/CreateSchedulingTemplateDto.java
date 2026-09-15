@@ -68,6 +68,7 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
+	private Boolean breakoutRooms;
 
 	@Size(max=100, message="ivrThme should have a maximum of 100 characters")
 	private String ivrTheme;
@@ -314,6 +315,14 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
+	}
+
+	public Boolean getBreakoutRooms() {
+		return breakoutRooms;
+	}
+
+	public void setBreakoutRooms(Boolean breakoutRooms) {
+		this.breakoutRooms = breakoutRooms;
 	}
 
     public String getCallType() {

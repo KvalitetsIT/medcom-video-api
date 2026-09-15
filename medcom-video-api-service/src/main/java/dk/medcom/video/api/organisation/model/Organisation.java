@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Organisation {
     private String code;
     private Integer poolSize;
+    private boolean policyServerEnabled;
 
     public String getCode() {
         return code;
@@ -21,5 +22,13 @@ public class Organisation {
 
     public void setPoolSize(Integer poolSize) {
         this.poolSize = poolSize;
+    }
+
+    public boolean isPolicyServerEnabled() {
+        return policyServerEnabled;
+    }
+
+    public void setPolicyServerEnabled(boolean policyServerEnabled) {
+        this.policyServerEnabled = policyServerEnabled;
     }
 }
