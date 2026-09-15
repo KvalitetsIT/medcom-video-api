@@ -29,5 +29,6 @@ public record SchedulingTemplateRequestModel(Long conferencingSysId,
                                              Boolean forcePresenterIntoMain,
                                              Boolean forceEncryption,
                                              Boolean muteAllGuests,
-                                             DirectMediaModel directMedia) {
+                                             DirectMediaModel directMedia,
+                                             String callType) {
 }

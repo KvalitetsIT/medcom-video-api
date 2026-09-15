@@ -36,6 +36,7 @@ public class DomainMapper {
         if(schedulingInfo.getHostPin() != null) {
             updateMeeting.setHostPin(new BigDecimal(schedulingInfo.getHostPin()));
         }
+        updateMeeting.setCallType(schedulingInfo.getCallType());
 
         return updateMeeting;
     }
@@ -126,6 +127,11 @@ public class DomainMapper {
             } else {
                 updateMeetingDto.setMeetingAdditionalInfo(mapAdditionalInformationType(patchMeetingDto.getAdditionalInformation()));
             }
+        }
+        if (patchMeetingDto.isCallTypeSet()) {
+            updateMeetingDto.setCallType(patchMeetingDto.getCallType());
+        } else {
+            updateMeetingDto.setCallType(schedulingInfo.getCallType());
         }
 
         return updateMeetingDto;

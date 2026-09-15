@@ -41,7 +41,8 @@ public record SchedulingInfoModel(UUID uuid,
                                   MeetingModel meetingDetails,
                                   DirectMediaModel directMedia,
                                   String shortLink,
-                                  String shortlink) {
+                                  String shortlink,
+                                  String callType) {
     public static SchedulingInfoModel from(SchedulingInfo schedulingInfo, String shortLinkBaseUrl) {
         return new SchedulingInfoModel(UUID.fromString(schedulingInfo.getUuid()),
                 schedulingInfo.getHostPin(),
@@ -77,7 +78,8 @@ public record SchedulingInfoModel(UUID uuid,
                 MeetingModel.from(schedulingInfo.getMeeting(), shortLinkBaseUrl),
                 DirectMediaModel.from(schedulingInfo.getDirectMedia()),
                 schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
-                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null);
+                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
+                schedulingInfo.getCallType());
     }
 
     private static OffsetDateTime mapDate(Date input) {

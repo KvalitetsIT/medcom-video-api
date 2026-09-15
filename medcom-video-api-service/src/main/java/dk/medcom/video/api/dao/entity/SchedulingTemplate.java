@@ -24,6 +24,7 @@ public class SchedulingTemplate {
 	private boolean guestPinRequired;
 	private Long guestPinRangeLow;			//when random generating
 	private Long guestPinRangeHigh;			//when random generating
+	@Column(name = "vmravailable_before")
 	private int vMRAvailableBefore;			//how many minutes before meeting should the meeting room be availabe
 	private int maxParticipants;			//Locked when max i reached
 	private boolean endMeetingOnEndTime;	//If true users are kicked from the meeting when it ends
@@ -69,6 +70,7 @@ public class SchedulingTemplate {
 	private String customPortalGuest;
 	private String customPortalHost;
 	private String returnUrl;
+	private String callType;
 
 	public Long getId() {
 		return id;
@@ -338,4 +340,12 @@ public class SchedulingTemplate {
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
 	}
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+    }
 }

@@ -312,6 +312,7 @@ public class SchedulingInfoServiceV2ImplTest {
     @Test
     public void testReserveSchedulingInfoV2() throws RessourceNotFoundException {
         var schedulingInfo = randomSchedulingInfo();
+        var callTypeInput = randomString();
 
         Mockito.when(schedulingInfoService.reserveSchedulingInfo(
                 VmrType.lecture,
@@ -322,7 +323,8 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true
+                true,
+                callTypeInput
         )).thenReturn(schedulingInfo);
 
         var result = schedulingInfoServiceV2.reserveSchedulingInfoV2(
@@ -334,7 +336,8 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callTypeInput);
         assertNotNull(result);
 
         assertSchedulingInfo(schedulingInfo, shortLinkBaseUrl, result);
@@ -348,12 +351,14 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callTypeInput);
         verifyNoMoreInteractions();
     }
 
     @Test
     public void testReserveSchedulingInfoV2ResourceNotFound() throws RessourceNotFoundException {
+        var callType = randomString();
         Mockito.when(schedulingInfoService.reserveSchedulingInfo(
                 VmrType.lecture,
                 ViewType.one_main_twentyone_pips,
@@ -363,7 +368,8 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true)).thenThrow(new RessourceNotFoundException("resource", "field"));
+                true,
+                callType)).thenThrow(new RessourceNotFoundException("resource", "field"));
 
         var expectedException = assertThrows(ResourceNotFoundExceptionV2.class, () -> schedulingInfoServiceV2.reserveSchedulingInfoV2(
                 VmrTypeModel.lecture,
@@ -374,7 +380,8 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true));
+                true,
+                callType));
         assertNotNull(expectedException);
         assertEquals("Resource: resource in field: field not found.", expectedException.getMessage());
 
@@ -387,7 +394,8 @@ public class SchedulingInfoServiceV2ImplTest {
                 false,
                 true,
                 false,
-                true);
+                true,
+                callType);
         verifyNoMoreInteractions();
     }
 

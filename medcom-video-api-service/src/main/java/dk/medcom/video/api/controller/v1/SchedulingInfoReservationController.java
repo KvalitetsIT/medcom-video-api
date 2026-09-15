@@ -43,10 +43,11 @@ public class SchedulingInfoReservationController {
             @RequestParam(name = "guestsCanPresent", defaultValue = "true") Boolean guestsCanPresent,
             @RequestParam(name = "forcePresenterIntoMain", defaultValue = "true") Boolean forcePresenterIntoMain,
             @RequestParam(name = "forceEncryption", defaultValue = "false") Boolean forceEncryption,
-            @RequestParam(name = "muteAllGuests", defaultValue = "false") Boolean muteAllGuests) throws RessourceNotFoundException {
+            @RequestParam(name = "muteAllGuests", defaultValue = "false") Boolean muteAllGuests,
+            @RequestParam(name = "callType", required = false) String callType) throws RessourceNotFoundException {
         LOGGER.debug("Entry of /scheduling-info-reserve.");
 
-        SchedulingInfo schedulingInfo = schedulingInfoService.reserveSchedulingInfo(vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption, muteAllGuests);
+        SchedulingInfo schedulingInfo = schedulingInfoService.reserveSchedulingInfo(vmrType, hostView, guestView, vmrQuality, enableOverlayText, guestsCanPresent, forcePresenterIntoMain, forceEncryption, muteAllGuests, callType);
         SchedulingInfoDto schedulingInfoDto = new SchedulingInfoDto(schedulingInfo, shortLinkBaseUrl);
         EntityModel<SchedulingInfoDto> resource = EntityModel.of(schedulingInfoDto);
 

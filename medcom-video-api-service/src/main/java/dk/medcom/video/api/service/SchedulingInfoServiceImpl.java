@@ -24,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -48,8 +46,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	private final SchedulingInfoEventPublisher schedulingInfoEventPublisher;
 	private final NewProvisionerOrganisationFilter newProvisionerOrganisationFilter;
 	private final PoolFinderService poolFinderService;
-	private final String citizenPortal;
-	private final OrganisationServiceClientV2 organisationServiceClientV2;
+    private final OrganisationServiceClientV2 organisationServiceClientV2;
+	private final PortalLinkBuilder portalLinkBuilder;
 
 	public SchedulingInfoServiceImpl(SchedulingInfoRepository schedulingInfoRepository,
                                      SchedulingTemplateRepository schedulingTemplateRepository,
@@ -66,7 +64,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
                                      SchedulingInfoEventPublisher schedulingInfoEventPublisher,
                                      NewProvisionerOrganisationFilter newProvisionerOrganisationFilter,
                                      PoolFinderService poolFinderService,
-                                     String citizenPortal, OrganisationServiceClientV2 organisationServiceClientV2) {
+                                     OrganisationServiceClientV2 organisationServiceClientV2,
+									 PortalLinkBuilder portalLinkBuilder) {
 		this.schedulingInfoRepository = schedulingInfoRepository;
 		this.schedulingTemplateRepository = schedulingTemplateRepository;
 		this.schedulingTemplateService = schedulingTemplateService;
@@ -82,8 +81,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		this.newProvisionerOrganisationFilter = newProvisionerOrganisationFilter;
 		this.poolFinderService = poolFinderService;
-		this.citizenPortal = citizenPortal;
         this.organisationServiceClientV2 = organisationServiceClientV2;
+        this.portalLinkBuilder = portalLinkBuilder;
 
         if(overflowPoolOrganisationId == null)  {
 			throw new RuntimeException("overflow.pool.organisation.id not set.");
@@ -226,7 +225,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setMeeting(meeting);
 		schedulingInfo.setOrganisation(meeting.getOrganisation());
 
-		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
+		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
@@ -297,6 +296,12 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
             LOGGER.debug("MuteAllGuests is taken from input: {}", createMeetingDto.getMuteAllGuests().toString());
 		}else {
 			schedulingInfo.setMuteAllGuests(schedulingTemplate.getMuteAllGuests());
+		}
+		if (createMeetingDto.getCallType() != null) {
+			schedulingInfo.setCallType(createMeetingDto.getCallType());
+			LOGGER.debug("CallType is taken from input: {}", createMeetingDto.getCallType());
+		}else {
+			schedulingInfo.setCallType(schedulingTemplate.getCallType());
 		}
 
 		schedulingInfo.setSchedulingTemplate(schedulingTemplate);
@@ -392,16 +397,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setProvisionStatus(updateSchedulingInfoDto.getProvisionStatus());
 		schedulingInfo.setProvisionStatusDescription(updateSchedulingInfoDto.getProvisionStatusDescription());
 		schedulingInfo.setProvisionTimestamp(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
-
-		//Removed UUID validation again
-//		try{
-//			if (updateSchedulingInfoDto.getProvisionVmrId() != null) {
-//				UUID uuidChk = UUID.fromString(updateSchedulingInfoDto.getProvisionVmrId());
-//			}
 		schedulingInfo.setProvisionVMRId(updateSchedulingInfoDto.getProvisionVmrId());
-//		} catch (IllegalArgumentException exception) {
-//			throw new NotValidDataException("provisionVmrId must have uuid format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
-//		}
 
 		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
@@ -422,7 +418,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	//used by meetingService to update VMRStarttime and portalLink because it depends on the meetings starttime
 	@Transactional(rollbackFor = Throwable.class)
 	@Override
-	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin) throws RessourceNotFoundException, PermissionDeniedException{
+	public SchedulingInfo updateSchedulingInfo(String uuid, Date startTime, Long hostPin, Long guestPin, String callType) throws RessourceNotFoundException, PermissionDeniedException{
         LOGGER.debug("Entry updateSchedulingInfo. uuid/startTime. uuid={}", uuid);
 
 		SchedulingInfo schedulingInfo = getSchedulingInfoByUuid(uuid);
@@ -433,13 +429,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
-		schedulingInfo.setPortalLink(createPortalLink(startTime, schedulingInfo));
+		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(startTime, schedulingInfo));
 
 		schedulingInfo.setUpdatedByUser(meetingUserService.getOrCreateCurrentMeetingUser());
 		Calendar calendarNow = new GregorianCalendar();
 		schedulingInfo.setUpdatedTime(calendarNow.getTime());
 		schedulingInfo.setHostPin(hostPin);
 		schedulingInfo.setGuestPin(guestPin);
+		schedulingInfo.setCallType(callType);
 
 		schedulingInfo = schedulingInfoRepository.save(schedulingInfo);
 
@@ -475,49 +472,6 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		LOGGER.debug("Exit deleteSchedulingInfoPool");
 	}
 
-	private String createPortalLink(Date startTime, SchedulingInfo schedulingInfo) {
-        LOGGER.debug("CitizenPortal (borgerPortal) parameter is: {}", citizenPortal);
-
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		String portalDate = formatter.format(startTime);
-        LOGGER.debug("portalDate is: {}", portalDate);
-
-		String portalPin;
-		if (schedulingInfo.getGuestPin() != null && schedulingInfo.getGuestPin() != null) {
-			portalPin = schedulingInfo.getGuestPin().toString();
-			LOGGER.debug("Portal pin used is guest");
-		}
-		else {
-			if (schedulingInfo.getHostPin() != null && schedulingInfo.getHostPin() != null) {
-				portalPin = schedulingInfo.getHostPin().toString();
-				LOGGER.debug("Portal pin used is host");
-			} else {
-				portalPin = "";
-				LOGGER.debug("Portal pin used is empty");
-			}
-		}
-
-		String microphone = null;
-		if (schedulingInfo.getMeeting() != null && schedulingInfo.getMeeting().getGuestMicrophone() != null){
-			if (schedulingInfo.getMeeting().getGuestMicrophone() != GuestMicrophone.on){
-				microphone = schedulingInfo.getMeeting().getGuestMicrophone().toString().toLowerCase();
-			}
-			LOGGER.debug("Guest microphone is: "+ schedulingInfo.getMeeting().getGuestMicrophone());
-		}else {
-			LOGGER.debug("Guest microphone is not set");
-		}
-
-		StringBuilder portalLink = new StringBuilder();
-		//Minimum portal link
-		portalLink.append(citizenPortal).append("/?url=").append(schedulingInfo.getUriWithDomain()).append("&pin=").append(portalPin).append("&start_dato=").append(portalDate);
-
-		if (microphone != null){
-			portalLink.append("&microphone=").append(microphone); 		//Example: https://portal-test.vconf.dk/?url=12312@rooms.vconf.dk&pin=1020&start_dato=2018-11-19T13:50:54&microphone=off
-		}
-        LOGGER.debug("portalLink is {}", portalLink);
-		return portalLink.toString();
-	}
-
 	@Override
 	@Transactional(rollbackFor = Throwable.class)
 	public SchedulingInfo createSchedulingInfo(CreateSchedulingInfoDto createSchedulingInfoDto) throws PermissionDeniedException, NotValidDataException, NotAcceptableException {
@@ -527,7 +481,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 	@Override
 	@Transactional
 	public SchedulingInfo createSchedulingInfoWithCustomCreatedBy(CreateSchedulingInfoDto createSchedulingInfoDto, MeetingUser createdBy) throws NotValidDataException, NotAcceptableException {
-		LOGGER.debug("Entry createSchedulingInfo");
+		LOGGER.debug("Entry createSchedulingInfoWithCustomCreatedBy");
 
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 
@@ -595,6 +549,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		schedulingInfo.setCustomPortalHost(schedulingTemplate.getCustomPortalHost());
 		schedulingInfo.setReturnUrl(schedulingTemplate.getReturnUrl());
 		schedulingInfo.setDirectMedia(schedulingTemplate.getDirectMedia());
+		schedulingInfo.setCallType(schedulingTemplate.getCallType());
 
 		schedulingInfo.setNewProvisioner(newProvisionerOrganisationFilter.newProvisioner(schedulingInfo.getOrganisation().getOrganisationId()));
 
@@ -603,7 +558,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 
 		auditService.auditSchedulingInformation(schedulingInfo, "create");
 
-		LOGGER.debug("Exit createSchedulingInfo");
+		LOGGER.debug("Exit createSchedulingInfoWithCustomCreatedBy");
 		return schedulingInfo;
 	}
 
@@ -650,7 +605,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		cal.set(Calendar.MINUTE, cal.get(Calendar.MINUTE) - schedulingInfo.getVMRAvailableBefore());
 		schedulingInfo.setvMRStartTime(cal.getTime());
 
-		schedulingInfo.setPortalLink(createPortalLink(meeting.getStartTime(), schedulingInfo));
+		schedulingInfo.setPortalLink(portalLinkBuilder.buildPortalLink(meeting.getStartTime(), schedulingInfo));
 		if(!meeting.getOrganisation().getOrganisationId().equals(organisationFromSchedulingInfo)) {
 			schedulingInfo.setOrganisation(meeting.getOrganisation());
 		}
@@ -745,7 +700,8 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 												Boolean guestsCanPresent,
 												Boolean forcePresenterIntoMain,
 												Boolean forceEncryption,
-												Boolean muteAllGuests) throws RessourceNotFoundException {
+												Boolean muteAllGuests,
+												String callType) throws RessourceNotFoundException {
 		var organisation = organisationRepository.findByOrganisationId(userContextService.getUserContext().getUserOrganisation());
 
 		var createMeetingDto = new CreateMeetingDto();
@@ -758,6 +714,7 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		createMeetingDto.setForcePresenterIntoMain(forcePresenterIntoMain);
 		createMeetingDto.setForceEncryption(forceEncryption);
 		createMeetingDto.setMuteAllGuests(muteAllGuests);
+		createMeetingDto.setCallType(callType);
 
 		var id = getUnusedSchedulingInfoForOrganisation(organisation, createMeetingDto);
 

@@ -71,6 +71,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(createSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 		assertEquals(createSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
 		assertEquals(createSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+		assertEquals(createSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
 	}
 
 	@Test
@@ -118,6 +119,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(updateSchedulingTemplateDto.getReturnUrl(), schedulingTemplateArgumentCaptor.getValue().getReturnUrl());
 		assertEquals(updateSchedulingTemplateDto.getIsPoolTemplate(), schedulingTemplateArgumentCaptor.getValue().getIsPoolTemplate());
 		assertEquals(updateSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
+		assertEquals(updateSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
 	}
 
 	@Test
@@ -270,6 +272,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(schedulingTemplateInService.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
 		assertEquals(schedulingTemplateInService.getReturnUrl(), schedulingTemplate.getReturnUrl());
 		assertEquals(schedulingTemplateInService.getIsPoolTemplate(), schedulingTemplate.getIsPoolTemplate());
+		assertEquals(schedulingTemplateInService.getCallType(), schedulingTemplate.getCallType());
 	}
 	
 	@Test  
@@ -354,9 +357,10 @@ public class SchedulingTemplateServiceTest {
 		createSchedulingTemplateDto.setIvrTheme("20");
 		createSchedulingTemplateDto.setIsDefaultTemplate(false);
 		createSchedulingTemplateDto.setIsPoolTemplate(false);
-		createSchedulingTemplateDto.setCustomPortalGuest(UUID.randomUUID().toString());
-		createSchedulingTemplateDto.setCustomPortalHost(UUID.randomUUID().toString());
-		createSchedulingTemplateDto.setReturnUrl(UUID.randomUUID().toString());
+		createSchedulingTemplateDto.setCustomPortalGuest(randomString());
+		createSchedulingTemplateDto.setCustomPortalHost(randomString());
+		createSchedulingTemplateDto.setReturnUrl(randomString());
+		createSchedulingTemplateDto.setCallType(randomString());
 
 		return createSchedulingTemplateDto;
 	}
@@ -380,6 +384,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setIvrTheme("20");
 		updateSchedulingTemplateDto.setIsDefaultTemplate(false);
 		updateSchedulingTemplateDto.setIsPoolTemplate(false);
+		updateSchedulingTemplateDto.setCallType(randomString());
 
 		return updateSchedulingTemplateDto;
 	}
@@ -405,9 +410,10 @@ public class SchedulingTemplateServiceTest {
 		schedulingTemplate.setIvrTheme("20");
 		schedulingTemplate.setIsDefaultTemplate(false);
 		schedulingTemplate.setIsPoolTemplate(false);
-		schedulingTemplate.setCustomPortalGuest(UUID.randomUUID().toString());
-		schedulingTemplate.setCustomPortalHost(UUID.randomUUID().toString());
-		schedulingTemplate.setReturnUrl(UUID.randomUUID().toString());
+		schedulingTemplate.setCustomPortalGuest(randomString());
+		schedulingTemplate.setCustomPortalHost(randomString());
+		schedulingTemplate.setReturnUrl(randomString());
+		schedulingTemplate.setCallType(randomString());
 
 		return schedulingTemplate;
 	}
@@ -465,5 +471,9 @@ public class SchedulingTemplateServiceTest {
 		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
 
 		return schedulingTemplateService;
+	}
+
+	private String randomString() {
+		return UUID.randomUUID().toString();
 	}
 }

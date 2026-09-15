@@ -14,5 +14,6 @@ public record PatchMeetingModel(String subject,
                                 Boolean guestPinRequired,
                                 Integer hostPin,
                                 Integer guestPin,
+                                String callType,
                                 List<AdditionalInformationModel> additionalInformation) {
 }

@@ -1,7 +1,7 @@
 package dk.medcom.video.api.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 import dk.medcom.video.api.dao.entity.GuestMicrophone;
 import jakarta.validation.constraints.Size;
@@ -58,6 +58,10 @@ public class PatchMeetingDto {
     private Integer guestPin;
     @JsonIgnore
     private boolean guestPinSet;
+
+    private String callType;
+    @JsonIgnore
+    private boolean callTypeSet;
 
     private List<AdditionalInformationType> additionalInformation;
     @JsonIgnore
@@ -218,5 +222,18 @@ public class PatchMeetingDto {
 
     public boolean isAdditionalInfoSet() {
         return additionalInfoSet;
+    }
+
+    public String getCallType() {
+        return callType;
+    }
+
+    public void setCallType(String callType) {
+        this.callType = callType;
+        this.callTypeSet = true;
+    }
+
+    public boolean isCallTypeSet() {
+        return callTypeSet;
     }
 }

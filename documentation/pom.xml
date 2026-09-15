@@ -28,8 +28,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -141,7 +141,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.22.0</version>
+                <version>7.25.0</version>
                 <executions>
                     <execution>
                         <id>test-v1</id>
@@ -154,7 +154,8 @@
                             <configOptions>
                                 <sourceFolder>src/test/java</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
-                                <useSpringBoot3>true</useSpringBoot3>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <openApiNullable>false</openApiNullable>
                                 <useJakartaEe>true</useJakartaEe>
                                 <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>
@@ -179,7 +180,8 @@
                                 <interfaceOnly>true</interfaceOnly>
                                 <performBeanValidation>true</performBeanValidation>
                                 <library>spring-cloud</library>
-                                <useSpringBoot3>true</useSpringBoot3>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <openApiNullable>false</openApiNullable>
                                 <useJakartaEe>true</useJakartaEe>
                                 <useTags>true</useTags>
                                 <containerDefaultToNull>true</containerDefaultToNull>
@@ -201,7 +203,8 @@
                             <configOptions>
                                 <sourceFolder>src/test/java</sourceFolder>
                                 <dateLibrary>java8</dateLibrary>
-                                <useSpringBoot3>true</useSpringBoot3>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <openApiNullable>false</openApiNullable>
                                 <useJakartaEe>true</useJakartaEe>
                                 <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>
@@ -226,7 +229,8 @@
                                 <interfaceOnly>true</interfaceOnly>
                                 <performBeanValidation>true</performBeanValidation>
                                 <library>spring-cloud</library>
-                                <useSpringBoot3>true</useSpringBoot3>
+                                <useSpringBoot4>true</useSpringBoot4>
+                                <openApiNullable>false</openApiNullable>
                                 <useJakartaEe>true</useJakartaEe>
                                 <useTags>true</useTags>
                                 <containerDefaultToNull>true</containerDefaultToNull>

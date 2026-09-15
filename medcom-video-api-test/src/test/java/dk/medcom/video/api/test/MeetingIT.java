@@ -132,6 +132,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		createMeeting.setUriWithoutDomain("12345");
 		createMeeting.setGuestPin(4321);
 		createMeeting.setHostPin(1234);
+		createMeeting.setCallType("Call type");
 		createMeeting.setAdditionalInformation(new ArrayList<>());
 		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key one", "value one"));
 		createMeeting.getAdditionalInformation().add(createAdditionalInformationType("key two", "value two"));
@@ -149,6 +150,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertTrue(schedulingInfo.getUriWithDomain().startsWith(createMeeting.getUriWithoutDomain()));
 		assertEquals(createMeeting.getHostPin().longValue(), schedulingInfo.getHostPin().longValue());
 		assertEquals(createMeeting.getGuestPin().longValue(), schedulingInfo.getGuestPin().longValue());
+		assertEquals(createMeeting.getCallType(), schedulingInfo.getCallType());
 
 		var updateMeeting = new UpdateMeeting();
 		updateMeeting.setSubject("SUBJECT");
@@ -379,6 +381,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		request = new PatchMeeting();
 		request.setHostPin(4321);
 		request.setGuestPin(1234);
+		request.setCallType("call_type");
 		response = videoMeetings.meetingsUuidPatch(UUID.fromString(createResponse.getUuid()), request);
 
 		// Then
@@ -391,6 +394,7 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
 		assertNotNull(getResponse);
 		assertEquals(request.getHostPin(), updatedSchedulingInfo.getHostPin());
 		assertEquals(request.getGuestPin(), updatedSchedulingInfo.getGuestPin());
+		assertEquals(request.getCallType(), updatedSchedulingInfo.getCallType());
 		assertEquals(2, getResponse.getAdditionalInformation().size());
 	}
 
