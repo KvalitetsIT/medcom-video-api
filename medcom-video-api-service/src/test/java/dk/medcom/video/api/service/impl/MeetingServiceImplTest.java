@@ -11,6 +11,8 @@ import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.entity.*;
+import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.service.*;
@@ -47,7 +49,8 @@ public class MeetingServiceImplTest {
 	private final UUID reservationId = UUID.randomUUID();
 	private SchedulingInfo schedulingInfo;
 	private OrganisationTreeServiceClient organisationTreeServiceClient;
-	private OrganisationRepository organisationRepository;
+	private OrganisationStrategy organisationStrategy;
+	private Organisation userOrganisation;
     private MeetingAdditionalInfoRepository meetingAdditionalInfoRepository;
 
 	@BeforeEach
@@ -55,13 +58,12 @@ public class MeetingServiceImplTest {
 		createMeetingDto = getCreateMeetingDtoWithDefaultValues();
 		updateMeetingDto = getUpdateMeetingDtoWithDefaultValues();
 		meetingUser = new MeetingUser();
-		Organisation organisation = new Organisation();
-		organisation.setOrganisationId("RH");
-		organisation.setName("some name");
-		organisation.setId(1234L);
-		organisation.setPoolSize(10);
+		userOrganisation = new Organisation();
+		userOrganisation.setCode("RH");
+		userOrganisation.setName("some name");
+		userOrganisation.setPoolSize(10);
 
-		meetingUser.setOrganisation(organisation);
+		meetingUser.setOrganisationCode("RH");
 		meetingUser.setEmail("test@test.dk");
 
 		meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
@@ -73,7 +75,7 @@ public class MeetingServiceImplTest {
 		meeting.setId((long) 100077);
 		meeting.setUuid(uuid);
 		meeting.setSubject("Test møde");
-		meeting.setOrganisation(meetingUser.getOrganisation());
+		meeting.setOrganisationCode(meetingUser.getOrganisationCode());
 		meeting.setMeetingUser(meetingUser);
 		meeting.setCreatedTime(calendarDate.getTime());
 		meeting.setUpdatedByUser(meetingUser);
@@ -136,7 +138,7 @@ public class MeetingServiceImplTest {
 		SchedulingStatusServiceImpl schedulingStatusService = Mockito.mock(SchedulingStatusServiceImpl.class);
 		OrganisationService organisationService = Mockito.mock(OrganisationService.class);
 		UserContextService userContextService = Mockito.mock(UserContextService.class);
-		organisationRepository = Mockito.mock(OrganisationRepository.class);
+		organisationStrategy = Mockito.mock(OrganisationStrategy.class);
 		organisationTreeServiceClient = Mockito.mock(OrganisationTreeServiceClient.class);
         AuditService auditService = Mockito.mock(AuditService.class);
 
@@ -148,11 +150,11 @@ public class MeetingServiceImplTest {
 		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(organisationTree);
 
 		Organisation o = new Organisation();
-		o.setOrganisationId(userContext.getUserOrganisation());
+		o.setCode(userContext.getUserOrganisation());
 		if(userOrganistionPoolSize != null) {
 			o.setPoolSize(userOrganistionPoolSize);
 		}
-		Mockito.when(organisationRepository.findByOrganisationId(userContext.getUserOrganisation())).thenReturn(o);
+		Mockito.when(organisationStrategy.findOrganisationByCode(userContext.getUserOrganisation())).thenReturn(o);
 
 		var schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
 		meetingAdditionalInfoRepository = Mockito.mock(MeetingAdditionalInfoRepository.class);
@@ -164,7 +166,7 @@ public class MeetingServiceImplTest {
 				organisationService,
 				userContextService,
 				meetingLabelRepository,
-				organisationRepository,
+				organisationStrategy,
 				organisationTreeServiceClient,
                 auditService,
 				schedulingInfoEventPublisher,
@@ -178,7 +180,7 @@ public class MeetingServiceImplTest {
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser(Mockito.anyString())).thenReturn(meetingUserOrganizer);
 
-		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
+		Mockito.when(organisationService.getUserOrganisation()).thenReturn(userOrganisation);
 		Mockito.when(organisationService.getPoolSizeForOrganisation("org")).thenReturn(null);
 		Mockito.when(organisationService.getPoolSizeForUserOrganisation()).thenReturn(userOrganistionPoolSize);
 
@@ -193,9 +195,7 @@ public class MeetingServiceImplTest {
 		schedulingInfo.setProvisionStatus(provisionStatus);
 		schedulingInfo.setDirectMedia(DirectMedia.best_effort);
 		schedulingInfo.setMeetingUser(meetingUser);
-		Organisation organisation = new Organisation();
-		organisation.setOrganisationId("org");
-		schedulingInfo.setOrganisation(organisation);
+		schedulingInfo.setOrganisationCode("org");
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(new SchedulingInfo());
 		Mockito.when(schedulingInfoService.getSchedulingInfoByUuid(Mockito.anyString())).thenReturn(schedulingInfo);
 		Mockito.when(schedulingInfoService.getSchedulingInfoByReservation(reservationId)).thenReturn(schedulingInfo);
@@ -640,7 +640,7 @@ public class MeetingServiceImplTest {
 		input.setEndTime(new Date());
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK, 10);
-		schedulingInfo.getOrganisation().setOrganisationId("some_other_org");
+		schedulingInfo.setOrganisationCode("some_other_org");
 
         assertThrows(NotValidDataException.class, () -> meetingService.createMeeting(input));
 	}
@@ -777,7 +777,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+		userOrganisation.setAllowCustomUriWithoutDomain(true);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 
@@ -816,7 +816,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+		userOrganisation.setAllowCustomUriWithoutDomain(true);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 
@@ -855,7 +855,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+		userOrganisation.setAllowCustomUriWithoutDomain(true);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 
@@ -894,7 +894,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setAllowCustomUriWithoutDomain(true);
+		userOrganisation.setAllowCustomUriWithoutDomain(true);
 
 		MeetingLabelRepository meetingLabelRepository = Mockito.mock(MeetingLabelRepository.class);
 
@@ -1035,7 +1035,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setPoolSize(null);
+		userOrganisation.setPoolSize(null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1057,7 +1057,7 @@ public class MeetingServiceImplTest {
 		UUID uuid = UUID.randomUUID();
 		UserContext userContext = new UserContextImpl("org", "test@test.dk", UserRole.ADMIN, null);
 
-		meetingUser.getOrganisation().setPoolSize(null);
+		userOrganisation.setPoolSize(null);
 
 		CreateMeetingDto input = new CreateMeetingDto();
 		input.setDescription("This is a description");
@@ -1080,10 +1080,10 @@ public class MeetingServiceImplTest {
 		Mockito.reset(organisationTreeServiceClient);
 		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(superParent);
 
-		Mockito.reset(organisationRepository);
+		Mockito.reset(organisationStrategy);
 		var o = new Organisation();
-		o.setOrganisationId("superParent");
-		Mockito.when(organisationRepository.findByOrganisationId("superParent")).thenReturn(o);
+		o.setCode("superParent");
+		Mockito.when(organisationStrategy.findOrganisationByCode("superParent")).thenReturn(o);
 
 		assertThrows(NotValidDataException.class, () -> meetingService.createMeeting(input));
 		Mockito.verify(meetingAdditionalInfoRepository, times(0)).saveAll(Mockito.any());
@@ -1115,11 +1115,11 @@ public class MeetingServiceImplTest {
 		Mockito.reset(organisationTreeServiceClient);
 		Mockito.when(organisationTreeServiceClient.getOrganisationTree(userContext.getUserOrganisation())).thenReturn(superParent);
 
-		Mockito.reset(organisationRepository);
+		Mockito.reset(organisationStrategy);
 		var o = new Organisation();
-		o.setOrganisationId("parent");
+		o.setCode("parent");
 		o.setPoolSize(10);
-		Mockito.when(organisationRepository.findByOrganisationId("parent")).thenReturn(o);
+		Mockito.when(organisationStrategy.findOrganisationByCode("parent")).thenReturn(o);
 
 		Meeting result = meetingService.createMeeting(input);
 		assertNotNull(result);
@@ -1285,7 +1285,7 @@ public class MeetingServiceImplTest {
 
 		meetingService.getMeetingsByOrganizedBy("test@test.dk");
 
-		Mockito.verify(meetingRepository).findByOrganisationAndOrganizedBy(Mockito.any(Organisation.class), Mockito.any(MeetingUser.class));
+		Mockito.verify(meetingRepository).findByOrganisationCodeAndOrganizedBy(Mockito.anyString(), Mockito.any(MeetingUser.class));
 	}
 
 	@Test
@@ -1311,7 +1311,7 @@ public class MeetingServiceImplTest {
 
 		meetingService.getMeetingsByUriWithDomain("uriWithDomain");
 
-		Mockito.verify(meetingRepository).findByUriWithDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
+		Mockito.verify(meetingRepository).findByUriWithDomainAndOrganisationCode(Mockito.anyString(), Mockito.anyString());
 	}
 
 	@Test
@@ -1335,11 +1335,11 @@ public class MeetingServiceImplTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
-		Mockito.when(meetingRepository.findOneByUriWithoutDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+		Mockito.when(meetingRepository.findOneByUriWithoutDomainAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
 
 		meetingService.getMeetingsByUriWithoutDomain("uriWithDomain");
 
-		Mockito.verify(meetingRepository).findOneByUriWithoutDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
+		Mockito.verify(meetingRepository).findOneByUriWithoutDomainAndOrganisationCode(Mockito.anyString(), Mockito.anyString());
 	}
 
 	@Test
@@ -1363,11 +1363,11 @@ public class MeetingServiceImplTest {
 
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
-		Mockito.when(meetingRepository.findOneByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
+		Mockito.when(meetingRepository.findOneByUriWithDomainAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(new Meeting());
 
 		meetingService.getMeetingsByUriWithDomainSingle("uriWithDomain");
 
-		Mockito.verify(meetingRepository).findOneByUriWithDomainAndOrganisation(Mockito.any(Organisation.class), Mockito.anyString());
+		Mockito.verify(meetingRepository).findOneByUriWithDomainAndOrganisationCode(Mockito.anyString(), Mockito.anyString());
 	}
 
 	@Test
@@ -1393,7 +1393,7 @@ public class MeetingServiceImplTest {
 
 		meetingService.getMeetingsByLabel("uriWithDomain");
 
-		Mockito.verify(meetingRepository).findByLabelAndOrganisation(Mockito.any(Organisation.class), Mockito.eq("uriWithDomain"));
+		Mockito.verify(meetingRepository).findByLabelAndOrganisationCode(Mockito.anyString(), Mockito.eq("uriWithDomain"));
 	}
 
 	@Test
@@ -1512,13 +1512,12 @@ public class MeetingServiceImplTest {
 	@Test
 	public void testCreateMeetingFromNonPooledOrganization() throws NotValidDataException, PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 		meetingUser = new MeetingUser();
-		Organisation organisation = new Organisation();
-		organisation.setOrganisationId("RH");
-		organisation.setName("some name");
-		organisation.setId(1234L);
-//		organisation.setPoolSize(10);
+		userOrganisation = new Organisation();
+		userOrganisation.setCode("RH");
+		userOrganisation.setName("some name");
+//		userOrganisation.setPoolSize(10);
 
-		meetingUser.setOrganisation(organisation);
+		meetingUser.setOrganisationCode("RH");
 		meetingUser.setEmail("test@test.dk");
 
 		UUID uuid = UUID.randomUUID();
@@ -1569,10 +1568,10 @@ public class MeetingServiceImplTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
 
-		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
-		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
-		Mockito.when(meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
-		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPastExcluded));
+		Mockito.when(meetingRepository.findByOrganisationCodeAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
+		Mockito.when(meetingRepository.findByLabelAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
+		Mockito.when(meetingRepository.findByOrganisationCodeAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPastExcluded));
 
 		Calendar yesterdayCal = Calendar.getInstance();
 		yesterdayCal.add(Calendar.DATE, -1);
@@ -1609,10 +1608,10 @@ public class MeetingServiceImplTest {
 		MeetingService meetingService = createMeetingServiceMocked(userContext, meetingUser, uuid.toString(), ProvisionStatus.PROVISIONED_OK);
 		Mockito.when(schedulingInfoService.attachMeetingToSchedulingInfo(Mockito.any(Meeting.class), Mockito.any(CreateMeetingDto.class))).thenReturn(null);
 
-		Mockito.when(meetingRepository.findByOrganisationAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
-		Mockito.when(meetingRepository.findByLabelAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
-		Mockito.when(meetingRepository.findByOrganisationAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
-		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisation(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPast));
+		Mockito.when(meetingRepository.findByOrganisationCodeAndOrganizedBy(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOne));
+		Mockito.when(meetingRepository.findByLabelAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingTwo));
+		Mockito.when(meetingRepository.findByOrganisationCodeAndSubjectLikeOrDescriptionLike(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingOneDuplicate, meetingThree));
+		Mockito.when(meetingRepository.findByUriWithDomainAndOrganisationCode(Mockito.any(), Mockito.any())).thenReturn(wrapInList(meetingFour, meetingPast));
 
 		List<Meeting> result = meetingService.searchMeetings("search", null, null);
 

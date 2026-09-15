@@ -31,7 +31,7 @@ public class HelperMethods {
         meeting.setId(count++);
         meeting.setUuid(randomString());
         meeting.setSubject(randomString());
-        meeting.setOrganisation(randomOrganisation());
+        meeting.setOrganisationCode(randomOrganisationCode());
         meeting.setMeetingUser(randomMeetingUser());
         meeting.setCreatedTime(Date.from(Instant.now().minusSeconds(count++)));
         meeting.setUpdatedByUser(randomMeetingUser());
@@ -78,7 +78,7 @@ public class HelperMethods {
         schedulingInfo.setProvisionStatus(ProvisionStatus.PROVISIONED_OK);
         schedulingInfo.setProvisionStatusDescription(randomString());
         schedulingInfo.setProvisionTimestamp(Date.from(Instant.now().minusSeconds(count++)));
-        schedulingInfo.setOrganisation(randomOrganisation());
+        schedulingInfo.setOrganisationCode(randomOrganisationCode());
         schedulingInfo.setMeeting(randomMeeting());
         schedulingInfo.setPortalLink(randomString());
         schedulingInfo.setIvrTheme(randomString());
@@ -101,7 +101,7 @@ public class HelperMethods {
     public static SchedulingTemplate randomSchedulingTemplate() {
         var schedulingTemplate = new SchedulingTemplate();
         schedulingTemplate.setId(count++);
-        schedulingTemplate.setOrganisation(randomOrganisation());
+        schedulingTemplate.setOrganisationCode(randomOrganisationCode());
         schedulingTemplate.setConferencingSysId(count++);
         schedulingTemplate.setUriPrefix(randomString());
         schedulingTemplate.setUriDomain(randomString());
@@ -241,24 +241,14 @@ public class HelperMethods {
         return UUID.randomUUID().toString();
     }
 
-    private static Organisation randomOrganisation() {
-        var organisation = new Organisation();
-        organisation.setId(count++);
-        organisation.setOrganisationId(randomString());
-        organisation.setName(randomString());
-        organisation.setPoolSize((int) count++);
-        organisation.setGroupId(count++);
-        organisation.setSmsSenderName(randomString());
-        organisation.setAllowCustomUriWithoutDomain(randomBoolean());
-        organisation.setSmsCallbackUrl(randomString());
-
-        return organisation;
+    private static String randomOrganisationCode() {
+        return randomString();
     }
 
     private static MeetingUser randomMeetingUser() {
         var meetingUser = new MeetingUser();
         meetingUser.setId(count++);
-        meetingUser.setOrganisation(randomOrganisation());
+        meetingUser.setOrganisationCode(randomOrganisationCode());
         meetingUser.setEmail(randomString());
 
         return meetingUser;
@@ -465,7 +455,7 @@ public class HelperMethods {
 
     public static void assertSchedulingTemplate(SchedulingTemplate expected, SchedulingTemplateModel actual) {
         assertEquals(expected.getId(), actual.id());
-        assertEquals(expected.getOrganisation().getOrganisationId(), actual.organisationId());
+        assertEquals(expected.getOrganisationCode(), actual.organisationId());
         assertEquals(expected.getConferencingSysId(), actual.conferencingSysId());
         assertEquals(expected.getUriPrefix(), actual.uriPrefix());
         assertEquals(expected.getUriDomain(), actual.uriDomain());
@@ -616,7 +606,7 @@ public class HelperMethods {
     }
 
     private static void assertMeetingUser(MeetingUser expected, MeetingUserModel actual) {
-        assertEquals(expected.getOrganisation().getOrganisationId(), actual.organisationId());
+        assertEquals(expected.getOrganisationCode(), actual.organisationId());
         assertEquals(expected.getEmail(), actual.email());
     }
 

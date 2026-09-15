@@ -8,9 +8,9 @@ import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.MeetingUserServiceImpl;
 import dk.medcom.video.api.service.OrganisationService;
@@ -44,8 +44,8 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto = getUpdateSchedulingTemplateDtoWithDefaultValues();
 		meetingUser = new MeetingUser();
 		organisation = new Organisation();
-		organisation.setOrganisationId("org");
-		meetingUser.setOrganisation(organisation);
+		organisation.setCode("org");
+		meetingUser.setOrganisationCode("org");
 	}
 
 	@Test 
@@ -164,14 +164,14 @@ public class SchedulingTemplateServiceTest {
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(organisation,  1L));
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(organisation,  2L));
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(organisation,  3L));
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(true))).thenReturn(schedulingTemplatesInService);
 		
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();
 		
 		// Then
 		assertNotNull(schedulingTemplate);
-		assertNotNull(schedulingTemplate.getOrganisation());
+		assertNotNull(schedulingTemplate.getOrganisationCode());
 		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
 		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
@@ -187,7 +187,7 @@ public class SchedulingTemplateServiceTest {
 
 		var inputSchedulingTemplate = getSchedulingTemplateWithDefaultValues(organisation,  1L);
 		inputSchedulingTemplate.setIsDefaultTemplate(true);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(Collections.emptyList());
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(true))).thenReturn(Collections.emptyList());
 		Mockito.when(schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull("child")).thenReturn(null);
 		Mockito.when(schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull("childOne")).thenReturn(null);
 		Mockito.when(schedulingTemplateRepository.findByOrganisationIdAndIsDefaultTemplateAndDeletedTimeIsNull("parent")).thenReturn(Collections.singletonList(inputSchedulingTemplate));
@@ -202,7 +202,7 @@ public class SchedulingTemplateServiceTest {
 
 		// Then
 		assertNotNull(schedulingTemplate);
-		assertNotNull(schedulingTemplate.getOrganisation());
+		assertNotNull(schedulingTemplate.getOrganisationCode());
 		assertEquals(inputSchedulingTemplate.getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(inputSchedulingTemplate.getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
 		assertEquals(inputSchedulingTemplate.getReturnUrl(), schedulingTemplate.getReturnUrl());
@@ -221,8 +221,8 @@ public class SchedulingTemplateServiceTest {
 		List<SchedulingTemplate> schedulingTemplatesInService = new ArrayList<>();
 
 		schedulingTemplatesInService.add(getSchedulingTemplateWithDefaultValues(null,  1L));
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull()).thenReturn(schedulingTemplatesInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeIsNullAndDeletedTimeIsNull()).thenReturn(schedulingTemplatesInService);
 		Mockito.when(organisationTreeServiceClient.getOrganisationTree("org")).thenReturn(createOrganisationTree("org", "org-name", null));
 
 		// When
@@ -230,7 +230,7 @@ public class SchedulingTemplateServiceTest {
 		
 		// Then
 		assertNotNull(schedulingTemplate);
-		assertNull(schedulingTemplate.getOrganisation());
+		assertNull(schedulingTemplate.getOrganisationCode());
 		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalGuest(), schedulingTemplate.getCustomPortalGuest());
 		assertEquals(schedulingTemplatesInService.getFirst().getCustomPortalHost(), schedulingTemplate.getCustomPortalHost());
 		assertEquals(schedulingTemplatesInService.getFirst().getReturnUrl(), schedulingTemplate.getReturnUrl());
@@ -259,7 +259,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplateServiceImpl schedulingTemplateService = simpleSchedulingTemplateServiceMocked(meetingUser, schedulingTemplateRepository);
 		
 		SchedulingTemplate schedulingTemplateInService = getSchedulingTemplateWithDefaultValues(organisation,  1L);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIdAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
 
 		schedulingTemplateInService.setIsPoolTemplate(true);
 		
@@ -288,7 +288,7 @@ public class SchedulingTemplateServiceTest {
 		var template = getSchedulingTemplateWithDefaultValues(organisation, 3L);
 		template.setIsPoolTemplate(true);
 		schedulingTemplatesInService.add(template);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndDeletedTimeIsNull(Mockito.any(Organisation.class))).thenReturn(schedulingTemplatesInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndDeletedTimeIsNull(Mockito.anyString())).thenReturn(schedulingTemplatesInService);
 		
 		// When
 		List<SchedulingTemplate> schedulingTemplates = schedulingTemplateService.getSchedulingTemplates();
@@ -312,7 +312,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate template = getSchedulingTemplateWithDefaultValues(organisation, 1L);
 		template.setIsPoolTemplate(true);
 		templates.add(template);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisation, true)).thenReturn(templates);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(organisation.getCode(), true)).thenReturn(templates);
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
 
 		//Then
@@ -330,7 +330,7 @@ public class SchedulingTemplateServiceTest {
 		SchedulingTemplate template = getSchedulingTemplateWithDefaultValues(organisation, 1L);
 		template.setIsPoolTemplate(true);
 		templates.add(template);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(organisation, true)).thenReturn(templates);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(organisation.getCode(), true)).thenReturn(templates);
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
 
 		//Then
@@ -391,7 +391,7 @@ public class SchedulingTemplateServiceTest {
 
 	private SchedulingTemplate getSchedulingTemplateWithDefaultValues(Organisation organisation, Long id) {
 		SchedulingTemplate schedulingTemplate = new SchedulingTemplate();
-		schedulingTemplate.setOrganisation(organisation);
+		schedulingTemplate.setOrganisationCode(organisation == null ? null : organisation.getCode());
 		schedulingTemplate.setId(id);
 		schedulingTemplate.setConferencingSysId(1L);
 		schedulingTemplate.setUriPrefix("a");
@@ -431,11 +431,11 @@ public class SchedulingTemplateServiceTest {
 			Mockito.when(schedulingTemplateRepository.save(schedulingTemplateInService)).thenAnswer(i -> i.getArguments()[0]); //returns the actual modified meeting from the updateMeeting call
 		}
 
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIdAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(777L))).thenReturn(null);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIdAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(1L))).thenReturn(schedulingTemplateInService);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIdAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(777L))).thenReturn(null);
 
 		List<SchedulingTemplate> schedulingTemplatesInServiceEmpty = new ArrayList<>();
-		Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(Organisation.class), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
+		Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.anyString(), Mockito.eq(true))).thenReturn(schedulingTemplatesInServiceEmpty);
 
 		Mockito.when(schedulingTemplateRepository.save(Mockito.any())).thenAnswer(x -> x.getArgument(0));
 
@@ -468,7 +468,7 @@ public class SchedulingTemplateServiceTest {
 				null);
 
 		Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(meetingUser);
-		Mockito.when(organisationService.getUserOrganisation()).thenReturn(meetingUser.getOrganisation());
+		Mockito.when(organisationService.getUserOrganisation()).thenReturn(organisation);
 
 		return schedulingTemplateService;
 	}

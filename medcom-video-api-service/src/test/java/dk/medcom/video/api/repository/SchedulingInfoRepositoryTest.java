@@ -25,9 +25,6 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
     @Resource
     private MeetingUserRepository subjectMU;
 
-    @Resource
-    private OrganisationRepository subjectOrganisationRepository;
-
     @Test
     public void testSchedulingInfo() {
         // Given
@@ -98,8 +95,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setPortalLink(portalLink);
         schedulingInfo.setIvrTheme(ivrTheme);
 
-        Organisation organization = subjectOrganisationRepository.findByOrganisationId("test-org");
-        schedulingInfo.setOrganisation(organization);
+        String organisationCode = "test-org";
+        schedulingInfo.setOrganisationCode(organisationCode);
         schedulingInfo.setPoolOverflow(true);
         schedulingInfo.setCustomPortalGuest(customPortalGuest);
         schedulingInfo.setCustomPortalHost(customPortalHost);
@@ -139,7 +136,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertEquals(meetingUserId, schedulingInfo.getMeetingUser().getId());
         assertEquals(meetingUserId, schedulingInfo.getUpdatedByUser().getId());
 
-        assertEquals(organization.getOrganisationId(), schedulingInfo.getOrganisation().getOrganisationId());
+        assertEquals(organisationCode, schedulingInfo.getOrganisationCode());
 
         assertEquals(reservationId.toString(), schedulingInfo.getReservationId());
         assertTrue(schedulingInfo.getPoolOverflow());
@@ -299,7 +296,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
         // Then
         assertEquals(1, schedulingInfos.size());
-        assertEquals(organisation, schedulingInfos.getFirst().getOrganisation().getOrganisationId());
+        assertEquals(organisation, schedulingInfos.getFirst().getOrganisationCode());
     }
 
     @Test
@@ -317,8 +314,8 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
         // Then
         assertEquals(2, schedulingInfos.size());
-        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(testOrg)));
-        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisation().getOrganisationId().equals(anotherTestOrg)));
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisationCode().equals(testOrg)));
+        assertTrue(schedulingInfos.stream().anyMatch(x -> x.getOrganisationCode().equals(anotherTestOrg)));
     }
 
     @Test
@@ -518,8 +515,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganization() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
         var optionalSchedulingInfo = subject.findById(207L);
         assertTrue(optionalSchedulingInfo.isPresent());
         SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
@@ -535,7 +531,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 null,
@@ -555,8 +551,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganizationGuestCanPresentAndVmrType() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
 
         var optionalSchedulingInfo = subject.findById(207L);
         assertTrue(optionalSchedulingInfo.isPresent());
@@ -569,11 +564,11 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setProvisionTimestamp(cal.getTime());
         subject.save(schedulingInfo);
 
-        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisation);
+        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisationCode);
         schedulingInfoVmrType.setVmrType(VmrType.lecture);
         schedulingInfoVmrType.setGuestsCanPresent(true);
         schedulingInfoVmrType.setProvisionTimestamp(cal.getTime());
-        schedulingInfoVmrType.setOrganisation(schedulingInfo.getOrganisation());
+        schedulingInfoVmrType.setOrganisationCode(schedulingInfo.getOrganisationCode());
         schedulingInfoVmrType.setUpdatedByUser(schedulingInfo.getUpdatedByUser());
         schedulingInfoVmrType.setMeetingUser(schedulingInfo.getMeetingUser());
         schedulingInfoVmrType.setSchedulingTemplate(schedulingInfo.getSchedulingTemplate());
@@ -583,7 +578,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 "lecture",
@@ -603,8 +598,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganizationVmrType() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
 
         var optionalSchedulingInfo = subject.findById(207L);
         assertTrue(optionalSchedulingInfo.isPresent());
@@ -617,10 +611,10 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         schedulingInfo.setProvisionTimestamp(cal.getTime());
         subject.save(schedulingInfo);
 
-        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisation);
+        var schedulingInfoVmrType = TestDataHelper.createSchedulingInfo(organisationCode);
         schedulingInfoVmrType.setVmrType(VmrType.lecture);
         schedulingInfoVmrType.setProvisionTimestamp(cal.getTime());
-        schedulingInfoVmrType.setOrganisation(schedulingInfo.getOrganisation());
+        schedulingInfoVmrType.setOrganisationCode(schedulingInfo.getOrganisationCode());
         schedulingInfoVmrType.setUpdatedByUser(schedulingInfo.getUpdatedByUser());
         schedulingInfoVmrType.setMeetingUser(schedulingInfo.getMeetingUser());
         schedulingInfoVmrType.setSchedulingTemplate(schedulingInfo.getSchedulingTemplate());
@@ -630,7 +624,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
-        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 "lecture",
@@ -650,8 +644,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganization_withNonDefaultSettings() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
         var optionalSchedulingInfo = subject.findById(211L);
         assertTrue(optionalSchedulingInfo.isPresent());
         SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
@@ -668,7 +661,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
         List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                organisation.getId(),
+                organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 VmrType.lecture.name(),
@@ -688,8 +681,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganizationProvisionTimestamp() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
         var optionalSchedulingInfo = subject.findById(207L);
         assertTrue(optionalSchedulingInfo.isPresent());
         SchedulingInfo schedulingInfo = optionalSchedulingInfo.get();
@@ -706,7 +698,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
 
-        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisation.getId(),
+        List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 null,
@@ -728,7 +720,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         subject.save(schedulingInfo);
 
         schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                organisation.getId(),
+                organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 null,
@@ -748,15 +740,14 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
 
     @Test
     public void testFindUnusedSchedulingInfoForOrganizationNoProvisionTimestampReady() {
-        Organisation organisation = new Organisation();
-        organisation.setId(7L);
+        String organisationCode = "pool-test-org";
 
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(new Date());
         cal2.set(Calendar.SECOND, cal2.get(Calendar.SECOND) - 60);
 
         List<SchedulingInfo> schedulingInfos = subject.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                organisation.getId(),
+                organisationCode,
                 ProvisionStatus.PROVISIONED_OK.name(),
                 cal2.getTime(),
                 null,
@@ -807,9 +798,7 @@ public class SchedulingInfoRepositoryTest extends RepositoryTest {
         assertFalse(result.isEmpty());
         SchedulingInfo schedulingInfo = result.getFirst();
         assertEquals(uris.getFirst(), schedulingInfo.getUriWithDomain());
-        assertNotNull(schedulingInfo.getOrganisation());
-        assertNotNull(schedulingInfo.getOrganisation().getId());
-        assertNotNull(schedulingInfo.getOrganisation().getName());
+        assertNotNull(schedulingInfo.getOrganisationCode());
     }
 
     @Test

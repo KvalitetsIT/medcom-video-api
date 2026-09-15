@@ -4,7 +4,7 @@ import dk.medcom.video.api.api.CreateMeetingDto;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
 import dk.medcom.video.api.dao.entity.VmrQuality;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
-import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.PoolFinderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,15 +28,15 @@ public class PoolFinderServiceTest {
 
     @Test
     public void testFindPoolSchedulingInfoDefault() {
-        var orgId = 123L;
+        var orgCode = "123";
 
         var organisation = new Organisation();
-        organisation.setId(orgId);
+        organisation.setCode(orgCode);
 
         var schedulingInfo = new SchedulingInfo();
 
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -56,7 +56,7 @@ public class PoolFinderServiceTest {
         assertEquals(schedulingInfo, result.get());
 
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -75,13 +75,13 @@ public class PoolFinderServiceTest {
 
     @Test
     public void testFindPoolSchedulingInfoNotFound() {
-        var orgId = 123L;
+        var orgCode = "123";
 
         var organisation = new Organisation();
-        organisation.setId(orgId);
+        organisation.setCode(orgCode);
 
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -100,7 +100,7 @@ public class PoolFinderServiceTest {
         assertTrue(result.isEmpty());
 
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -119,17 +119,17 @@ public class PoolFinderServiceTest {
 
     @Test
     public void testFindPoolSchedulingInfoWithFieldsFromCreateMeeting() {
-        var orgId = 123L;
+        var orgCode = "123";
 
         var organisation = new Organisation();
-        organisation.setId(orgId);
+        organisation.setCode(orgCode);
 
         var createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setVmrQuality(VmrQuality.fullhd);
 
         var schedulingInfo = new SchedulingInfo();
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -150,7 +150,7 @@ public class PoolFinderServiceTest {
         assertEquals(schedulingInfo, result.get());
 
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -169,16 +169,16 @@ public class PoolFinderServiceTest {
 
     @Test
     public void testFindPoolSchedulingInfoWithFieldsFromCreateMeetingNotFound() {
-        var orgId = 123L;
+        var orgCode = "123";
 
         var organisation = new Organisation();
-        organisation.setId(orgId);
+        organisation.setCode(orgCode);
 
         var createMeetingDto = new CreateMeetingDto();
         createMeetingDto.setVmrQuality(VmrQuality.fullhd);
 
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),
@@ -198,7 +198,7 @@ public class PoolFinderServiceTest {
         assertTrue(result.isEmpty());
 
         Mockito.verify(schedulingInfoRepository).findByMeetingIsNullAndOrganisationAndProvisionStatus(
-                Mockito.eq(orgId),
+                Mockito.eq(orgCode),
                 Mockito.eq(ProvisionStatus.PROVISIONED_OK.name()),
                 Mockito.any(),
                 Mockito.any(),

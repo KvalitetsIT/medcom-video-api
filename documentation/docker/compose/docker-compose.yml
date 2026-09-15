@@ -94,7 +94,6 @@ services:
 
       - LOG_LEVEL=debug
 
-      - organisation.service.enabled=true
       - organisation.service.endpoint=http://organisation:1080/services
       - organisationtree.service.endpoint=http://organisation:1080
       - organisation.service.v2.endpoint=http://organisation:1080

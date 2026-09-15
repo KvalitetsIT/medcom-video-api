@@ -2,14 +2,12 @@ package dk.medcom.video.api.service.impl;
 
 import dk.medcom.video.api.api.PoolInfoDto;
 import dk.medcom.video.api.dao.entity.ProvisionStatus;
-import dk.medcom.video.api.dao.OrganisationRepository;
-import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.SchedulingTemplateRepository;
-import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
 import dk.medcom.video.api.organisation.OrganisationStrategy;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.service.PoolInfoService;
 import dk.medcom.video.api.service.PoolInfoServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +28,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PoolInfoServiceTest {
-	@Mock
-    private PoolInfoRepository poolInfoRepository;
-
-    private OrganisationRepository organisationRepository;
     private SchedulingInfoRepository schedulingInfoRepository;
     private SchedulingTemplateRepository schedulingTemplateRepository;
     private OrganisationStrategy organisationStrategy;
@@ -45,12 +39,11 @@ public class PoolInfoServiceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        organisationRepository = Mockito.mock(OrganisationRepository.class);
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         organisationStrategy = Mockito.mock(OrganisationStrategy.class);
 
-        poolInfoService = new PoolInfoServiceImpl(organisationRepository, schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy, poolInfoRepository);
+        poolInfoService = new PoolInfoServiceImpl(schedulingInfoRepository, schedulingTemplateRepository, organisationStrategy);
     }
 
     @Test
@@ -58,14 +51,10 @@ public class PoolInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
-        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(organisations);
 
         SchedulingTemplate schedulingTemplate = createPoolSchedulingTemplate();
-        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsPoolTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
-
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
-
+        Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsPoolTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -73,14 +62,14 @@ public class PoolInfoServiceTest {
         assertEquals(2, response.size());
 
         PoolInfoDto firstPoolInfo = response.getFirst();
-        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getCode(), firstPoolInfo.getOrganizationId());
         assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNotNull(firstPoolInfo.getSchedulingTemplate());
 
         PoolInfoDto secondPoolInfo = response.get(1);
-        assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(1).getCode(), secondPoolInfo.getOrganizationId());
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
         assertNotNull(secondPoolInfo.getSchedulingTemplate());
@@ -91,14 +80,10 @@ public class PoolInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
-        Mockito.when(organisationRepository.findByOrganisationId(Mockito.anyString())).thenReturn(new Organisation());
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(organisations);
 
         SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
-        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
-
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
-
+        Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.singletonList(schedulingTemplate));
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -106,14 +91,14 @@ public class PoolInfoServiceTest {
         assertEquals(2, response.size());
 
         PoolInfoDto firstPoolInfo = response.getFirst();
-        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getCode(), firstPoolInfo.getOrganizationId());
         assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNotNull(firstPoolInfo.getSchedulingTemplate());
 
         PoolInfoDto secondPoolInfo = response.get(1);
-        assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(1).getCode(), secondPoolInfo.getOrganizationId());
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
         assertNotNull(secondPoolInfo.getSchedulingTemplate());
@@ -124,12 +109,9 @@ public class PoolInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfo());
 
         List<Organisation> organisations = createOrganisationList();
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(organisations);
 
-        Mockito.when(schedulingTemplateRepository.findByOrganisationAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.emptyList());
-
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
-
+        Mockito.when(schedulingTemplateRepository.findByOrganisationCodeAndIsDefaultTemplateAndDeletedTimeIsNull(Mockito.any(), Mockito.anyBoolean())).thenReturn(Collections.emptyList());
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -137,14 +119,14 @@ public class PoolInfoServiceTest {
         assertEquals(2, response.size());
 
         PoolInfoDto firstPoolInfo = response.getFirst();
-        assertEquals(organisations.getFirst().getOrganisationId(), firstPoolInfo.getOrganizationId());
+        assertEquals(organisations.getFirst().getCode(), firstPoolInfo.getOrganizationId());
         assertEquals(organisations.getFirst().getPoolSize().intValue(), firstPoolInfo.getDesiredPoolSize());
         assertEquals(2, firstPoolInfo.getAvailablePoolSize());
 
         assertNull(firstPoolInfo.getSchedulingTemplate());
 
         PoolInfoDto secondPoolInfo = response.get(1);
-        assertEquals(organisations.get(1).getOrganisationId(), secondPoolInfo.getOrganizationId());
+        assertEquals(organisations.get(1).getCode(), secondPoolInfo.getOrganizationId());
         assertEquals(organisations.get(1).getPoolSize().intValue(), secondPoolInfo.getDesiredPoolSize());
         assertEquals(0, secondPoolInfo.getAvailablePoolSize());
         assertNull(secondPoolInfo.getSchedulingTemplate());
@@ -152,15 +134,10 @@ public class PoolInfoServiceTest {
 
     @Test
     public void testGetPoolInfoNoConfiguredPools() {
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
-
-//        Mockito.when(schedulingInfoRepository.findByMeetingIsNull()).thenReturn(Collections.emptyList());
-
-        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
-        Mockito.when(schedulingTemplateRepository.findByOrganisationIsNullAndDeletedTimeIsNull()).thenReturn(Collections.singletonList(schedulingTemplate));
-
         Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(Collections.emptyList());
 
+        SchedulingTemplate schedulingTemplate = createDefaultSchedulingTemplate();
+        Mockito.when(schedulingTemplateRepository.findByOrganisationCodeIsNullAndDeletedTimeIsNull()).thenReturn(Collections.singletonList(schedulingTemplate));
 
         List<PoolInfoDto> response = poolInfoService.getPoolInfo();
 
@@ -177,9 +154,7 @@ public class PoolInfoServiceTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIsNullAndReservationIdIsNullAndProvisionStatus(ProvisionStatus.PROVISIONED_OK)).thenReturn(createSchedulingInfoListWithCreatedTime(yesterday, now, someTimeAgo));
 
         List<Organisation> organisations = createOrganisationList();
-        Mockito.when(organisationRepository.findByPoolSizeNotNull()).thenReturn(organisations);
-
-        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(createStrategyOrganisationList());
+        Mockito.when(organisationStrategy.findByPoolSizeNotNull()).thenReturn(organisations);
 
         var result = poolInfoService.getPoolInfo();
         assertNotNull(result);
@@ -202,12 +177,12 @@ public class PoolInfoServiceTest {
         List<SchedulingInfo> schedulingInfos = new ArrayList<>();
 
         SchedulingInfo sched1 = new SchedulingInfo();
-        sched1.setOrganisation(createOrganiztion(1));
+        sched1.setOrganisationCode(createOrganiztion(1).getCode());
         sched1.setCreatedTime(new Date());
         schedulingInfos.add(sched1);
 
         SchedulingInfo sched2 = new SchedulingInfo();
-        sched2.setOrganisation(createOrganiztion(1));
+        sched2.setOrganisationCode(createOrganiztion(1).getCode());
         sched2.setCreatedTime(new Date());
         schedulingInfos.add(sched2);
 
@@ -217,24 +192,24 @@ public class PoolInfoServiceTest {
     private List<SchedulingInfo> createSchedulingInfoListWithCreatedTime(Date date1, Date date2, Date date3) {
         List<SchedulingInfo> schedulingInfoList = new ArrayList<>();
 
-        Organisation organisation1 = createOrganiztion(1);
-        Organisation organisation2 = createOrganiztion(2);
+        String organisationCode1 = createOrganiztion(1).getCode();
+        String organisationCode2 = createOrganiztion(2).getCode();
 
         SchedulingInfo schedulingInfo1 = new SchedulingInfo();
         schedulingInfo1.setCreatedTime(date1);
-        schedulingInfo1.setOrganisation(organisation1);
+        schedulingInfo1.setOrganisationCode(organisationCode1);
 
         SchedulingInfo schedulingInfo2 = new SchedulingInfo();
         schedulingInfo2.setCreatedTime(date2);
-        schedulingInfo2.setOrganisation(organisation1);
+        schedulingInfo2.setOrganisationCode(organisationCode1);
 
         SchedulingInfo schedulingInfo3 = new SchedulingInfo();
         schedulingInfo3.setCreatedTime(date3);
-        schedulingInfo3.setOrganisation(organisation1);
+        schedulingInfo3.setOrganisationCode(organisationCode1);
 
         SchedulingInfo schedulingInfo4 = new SchedulingInfo();
         schedulingInfo4.setCreatedTime(date3);
-        schedulingInfo4.setOrganisation(organisation2);
+        schedulingInfo4.setOrganisationCode(organisationCode2);
 
         schedulingInfoList.add(schedulingInfo1);
         schedulingInfoList.add(schedulingInfo2);
@@ -253,29 +228,10 @@ public class PoolInfoServiceTest {
         return organisations;
     }
 
-    private List<dk.medcom.video.api.organisation.model.Organisation> createStrategyOrganisationList() {
-        List<Organisation> organisations = new ArrayList<>();
-
-        organisations.add(createOrganiztion(1));
-        organisations.add(createOrganiztion(2));
-
-        List<dk.medcom.video.api.organisation.model.Organisation> returnOrganisations = new ArrayList<>();
-        organisations.forEach(x -> {
-            dk.medcom.video.api.organisation.model.Organisation organisation = new dk.medcom.video.api.organisation.model.Organisation();
-            organisation.setCode(x.getOrganisationId());
-            organisation.setPoolSize(x.getPoolSize());
-
-            returnOrganisations.add(organisation);
-        });
-
-        return returnOrganisations;
-    }
-
     private Organisation createOrganiztion(int organizationId) {
         Organisation organization = new Organisation();
-        organization.setId((long) organizationId);
         organization.setPoolSize(10 + organizationId);
-        organization.setOrganisationId("test-org " + organizationId);
+        organization.setCode("test-org " + organizationId);
         organization.setName("This is a name " + organizationId);
 
         return organization;

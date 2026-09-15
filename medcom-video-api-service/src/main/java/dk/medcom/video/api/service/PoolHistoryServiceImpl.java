@@ -1,7 +1,6 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.dao.PoolHistoryDao;
-import dk.medcom.video.api.dao.PoolInfoRepository;
 import dk.medcom.video.api.dao.entity.PoolHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,11 +11,11 @@ import java.time.Instant;
 public class PoolHistoryServiceImpl implements PoolHistoryService {
     private static final Logger logger = LoggerFactory.getLogger(PoolHistoryServiceImpl.class);
 
-    private final PoolInfoRepository poolInfoRepository;
+    private final PoolInfoService poolInfoService;
     private final PoolHistoryDao poolHistoryDao;
 
-    public PoolHistoryServiceImpl(PoolInfoRepository poolInfoRepository, PoolHistoryDao poolHistoryDao) {
-        this.poolInfoRepository = poolInfoRepository;
+    public PoolHistoryServiceImpl(PoolInfoService poolInfoService, PoolHistoryDao poolHistoryDao) {
+        this.poolInfoService = poolInfoService;
         this.poolHistoryDao = poolHistoryDao;
     }
 
@@ -25,13 +24,13 @@ public class PoolHistoryServiceImpl implements PoolHistoryService {
     public void calculateHistory() {
         var start = System.currentTimeMillis();
         logger.debug("Starting to calculate pool history.");
-        var poolInfo = poolInfoRepository.getPoolInfos();
+        var poolInfo = poolInfoService.getPoolInfo();
         logger.info("Found data for {} pools. Updating pool history.", poolInfo.size());
         poolInfo.forEach(x -> {
             var now = Instant.now();
             var poolHistory = new PoolHistory();
-            poolHistory.setOrganisationCode(x.getOrganisationCode());
-            poolHistory.setDesiredPoolSize(x.getWantedPoolSize());
+            poolHistory.setOrganisationCode(x.getOrganizationId());
+            poolHistory.setDesiredPoolSize(x.getDesiredPoolSize());
             poolHistory.setAvailablePoolRooms(x.getAvailablePoolSize());
             poolHistory.setStatusTime(now);
             poolHistory.setCreatedTime(now);

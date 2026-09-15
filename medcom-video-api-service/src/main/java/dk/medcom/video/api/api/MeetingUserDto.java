@@ -15,7 +15,7 @@ public class MeetingUserDto {
 		if (meetingUser == null) {
 			return;
 		}
-		organisationId = meetingUser.getOrganisation().getOrganisationId();
+		organisationId = meetingUser.getOrganisationCode();
 		email = meetingUser.getEmail();
 	}
 		

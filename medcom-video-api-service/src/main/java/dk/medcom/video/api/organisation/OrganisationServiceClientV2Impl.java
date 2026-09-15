@@ -1,11 +1,13 @@
 package dk.medcom.video.api.organisation;
 
 import dk.medcom.video.api.keycloak.KeycloakHttpClientService;
+import dk.medcom.video.api.organisation.model.Organisation;
 import dk.medcom.video.api.organisation.model.OrganisationSimple;
 import dk.medcom.video.api.service.exception.OrganisationServiceClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -33,6 +35,45 @@ public class OrganisationServiceClientV2Impl implements OrganisationServiceClien
                     .retrieve()
                     .body(new ParameterizedTypeReference<>() {
                     });
+        } catch (Exception e) {
+            logger.warn("Caught exception from organisation service request. Exception: ", e);
+            throw new OrganisationServiceClientException("Caught exception from organisation service request. Message: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Organisation getOrganisationByCode(String code) {
+        logger.debug("Calling GET /services/v2/organisation/{}", code);
+
+        try {
+            return restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/services/v2/organisation/" + code)
+                            .build())
+                    .header("Authorization", retrieveAccessTokenHeader())
+                    .retrieve()
+                    .body(Organisation.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            logger.debug("Organisation {} not found.", code);
+            return null;
+        } catch (Exception e) {
+            logger.warn("Caught exception from organisation service request. Exception: ", e);
+            throw new OrganisationServiceClientException("Caught exception from organisation service request. Message: %s".formatted(e.getMessage()));
+        }
+    }
+
+    @Override
+    public Organisation ensureOrganisationExists(String code) {
+        logger.debug("Calling PUT /services/v2/organisation/{}/ensure", code);
+
+        try {
+            return restClient.put()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/services/v2/organisation/" + code + "/ensure")
+                            .build())
+                    .header("Authorization", retrieveAccessTokenHeader())
+                    .retrieve()
+                    .body(Organisation.class);
         } catch (Exception e) {
             logger.warn("Caught exception from organisation service request. Exception: ", e);
             throw new OrganisationServiceClientException("Caught exception from organisation service request. Message: %s".formatted(e.getMessage()));

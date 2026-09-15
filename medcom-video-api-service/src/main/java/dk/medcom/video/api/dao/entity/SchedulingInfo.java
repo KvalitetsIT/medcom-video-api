@@ -56,9 +56,7 @@ public class SchedulingInfo {
 	private Date provisionTimestamp;
 	private String provisionVMRId;
 
-	@ManyToOne
-	@JoinColumn(name="organisation_id")
-	private Organisation organisation;
+	private String organisationCode;
 
 	@OneToOne
 	@JoinColumn(name="meetings_id")
@@ -220,12 +218,12 @@ public class SchedulingInfo {
 		this.updatedTime = updatedTime;
 	}
 
-	public Organisation getOrganisation() {
-		return organisation;
+	public String getOrganisationCode() {
+		return organisationCode;
 	}
 
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setOrganisationCode(String organisationCode) {
+		this.organisationCode = organisationCode;
 	}
 
     public void setReservationId(String reservationId) {

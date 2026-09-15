@@ -3,7 +3,6 @@ package dk.medcom.video.api.configuration;
 import dk.medcom.video.api.dao.*;
 import dk.medcom.video.api.dao.EntitiesIvrThemeDaoImpl;
 import dk.medcom.video.api.dao.PoolHistoryDaoImpl;
-import dk.medcom.video.api.dao.PoolInfoRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,7 +22,7 @@ import javax.sql.DataSource;
 @ComponentScan("dk.medcom.video.api.dao.impl")
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "dk.medcom.video.api.dao" })
-@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, OrganisationRepository.class, SchedulingInfoRepository.class})
+@EnableJpaRepositories(basePackageClasses = {MeetingRepository.class, MeetingUserRepository.class, SchedulingTemplateRepository.class, SchedulingInfoRepository.class})
 @PropertySource("db.properties")
 @EnableTransactionManagement
 public class DatabaseConfiguration {
@@ -43,11 +42,6 @@ public class DatabaseConfiguration {
 	@Bean
 	public PoolHistoryDao poolHistoryDao(DataSource dataSource) {
 		return new PoolHistoryDaoImpl(dataSource);
-	}
-
-	@Bean
-	public PoolInfoRepository poolInfoRepository(DataSource dataSource) {
-		return new PoolInfoRepositoryImpl(dataSource);
 	}
 
 	@Bean

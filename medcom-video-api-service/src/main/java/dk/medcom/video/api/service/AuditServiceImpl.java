@@ -86,7 +86,7 @@ public class AuditServiceImpl implements AuditService {
         auditSchedulingInfo.setProvisionStatusDescription(input.getProvisionStatusDescription());
         auditSchedulingInfo.setProvisionTimestamp(toOffsetDateTime(input.getProvisionTimestamp()));
         auditSchedulingInfo.setProvisionVMRId(input.getProvisionVMRId());
-        auditSchedulingInfo.setOrganisation(input.getOrganisation().getOrganisationId()); // Not null in database. Always present.
+        auditSchedulingInfo.setOrganisation(input.getOrganisationCode()); // Not null in database. Always present.
         auditSchedulingInfo.setPortalLink(input.getPortalLink());
         auditSchedulingInfo.setIvrTheme(input.getIvrTheme());
         auditSchedulingInfo.setCreatedBy(input.getMeetingUser() == null ? null : input.getMeetingUser().getEmail());
@@ -116,7 +116,7 @@ public class AuditServiceImpl implements AuditService {
         auditMeeting.setExternalId(meeting.getExternalId());
         auditMeeting.setCreatedTime(toOffsetDateTime(meeting.getCreatedTime()));
         auditMeeting.setGuestMicrophone(meeting.getGuestMicrophone());
-        auditMeeting.setOrganisation(meeting.getOrganisation().getOrganisationId());
+        auditMeeting.setOrganisation(meeting.getOrganisationCode());
         auditMeeting.setSubject(meeting.getSubject());
         auditMeeting.setProjectCode(meeting.getProjectCode());
         auditMeeting.setStartTime(toOffsetDateTime(meeting.getStartTime()));
