@@ -21,7 +21,6 @@ public class Organisation {
 	private String smsSenderName;
 	private boolean allowCustomUriWithoutDomain;
 	private String smsCallbackUrl;
-	private boolean policyServerEnabled;
 
 	public Long getId() {
 		return id;
@@ -90,13 +89,5 @@ public class Organisation {
 
 	public void setSmsCallbackUrl(String smsCallbackUrl) {
 		this.smsCallbackUrl = smsCallbackUrl;
-	}
-
-	public boolean getPolicyServerEnabled() {
-		return policyServerEnabled;
-	}
-
-	public void setPolicyServerEnabled(boolean policyServerEnabled) {
-		this.policyServerEnabled = policyServerEnabled;
 	}
 }
