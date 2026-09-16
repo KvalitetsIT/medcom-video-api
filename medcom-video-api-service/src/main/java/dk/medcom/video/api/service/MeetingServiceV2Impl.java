@@ -55,7 +55,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                                                                            OffsetDateTime fromStartTime,
                                                                            OffsetDateTime toStartTime) {
         logger.debug("Get citizen meeting participations for participant, v2.");
-        var participants = participantDao.findByParticipantId(participantId);
+        var participants = participantDao.findByParticipantId(cprHasher.hash(participantId));
         if (participants.isEmpty()) {
             return List.of();
         }
