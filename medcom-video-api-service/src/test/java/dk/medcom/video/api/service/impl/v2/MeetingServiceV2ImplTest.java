@@ -14,7 +14,6 @@ import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.openapitools.model.DetailedError;
 
@@ -953,6 +952,7 @@ public class MeetingServiceV2ImplTest {
         var schedulingInfo2 = randomSchedulingInfo();
         schedulingInfo2.setMeeting(meeting2);
 
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant1, participant2));
         Mockito.when(meetingRepository.findAllById(List.of(meeting1.getId(), meeting2.getId())))
                 .thenReturn(List.of(meeting1, meeting2));
@@ -983,6 +983,7 @@ public class MeetingServiceV2ImplTest {
         var schedulingInfo = randomSchedulingInfo();
         schedulingInfo.setMeeting(meeting);
 
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
         Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of(schedulingInfo));
@@ -1007,6 +1008,7 @@ public class MeetingServiceV2ImplTest {
         var meeting = randomMeeting();
         var participant = randomParticipant(meeting.getId());
 
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
         Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of())).thenReturn(List.of());
@@ -1028,6 +1030,7 @@ public class MeetingServiceV2ImplTest {
         var participantId = randomString();
         var participant = randomParticipant(999999L);
 
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
         Mockito.when(meetingRepository.findAllById(List.of(participant.meetingId()))).thenReturn(List.of());
 
@@ -1044,6 +1047,7 @@ public class MeetingServiceV2ImplTest {
     public void testGetCitizenMeetingParticipationsEmptyParticipantList() {
         var participantId = randomString();
 
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of());
 
         var result = meetingServiceV2.getCitizenMeetingParticipations(participantId, null, null);

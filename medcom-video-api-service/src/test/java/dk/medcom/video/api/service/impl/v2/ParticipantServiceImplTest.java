@@ -31,7 +31,6 @@ import java.util.UUID;
 public class ParticipantServiceImplTest {
     private ParticipantDao participantDao;
     private MeetingUserService meetingUserService;
-    private MeetingUserRepository meetingUserRepository;
     private MeetingRepository meetingRepository;
     private UserContextService userContextService;
     private OrganisationService organisationService;
@@ -43,7 +42,7 @@ public class ParticipantServiceImplTest {
     public void setup() {
         participantDao = Mockito.mock(ParticipantDao.class);
         meetingUserService = Mockito.mock(MeetingUserService.class);
-        meetingUserRepository = Mockito.mock(MeetingUserRepository.class);
+        MeetingUserRepository meetingUserRepository = Mockito.mock(MeetingUserRepository.class);
         meetingRepository = Mockito.mock(MeetingRepository.class);
         userContextService = Mockito.mock(UserContextService.class);
         organisationService = Mockito.mock(OrganisationService.class);
@@ -332,11 +331,13 @@ public class ParticipantServiceImplTest {
         var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
         setupValidUserContext();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(cprHasher.hash("0101011234")).thenReturn("hashed-cpr");
         Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
 
         var result = participantService.createCitizenParticipants(uuid, createParticipants);
 
         assertEquals(1, result.size());
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "hashed-cpr".equals(p.participantId())));
         Mockito.verify(meetingRepository).save(meeting);
     }
 

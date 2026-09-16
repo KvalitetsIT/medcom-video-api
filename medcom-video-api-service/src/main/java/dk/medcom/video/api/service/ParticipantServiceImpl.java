@@ -156,7 +156,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                     meeting.getId(),
                     UUID.fromString(meeting.getUuid()),
                     p.type(),
-                    p.participantId(),
+                    cprHasher.hash(p.participantId()),
                     p.organisation(),
                     p.role(),
                     null,
