@@ -52,7 +52,7 @@ public class SchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
-	private boolean breakoutRooms;
+	private boolean breakoutRooms; //only part of the v2 API contract
 
 	public MeetingUserDto createdBy;
 	public MeetingUserDto updatedBy;

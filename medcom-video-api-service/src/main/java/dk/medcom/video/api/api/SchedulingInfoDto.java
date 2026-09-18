@@ -39,7 +39,7 @@ public class SchedulingInfoDto extends RepresentationModel {
 	private boolean forceEncryption;
 	private boolean muteAllGuests;
 	private DirectMedia directMedia;
-	private boolean breakoutRooms;
+	private boolean breakoutRooms; //only part of the v2 API contract
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss Z")		//Date format should be: "2018-07-12T09:00:00
 	private Date provisionTimestamp;

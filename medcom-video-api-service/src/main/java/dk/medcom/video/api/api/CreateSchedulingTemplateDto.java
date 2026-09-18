@@ -68,7 +68,7 @@ public class CreateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
-	private Boolean breakoutRooms;
+	private Boolean breakoutRooms; //only part of the v2 API contract
 
 	@Size(max=100, message="ivrThme should have a maximum of 100 characters")
 	private String ivrTheme;

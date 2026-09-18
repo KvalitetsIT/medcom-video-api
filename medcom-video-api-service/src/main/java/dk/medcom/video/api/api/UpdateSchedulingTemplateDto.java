@@ -75,7 +75,7 @@ public class UpdateSchedulingTemplateDto extends RepresentationModel {
 	private String customPortalHost;
 	private String returnUrl;
 	private DirectMedia directMedia;
-	private Boolean breakoutRooms;
+	private Boolean breakoutRooms; //only part of the v2 API contract
 	private String callType;
 
 	public Long getConferencingSysId() {
