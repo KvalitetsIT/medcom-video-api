@@ -53,6 +53,7 @@ public class SchedulingTemplate {
 	@Column(columnDefinition = "varchar")
 	@Enumerated(EnumType.STRING)
 	private DirectMedia directMedia;
+	private boolean breakoutRooms;
 	@ManyToOne
     @JoinColumn(name="created_by")
 	private MeetingUser createdBy;
@@ -339,6 +340,14 @@ public class SchedulingTemplate {
 
 	public void setDirectMedia(DirectMedia directMedia) {
 		this.directMedia = directMedia;
+	}
+
+	public boolean getBreakoutRooms() {
+		return breakoutRooms;
+	}
+
+	public void setBreakoutRooms(boolean breakoutRooms) {
+		this.breakoutRooms = breakoutRooms;
 	}
 
     public String getCallType() {

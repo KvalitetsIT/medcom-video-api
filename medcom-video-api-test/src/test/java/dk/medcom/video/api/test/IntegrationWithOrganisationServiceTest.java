@@ -106,6 +106,7 @@ public class IntegrationWithOrganisationServiceTest {
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 1")).respond(organisationServiceResponse("company 1"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/organisation").withQueryStringParameter("organisationCode", "company 3")).respond(organisationServiceResponse("company 1"));
 		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/pool-test-org/descendants").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationSimpleResponse());
+		mockServerClient.when(HttpRequest.request().withMethod("GET").withPath("/services/v2/organisation/pool-test-org").withHeader("Authorization", "Bearer mock-access-token")).respond(organisationServiceResponse("pool-test-org"));
 
 		// Keycloak mock server
 		MockServerContainer keycloakService = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))

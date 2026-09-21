@@ -41,6 +41,7 @@ public class VideoSchedulingMapper {
                 .forceEncryption(input.forceEncryption())
                 .muteAllGuests(input.muteAllGuests())
                 .directMedia(EnumMapper.internalToExternal(input.directMedia()))
+                .breakoutRooms(input.breakoutRooms())
                 .provisionTimestamp(input.provisionTimestamp())
                 .provisionVmrId(input.provisionVmrId())
                 .createdBy(internalToExternal(input.createdBy()))
