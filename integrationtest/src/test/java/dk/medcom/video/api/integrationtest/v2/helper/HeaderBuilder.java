@@ -12,7 +12,7 @@ import java.util.UUID;
 public class HeaderBuilder {
 
     public static String getJwtAllRoleAtt(String keycloakUrl) {
-        return buildJwt(keycloakUrl, 100, "user-org-pool", "eva@klak.dk", List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner"));
+        return buildJwt(keycloakUrl, 100, "user-org-pool", "eva@klak.dk", List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner","meeting-citizen-lookup"));
     }
 
     public static String getJwtNoRoleAtt(String keycloakUrl) {
@@ -40,11 +40,11 @@ public class HeaderBuilder {
     }
 
     public static String getExpiredJwt(String keycloakUrl) {
-        return buildJwt(keycloakUrl, 0, "user-org-pool", randomString(), List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner"));
+        return buildJwt(keycloakUrl, 0, "user-org-pool", randomString(), List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner","meeting-citizen-lookup"));
     }
 
     public static String getInvalidIssuerJwt() {
-        return buildJwt(randomString(), 100, "user-org-pool", randomString(), List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner"));
+        return buildJwt(randomString(), 100, "user-org-pool", randomString(), List.of("meeting-user","meeting-admin","meeting-provisioner","meeting-provisioner-user","meeting-planner","meeting-citizen-lookup"));
     }
 
     public static String getTamperedJwt(String keycloakUrl) {
