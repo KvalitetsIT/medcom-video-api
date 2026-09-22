@@ -1,5 +1,7 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -10,9 +12,12 @@ import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.filter.MeetingParticipationFilter;
 import dk.medcom.video.api.service.exception.*;
+import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
+import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
 import dk.medcom.video.api.service.model.*;
 import org.slf4j.Logger;
@@ -30,17 +35,26 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final ParticipantDao participantDao;
     private final MeetingRepository meetingRepository;
     private final SchedulingInfoRepository schedulingInfoRepository;
+    private final UserContextService userContextService;
+    private final AuditService auditService;
+    private final CprHasher cprHasher;
 
     public MeetingServiceV2Impl(MeetingService meetingService,
                                 String shortLinkBaseUrl,
                                 ParticipantDao participantDao,
                                 MeetingRepository meetingRepository,
-                                SchedulingInfoRepository schedulingInfoRepository) {
+                                SchedulingInfoRepository schedulingInfoRepository,
+                                UserContextService userContextService,
+                                AuditService auditService,
+                                CprHasher cprHasher) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.schedulingInfoRepository = schedulingInfoRepository;
+        this.userContextService = userContextService;
+        this.auditService = auditService;
+        this.cprHasher = cprHasher;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
@@ -244,12 +258,23 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     }
 
     @Override
-    public List<MeetingParticipationModel> getMeetingParticipations(String participantId,
+    public List<MeetingParticipationModel> getMeetingParticipations(ParticipantType type,
+                                                                    String participantId,
                                                                     OffsetDateTime fromStartTime,
                                                                     OffsetDateTime toStartTime) {
         logger.debug("Get meeting participations for participant, v2.");
-        var participants = participantDao.findByParticipantId(participantId);
+
+        var lookupParticipantId = participantId;
+        if (type == ParticipantType.CITIZEN) {
+            if (!userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
+                throw new PermissionDeniedExceptionV2();
+            }
+            lookupParticipantId = cprHasher.hash(participantId);
+        }
+
+        var participants = participantDao.findByParticipantId(lookupParticipantId);
         if (participants.isEmpty()) {
+            auditMeetingParticipationSearch(type, lookupParticipantId, List.of());
             return List.of();
         }
 
@@ -290,6 +315,21 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                     pin != null ? pin.intValue() : 0,
                     shortLinkBaseUrl));
         }
+
+        auditMeetingParticipationSearch(type, lookupParticipantId, result.stream().map(r -> r.uuid().toString()).toList());
         return result;
+    }
+
+    private void auditMeetingParticipationSearch(ParticipantType type, String lookupParticipantId, List<String> resultIdentifiers) {
+        var userContext = userContextService.getUserContext();
+        var search = new ParticipantSearch();
+        search.setSearchParticipantId(lookupParticipantId);
+        search.setType(type.toString());
+        search.setOrganisation(userContext.getUserOrganisation());
+        search.setPerformedBy(userContext.getUserEmail());
+        search.setResultCount(resultIdentifiers.size());
+        search.setResultIdentifiers(resultIdentifiers);
+
+        auditService.auditParticipantSearch(search, "search");
     }
 }

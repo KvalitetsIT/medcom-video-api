@@ -13,6 +13,7 @@ import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.PortalLinkBuilder;
+import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.PortalLinkModel;
 import org.openapitools.model.ViewType;
 import org.openapitools.model.VmrQuality;
@@ -182,8 +183,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao, MeetingRepository meetingRepository, SchedulingInfoRepository schedulingInfoRepository) {
-        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository);
+    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao, MeetingRepository meetingRepository, SchedulingInfoRepository schedulingInfoRepository, UserContextService userContextService, AuditService auditService, CprHasher cprHasher) {
+        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher);
     }
 
     @Bean
@@ -365,8 +366,13 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService) {
-        return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService);
+    public CprHasher cprHasher(@Value("${cpr.hash.secret-key}") String cprHashSecretKey) {
+        return new CprHasher(cprHashSecretKey);
+    }
+
+    @Bean
+    public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, CprHasher cprHasher, UserContextService userContextService, AuditService auditService) {
+        return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher);
     }
 
     @Override

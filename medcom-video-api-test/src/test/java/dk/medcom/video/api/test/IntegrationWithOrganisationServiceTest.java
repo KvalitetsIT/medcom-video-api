@@ -167,6 +167,7 @@ public class IntegrationWithOrganisationServiceTest {
 				.withEnv("organisation.service.v2.endpoint", "http://organisation:1080")
 				.withEnv("organisationtree.service.endpoint", "http://organisation:1080")
 				.withEnv("short.link.base.url", "https://video.link/")
+				.withEnv("cpr.hash.secret-key", "dGVzdC1zZWNyZXQta2V5LWZvci1obWFjLXNoYTI1Ni10ZXN0aW5n")
 				.withEnv("overflow.pool.organisation.id", "overflow")
 
 				.withEnv("keycloak.service.endpoint", "http://keycloakservice:1080")

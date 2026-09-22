@@ -2,6 +2,7 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.controller.v2.exception.*;
+import dk.medcom.video.api.controller.v2.mapper.EnumMapper;
 import dk.medcom.video.api.controller.v2.mapper.MeetingParticipationMapper;
 import dk.medcom.video.api.controller.v2.mapper.ParticipantMapper;
 import dk.medcom.video.api.controller.v2.mapper.VideoMeetingMapper;
@@ -45,15 +46,19 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(String participantId, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
-        logger.debug("Enter GET meeting participations, v2.");
+    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(MeetingParticipationSearch meetingParticipationSearch) {
+        logger.debug("Enter POST meeting participations, v2.");
         try {
+            var fromStartTime = meetingParticipationSearch.getFromStartTime();
+            var toStartTime = meetingParticipationSearch.getToStartTime();
+
             if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
                 throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
             }
 
             var meetingParticipations = meetingService.getMeetingParticipations(
-                    participantId, fromStartTime, toStartTime);
+                    EnumMapper.externalToInternal(meetingParticipationSearch.getType()),
+                    meetingParticipationSearch.getParticipantId(), fromStartTime, toStartTime);
 
             var result = new MeetingParticipationList()
                     .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));

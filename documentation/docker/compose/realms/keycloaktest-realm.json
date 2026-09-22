@@ -70,7 +70,7 @@
           "consentRequired": false,
           "config": {
             "introspection.token.claim": "true",
-            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\"]",
+            "claim.value": "[\"meeting-user\",\"meeting-admin\",\"meeting-provisioner\",\"meeting-provisioner-user\",\"meeting-planner\",\"meeting-citizen-lookup\"]",
             "userinfo.token.claim": "true",
             "id.token.claim": "true",
             "lightweight.claim": "false",
@@ -184,6 +184,39 @@
           "config": {
             "introspection.token.claim": "true",
             "claim.value": "[\"meeting-provisioner\"]",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "dk:medcom:video:role",
+            "jsonType.label": "JSON",
+            "access.tokenResponse.claim": "false"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "videoapi-clientscope"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "videoapi-only-citizen-lookup",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "only-citizen-lookup-pass",
+      "redirectUris": [
+        "http://localhost/*"
+      ],
+      "serviceAccountsEnabled": true,
+      "protocolMappers": [
+        {
+          "name": "user_roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-claim-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "claim.value": "[\"meeting-citizen-lookup\"]",
             "userinfo.token.claim": "true",
             "id.token.claim": "true",
             "lightweight.claim": "false",

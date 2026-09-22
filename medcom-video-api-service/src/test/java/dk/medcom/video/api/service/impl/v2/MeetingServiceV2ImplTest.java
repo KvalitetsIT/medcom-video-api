@@ -1,15 +1,20 @@
 package dk.medcom.video.api.service.impl.v2;
 
+import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.*;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +37,9 @@ public class MeetingServiceV2ImplTest {
     private SchedulingInfoRepository schedulingInfoRepository;
     private ParticipantDao participantDao;
     private final String shortLinkBaseUrl = "base.url";
+    private CprHasher cprHasher;
+    private UserContextService userContextService;
+    private AuditService auditService;
 
     @BeforeEach
     public void setup() {
@@ -39,8 +47,14 @@ public class MeetingServiceV2ImplTest {
         participantDao = Mockito.mock(ParticipantDao.class);
         meetingRepository = Mockito.mock(MeetingRepository.class);
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
+        cprHasher = Mockito.mock(CprHasher.class);
+        userContextService = Mockito.mock(UserContextService.class);
+        auditService = Mockito.mock(AuditService.class);
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(true);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(participantDao.findByMeeting(Mockito.any())).thenReturn(List.of());
-        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository);
+        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher);
     }
 
     private void verifyNoMoreInteractions() {
@@ -772,7 +786,7 @@ public class MeetingServiceV2ImplTest {
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting1, meeting2)))
                 .thenReturn(List.of(schedulingInfo1, schedulingInfo2));
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
         assertNotNull(result);
         assertEquals(2, result.size());
 
@@ -786,6 +800,38 @@ public class MeetingServiceV2ImplTest {
         Mockito.verify(meetingRepository).findAllById(List.of(meeting1.getId(), meeting2.getId()));
         Mockito.verify(schedulingInfoRepository).findByMeetingIn(List.of(meeting1, meeting2));
         verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsAuditsSearch() {
+        var participantId = randomString();
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(true);
+        Mockito.when(userContext.getUserEmail()).thenReturn("user@example.com");
+        Mockito.when(userContext.getUserOrganisation()).thenReturn("org-id");
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+        schedulingInfo.setMeeting(meeting);
+
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
+        Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of(schedulingInfo));
+
+        meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
+
+        var captor = org.mockito.ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.ParticipantSearch.class);
+        Mockito.verify(auditService).auditParticipantSearch(captor.capture(), Mockito.eq("search"));
+        var audited = captor.getValue();
+        assertEquals(participantId, audited.getSearchParticipantId());
+        assertEquals("USER", audited.getType());
+        assertEquals("user@example.com", audited.getPerformedBy());
+        assertEquals("org-id", audited.getOrganisation());
+        assertEquals(1, audited.getResultCount());
+        assertEquals(List.of(meeting.getUuid()), audited.getResultIdentifiers());
     }
 
     @Test
@@ -804,7 +850,7 @@ public class MeetingServiceV2ImplTest {
         var fromStartTime = meetingStart.minusHours(1);
         var toStartTime = meetingStart.plusHours(1);
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, fromStartTime, toStartTime);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, fromStartTime, toStartTime);
         assertEquals(1, result.size());
         assertMeetingParticipation(meeting, schedulingInfo, participant, 0, shortLinkBaseUrl, result.getFirst());
 
@@ -827,7 +873,7 @@ public class MeetingServiceV2ImplTest {
         var fromStartTime = OffsetDateTime.now().plusDays(10);
         var toStartTime = OffsetDateTime.now().plusDays(20);
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, fromStartTime, toStartTime);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, fromStartTime, toStartTime);
         assertEquals(0, result.size());
 
         Mockito.verify(participantDao).findByParticipantId(participantId);
@@ -848,7 +894,7 @@ public class MeetingServiceV2ImplTest {
         Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of(schedulingInfo));
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
         assertEquals(1, result.size());
         assertEquals(schedulingInfo.getHostPin(), result.getFirst().pin());
 
@@ -870,7 +916,7 @@ public class MeetingServiceV2ImplTest {
         Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of(schedulingInfo));
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
         assertEquals(1, result.size());
         assertEquals(schedulingInfo.getGuestPin(), result.getFirst().pin());
 
@@ -890,7 +936,7 @@ public class MeetingServiceV2ImplTest {
         Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
         Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of());
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
         assertEquals(1, result.size());
         assertEquals(0, result.getFirst().pin());
         assertNull(result.getFirst().uriWithDomain());
@@ -911,7 +957,7 @@ public class MeetingServiceV2ImplTest {
         Mockito.when(meetingRepository.findAllById(List.of(participant.meetingId()))).thenReturn(List.of());
 
         var expectedException = assertThrows(ResourceNotFoundExceptionV2.class,
-                () -> meetingServiceV2.getMeetingParticipations(participantId, null, null));
+                () -> meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null));
         assertNotNull(expectedException);
 
         Mockito.verify(participantDao).findByParticipantId(participantId);
@@ -925,11 +971,147 @@ public class MeetingServiceV2ImplTest {
 
         Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of());
 
-        var result = meetingServiceV2.getMeetingParticipations(participantId, null, null);
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.USER, participantId, null, null);
         assertNotNull(result);
         assertEquals(0, result.size());
 
         Mockito.verify(participantDao).findByParticipantId(participantId);
         verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetCitizenMeetingParticipations() {
+        var participantId = randomString();
+
+        var meeting1 = randomMeeting();
+        var meeting2 = randomMeeting();
+
+        var participant1 = randomParticipant(meeting1.getId());
+        var participant2 = randomParticipant(meeting2.getId());
+
+        var schedulingInfo1 = randomSchedulingInfo();
+        schedulingInfo1.setMeeting(meeting1);
+
+        var schedulingInfo2 = randomSchedulingInfo();
+        schedulingInfo2.setMeeting(meeting2);
+
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant1, participant2));
+        Mockito.when(meetingRepository.findAllById(List.of(meeting1.getId(), meeting2.getId())))
+                .thenReturn(List.of(meeting1, meeting2));
+        Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting1, meeting2)))
+                .thenReturn(List.of(schedulingInfo1, schedulingInfo2));
+
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, null, null);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        var res1 = result.stream().filter(x -> x.uuid().toString().equals(meeting1.getUuid())).findFirst().orElseThrow();
+        var res2 = result.stream().filter(x -> x.uuid().toString().equals(meeting2.getUuid())).findFirst().orElseThrow();
+
+        assertMeetingParticipation(meeting1, schedulingInfo1, participant1, 0, shortLinkBaseUrl, res1);
+        assertMeetingParticipation(meeting2, schedulingInfo2, participant2, 0, shortLinkBaseUrl, res2);
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findAllById(List.of(meeting1.getId(), meeting2.getId()));
+        Mockito.verify(schedulingInfoRepository).findByMeetingIn(List.of(meeting1, meeting2));
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetCitizenMeetingParticipationsFilteredByStartTimeInterval() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+        var schedulingInfo = randomSchedulingInfo();
+        schedulingInfo.setMeeting(meeting);
+
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
+        Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of(meeting))).thenReturn(List.of(schedulingInfo));
+
+        var meetingStart = meeting.getStartTime().toInstant().atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+        var fromStartTime = meetingStart.minusHours(1);
+        var toStartTime = meetingStart.plusHours(1);
+
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, fromStartTime, toStartTime);
+        assertEquals(1, result.size());
+        assertMeetingParticipation(meeting, schedulingInfo, participant, 0, shortLinkBaseUrl, result.getFirst());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findAllById(List.of(meeting.getId()));
+        Mockito.verify(schedulingInfoRepository).findByMeetingIn(List.of(meeting));
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetCitizenMeetingParticipationsFilteredByStartTimeIntervalNoMatch() {
+        var participantId = randomString();
+        var meeting = randomMeeting();
+        var participant = randomParticipant(meeting.getId());
+
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findAllById(List.of(meeting.getId()))).thenReturn(List.of(meeting));
+        Mockito.when(schedulingInfoRepository.findByMeetingIn(List.of())).thenReturn(List.of());
+
+        var fromStartTime = OffsetDateTime.now().plusDays(10);
+        var toStartTime = OffsetDateTime.now().plusDays(20);
+
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, fromStartTime, toStartTime);
+        assertEquals(0, result.size());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findAllById(List.of(meeting.getId()));
+        Mockito.verify(schedulingInfoRepository).findByMeetingIn(List.of());
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetCitizenMeetingParticipationsMeetingNotFound() {
+        var participantId = randomString();
+        var participant = randomParticipant(999999L);
+
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of(participant));
+        Mockito.when(meetingRepository.findAllById(List.of(participant.meetingId()))).thenReturn(List.of());
+
+        var expectedException = assertThrows(ResourceNotFoundExceptionV2.class,
+                () -> meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, null, null));
+        assertNotNull(expectedException);
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        Mockito.verify(meetingRepository).findAllById(List.of(participant.meetingId()));
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetCitizenMeetingParticipationsEmptyParticipantList() {
+        var participantId = randomString();
+
+        Mockito.when(cprHasher.hash(participantId)).thenReturn(participantId);
+        Mockito.when(participantDao.findByParticipantId(participantId)).thenReturn(List.of());
+
+        var result = meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, null, null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+
+        Mockito.verify(participantDao).findByParticipantId(participantId);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsCitizenWithoutRoleIsDenied() {
+        var participantId = randomString();
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+
+        assertThrows(PermissionDeniedExceptionV2.class,
+                () -> meetingServiceV2.getMeetingParticipations(ParticipantType.CITIZEN, participantId, null, null));
+
+        Mockito.verifyNoInteractions(participantDao, meetingRepository, schedulingInfoRepository, cprHasher);
     }
 }
