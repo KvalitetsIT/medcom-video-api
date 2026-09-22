@@ -1030,12 +1030,13 @@ public class VideoMeetingsControllerV2Test {
     @Test
     public void testGetMeetingParticipations() {
         var participantId = randomString();
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId);
         var meetingParticipations = List.of(randomMeetingParticipationModel(), randomMeetingParticipationModel());
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null))
                 .thenReturn(meetingParticipations);
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(search);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
 
@@ -1051,7 +1052,7 @@ public class VideoMeetingsControllerV2Test {
         assertMeetingParticipation(meetingParticipations.getFirst(), res1);
         assertMeetingParticipation(meetingParticipations.getLast(), res2);
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
+        Mockito.verify(meetingService).getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null);
         verifyNoMoreInteractions();
     }
 
@@ -1060,52 +1061,73 @@ public class VideoMeetingsControllerV2Test {
         var participantId = randomString();
         var fromStartTime = OffsetDateTime.now().minusHours(5);
         var toStartTime = OffsetDateTime.now();
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId)
+                .fromStartTime(fromStartTime).toStartTime(toStartTime);
         var meetingParticipations = List.of(randomMeetingParticipationModel());
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, fromStartTime, toStartTime))
+        Mockito.when(meetingService.getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, fromStartTime, toStartTime))
                 .thenReturn(meetingParticipations);
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, toStartTime);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(search);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
         assertEquals(1, result.getBody().getMeetingParticipations().size());
         assertMeetingParticipation(meetingParticipations.getFirst(), result.getBody().getMeetingParticipations().getFirst());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, fromStartTime, toStartTime);
+        Mockito.verify(meetingService).getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, fromStartTime, toStartTime);
         verifyNoMoreInteractions();
     }
 
     @Test
     public void testGetMeetingParticipationsEmptyResult() {
         var participantId = randomString();
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId);
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null))
                 .thenReturn(List.of());
 
-        var result = videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null);
+        var result = videoMeetingsControllerV2.getMeetingParticipations(search);
         assertNotNull(result);
         assertEquals(200, result.getStatusCode().value());
         assertNotNull(result.getBody().getMeetingParticipations());
         assertEquals(0, result.getBody().getMeetingParticipations().size());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
+        Mockito.verify(meetingService).getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null);
         verifyNoMoreInteractions();
     }
 
     @Test
     public void testGetMeetingParticipationsResourceNotFound() {
         var participantId = randomString();
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId);
 
-        Mockito.when(meetingService.getMeetingParticipations(participantId, null, null))
+        Mockito.when(meetingService.getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null))
                 .thenThrow(new ResourceNotFoundExceptionV2("meeting", "id"));
 
         var expectedException = assertThrows(ResourceNotFoundException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, null));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(search));
         assertNotNull(expectedException);
         assertEquals(404, expectedException.getHttpStatus().value());
         assertEquals("Resource: meeting in field: id not found.", expectedException.getErrorMessage());
 
-        Mockito.verify(meetingService).getMeetingParticipations(participantId, null, null);
+        Mockito.verify(meetingService).getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.USER, participantId, null, null);
+        verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testGetMeetingParticipationsCitizenPermissionDenied() {
+        var participantId = randomString();
+        var search = new MeetingParticipationSearch().type(ParticipantType.CITIZEN).participantId(participantId);
+
+        Mockito.when(meetingService.getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, participantId, null, null))
+                .thenThrow(new PermissionDeniedExceptionV2());
+
+        var expectedException = assertThrows(PermissionDeniedException.class,
+                () -> videoMeetingsControllerV2.getMeetingParticipations(search));
+        assertNotNull(expectedException);
+        assertEquals(403, expectedException.getHttpStatus().value());
+
+        Mockito.verify(meetingService).getMeetingParticipations(dk.medcom.video.api.dao.entity.ParticipantType.CITIZEN, participantId, null, null);
         verifyNoMoreInteractions();
     }
 
@@ -1113,9 +1135,11 @@ public class VideoMeetingsControllerV2Test {
     public void testGetMeetingParticipationsOnlyFromStartTimeGiven() {
         var participantId = randomString();
         var fromStartTime = OffsetDateTime.now().minusHours(5);
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId)
+                .fromStartTime(fromStartTime);
 
         var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, fromStartTime, null));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(search));
         assertNotNull(expectedException);
         assertEquals(400, expectedException.getHttpStatus().value());
         assertEquals(DetailedError.DetailedErrorCodeEnum._28, expectedException.getDetailedErrorCode());
@@ -1128,9 +1152,11 @@ public class VideoMeetingsControllerV2Test {
     public void testGetMeetingParticipationsOnlyToStartTimeGiven() {
         var participantId = randomString();
         var toStartTime = OffsetDateTime.now();
+        var search = new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId)
+                .toStartTime(toStartTime);
 
         var expectedException = assertThrows(NotValidDataException.class,
-                () -> videoMeetingsControllerV2.getMeetingParticipations(participantId, null, toStartTime));
+                () -> videoMeetingsControllerV2.getMeetingParticipations(search));
         assertNotNull(expectedException);
         assertEquals(400, expectedException.getHttpStatus().value());
         assertEquals(DetailedError.DetailedErrorCodeEnum._28, expectedException.getDetailedErrorCode());
