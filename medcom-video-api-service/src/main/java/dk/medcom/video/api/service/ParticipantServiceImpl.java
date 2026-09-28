@@ -74,8 +74,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         auditService.auditParticipantSearch(search, "list");
     }
 
-
-
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public List<ParticipantModel> createParticipants(UUID meetingUuid, List<CreateParticipantModel> createParticipantModel) {
@@ -91,7 +89,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
 
         var participants = createParticipantModel.stream().map(p -> {
-
             String organisation = p.organisation();
             var participantId = p.participantId();
 

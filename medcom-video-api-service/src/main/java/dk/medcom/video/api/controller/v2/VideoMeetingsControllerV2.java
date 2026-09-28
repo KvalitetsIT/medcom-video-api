@@ -2,7 +2,6 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.controller.v2.exception.*;
-import dk.medcom.video.api.controller.v2.mapper.EnumMapper;
 import dk.medcom.video.api.controller.v2.mapper.MeetingParticipationMapper;
 import dk.medcom.video.api.controller.v2.mapper.ParticipantMapper;
 import dk.medcom.video.api.controller.v2.mapper.VideoMeetingMapper;
@@ -46,19 +45,47 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     @Oauth
     @Override
     @PreAuthorize(anyRoleAtt)
-    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(MeetingParticipationSearch meetingParticipationSearch) {
-        logger.debug("Enter POST meeting participations, v2.");
+    public ResponseEntity<MeetingParticipationList> getCitizenMeetingParticipations(CitizenParticipationSearch citizenParticipationSearch) {
+        logger.debug("Enter POST citizen meeting participations, v2.");
         try {
-            var fromStartTime = meetingParticipationSearch.getFromStartTime();
-            var toStartTime = meetingParticipationSearch.getToStartTime();
+            var fromStartTime = citizenParticipationSearch.getFromStartTime();
+            var toStartTime = citizenParticipationSearch.getToStartTime();
 
             if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
                 throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
             }
 
+            var meetingParticipations = meetingService.getCitizenMeetingParticipations(
+                    citizenParticipationSearch.getParticipantId(), fromStartTime, toStartTime);
+
+            var result = new MeetingParticipationList()
+                    .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));
+
+            return ResponseEntity.ok(result);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        } catch (NotValidDataExceptionV2 e) {
+            throw new NotValidDataException(e.getDetailedErrorCode(), e.getDetailedError());
+        } catch (Exception e) {
+            logger.error("Caught unexpected exception.", e);
+            throw new InternalServerErrorException("Unexpected exception caught. " + e);
+        }
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(anyRoleAtt)
+    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(String participantId, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
+        logger.debug("Enter GET meeting participations, v2.");
+        try {
+            if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+            }
+
             var meetingParticipations = meetingService.getMeetingParticipations(
-                    EnumMapper.externalToInternal(meetingParticipationSearch.getType()),
-                    meetingParticipationSearch.getParticipantId(), fromStartTime, toStartTime);
+                    participantId, fromStartTime, toStartTime);
 
             var result = new MeetingParticipationList()
                     .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));

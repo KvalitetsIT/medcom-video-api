@@ -62,6 +62,17 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     }
 
     @Override
+    public List<MeetingParticipationModel> getCitizenMeetingParticipations(String participantId,
+                                                                           OffsetDateTime fromStartTime,
+                                                                           OffsetDateTime toStartTime) {
+        logger.debug("Get citizen meeting participations for participant, v2.");
+        if (!userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
+            throw new PermissionDeniedExceptionV2();
+        }
+        return findMeetingParticipations(ParticipantType.CITIZEN, cprHasher.hash(participantId), fromStartTime, toStartTime);
+    }
+
+    @Override
     public List<MeetingModel> getMeetingsV2(OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
         logger.debug("Get meetings by start time, v2.");
         try {
@@ -258,20 +269,17 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     }
 
     @Override
-    public List<MeetingParticipationModel> getMeetingParticipations(ParticipantType type,
-                                                                    String participantId,
+    public List<MeetingParticipationModel> getMeetingParticipations(String participantId,
                                                                     OffsetDateTime fromStartTime,
                                                                     OffsetDateTime toStartTime) {
         logger.debug("Get meeting participations for participant, v2.");
+        return findMeetingParticipations(null, participantId, fromStartTime, toStartTime);
+    }
 
-        var lookupParticipantId = participantId;
-        if (type == ParticipantType.CITIZEN) {
-            if (!userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
-                throw new PermissionDeniedExceptionV2();
-            }
-            lookupParticipantId = cprHasher.hash(participantId);
-        }
-
+    private List<MeetingParticipationModel> findMeetingParticipations(ParticipantType type,
+                                                                      String lookupParticipantId,
+                                                                      OffsetDateTime fromStartTime,
+                                                                      OffsetDateTime toStartTime) {
         var participants = participantDao.findByParticipantId(lookupParticipantId);
         if (participants.isEmpty()) {
             auditMeetingParticipationSearch(type, lookupParticipantId, List.of());
@@ -324,7 +332,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         var userContext = userContextService.getUserContext();
         var search = new ParticipantSearch();
         search.setSearchParticipantId(lookupParticipantId);
-        search.setType(type.toString());
+        search.setType(type != null ? type.toString() : null);
         search.setOrganisation(userContext.getUserOrganisation());
         search.setPerformedBy(userContext.getUserEmail());
         search.setResultCount(resultIdentifiers.size());

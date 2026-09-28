@@ -1,6 +1,5 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.model.*;
 
 import java.time.OffsetDateTime;
@@ -36,8 +35,10 @@ public interface MeetingServiceV2 {
 
     MeetingModel patchMeetingV2(UUID uuid, PatchMeetingModel patchMeeting);
 
-    List<MeetingParticipationModel> getMeetingParticipations(ParticipantType type,
-                                                             String participantId,
+    List<MeetingParticipationModel> getMeetingParticipations(String participantId,
                                                              OffsetDateTime fromStartTime,
                                                              OffsetDateTime toStartTime);
+    List<MeetingParticipationModel> getCitizenMeetingParticipations(String participantId,
+                                                                    OffsetDateTime fromStartTime,
+                                                                    OffsetDateTime toStartTime);
 }
