@@ -55,6 +55,30 @@ public class AuditServiceImpl implements AuditService {
         auditClient.addAuditEntry(createParticipantSearchAuditEvent(search, action));
     }
 
+    @Override
+    public void auditParticipant(dk.medcom.video.api.service.domain.audit.Participant participant, String action) {
+        if(participant == null) {
+            logger.warn("Unable to create audit entry as input is null.");
+            return;
+        }
+
+        auditClient.addAuditEntry(createParticipantAuditEvent(participant, action));
+    }
+
+    private AuditEvent<dk.medcom.video.api.service.domain.audit.Participant> createParticipantAuditEvent(dk.medcom.video.api.service.domain.audit.Participant participant, String action) {
+        var auditEvent = new AuditEvent<dk.medcom.video.api.service.domain.audit.Participant>();
+        auditEvent.setAuditData(participant);
+        auditEvent.setAuditEventDateTime(OffsetDateTime.now());
+        auditEvent.setOrganisationCode(participant.getOrganisation());
+        auditEvent.setUser(participant.getPerformedBy());
+        auditEvent.setSource("video-api");
+        auditEvent.setIdentifier(participant.getUuid());
+        auditEvent.setOperation(action);
+        auditEvent.setResource("participant");
+
+        return auditEvent;
+    }
+
     private AuditEvent<ParticipantSearch> createParticipantSearchAuditEvent(ParticipantSearch search, String action) {
         var auditEvent = new AuditEvent<ParticipantSearch>();
         auditEvent.setAuditData(search);

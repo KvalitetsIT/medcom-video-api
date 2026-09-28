@@ -10,4 +10,6 @@ public interface AuditService {
     void auditSchedulingInformation(SchedulingInfo input, String action);
 
     void auditParticipantSearch(ParticipantSearch search, String action);
+
+    void auditParticipant(dk.medcom.video.api.service.domain.audit.Participant participant, String action);
 }
