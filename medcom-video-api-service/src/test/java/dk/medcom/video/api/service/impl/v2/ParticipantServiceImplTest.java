@@ -273,6 +273,11 @@ public class ParticipantServiceImplTest {
         Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
         var result = participantService.updateParticipant(uuid, participantUuid, updateParticipant);
         assertEquals(updateParticipant.role(), result.role());
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("update"));
+        assertEquals(participantUuid.toString(), captor.getValue().getUuid());
+        assertEquals("GUEST", captor.getValue().getRole());
     }
 
     @Test
@@ -328,6 +333,11 @@ public class ParticipantServiceImplTest {
         participantService.deleteParticipant(uuid, participantUuid);
 
         Mockito.verify(participantDao).delete(participantToDelete);
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("delete"));
+        assertEquals(participantUuid.toString(), captor.getValue().getUuid());
+        assertEquals(uuid.toString(), captor.getValue().getMeetingUuid());
     }
 
     @Test
@@ -425,6 +435,35 @@ public class ParticipantServiceImplTest {
     }
 
     @Test
+    public void testCreateParticipantsAudited() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        organisation.setOrganisationId("meeting-org");
+        var meeting = createMeeting(uuid, organisation);
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", null, ParticipantRole.GUEST)
+        );
+        setupValidUserContext(true);
+        Mockito.when(userContextService.getUserContext().getUserEmail()).thenReturn("user@example.com");
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(cprHasher.hash("0101011234")).thenReturn("hashed-cpr");
+        Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("create"));
+        var audited = captor.getValue();
+        assertEquals(result.getFirst().uuid().toString(), audited.getUuid());
+        assertEquals(uuid.toString(), audited.getMeetingUuid());
+        assertEquals("CITIZEN", audited.getType());
+        assertEquals("hashed-cpr", audited.getParticipantId());
+        assertEquals("GUEST", audited.getRole());
+        assertEquals("meeting-org", audited.getOrganisation());
+        assertEquals("user@example.com", audited.getPerformedBy());
+    }
+
+    @Test
     public void testCreateParticipantsCitizenRejectedWithoutRole() {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
@@ -440,5 +479,6 @@ public class ParticipantServiceImplTest {
 
         Mockito.verify(participantDao, Mockito.never()).save(Mockito.any());
         Mockito.verify(meetingRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(auditService, Mockito.never()).auditParticipant(Mockito.any(), Mockito.any());
     }
 }

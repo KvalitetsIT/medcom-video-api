@@ -118,11 +118,12 @@ public class ParticipantServiceImpl implements ParticipantService {
                     currentUser.getId(),
                     null,
                     currentUser.getId());
-            return toModel(participantDao.save(participant));
+            return participantDao.save(participant);
         }).toList();
 
         updateMeeting(meeting);
-        return participants;
+        participants.forEach(p -> auditParticipant(meeting, p, "create"));
+        return participants.stream().map(this::toModel).toList();
     }
 
     @Override
@@ -137,6 +138,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         }
         participantDao.delete(participant);
         updateMeeting(meeting);
+        auditParticipant(meeting, participant, "delete");
     }
 
     @Override
@@ -165,6 +167,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         var saved = participantDao.save(updated);
 
         updateMeeting(meeting);
+        auditParticipant(meeting, saved, "update");
 
         return toModel(saved);
     }
@@ -197,6 +200,20 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new PermissionDeniedExceptionV2();
         }
         meetingRepository.save(meeting);
+    }
+
+    private void auditParticipant(Meeting meeting, Participant participant, String action) {
+        var auditParticipant = new dk.medcom.video.api.service.domain.audit.Participant();
+        auditParticipant.setUuid(participant.uuid() != null ? participant.uuid().toString() : null);
+        auditParticipant.setMeetingUuid(meeting.getUuid());
+        auditParticipant.setType(participant.type() != null ? participant.type().toString() : null);
+        auditParticipant.setParticipantId(participant.participantId());
+        auditParticipant.setParticipantOrganisation(participant.organisationId());
+        auditParticipant.setRole(participant.role() != null ? participant.role().toString() : null);
+        auditParticipant.setOrganisation(meeting.getOrganisation().getOrganisationId());
+        auditParticipant.setPerformedBy(userContextService.getUserContext().getUserEmail());
+
+        auditService.auditParticipant(auditParticipant, action);
     }
 
     private ParticipantModel redactIfCitizen(ParticipantModel participant) {
