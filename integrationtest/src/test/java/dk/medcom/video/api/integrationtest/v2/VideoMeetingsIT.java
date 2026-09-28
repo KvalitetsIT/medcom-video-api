@@ -1617,37 +1617,37 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfNoRoleAttInToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfExpiredJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfInvalidIssuerJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfTamperedJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfMissingSignatureJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
     void errorIfDifferentSignedJwtToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.getMeetingParticipations(meetingParticipationSearch(randomString())));
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
@@ -1662,7 +1662,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .participantId(participantId);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
-        var result = videoMeetingsV2Api.getMeetingParticipations(meetingParticipationSearch(participantId));
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
 
         assertNotNull(result);
         assertNotNull(result.getMeetingParticipations());
@@ -1688,7 +1688,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
 
-        var result = videoMeetingsV2Api.getMeetingParticipations(meetingParticipationSearch(participantId));
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
         var participation = result.getMeetingParticipations().getFirst();
 
         assertEquals(schedulingInfo.getHostPin(), participation.getPin());
@@ -1707,7 +1707,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
 
-        var result = videoMeetingsV2Api.getMeetingParticipations(meetingParticipationSearch(participantId));
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId, null, null);
         var participation = result.getMeetingParticipations().getFirst();
 
         assertNotNull(schedulingInfo.getGuestPin());
@@ -1723,18 +1723,16 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
-        var search = meetingParticipationSearch(participantId)
-                .fromStartTime(createMeeting.getStartTime().minusHours(1))
-                .toStartTime(createMeeting.getStartTime().plusHours(1));
-
-        var result = videoMeetingsV2Api.getMeetingParticipations(search);
+        var result = videoMeetingsV2Api.getMeetingParticipations(participantId,
+                createMeeting.getStartTime().minusHours(1),
+                createMeeting.getStartTime().plusHours(1));
 
         assertEquals(1, result.getMeetingParticipations().size());
     }
 
     @Test
     void testGetMeetingParticipationsNoMatchingParticipant() throws ApiException {
-        var result = videoMeetingsV2Api.getMeetingParticipations(meetingParticipationSearch(randomString()));
+        var result = videoMeetingsV2Api.getMeetingParticipations(randomString(), null, null);
 
         assertNotNull(result);
         assertNotNull(result.getMeetingParticipations());
@@ -1743,24 +1741,18 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testGetMeetingParticipationsOnlyFromStartTimeGiven() {
-        var search = meetingParticipationSearch(randomString()).fromStartTime(OffsetDateTime.now());
         var expectedException = assertThrows(ApiException.class, () ->
-                videoMeetingsV2Api.getMeetingParticipations(search));
+                videoMeetingsV2Api.getMeetingParticipations(randomString(), OffsetDateTime.now(), null));
         assertEquals(400, expectedException.getCode());
         assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
     }
 
     @Test
     void testGetMeetingParticipationsOnlyToStartTimeGiven() {
-        var search = meetingParticipationSearch(randomString()).toStartTime(OffsetDateTime.now());
         var expectedException = assertThrows(ApiException.class, () ->
-                videoMeetingsV2Api.getMeetingParticipations(search));
+                videoMeetingsV2Api.getMeetingParticipations(randomString(), null, OffsetDateTime.now()));
         assertEquals(400, expectedException.getCode());
         assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
-    }
-
-    private static MeetingParticipationSearch meetingParticipationSearch(String participantId) {
-        return new MeetingParticipationSearch().type(ParticipantType.USER).participantId(participantId);
     }
 
     /**
@@ -1945,6 +1937,42 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         assertTrue(responseSchedulingInfo.body().matches("\\{\"uuid\":\"" + schedulingInfoUuid + "\".*\"meetingDetails\":.*\"uuid\":\"" + meetingUuid + "\".*}"));
     }
 
+    // ---------- JWT errors - getCitizenMeetingParticipations ----------
+    @Test
+    void errorIfNoJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiNoHeader.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfNoRoleAttInToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfExpiredJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiExpiredJwt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfInvalidIssuerJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiInvalidIssuerJwt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfTamperedJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiTamperedJwt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfMissingSignatureJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiMissingSignatureJwt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
+    @Test
+    void errorIfDifferentSignedJwtToken_getCitizenMeetingParticipations() {
+        assertStatus(401, () -> videoMeetingsV2ApiDifferentSignedJwt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+    }
+
     // ---------- No JWT errors - citizen participants/participations ----------
     @Test
     void testV2MeetingsPostThenV2MeetingsUuidParticipantsPostCitizen() throws ApiException {
@@ -1966,7 +1994,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGetMeetingParticipationsCitizen() throws ApiException {
+    void testGetCitizenMeetingParticipations() throws ApiException {
         var cpr = randomString();
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
@@ -1977,7 +2005,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .participantId(cpr);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
-        var result = videoMeetingsV2Api.getMeetingParticipations(citizenParticipationSearch(cpr));
+        var result = videoMeetingsV2Api.getCitizenMeetingParticipations(citizenParticipationSearch(cpr));
 
         assertNotNull(result);
         assertNotNull(result.getMeetingParticipations());
@@ -1993,7 +2021,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGetMeetingParticipationsCitizenFilteredByStartTimeInterval() throws ApiException {
+    void testGetCitizenMeetingParticipationsFilteredByStartTimeInterval() throws ApiException {
         var cpr = randomString();
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
@@ -2005,14 +2033,14 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .fromStartTime(createMeeting.getStartTime().minusHours(1))
                 .toStartTime(createMeeting.getStartTime().plusHours(1));
 
-        var result = videoMeetingsV2Api.getMeetingParticipations(search);
+        var result = videoMeetingsV2Api.getCitizenMeetingParticipations(search);
 
         assertEquals(1, result.getMeetingParticipations().size());
     }
 
     @Test
-    void testGetMeetingParticipationsCitizenNoMatchingParticipant() throws ApiException {
-        var result = videoMeetingsV2Api.getMeetingParticipations(citizenParticipationSearch(randomString()));
+    void testGetCitizenMeetingParticipationsNoMatchingParticipant() throws ApiException {
+        var result = videoMeetingsV2Api.getCitizenMeetingParticipations(citizenParticipationSearch(randomString()));
 
         assertNotNull(result);
         assertNotNull(result.getMeetingParticipations());
@@ -2020,30 +2048,30 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void testGetMeetingParticipationsCitizenOnlyFromStartTimeGiven() {
+    void testGetCitizenMeetingParticipationsOnlyFromStartTimeGiven() {
         var search = citizenParticipationSearch(randomString()).fromStartTime(OffsetDateTime.now());
         var expectedException = assertThrows(ApiException.class, () ->
-                videoMeetingsV2Api.getMeetingParticipations(search));
+                videoMeetingsV2Api.getCitizenMeetingParticipations(search));
         assertEquals(400, expectedException.getCode());
         assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
     }
 
     @Test
-    void testGetMeetingParticipationsCitizenOnlyToStartTimeGiven() {
+    void testGetCitizenMeetingParticipationsOnlyToStartTimeGiven() {
         var search = citizenParticipationSearch(randomString()).toStartTime(OffsetDateTime.now());
         var expectedException = assertThrows(ApiException.class, () ->
-                videoMeetingsV2Api.getMeetingParticipations(search));
+                videoMeetingsV2Api.getCitizenMeetingParticipations(search));
         assertEquals(400, expectedException.getCode());
         assertTrue(expectedException.getResponseBody().contains("\"detailed_error_code\":\"28\""));
     }
 
     @Test
-    void testGetMeetingParticipationsCitizenForbiddenWithoutCitizenLookupRole() {
-        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.getMeetingParticipations(citizenParticipationSearch(randomString())));
+    void testGetCitizenMeetingParticipationsForbiddenWithoutCitizenLookupRole() {
+        assertStatus(403, () -> videoMeetingsV2ApiOnlyProvisioner.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
     }
 
-    private static MeetingParticipationSearch citizenParticipationSearch(String cpr) {
-        return new MeetingParticipationSearch().type(ParticipantType.CITIZEN).participantId(cpr);
+    private static CitizenParticipationSearch citizenParticipationSearch(String cpr) {
+        return new CitizenParticipationSearch().participantId(cpr);
     }
 
     private static List<CreateParticipant> createCitizenParticipants() {
