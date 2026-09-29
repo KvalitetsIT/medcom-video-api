@@ -66,9 +66,6 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                                                                            OffsetDateTime fromStartTime,
                                                                            OffsetDateTime toStartTime) {
         logger.debug("Get citizen meeting participations for participant, v2.");
-        if (!userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
-            throw new PermissionDeniedExceptionV2();
-        }
         return findMeetingParticipations(ParticipantType.CITIZEN, cprHasher.hash(participantId), fromStartTime, toStartTime);
     }
 

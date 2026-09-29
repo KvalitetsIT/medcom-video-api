@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class ParticipantServiceImpl implements ParticipantService {
-    private static final UUID REDACTED_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static final String REDACTED_VALUE = "*****";
-
     private final Logger logger = LoggerFactory.getLogger(ParticipantServiceImpl.class);
     private final ParticipantDao participantDao;
     private final MeetingUserService meetingUserService;
@@ -57,9 +54,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         var participants = participantDao.findByMeeting(meeting).stream().map(this::toModel).toList();
         auditGetParticipants(meetingUuid, participants);
 
-        return userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)
-                ? participants
-                : participants.stream().map(this::redactIfCitizen).toList();
+        return participants.stream().map(this::redactIfCitizen).toList();
     }
 
     private void auditGetParticipants(UUID meetingUuid, List<ParticipantModel> participants) {
@@ -207,8 +202,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         auditParticipant.setUuid(participant.uuid() != null ? participant.uuid().toString() : null);
         auditParticipant.setMeetingUuid(meeting.getUuid());
         auditParticipant.setType(participant.type() != null ? participant.type().toString() : null);
-        auditParticipant.setParticipantId(participant.participantId());
-        auditParticipant.setParticipantOrganisation(participant.organisationId());
         auditParticipant.setRole(participant.role() != null ? participant.role().toString() : null);
         auditParticipant.setOrganisation(meeting.getOrganisation().getOrganisationId());
         auditParticipant.setPerformedBy(userContextService.getUserContext().getUserEmail());
@@ -221,15 +214,15 @@ public class ParticipantServiceImpl implements ParticipantService {
             return participant;
         }
         return new ParticipantModel(
-                participant.id(),
-                REDACTED_UUID,
+                null,
+                null,
                 participant.type(),
-                REDACTED_VALUE,
-                REDACTED_VALUE,
+                null,
+                null,
                 participant.role(),
-                participant.createdTime(),
-                participant.createdBy(),
-                participant.updatedTime(),
-                participant.updatedBy());
+                null,
+                null,
+                null,
+                null);
     }
 }

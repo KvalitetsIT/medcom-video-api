@@ -76,7 +76,6 @@ public class AuditServiceImplTest {
         input.setUuid(UUID.randomUUID().toString());
         input.setMeetingUuid(UUID.randomUUID().toString());
         input.setType("CITIZEN");
-        input.setParticipantId("hashed-cpr");
         input.setRole("GUEST");
         input.setOrganisation("org");
         input.setPerformedBy("user@example.com");

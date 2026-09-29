@@ -565,11 +565,9 @@ paths:
         * meeting-user <br>
         * meeting-planner <br>
         * meeting-provisioner-user <br> <br>
-        If the caller does not also have the meeting-citizen-lookup role, participants of
-        type CITIZEN are still included in the response, but with uuid, participantId and
-        organisationId redacted: uuid is returned as 00000000-0000-0000-0000-000000000000,
-        and participantId and organisationId are returned as "*****". Type, role,
-        createdTime, createdBy, updatedTime and updatedBy are unaffected.
+        Participants of type CITIZEN are returned only with
+        type and role. All other fields (uuid, participantId, organisationId, createdTime,
+        createdBy, updatedTime and updatedBy) are returned as null.
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -2630,15 +2628,13 @@ components:
     participant:
       type: object
       required:
-        - uuid
         - type
-        - participantId
         - role
       properties:
         uuid:
           type: string
           format: uuid
-          description: The uuid of the participant
+          description: The uuid of the participant. Null for participants of type CITIZEN when returned from GET /v2/meetings/{uuid}/participants.
         type:
           $ref: '#/components/schemas/participantType'
         participantId:

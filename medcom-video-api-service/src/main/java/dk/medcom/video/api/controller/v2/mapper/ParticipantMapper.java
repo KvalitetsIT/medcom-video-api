@@ -40,7 +40,7 @@ public class ParticipantMapper {
 
     private static MeetingUser internalToExternal(MeetingUserModel input) {
         if (input == null) {
-            return new MeetingUser();
+            return null;
         }
         return new MeetingUser()
                 .organisationId(input.organisationId())
