@@ -33,6 +33,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
     private final String plannerProvisionerUserAdminUserRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-planner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-user')";
+    private final String anyRoleAttAndCitizenLookup = anyRoleAtt + " and hasAuthority('ROLE_ATT_meeting-citizen-lookup')";
 
     private final MeetingServiceV2 meetingService;
     private final ParticipantService participantService;
@@ -44,7 +45,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     @Oauth
     @Override
-    @PreAuthorize(anyRoleAtt)
+    @PreAuthorize(anyRoleAttAndCitizenLookup)
     public ResponseEntity<MeetingParticipationList> getCitizenMeetingParticipations(CitizenParticipationSearch citizenParticipationSearch) {
         logger.debug("Enter POST citizen meeting participations, v2.");
         try {

@@ -25,6 +25,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -120,13 +121,12 @@ public class ParticipantServiceImplTest {
     }
 
     @Test
-    public void testGetParticipantsRedactsCitizenParticipantsWithoutRole() throws PermissionDeniedExceptionV2 {
+    public void testGetParticipantsRedactsCitizenParticipants() throws PermissionDeniedExceptionV2 {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
         setupValidUserContext();
-        var citizenUuid = UUID.randomUUID();
         var participants = List.of(
-                new Participant(1L, citizenUuid, null, null, ParticipantType.CITIZEN, "hashed-cpr", "org", ParticipantRole.GUEST, null, null, null, null),
+                new Participant(1L, UUID.randomUUID(), null, null, ParticipantType.CITIZEN, "hashed-cpr", "org", ParticipantRole.GUEST, LocalDateTime.now(), 10L, LocalDateTime.now(), 10L),
                 new Participant(2L, UUID.randomUUID(), null, null, ParticipantType.USER, "ext-id", "org", ParticipantRole.HOST, null, null, null, null));
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
@@ -136,34 +136,19 @@ public class ParticipantServiceImplTest {
         assertEquals(2, result.size());
 
         var citizenResult = result.stream().filter(p -> p.type() == ParticipantType.CITIZEN).findFirst().orElseThrow();
-        assertEquals(UUID.fromString("00000000-0000-0000-0000-000000000000"), citizenResult.uuid());
-        assertEquals("*****", citizenResult.externalId());
-        assertEquals("*****", citizenResult.organisation());
         assertEquals(ParticipantRole.GUEST, citizenResult.role());
+        assertNull(citizenResult.id());
+        assertNull(citizenResult.uuid());
+        assertNull(citizenResult.externalId());
+        assertNull(citizenResult.organisation());
+        assertNull(citizenResult.createdTime());
+        assertNull(citizenResult.createdBy());
+        assertNull(citizenResult.updatedTime());
+        assertNull(citizenResult.updatedBy());
 
         var userResult = result.stream().filter(p -> p.type() == ParticipantType.USER).findFirst().orElseThrow();
         assertEquals("ext-id", userResult.externalId());
         assertEquals("org", userResult.organisation());
-    }
-
-    @Test
-    public void testGetParticipantsIncludesUnredactedCitizenParticipantsWithRole() throws PermissionDeniedExceptionV2 {
-        var uuid = UUID.randomUUID();
-        var meeting = createMeeting(uuid, new Organisation());
-        setupValidUserContext(true);
-
-        var citizenUuid = UUID.randomUUID();
-        var participants = List.of(
-                new Participant(1L, citizenUuid, null, null, ParticipantType.CITIZEN, "hashed-cpr", "org", ParticipantRole.GUEST, null, null, null, null));
-        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
-        Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
-
-        var result = participantService.getParticipants(uuid);
-
-        assertEquals(1, result.size());
-        assertEquals(citizenUuid, result.getFirst().uuid());
-        assertEquals("hashed-cpr", result.getFirst().externalId());
-        assertEquals("org", result.getFirst().organisation());
     }
 
     @Test
@@ -457,7 +442,6 @@ public class ParticipantServiceImplTest {
         assertEquals(result.getFirst().uuid().toString(), audited.getUuid());
         assertEquals(uuid.toString(), audited.getMeetingUuid());
         assertEquals("CITIZEN", audited.getType());
-        assertEquals("hashed-cpr", audited.getParticipantId());
         assertEquals("GUEST", audited.getRole());
         assertEquals("meeting-org", audited.getOrganisation());
         assertEquals("user@example.com", audited.getPerformedBy());

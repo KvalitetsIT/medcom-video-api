@@ -1123,18 +1123,4 @@ public class MeetingServiceV2ImplTest {
         assertEquals(0, audited.getResultCount());
         assertEquals(List.of(), audited.getResultIdentifiers());
     }
-
-    @Test
-    public void testGetCitizenMeetingParticipationsWithoutRoleIsDenied() {
-        var participantId = randomString();
-
-        var userContext = Mockito.mock(UserContext.class);
-        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(false);
-        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
-
-        assertThrows(PermissionDeniedExceptionV2.class,
-                () -> meetingServiceV2.getCitizenMeetingParticipations(participantId, null, null));
-
-        Mockito.verifyNoInteractions(participantDao, meetingRepository, schedulingInfoRepository, cprHasher, auditService);
-    }
 }
