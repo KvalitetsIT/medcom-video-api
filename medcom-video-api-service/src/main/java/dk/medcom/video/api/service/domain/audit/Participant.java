@@ -4,6 +4,7 @@ public class Participant {
     private String uuid;
     private String meetingUuid;
     private String type;
+    private String participantId;
     private String role;
     private String organisation;
     private String performedBy;
@@ -30,6 +31,14 @@ public class Participant {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(String participantId) {
+        this.participantId = participantId;
     }
 
     public String getRole() {

@@ -252,7 +252,7 @@ public class ParticipantServiceImplTest {
         var meeting = createMeeting(uuid, organisation);
         setupValidUserContext();
         var updateParticipant = new UpdateParticipantModel(ParticipantRole.GUEST);
-        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), null, null, null, null, null, null, null, null);
+        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), ParticipantType.USER, "ext-id", null, null, null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(savedParticipant));
         Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -262,6 +262,7 @@ public class ParticipantServiceImplTest {
         var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
         Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("update"));
         assertEquals(participantUuid.toString(), captor.getValue().getUuid());
+        assertEquals("ext-id", captor.getValue().getParticipantId());
         assertEquals("GUEST", captor.getValue().getRole());
     }
 
@@ -442,6 +443,7 @@ public class ParticipantServiceImplTest {
         assertEquals(result.getFirst().uuid().toString(), audited.getUuid());
         assertEquals(uuid.toString(), audited.getMeetingUuid());
         assertEquals("CITIZEN", audited.getType());
+        assertNull(audited.getParticipantId());
         assertEquals("GUEST", audited.getRole());
         assertEquals("meeting-org", audited.getOrganisation());
         assertEquals("user@example.com", audited.getPerformedBy());
