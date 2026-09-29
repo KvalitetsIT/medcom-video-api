@@ -202,6 +202,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         auditParticipant.setUuid(participant.uuid() != null ? participant.uuid().toString() : null);
         auditParticipant.setMeetingUuid(meeting.getUuid());
         auditParticipant.setType(participant.type() != null ? participant.type().toString() : null);
+        auditParticipant.setParticipantId(participant.type() != ParticipantType.CITIZEN ? participant.participantId() : null);
         auditParticipant.setRole(participant.role() != null ? participant.role().toString() : null);
         auditParticipant.setOrganisation(meeting.getOrganisation().getOrganisationId());
         auditParticipant.setPerformedBy(userContextService.getUserContext().getUserEmail());
