@@ -16,6 +16,4 @@ public interface ParticipantService {
     void deleteParticipant(UUID meetingUuid, UUID participantId);
 
     ParticipantModel updateParticipant(UUID uuid, UUID id, UpdateParticipantModel updateParticipant);
-
-    List<ParticipantModel> createCitizenParticipants(UUID meetingUuid, List<CreateParticipantModel> createParticipantModel);
 }
