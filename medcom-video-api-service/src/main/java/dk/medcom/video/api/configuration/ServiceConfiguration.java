@@ -148,9 +148,7 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     @Bean
     public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationTreeServiceClient) {
         return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationTreeServiceClient);
-    public OrganisationService organisationService(UserContextService userContextService, OrganisationRepository organisationRepository, OrganisationStrategy organisationStrategy, OrganisationServiceClientV2 organisationServiceClientV2) {
-		return new OrganisationServiceImpl(userContextService, organisationRepository, organisationStrategy, organisationServiceClientV2);
-	}
+    }
 
     @Bean
     public MeetingUserService meetingUserService(MeetingUserRepository meetingUserRepository, UserContextService userContextService, OrganisationService organisationService) {
@@ -373,9 +371,6 @@ public class ServiceConfiguration implements WebMvcConfigurer {
         return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService);
     }
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.setUseTrailingSlashMatch(true);
     @Bean
     public FilterRegistrationBean<UrlHandlerFilter> urlHandlerFilterRegistration() {
 		// Preserve trailing-slash matching removed in Spring Framework 7.0 (replaces the deprecated

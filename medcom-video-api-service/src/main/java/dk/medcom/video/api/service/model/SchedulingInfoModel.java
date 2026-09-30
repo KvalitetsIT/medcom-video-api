@@ -80,11 +80,9 @@ public record SchedulingInfoModel(UUID uuid,
                 schedulingInfo.getReturnUrl(),
                 meeting != null ? MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount()) : null,
                 DirectMediaModel.from(schedulingInfo.getDirectMedia()),
-                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
-                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
                 schedulingInfo.getBreakoutRooms(),
-                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
-                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
+                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
+                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
                 schedulingInfo.getCallType());
     }
 
