@@ -17,21 +17,16 @@ public class OrganisationServiceImpl implements OrganisationService {
     private final OrganisationRepository organisationRepository;
     private final OrganisationStrategy organisationStrategy;
     private final OrganisationServiceClientV2 organisationServiceClientV2;
-	private final OrganisationServiceClientV2 organisationServiceClientV2;
 
     public OrganisationServiceImpl(UserContextService userContextService,
                                    OrganisationRepository organisationRepository,
                                    OrganisationStrategy organisationStrategy,
                                    OrganisationServiceClientV2 organisationServiceClientV2) {
-        OrganisationRepository organisationRepository,
-								   OrganisationStrategy organisationStrategy,
-								   OrganisationServiceClientV2 organisationServiceClientV2) {
-								   OrganisationStrategy organisationStrategy, OrganisationTreeServiceClient organisationTreeServiceClient) {this.organisationRepository = organisationRepository;
         this.organisationStrategy = organisationStrategy;
         this.userService = userContextService;
+        this.organisationRepository = organisationRepository;
         this.organisationServiceClientV2 = organisationServiceClientV2;
-    this.organisationServiceClientV2 = organisationServiceClientV2;
-	}
+    }
 
     @Override
     public Integer getPoolSizeForUserOrganisation() {
@@ -64,17 +59,17 @@ public class OrganisationServiceImpl implements OrganisationService {
     }
 
     @Override
-	public boolean isPolicyServerEnabledForOrganisation(String organisationId) {
-		var organisation = organisationServiceClientV2.getOrganisationByCode(organisationId);
-		return organisation != null && organisation.isPolicyServerEnabled();
-	}
+    public boolean isPolicyServerEnabledForOrganisation(String organisationId) {
+        var organisation = organisationServiceClientV2.getOrganisationByCode(organisationId);
+        return organisation != null && organisation.isPolicyServerEnabled();
+    }
 
-	@Override
-	public boolean isPolicyServerEnabledForUserOrganisation() {
-		return isPolicyServerEnabledForOrganisation(userService.getUserContext().getUserOrganisation());
-	}
+    @Override
+    public boolean isPolicyServerEnabledForUserOrganisation() {
+        return isPolicyServerEnabledForOrganisation(userService.getUserContext().getUserOrganisation());
+    }
 
-	@Override
+    @Override
     public boolean userIsPermittedForOrganisation(String organisationId) {
         var userOrganisationCode = userService.getUserContext().getUserOrganisation();
 
