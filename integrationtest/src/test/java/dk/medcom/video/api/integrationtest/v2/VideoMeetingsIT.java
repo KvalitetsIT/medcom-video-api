@@ -154,7 +154,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsGet() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsGet(meeting301Uuid()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsGet(meeting301Uuid()));
     }
 
     @Test
@@ -195,7 +195,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsPost() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsPost(meeting301Uuid(), createParticipants()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsPost(meeting301Uuid(), createParticipants()));
     }
 
     @Test
@@ -237,7 +237,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsIdPut() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidPut(meeting301Uuid(), UUID.randomUUID(), new UpdateParticipant().role(ParticipantRole.HOST)));
     }
 
     @Test
@@ -278,7 +278,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_v2MeetingsUuidParticipantsIdDelete() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.v2MeetingsUuidParticipantsParticipantUuidDelete(meeting301Uuid(), UUID.randomUUID()));
     }
 
     @Test
@@ -1622,7 +1622,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_getMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getMeetingParticipations(randomString(), null, null));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.getMeetingParticipations(randomString(), null, null));
     }
 
     @Test
@@ -1945,7 +1945,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void errorIfNoRoleAttInToken_getCitizenMeetingParticipations() {
-        assertStatus(401, () -> videoMeetingsV2ApiNoRoleAtt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
+        assertStatus(403, () -> videoMeetingsV2ApiNoRoleAtt.getCitizenMeetingParticipations(citizenParticipationSearch(randomString())));
     }
 
     @Test
