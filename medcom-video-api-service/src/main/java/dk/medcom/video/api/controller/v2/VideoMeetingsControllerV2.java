@@ -2,9 +2,12 @@ package dk.medcom.video.api.controller.v2;
 
 import dk.medcom.video.api.PerformanceLogger;
 import dk.medcom.video.api.controller.v2.exception.*;
+import dk.medcom.video.api.controller.v2.mapper.MeetingParticipationMapper;
+import dk.medcom.video.api.controller.v2.mapper.ParticipantMapper;
 import dk.medcom.video.api.controller.v2.mapper.VideoMeetingMapper;
 import dk.medcom.video.api.interceptor.Oauth;
 import dk.medcom.video.api.service.MeetingServiceV2;
+import dk.medcom.video.api.service.ParticipantService;
 import dk.medcom.video.api.service.RetryOnException;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
@@ -30,11 +33,75 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
 
     private final String anyRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-provisioner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-planner')";
     private final String plannerProvisionerUserAdminUserRoleAtt = "hasAnyAuthority('ROLE_ATT_meeting-planner','ROLE_ATT_meeting-provisioner-user','ROLE_ATT_meeting-admin','ROLE_ATT_meeting-user')";
+    private final String anyRoleAttAndCitizenLookup = anyRoleAtt + " and hasAuthority('ROLE_ATT_meeting-citizen-lookup')";
 
     private final MeetingServiceV2 meetingService;
+    private final ParticipantService participantService;
 
-    public VideoMeetingsControllerV2(MeetingServiceV2 meetingService) {
+    public VideoMeetingsControllerV2(MeetingServiceV2 meetingService, ParticipantService participantService) {
         this.meetingService = meetingService;
+        this.participantService = participantService;
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(anyRoleAttAndCitizenLookup)
+    public ResponseEntity<MeetingParticipationList> getCitizenMeetingParticipations(CitizenParticipationSearch citizenParticipationSearch) {
+        logger.debug("Enter POST citizen meeting participations, v2.");
+        try {
+            var fromStartTime = citizenParticipationSearch.getFromStartTime();
+            var toStartTime = citizenParticipationSearch.getToStartTime();
+
+            if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+            }
+
+            var meetingParticipations = meetingService.getCitizenMeetingParticipations(
+                    citizenParticipationSearch.getParticipantId(), fromStartTime, toStartTime);
+
+            var result = new MeetingParticipationList()
+                    .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));
+
+            return ResponseEntity.ok(result);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        } catch (NotValidDataExceptionV2 e) {
+            throw new NotValidDataException(e.getDetailedErrorCode(), e.getDetailedError());
+        } catch (Exception e) {
+            logger.error("Caught unexpected exception.", e);
+            throw new InternalServerErrorException("Unexpected exception caught. " + e);
+        }
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(anyRoleAtt)
+    public ResponseEntity<MeetingParticipationList> getMeetingParticipations(String participantId, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
+        logger.debug("Enter GET meeting participations, v2.");
+        try {
+            if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+                throw new NotValidDataExceptionV2(DetailedError.DetailedErrorCodeEnum._28, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
+            }
+
+            var meetingParticipations = meetingService.getMeetingParticipations(
+                    participantId, fromStartTime, toStartTime);
+
+            var result = new MeetingParticipationList()
+                    .meetingParticipations(MeetingParticipationMapper.internalToExternal(meetingParticipations));
+
+            return ResponseEntity.ok(result);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        } catch (NotValidDataExceptionV2 e) {
+            throw new NotValidDataException(e.getDetailedErrorCode(), e.getDetailedError());
+        } catch (Exception e) {
+            logger.error("Caught unexpected exception.", e);
+            throw new InternalServerErrorException("Unexpected exception caught. " + e);
+        }
     }
 
     @Oauth
@@ -120,7 +187,7 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
     private ResponseEntity<List<Meeting>> genericSearchMeetings(String search, OffsetDateTime fromStartTime, OffsetDateTime toStartTime) {
         logger.debug("Get meetings by search: {}, fromStartTime: {}, toStartTime: {}, v2.", search, fromStartTime, toStartTime);
 
-        if((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
+        if ((fromStartTime != null && toStartTime == null) || (fromStartTime == null && toStartTime != null)) {
             try {
                 throw new NotValidDataException(DetailedError.DetailedErrorCodeEnum._26, "Either both from-start-time and to-start-time must be provided or none of them must be provided.");
             } catch (NotValidDataExceptionV2 e) {
@@ -226,6 +293,69 @@ public class VideoMeetingsControllerV2 implements VideoMeetingsV2Api {
         } catch (Exception e) {
             logger.error("Caught unexpected exception.", e);
             throw new InternalServerErrorException("Unexpected exception caught. " + e);
+        }
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
+    public ResponseEntity<List<Participant>> v2MeetingsUuidParticipantsGet(UUID uuid) {
+        logger.debug("Enter GET participants by meeting uuid: {}, v2.", uuid);
+        try {
+            var participants = participantService.getParticipants(uuid);
+            var mappedParticipants = ParticipantMapper.internalToExternal(participants);
+            return ResponseEntity.ok(mappedParticipants);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
+    public ResponseEntity<Void> v2MeetingsUuidParticipantsParticipantUuidDelete(UUID uuid, UUID participantUuid) {
+        logger.debug("Enter DELETE participant by meeting uuid: {} and participant id {1}, v2.", uuid, participantUuid);
+        try {
+            participantService.deleteParticipant(uuid, participantUuid);
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
+    public ResponseEntity<Participant> v2MeetingsUuidParticipantsParticipantUuidPut(UUID uuid, UUID participantUuid, UpdateParticipant updateParticipant) {
+        logger.debug("ENTER PUT participant by meeting uuid: {} and participant id: {}, v2.", uuid, participantUuid);
+        try {
+            var participant = ParticipantMapper.externalToInternal(updateParticipant);
+            var result = participantService.updateParticipant(uuid, participantUuid, participant);
+            return ResponseEntity.ok(ParticipantMapper.internalToExternal(result));
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+    }
+
+    @Oauth
+    @Override
+    @PreAuthorize(plannerProvisionerUserAdminUserRoleAtt)
+    public ResponseEntity<List<Participant>> v2MeetingsUuidParticipantsPost(UUID uuid, List<CreateParticipant> createParticipant) {
+        logger.debug("Enter POST participants by meeting uuid: {}, v2.", uuid);
+        try {
+            var mappedParticipants = ParticipantMapper.externalToInternal(createParticipant);
+            var participants = participantService.createParticipants(uuid, mappedParticipants);
+            return ResponseEntity.ok(ParticipantMapper.internalToExternal(participants));
+        } catch (PermissionDeniedExceptionV2 e) {
+            throw new PermissionDeniedException(e.getMessage());
+        } catch (ResourceNotFoundExceptionV2 e) {
+            throw new ResourceNotFoundException(e.getMessage());
         }
     }
 
