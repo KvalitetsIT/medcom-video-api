@@ -558,13 +558,16 @@ paths:
         - Video Meetings V2
       summary: gets participants of a specific meeting
       description: >-
-        Gets participants of a specific meeting based on the given uuid. <br> <br> 
+        Gets participants of a specific meeting based on the given uuid. <br> <br>
         Only members of the owner organisation of the meeting can use this endpoint.
         Requires one of the following roles:
         * meeting-admin <br>
         * meeting-user <br>
         * meeting-planner <br>
-        * meeting-provisioner-user
+        * meeting-provisioner-user <br> <br>
+        Participants of type CITIZEN are returned only with
+        type and role. All other fields (uuid, participantId, organisationId, createdTime,
+        createdBy, updatedTime and updatedBy) are returned as null.
       parameters:
         - $ref: '#/components/parameters/uuid'
       responses:
@@ -603,7 +606,12 @@ paths:
         When a participant has type ORGANISATION, participantId must reference an existing organisation;
         the request fails with 404 if no organisation with that id exists. In that case the supplied
         organisation field is ignored, and the participant's organisation is instead set to the
-        organisationId resolved from participantId.
+        organisationId resolved from participantId. <br> <br>
+        When a participant has type CITIZEN, participantId must contain the citizen's CPR number. The CPR number is hashed
+        server-side before storage; it is
+        never persisted in cleartext. If the request contains one or more participants of type CITIZEN and the
+        caller does not have the meeting-citizen-lookup role, the entire request is rejected with 403; no
+        participants are added. <br> <br>
       parameters:
         - $ref: '#/components/parameters/uuid'
       requestBody:
@@ -714,6 +722,8 @@ paths:
         All provided query parameters are combined (AND) to filter the result. <br> <br>
         Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
         When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br>
+        Not to be used for participants of type CITIZEN, since participantId (CPR) can not be sent as a path
+        parameter. Use POST /v2/meeting-participations/citizen instead. <br> <br>
         The following values of the user role claim grants access: <br>
         * meeting-admin <br>
         * meeting-user <br>
@@ -744,6 +754,54 @@ paths:
             type: string
             format: date-time
           example: '2023-03-31T11:25:44Z'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/meetingParticipationList'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+
+  /v2/meeting-participations/citizen:
+    post:
+      security:
+        - keycloakOIDC: [ ]
+      tags:
+        - Video Meetings V2
+      summary: gets a list of meeting participations for a citizen participant
+      description: >-
+        Gets a list of meeting participations the given citizen participant is in, based on query
+        parameters. All provided query parameters are combined (AND) to filter the result. <br> <br>
+        participantId must contain the citizen's CPR number in cleartext in the request body,
+        since it can not be sent as a path or query parameter. It is hashed server-side
+        and matched against the stored hash;
+        the CPR number is not persisted. <br> <br>
+        Note that either both from-start-time and to-start-time must be provided or none of them must be provided. <br>
+        When using from-start-time and to-start-time the start time of the meeting must be within the date interval in order to be included in the response. <br> <br>
+        The following values of the user role claim grants access: <br>
+        * meeting-admin <br>
+        * meeting-user <br>
+        * meeting-planner <br>
+        * meeting-provisioner <br>
+        * meeting-provisioner-user <br> <br>
+        The caller must also have the meeting-citizen-lookup role, otherwise the request fails with 403.
+      operationId: getCitizenMeetingParticipations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/citizen-participation-search'
       responses:
         '200':
           description: Ok
@@ -1431,6 +1489,7 @@ components:
         * The uuid being requested has never existed <br> 
         * The id (scheduling template) being requested does not exist <br>
         * When adding a participant with type ORGANISATION, no organisation exists matching the given participantId <br>
+        * When looking up citizen meeting participations, no participation exists matching the given CPR number <br>
         (See a possible detailed error message in the response.)
       content:
         application/json:
@@ -2554,6 +2613,7 @@ components:
         - ORGANISATION
         - USER
         - DEVICE
+        - CITIZEN
       example: USER
       description: The type of participant
 
@@ -2568,15 +2628,13 @@ components:
     participant:
       type: object
       required:
-        - uuid
         - type
-        - participantId
         - role
       properties:
         uuid:
           type: string
           format: uuid
-          description: The uuid of the participant
+          description: The uuid of the participant. Null for participants of type CITIZEN when returned from GET /v2/meetings/{uuid}/participants.
         type:
           $ref: '#/components/schemas/participantType'
         participantId:
@@ -2604,6 +2662,30 @@ components:
           type: string
           format: date-time
           example: 2019-10-02T15:00:00Z
+
+    citizen-participation-search:
+      type: object
+      required:
+        - participantId
+      properties:
+        participantId:
+          type: string
+          maxLength: 255
+          example: '0101011234'
+          description: >-
+            The citizen's CPR number in cleartext. It is hashed server-side 
+            and matched against the stored hash; the CPR
+            number is not persisted.
+        from-start-time:
+          description: from start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          type: string
+          format: date-time
+          example: '2023-03-31T11:25:44Z'
+        to-start-time:
+          description: to start time, date format is "yyyy-MM-dd'T'HH:mm:ssXXX". Time-secfrac is allowed in the input, but will be ignored.
+          type: string
+          format: date-time
+          example: '2023-03-31T11:25:44Z'
 
     meetingParticipation:
       type: object

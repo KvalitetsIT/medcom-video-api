@@ -71,6 +71,40 @@ public class AuditServiceImplTest {
     }
 
     @Test
+    public void testAuditServiceParticipant() {
+        var input = new dk.medcom.video.api.service.domain.audit.Participant();
+        input.setUuid(UUID.randomUUID().toString());
+        input.setMeetingUuid(UUID.randomUUID().toString());
+        input.setType("CITIZEN");
+        input.setRole("GUEST");
+        input.setOrganisation("org");
+        input.setPerformedBy("user@example.com");
+
+        auditService.auditParticipant(input, "action");
+
+        var auditArgumentCaptor = ArgumentCaptor.forClass(AuditEvent.class);
+        Mockito.verify(auditClient, times(1)).addAuditEntry(auditArgumentCaptor.capture());
+
+        AuditEvent<dk.medcom.video.api.service.domain.audit.Participant> auditEvent = auditArgumentCaptor.getValue();
+
+        assertNotNull(auditEvent.getAuditEventDateTime());
+        assertEquals(input.getUuid(), auditEvent.getIdentifier());
+        assertEquals("action", auditEvent.getOperation());
+        assertEquals("participant", auditEvent.getResource());
+        assertEquals("video-api", auditEvent.getSource());
+        assertEquals(input.getPerformedBy(), auditEvent.getUser());
+        assertEquals(input.getOrganisation(), auditEvent.getOrganisationCode());
+        assertEquals(input, auditEvent.getAuditData());
+    }
+
+    @Test
+    public void testAuditServiceParticipantNullInput() {
+        auditService.auditParticipant(null, "action");
+
+        Mockito.verify(auditClient, Mockito.never()).addAuditEntry(Mockito.any());
+    }
+
+    @Test
     public void testAuditServiceSchedulingInformation() {
         var input = createSchedulingInformation();
 

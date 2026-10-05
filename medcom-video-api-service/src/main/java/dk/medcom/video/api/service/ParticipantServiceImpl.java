@@ -1,5 +1,7 @@
 package dk.medcom.video.api.service;
 
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.MeetingUserRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
@@ -9,6 +11,8 @@ import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.hashing.CprHasher;
+import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
 import dk.medcom.video.api.service.model.CreateParticipantModel;
 import dk.medcom.video.api.service.model.ParticipantModel;
 import dk.medcom.video.api.service.model.UpdateParticipantModel;
@@ -27,13 +31,19 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final MeetingUserRepository meetingUserRepository;
     private final MeetingRepository meetingRepository;
     private final OrganisationService organisationService;
+    private final UserContextService userContextService;
+    private final AuditService auditService;
+    private final CprHasher cprHasher;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService) {
+    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, UserContextService userContextService, AuditService auditService, CprHasher cprHasher) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.meetingUserService = meetingUserService;
         this.meetingUserRepository = meetingUserRepository;
         this.organisationService = organisationService;
+        this.userContextService = userContextService;
+        this.auditService = auditService;
+        this.cprHasher = cprHasher;
     }
 
     @Override
@@ -41,7 +51,22 @@ public class ParticipantServiceImpl implements ParticipantService {
         logger.debug("Get participants for meeting {}.", meetingUuid);
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
-        return participantDao.findByMeeting(meeting).stream().map(this::toModel).toList();
+        var participants = participantDao.findByMeeting(meeting).stream().map(this::toModel).toList();
+        auditGetParticipants(meetingUuid, participants);
+
+        return participants.stream().map(this::redactIfCitizen).toList();
+    }
+
+    private void auditGetParticipants(UUID meetingUuid, List<ParticipantModel> participants) {
+        var userContext = userContextService.getUserContext();
+        var search = new ParticipantSearch();
+        search.setMeetingUuid(meetingUuid.toString());
+        search.setOrganisation(userContext.getUserOrganisation());
+        search.setPerformedBy(userContext.getUserEmail());
+        search.setResultCount(participants.size());
+        search.setResultIdentifiers(participants.stream().map(p -> String.valueOf(p.uuid())).toList());
+
+        auditService.auditParticipantSearch(search, "list");
     }
 
     @Transactional(rollbackFor = Throwable.class)
@@ -50,10 +75,21 @@ public class ParticipantServiceImpl implements ParticipantService {
         logger.debug("Create participants for meeting {}.", meetingUuid);
         var meeting = meetingRepository.findOneByUuid(meetingUuid.toString());
         validateUser(meeting);
+
+        var containsCitizen = createParticipantModel.stream().anyMatch(p -> p.type() == ParticipantType.CITIZEN);
+        if (containsCitizen && !userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
+            throw new PermissionDeniedExceptionV2();
+        }
+
         var currentUser = meetingUserService.getOrCreateCurrentMeetingUser();
 
         var participants = createParticipantModel.stream().map(p -> {
             String organisation = p.organisation();
+            var participantId = p.participantId();
+
+            if (p.type() == ParticipantType.CITIZEN) {
+                participantId = cprHasher.hash(p.participantId());
+            }
 
             if (p.type() == ParticipantType.ORGANISATION) {
                 var org = organisationService.getParticipantOrganisation(p.participantId());
@@ -70,18 +106,19 @@ public class ParticipantServiceImpl implements ParticipantService {
                     meeting.getId(),
                     UUID.fromString(meeting.getUuid()),
                     p.type(),
-                    p.participantId(),
+                    participantId,
                     organisation,
                     p.role(),
                     null,
                     currentUser.getId(),
                     null,
                     currentUser.getId());
-            return toModel(participantDao.save(participant));
+            return participantDao.save(participant);
         }).toList();
 
         updateMeeting(meeting);
-        return participants;
+        participants.forEach(p -> auditParticipant(meeting, p, "create"));
+        return participants.stream().map(this::toModel).toList();
     }
 
     @Override
@@ -96,6 +133,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         }
         participantDao.delete(participant);
         updateMeeting(meeting);
+        auditParticipant(meeting, participant, "delete");
     }
 
     @Override
@@ -124,6 +162,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         var saved = participantDao.save(updated);
 
         updateMeeting(meeting);
+        auditParticipant(meeting, saved, "update");
 
         return toModel(saved);
     }
@@ -156,5 +195,35 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new PermissionDeniedExceptionV2();
         }
         meetingRepository.save(meeting);
+    }
+
+    private void auditParticipant(Meeting meeting, Participant participant, String action) {
+        var auditParticipant = new dk.medcom.video.api.service.domain.audit.Participant();
+        auditParticipant.setUuid(participant.uuid() != null ? participant.uuid().toString() : null);
+        auditParticipant.setMeetingUuid(meeting.getUuid());
+        auditParticipant.setType(participant.type() != null ? participant.type().toString() : null);
+        auditParticipant.setParticipantId(participant.type() != ParticipantType.CITIZEN ? participant.participantId() : null);
+        auditParticipant.setRole(participant.role() != null ? participant.role().toString() : null);
+        auditParticipant.setOrganisation(meeting.getOrganisation().getOrganisationId());
+        auditParticipant.setPerformedBy(userContextService.getUserContext().getUserEmail());
+
+        auditService.auditParticipant(auditParticipant, action);
+    }
+
+    private ParticipantModel redactIfCitizen(ParticipantModel participant) {
+        if (participant.type() != ParticipantType.CITIZEN) {
+            return participant;
+        }
+        return new ParticipantModel(
+                null,
+                null,
+                participant.type(),
+                null,
+                null,
+                participant.role(),
+                null,
+                null,
+                null,
+                null);
     }
 }
