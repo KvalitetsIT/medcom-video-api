@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ParticipantMapper {
     public static List<CreateParticipantModel> externalToInternal(List<CreateParticipant> participants) {
-        return participants.stream().map(p -> new CreateParticipantModel(EnumMapper.externalToInternal(p.getType()), p.getParticipantId(), p.getOrganisationId(), EnumMapper.externalToInternal(p.getRole()))).toList();
+        return participants.stream().map(p -> new CreateParticipantModel(EnumMapper.externalToInternal(p.getType()), p.getParticipantId(), p.getFullName(), p.getOrganisationId(), EnumMapper.externalToInternal(p.getRole()))).toList();
     }
 
     public static List<Participant> internalToExternal(List<ParticipantModel> participants){
@@ -24,6 +24,7 @@ public class ParticipantMapper {
         var participant = new Participant();
         participant.setUuid(participantModel.uuid());
         participant.setParticipantId(participantModel.externalId());
+        participant.setFullName(participantModel.fullName());
         participant.setRole(EnumMapper.internalToExternal(participantModel.role()));
         participant.setOrganisationId(participantModel.organisation());
         participant.setType(EnumMapper.internalToExternal(participantModel.type()));
