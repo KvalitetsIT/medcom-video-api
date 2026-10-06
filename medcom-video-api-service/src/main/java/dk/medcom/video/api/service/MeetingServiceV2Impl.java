@@ -1,7 +1,6 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.context.UserContextService;
-import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -199,7 +198,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                             UUID.fromString(meeting.getUuid()),
                             p.type(),
                             p.participantId(),
-                            p.fullName(),
+                            p.name(),
                             p.organisation(),
                             p.role(),
                             null,
