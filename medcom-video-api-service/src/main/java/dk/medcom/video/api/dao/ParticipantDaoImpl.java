@@ -23,7 +23,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
             new DataClassRowMapper<>(Participant.class);
 
     private static final String SELECT =
-            "select p.id, p.uuid, p.meeting_id, p.type, p.participant_id, p.organisation as organisation_id, p.role, " +
+            "select p.id, p.uuid, p.meeting_id, p.type, p.participant_id, p.full_name, p.organisation as organisation_id, p.role, " +
                     "p.created_at, p.created_by, p.updated_at, p.updated_by, " +
                     "m.uuid as meeting_uuid " +
                     "from participant p join meetings m on m.id = p.meeting_id ";
@@ -35,8 +35,8 @@ public class ParticipantDaoImpl implements ParticipantDao {
 
     private Participant insert(Participant participant) {
         var uuid = participant.uuid() != null ? participant.uuid() : UUID.randomUUID();
-        var sql = "insert into participant(uuid, meeting_id, type, participant_id, organisation, role, created_by, updated_by) " +
-                "values(:uuid, :meeting_id, :type, :participant_id, :organisation, :role, :created_by, :updated_by)";
+        var sql = "insert into participant(uuid, meeting_id, type, participant_id, full_name, organisation, role, created_by, updated_by) " +
+                "values(:uuid, :meeting_id, :type, :participant_id, :full_name, :organisation, :role, :created_by, :updated_by)";
         var keyHolder = new GeneratedKeyHolder();
         template.update(sql, params(participant).addValue("uuid", uuid), keyHolder, new String[]{"id"});
         long newId = keyHolder.getKey().longValue();
@@ -46,7 +46,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
 
     private Participant update(Participant participant) {
         var sql = "update participant set meeting_id = :meeting_id, type = :type, " +
-                "participant_id = :participant_id, organisation = :organisation, role = :role, " +
+                "participant_id = :participant_id, full_name = :full_name, organisation = :organisation, role = :role, " +
                 "updated_by = :updated_by " +
                 "where id = :id";
         template.update(sql, params(participant).addValue("id", participant.id()));
@@ -59,6 +59,7 @@ public class ParticipantDaoImpl implements ParticipantDao {
                 .addValue("meeting_id", p.meetingId())
                 .addValue("type", p.type() != null ? p.type().name() : null)
                 .addValue("participant_id", p.participantId())
+                .addValue("full_name", p.fullName())
                 .addValue("organisation", p.organisationId())
                 .addValue("role", p.role() != null ? p.role().name() : null)
                 .addValue("created_by", p.createdBy())

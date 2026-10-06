@@ -217,7 +217,7 @@ public class HelperMethods {
     }
 
     private static CreateParticipantModel randomCreateParticipantModel() {
-        return new CreateParticipantModel(randomEnum(ParticipantType.class), randomString(), randomString(), randomEnum(ParticipantRole.class));
+        return new CreateParticipantModel(randomEnum(ParticipantType.class), randomString(), randomString(), randomString(), randomEnum(ParticipantRole.class));
     }
 
     private static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
@@ -604,11 +604,11 @@ public class HelperMethods {
 
 
     public static Participant randomParticipant(Long meetingId) {
-        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), randomEnum(ParticipantRole.class), null, count++, null, count++);
+        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), randomString(), randomEnum(ParticipantRole.class), null, count++, null, count++);
     }
 
     public static Participant randomParticipant(Long meetingId, ParticipantRole role) {
-        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), role, randomLocalDateTime(), count++, randomLocalDateTime(), count++);
+        return new Participant(count++, UUID.randomUUID(), meetingId, UUID.randomUUID(), randomEnum(ParticipantType.class), randomString(), randomString(), randomString(), role, randomLocalDateTime(), count++, randomLocalDateTime(), count++);
     }
 
     public static LocalDateTime randomLocalDateTime() {

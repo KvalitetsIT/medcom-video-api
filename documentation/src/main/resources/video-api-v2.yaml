@@ -566,7 +566,7 @@ paths:
         * meeting-planner <br>
         * meeting-provisioner-user <br> <br>
         Participants of type CITIZEN are returned only with
-        type and role. All other fields (uuid, participantId, organisationId, createdTime,
+        type and role. All other fields (uuid, participantId, fullName, organisationId, createdTime,
         createdBy, updatedTime and updatedBy) are returned as null.
       parameters:
         - $ref: '#/components/parameters/uuid'
@@ -2577,6 +2577,7 @@ components:
       required:
         - type
         - participantId
+        - fullName
         - role
       properties:
         type:
@@ -2589,6 +2590,11 @@ components:
             External id of the participant, e.g. an email address. When type is ORGANISATION,
             this must instead match an existing organisationId; if no matching organisation
             exists the request is rejected with 404 (detailed_error_code 11).
+        fullName:
+          type: string
+          maxLength: 255
+          example: Jens Hansen
+          description: The full name of the participant
         organisationId:
           type: string
           maxLength: 255
@@ -2641,6 +2647,11 @@ components:
           type: string
           maxLength: 255
           description: External id of the participant, e.g. an email address
+        fullName:
+          type: string
+          maxLength: 255
+          example: Jens Hansen
+          description: The full name of the participant.
         organisationId:
           type: string
           maxLength: 255
