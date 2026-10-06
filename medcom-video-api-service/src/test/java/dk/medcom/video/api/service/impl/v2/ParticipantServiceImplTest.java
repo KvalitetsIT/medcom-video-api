@@ -104,7 +104,7 @@ public class ParticipantServiceImplTest {
         Mockito.when(organisationService.userIsPermittedForOrganisation(Mockito.any())).thenReturn(true);
         var participantUuid = UUID.randomUUID();
         var participants = List.of(
-                new Participant(1L, participantUuid, null, null, ParticipantType.USER, "ext-id", "Full Name", "org", ParticipantRole.GUEST, null, null, null, null));
+                new Participant(1L, participantUuid, null, null, ParticipantType.USER, "ext-id", "Name", "org", ParticipantRole.GUEST, null, null, null, null));
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
 
@@ -126,8 +126,8 @@ public class ParticipantServiceImplTest {
         var meeting = createMeeting(uuid, new Organisation());
         setupValidUserContext();
         var participants = List.of(
-                new Participant(1L, UUID.randomUUID(), null, null, ParticipantType.CITIZEN, "hashed-cpr", "Full Name", "org", ParticipantRole.GUEST, LocalDateTime.now(), 10L, LocalDateTime.now(), 10L),
-                new Participant(2L, UUID.randomUUID(), null, null, ParticipantType.USER, "ext-id", "Full Name", "org", ParticipantRole.HOST, null, null, null, null));
+                new Participant(1L, UUID.randomUUID(), null, null, ParticipantType.CITIZEN, "hashed-cpr", "Name", "org", ParticipantRole.GUEST, LocalDateTime.now(), 10L, LocalDateTime.now(), 10L),
+                new Participant(2L, UUID.randomUUID(), null, null, ParticipantType.USER, "ext-id", "Name", "org", ParticipantRole.HOST, null, null, null, null));
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
 
@@ -195,7 +195,7 @@ public class ParticipantServiceImplTest {
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Full Name", "org", ParticipantRole.GUEST)
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Name", "org", ParticipantRole.GUEST)
         );
         var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null, null);
         setupValidUserContext();
@@ -252,7 +252,7 @@ public class ParticipantServiceImplTest {
         var meeting = createMeeting(uuid, organisation);
         setupValidUserContext();
         var updateParticipant = new UpdateParticipantModel(ParticipantRole.GUEST);
-        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), ParticipantType.USER, "ext-id", "Full Name", null, null, null, null, null, null);
+        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), ParticipantType.USER, "ext-id", "Name", null, null, null, null, null, null);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
         Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(savedParticipant));
         Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -369,7 +369,7 @@ public class ParticipantServiceImplTest {
         var participantOrganisation = new Organisation();
         participantOrganisation.setOrganisationId("resolved-org-id");
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.ORGANISATION, "test-org", "Full Name", "ignored-input-org", ParticipantRole.HOST)
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "test-org", "Name", "ignored-input-org", ParticipantRole.HOST)
         );
         var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null, null);
         setupValidUserContext();
@@ -388,7 +388,7 @@ public class ParticipantServiceImplTest {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.ORGANISATION, "unknown-org", "Full Name", "ignored-input-org", ParticipantRole.HOST)
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "unknown-org", "Name", "ignored-input-org", ParticipantRole.HOST)
         );
         setupValidUserContext();
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
@@ -405,7 +405,7 @@ public class ParticipantServiceImplTest {
         var organisation = new Organisation();
         var meeting = createMeeting(uuid, organisation);
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Full Name", null, ParticipantRole.GUEST)
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Name", null, ParticipantRole.GUEST)
         );
         var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null, null);
         setupValidUserContext(true);
@@ -427,7 +427,7 @@ public class ParticipantServiceImplTest {
         organisation.setOrganisationId("meeting-org");
         var meeting = createMeeting(uuid, organisation);
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Full Name", null, ParticipantRole.GUEST)
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Name", null, ParticipantRole.GUEST)
         );
         setupValidUserContext(true);
         Mockito.when(userContextService.getUserContext().getUserEmail()).thenReturn("user@example.com");
@@ -454,8 +454,8 @@ public class ParticipantServiceImplTest {
         var uuid = UUID.randomUUID();
         var meeting = createMeeting(uuid, new Organisation());
         var createParticipants = List.of(
-                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Full Name", null, ParticipantRole.GUEST),
-                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Full Name", null, ParticipantRole.GUEST)
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Name", null, ParticipantRole.GUEST),
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Name", null, ParticipantRole.GUEST)
         );
         setupValidUserContext(false);
         Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
