@@ -10,6 +10,7 @@ import dk.medcom.video.api.dao.SchedulingTemplateRepository;
 import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Organisation;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.dao.entity.VmrQuality;
 import dk.medcom.video.api.organisation.OrganisationTreeServiceClient;
 import dk.medcom.video.api.organisation.model.OrganisationTree;
 import dk.medcom.video.api.service.MeetingUserServiceImpl;
@@ -55,6 +56,7 @@ public class SchedulingTemplateServiceTest {
 		createSchedulingTemplateDto.setIsPoolTemplate(true);
 		createSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
 		createSchedulingTemplateDto.setBreakoutRooms(true);
+		createSchedulingTemplateDto.setVmrQuality(VmrQuality.fullhd);
 
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
@@ -74,6 +76,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(createSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertEquals(createSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
 		assertTrue(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
+		assertEquals(VmrQuality.fullhd, schedulingTemplateArgumentCaptor.getValue().getVmrQuality());
 	}
 
 	@Test
@@ -94,6 +97,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertFalse(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
+		assertNull(schedulingTemplateArgumentCaptor.getValue().getVmrQuality());
 	}
 
 	@Test
@@ -107,6 +111,7 @@ public class SchedulingTemplateServiceTest {
 		updateSchedulingTemplateDto.setIsPoolTemplate(true);
 		updateSchedulingTemplateDto.setDirectMedia(DirectMedia.best_effort);
 		updateSchedulingTemplateDto.setBreakoutRooms(true);
+		updateSchedulingTemplateDto.setVmrQuality(VmrQuality.fullhd);
 
 		// When
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(1L, updateSchedulingTemplateDto);
@@ -125,6 +130,7 @@ public class SchedulingTemplateServiceTest {
 		assertEquals(updateSchedulingTemplateDto.getDirectMedia(), schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertEquals(updateSchedulingTemplateDto.getCallType(), schedulingTemplateArgumentCaptor.getValue().getCallType());
 		assertTrue(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
+		assertEquals(VmrQuality.fullhd, schedulingTemplateArgumentCaptor.getValue().getVmrQuality());
 	}
 
 	@Test
@@ -143,6 +149,7 @@ public class SchedulingTemplateServiceTest {
 		assertNotNull(schedulingTemplateArgumentCaptor.getValue());
 		assertEquals(DirectMedia.never, schedulingTemplateArgumentCaptor.getValue().getDirectMedia());
 		assertFalse(schedulingTemplateArgumentCaptor.getValue().getBreakoutRooms());
+		assertNull(schedulingTemplateArgumentCaptor.getValue().getVmrQuality());
 	}
 
 	@Test
