@@ -460,7 +460,7 @@ class SchedulingTemplateAdministrationIT extends AbstractIntegrationTest {
         assertEquals(VmrType.CONFERENCE, schedulingTemplateResult.getVmrType());
         assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, schedulingTemplateResult.getHostView());
         assertEquals(ViewType.ONE_MAIN_SEVEN_PIPS, schedulingTemplateResult.getGuestView());
-        assertEquals(VmrQuality.HD, schedulingTemplateResult.getVmrQuality());
+        assertNull(schedulingTemplateResult.getVmrQuality());
         assertEquals(Boolean.TRUE, schedulingTemplateResult.getEnableOverlayText());
         assertEquals(Boolean.TRUE, schedulingTemplateResult.getGuestsCanPresent());
         assertEquals(Boolean.TRUE, schedulingTemplateResult.getForcePresenterIntoMain());

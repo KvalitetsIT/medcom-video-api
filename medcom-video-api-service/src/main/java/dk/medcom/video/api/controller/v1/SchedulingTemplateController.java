@@ -27,6 +27,7 @@ import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.controller.exceptions.RessourceNotFoundException;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.dao.entity.VmrQuality;
 import dk.medcom.video.api.api.CreateSchedulingTemplateDto;
 import dk.medcom.video.api.api.SchedulingTemplateDto;
 import dk.medcom.video.api.api.UpdateSchedulingTemplateDto;
@@ -76,6 +77,9 @@ public class SchedulingTemplateController {
 	@RequestMapping(value = "/scheduling-templates", method = RequestMethod.POST)
 	public EntityModel <SchedulingTemplateDto> createSchedulingTemplate(@Valid @RequestBody CreateSchedulingTemplateDto createSchedulingTemplateDto) throws PermissionDeniedException, NotAcceptableException {
 		LOGGER.debug("Entry of /scheduling-template.post");
+		if (createSchedulingTemplateDto.getVmrQuality() == null) {
+			createSchedulingTemplateDto.setVmrQuality(VmrQuality.hd);
+		}
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.createSchedulingTemplate(createSchedulingTemplateDto, true);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
@@ -90,6 +94,9 @@ public class SchedulingTemplateController {
 	public EntityModel <SchedulingTemplateDto> updateSchedulingTemplate(@PathVariable("id") Long id, @Valid @RequestBody UpdateSchedulingTemplateDto updateSchedulingTemplateDto ) throws PermissionDeniedException, RessourceNotFoundException, NotAcceptableException {
 	
 		LOGGER.debug("Entry of /scheduling-template.put id: " + id);
+		if (updateSchedulingTemplateDto.getVmrQuality() == null) {
+			updateSchedulingTemplateDto.setVmrQuality(VmrQuality.hd);
+		}
 		
 		SchedulingTemplate schedulingTemplate = schedulingTemplateService.updateSchedulingTemplate(id, updateSchedulingTemplateDto);
 		SchedulingTemplateDto schedulingTemplateDto = new SchedulingTemplateDto(schedulingTemplate);
