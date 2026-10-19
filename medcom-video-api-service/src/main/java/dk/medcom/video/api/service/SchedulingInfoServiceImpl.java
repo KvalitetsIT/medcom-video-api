@@ -136,6 +136,23 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		return schedulingInfo;
 	}
 
+	private SchedulingTemplate getSchedulingTemplateInUserOrganisation(Long schedulingTemplateId) throws NotValidDataException {
+		var userOrganisation = userContextService.getUserContext().getUserOrganisation();
+		var schedulingTemplate = schedulingTemplateRepository.findById(schedulingTemplateId).orElse(null);
+
+		if (schedulingTemplate == null || schedulingTemplate.getDeletedTime() != null) {
+			LOGGER.debug("Scheduling template {} not found.", schedulingTemplateId);
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND, schedulingTemplateId.toString());
+		}
+
+		if (schedulingTemplate.getOrganisation() == null || !schedulingTemplate.getOrganisation().getOrganisationId().equals(userOrganisation)) {
+			LOGGER.debug("Scheduling template {} does not belong to organisation {}.", schedulingTemplateId, userOrganisation);
+			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION, schedulingTemplateId.toString(), userOrganisation);
+		}
+
+		return schedulingTemplate;
+	}
+
 	private void validateOrganisationAccess(Organisation organisation) throws PermissionDeniedException {
 		UserContext userContext = userContextService.getUserContext();
 		if (userContext.hasAnyNumberOfRoles(List.of(UserRole.PROVISIONER, UserRole.PROVISIONER_USER))) return;
@@ -156,19 +173,14 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		SchedulingTemplate schedulingTemplate = null;
 		SchedulingInfo schedulingInfo = new SchedulingInfo();
 
-		//if template is input and is related to the users organisation use that. Otherwise find default.
+		//if template is input it must exist and be related to the users organisation. Otherwise find default.
 		if (createMeetingDto.getSchedulingTemplateId() != null && createMeetingDto.getSchedulingTemplateId() > 0 ) {
 			LOGGER.debug("Searching for schedulingTemplate using id: " + createMeetingDto.getSchedulingTemplateId());
-			try {
-				var performanceLogger = new PerformanceLogger("create scheduling info get scheduling template for org");
-				schedulingTemplate = schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(createMeetingDto.getSchedulingTemplateId());
-				performanceLogger.logTimeSinceCreation();
-			} catch (RessourceNotFoundException e) {
-				LOGGER.debug("The template was not found using Organization and id");
-				//Do nothing. More logic below
-			}
+			var performanceLogger = new PerformanceLogger("create scheduling info get scheduling template for org");
+			schedulingTemplate = getSchedulingTemplateInUserOrganisation(createMeetingDto.getSchedulingTemplateId());
+			performanceLogger.logTimeSinceCreation();
 		}
-		if (schedulingTemplate == null) {
+		else {
 			LOGGER.debug("Searching for schedulingTemplate");
 			var performanceLogger = new PerformanceLogger("get scheduling template in org tree");
 			schedulingTemplate = schedulingTemplateService.getSchedulingTemplateInOrganisationTree();

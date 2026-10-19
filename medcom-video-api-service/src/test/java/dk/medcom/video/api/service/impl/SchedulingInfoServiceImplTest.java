@@ -72,6 +72,7 @@ public class SchedulingInfoServiceImplTest {
         reservationId = UUID.randomUUID();
 
         schedulingTemplateIdOne = createSchedulingTemplate(SCHEDULING_TEMPLATE_ID);
+        schedulingTemplateIdOne.setOrganisation(createOrganisation());
 
         schedulingInfoUuid = UUID.randomUUID();
         SchedulingInfo schedulingInfo = createSchedulingInfo();
@@ -92,7 +93,6 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(organizationRepository.findByOrganisationId(OVERFLOW_POOL)).thenReturn(createOverflowPool());
 
         schedulingTemplateService = Mockito.mock(SchedulingTemplateServiceImpl.class);
-        Mockito.when(schedulingTemplateService.getSchedulingTemplateFromOrganisationAndId(SCHEDULING_TEMPLATE_ID)).thenReturn(schedulingTemplateIdOne);
 
         schedulingTemplateRepository = Mockito.mock(SchedulingTemplateRepository.class);
         Mockito.when(schedulingTemplateRepository.findById(SCHEDULING_TEMPLATE_ID)).thenReturn(Optional.of(schedulingTemplateIdOne));
@@ -105,6 +105,7 @@ public class SchedulingInfoServiceImplTest {
         Mockito.when(organisationStrategy.findOrganisationByCode(POOL_ORG)).thenReturn(createStrategyOrganisation());
 
         userContextService = Mockito.mock(UserContextService.class);
+        Mockito.when(userContextService.getUserContext()).thenReturn(new UserContextImpl(POOL_ORG, "test@test.dk", List.of(UserRole.USER), null));
 
         schedulingInfoEventPublisher = Mockito.mock(SchedulingInfoEventPublisher.class);
 
@@ -640,6 +641,38 @@ public class SchedulingInfoServiceImplTest {
         Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
         Mockito.verify(schedulingInfoRepository, times(0)).findOneByUriWithoutDomainAndUriDomain(createMeetingDto.getUriWithoutDomain(), null);
         Mockito.verify(customUriValidator, times(1)).validate(createMeetingDto.getUriWithoutDomain());
+    }
+
+    @Test
+    public void testCanNotCreateSchedulingInfoMeetingOnNonExistingSchedulingTemplate() {
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+        meeting.setOrganisation(createOrganisation());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setSchedulingTemplateId(10L);
+
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
+
+        var exception = assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto));
+        assertEquals(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND.getErrorCode(), exception.getErrorCode());
+        Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
+    }
+
+    @Test
+    public void testCanNotCreateSchedulingInfoMeetingOnSchedulingTemplateForOtherOrg() {
+        Meeting meeting = new Meeting();
+        meeting.setStartTime(new Date());
+        meeting.setOrganisation(createOrganisation());
+
+        CreateMeetingDto createMeetingDto = new CreateMeetingDto();
+        createMeetingDto.setSchedulingTemplateId(SCHEDULING_TEMPLATE_ID_OTHER_ORG);
+
+        SchedulingInfoServiceImpl schedulingInfoService = createSchedulingInfoService();
+
+        var exception = assertThrows(NotValidDataException.class, () -> schedulingInfoService.createSchedulingInfo(meeting, createMeetingDto));
+        assertEquals(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION.getErrorCode(), exception.getErrorCode());
+        Mockito.verify(schedulingInfoRepository, times(0)).save(Mockito.any());
     }
 
     @Test
