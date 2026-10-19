@@ -984,12 +984,10 @@ paths:
           example: 'one_main_zero_pips'
         - name: vmrQuality
           in: query
-          description: Controls the maximum call quality for participants connecting to this service
+          description: Controls the maximum call quality for participants connecting to this service. If not given, scheduling information with any call quality can be reserved.
           required: false
           schema:
-            allOf:
-              - $ref: '#/components/schemas/vmrQuality'
-            default: hd
+            $ref: '#/components/schemas/vmrQuality'
           example: 'fullhd'
         - name: enableOverlayText
           in: query
@@ -1837,7 +1835,7 @@ components:
         - twentyfive_mains_zero_pips
     vmrQuality:
       example: hd
-      description: Corresponds to numeric status 0, 1 and 2.
+      description: Corresponds to numeric status 0, 1 and 2. If not set (null), the global call quality setting in Pexip is used.
       type: string
       enum:
         - sd

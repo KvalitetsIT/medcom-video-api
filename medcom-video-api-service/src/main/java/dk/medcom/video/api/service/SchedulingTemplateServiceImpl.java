@@ -197,7 +197,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setVmrType(createSchedulingTemplateDto.getVmrType() != null ? createSchedulingTemplateDto.getVmrType() : VmrType.conference);
 		schedulingTemplate.setHostView(createSchedulingTemplateDto.getHostView() != null ? createSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
 		schedulingTemplate.setGuestView(createSchedulingTemplateDto.getGuestView() != null ? createSchedulingTemplateDto.getGuestView() : ViewType.one_main_seven_pips);
-		schedulingTemplate.setVmrQuality(createSchedulingTemplateDto.getVmrQuality() != null ? createSchedulingTemplateDto.getVmrQuality() : VmrQuality.hd);
+		schedulingTemplate.setVmrQuality(createSchedulingTemplateDto.getVmrQuality());
 		schedulingTemplate.setEnableOverlayText(createSchedulingTemplateDto.getEnableOverlayText() != null ? createSchedulingTemplateDto.getEnableOverlayText() : true);
 		schedulingTemplate.setGuestsCanPresent(createSchedulingTemplateDto.getGuestsCanPresent() != null ? createSchedulingTemplateDto.getGuestsCanPresent() : true);
 		schedulingTemplate.setForcePresenterIntoMain(createSchedulingTemplateDto.getForcePresenterIntoMain() != null ? createSchedulingTemplateDto.getForcePresenterIntoMain() : true);
@@ -264,7 +264,7 @@ public class SchedulingTemplateServiceImpl implements SchedulingTemplateService 
 		schedulingTemplate.setVmrType(updateSchedulingTemplateDto.getVmrType() != null ? updateSchedulingTemplateDto.getVmrType() : VmrType.conference);
 		schedulingTemplate.setHostView(updateSchedulingTemplateDto.getHostView() != null ? updateSchedulingTemplateDto.getHostView() : ViewType.one_main_seven_pips);
 		schedulingTemplate.setGuestView(updateSchedulingTemplateDto.getGuestView() != null ? updateSchedulingTemplateDto.getGuestView() : ViewType.one_main_seven_pips);
-		schedulingTemplate.setVmrQuality(updateSchedulingTemplateDto.getVmrQuality() != null ? updateSchedulingTemplateDto.getVmrQuality() : VmrQuality.hd);
+		schedulingTemplate.setVmrQuality(updateSchedulingTemplateDto.getVmrQuality());
 		schedulingTemplate.setEnableOverlayText(updateSchedulingTemplateDto.getEnableOverlayText() != null ? updateSchedulingTemplateDto.getEnableOverlayText() : true);
 		schedulingTemplate.setGuestsCanPresent(updateSchedulingTemplateDto.getGuestsCanPresent() != null ? updateSchedulingTemplateDto.getGuestsCanPresent() : true);
 		schedulingTemplate.setForcePresenterIntoMain(updateSchedulingTemplateDto.getForcePresenterIntoMain() != null ? updateSchedulingTemplateDto.getForcePresenterIntoMain() : true);
