@@ -506,6 +506,30 @@ public class MeetingIT extends IntegrationWithOrganisationServiceTest {
         assertThat(putResultJson.getString("updatedTime")).matches("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2} \\+0000$");
     }
 
+    @Test
+    void testCreateMeetingWithNullMaxParticipantsUsesTemplateValue() throws JSONException, ApiException {
+        var input = """
+                {
+                  "subject": "Test null maxParticipants.",
+                  "startTime": "2225-11-02T15:00:00+02:00",
+                  "endTime": "2225-11-02T16:00:00+02:00",
+                  "maxParticipants": null
+                }""";
+
+        String result;
+        try(var client = ClientBuilder.newClient()) {
+            result = client.target(UriBuilder.fromPath(String.format("http://%s:%s/api", videoApi.getHost(), videoApiPort)))
+                    .path("meetings")
+                    .request()
+                    .post(Entity.json(input), String.class);
+        }
+        var resultJson = new JSONObject(result);
+
+        var schedulingInfo = schedulingInfoApi.schedulingInfoUuidGet(UUID.fromString(resultJson.getString("uuid")));
+
+        assertEquals(10, schedulingInfo.getMaxParticipants());
+    }
+
 	private Date createDate(Calendar calendar, int hoursToAdd) {
 		Calendar cal = (Calendar) calendar.clone();
 		cal.add(Calendar.HOUR, hoursToAdd);
