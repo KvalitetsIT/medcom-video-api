@@ -1384,7 +1384,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
                 .organizedByEmail(randomString())
                 .maxParticipants((int) count++)
                 .endMeetingOnEndTime(randomBoolean())
-                .schedulingTemplateId(count++)
+                .schedulingTemplateId(201L)
                 .meetingType(MeetingType.NORMAL)
                 .uuid(UUID.randomUUID())
                 .externalId(randomString())
