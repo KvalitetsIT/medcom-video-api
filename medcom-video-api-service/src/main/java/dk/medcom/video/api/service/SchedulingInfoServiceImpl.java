@@ -141,16 +141,27 @@ public class SchedulingInfoServiceImpl implements SchedulingInfoService {
 		var schedulingTemplate = schedulingTemplateRepository.findById(schedulingTemplateId).orElse(null);
 
 		if (schedulingTemplate == null || schedulingTemplate.getDeletedTime() != null) {
-			LOGGER.debug("Scheduling template {} not found.", schedulingTemplateId);
+			LOGGER.warn("Scheduling template {} not found.", schedulingTemplateId);
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_FOUND, schedulingTemplateId.toString());
 		}
 
-		if (schedulingTemplate.getOrganisation() == null || !schedulingTemplate.getOrganisation().getOrganisationId().equals(userOrganisation)) {
-			LOGGER.debug("Scheduling template {} does not belong to organisation {}.", schedulingTemplateId, userOrganisation);
+		if (schedulingTemplate.getOrganisation() == null || !isUserOrganisationOrDescendant(schedulingTemplate.getOrganisation().getOrganisationId(), userOrganisation)) {
+			LOGGER.warn("Scheduling template {} does not belong to organisation {}.", schedulingTemplateId, userOrganisation);
 			throw new NotValidDataException(NotValidDataErrors.SCHEDULING_TEMPLATE_NOT_IN_ORGANISATION, schedulingTemplateId.toString(), userOrganisation);
 		}
 
 		return schedulingTemplate;
+	}
+
+	private boolean isUserOrganisationOrDescendant(String organisationId, String userOrganisation) {
+		if (organisationId.equals(userOrganisation)) {
+			return true;
+		}
+
+		return organisationServiceClientV2.getDescendantsOfOrganisation(userOrganisation)
+				.stream()
+				.map(OrganisationSimple::code)
+				.anyMatch(organisationId::equals);
 	}
 
 	private void validateOrganisationAccess(Organisation organisation) throws PermissionDeniedException {
