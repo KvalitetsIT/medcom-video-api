@@ -102,6 +102,7 @@ services:
       - short.link.base.url=""
 
       - cpr.hash.secret-key=pSd1CT+dcWoBj1iYCPOFCFD7YJ9uGybwBbAA0DNBmXc=
+      - citizen.name.encryption-key=Kx1djnB9t+Q7jvSQrQRAEdu1RHv/41n7S5gE0Dp/4fs=
 
       - overflow.pool.organisation.id=0
 

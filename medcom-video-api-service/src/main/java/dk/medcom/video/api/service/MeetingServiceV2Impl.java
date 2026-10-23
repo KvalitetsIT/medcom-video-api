@@ -1,6 +1,7 @@
 package dk.medcom.video.api.service;
 
 import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
 import dk.medcom.video.api.controller.exceptions.NotAcceptableException;
 import dk.medcom.video.api.controller.exceptions.NotValidDataException;
 import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
@@ -16,6 +17,7 @@ import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.service.filter.MeetingParticipationFilter;
 import dk.medcom.video.api.service.exception.*;
 import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
+import dk.medcom.video.api.service.encryption.NameEncryptor;
 import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.mapper.v2.MeetingMapper;
 import dk.medcom.video.api.service.model.*;
@@ -37,6 +39,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     private final UserContextService userContextService;
     private final AuditService auditService;
     private final CprHasher cprHasher;
+    private final NameEncryptor nameEncryptor;
 
     public MeetingServiceV2Impl(MeetingService meetingService,
                                 String shortLinkBaseUrl,
@@ -45,7 +48,8 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
                                 SchedulingInfoRepository schedulingInfoRepository,
                                 UserContextService userContextService,
                                 AuditService auditService,
-                                CprHasher cprHasher) {
+                                CprHasher cprHasher,
+                                NameEncryptor nameEncryptor) {
         this.meetingService = meetingService;
         this.shortLinkBaseUrl = shortLinkBaseUrl;
         this.participantDao = participantDao;
@@ -54,6 +58,7 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
         this.userContextService = userContextService;
         this.auditService = auditService;
         this.cprHasher = cprHasher;
+        this.nameEncryptor = nameEncryptor;
     }
 
     private MeetingModel toModel(dk.medcom.video.api.dao.entity.Meeting meeting) {
@@ -187,18 +192,32 @@ public class MeetingServiceV2Impl implements MeetingServiceV2 {
     @Override
     public MeetingModel createMeetingV2(CreateMeetingModel createMeeting) {
         logger.debug("Create meeting, v2.");
+        var containsCitizen = createMeeting.participants() != null
+                && createMeeting.participants().stream().anyMatch(p -> p.type() == ParticipantType.CITIZEN);
+        if (containsCitizen && !userContextService.getUserContext().hasRole(UserRole.CITIZEN_LOOKUP)) {
+            throw new PermissionDeniedExceptionV2();
+        }
+
         try {
             var meeting = meetingService.createMeeting(MeetingMapper.modelToDto(createMeeting));
             if (createMeeting.participants() != null) {
                 createMeeting.participants().forEach(p -> {
+                    var participantId = p.participantId();
+                    var name = p.name();
+
+                    if (p.type() == ParticipantType.CITIZEN) {
+                        participantId = cprHasher.hash(p.participantId());
+                        name = nameEncryptor.encrypt(p.name());
+                    }
+
                     var participant = new Participant(
                             null,
                             UUID.randomUUID(),
                             meeting.getId(),
                             UUID.fromString(meeting.getUuid()),
                             p.type(),
-                            p.participantId(),
-                            p.name(),
+                            participantId,
+                            name,
                             p.organisation(),
                             p.role(),
                             null,
