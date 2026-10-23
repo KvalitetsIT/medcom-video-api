@@ -15,6 +15,7 @@ import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.encryption.NameEncryptor;
 import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.CreateParticipantModel;
 import dk.medcom.video.api.service.model.UpdateParticipantModel;
@@ -38,6 +39,7 @@ public class ParticipantServiceImplTest {
     private OrganisationService organisationService;
     private ParticipantService participantService;
     private CprHasher cprHasher;
+    private NameEncryptor nameEncryptor;
     private AuditService auditService;
 
 
@@ -50,8 +52,9 @@ public class ParticipantServiceImplTest {
         userContextService = Mockito.mock(UserContextService.class);
         organisationService = Mockito.mock(OrganisationService.class);
         cprHasher = Mockito.mock(CprHasher.class);
+        nameEncryptor = Mockito.mock(NameEncryptor.class);
         auditService = Mockito.mock(AuditService.class);
-        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher);
+        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher, nameEncryptor);
     }
 
     private void setupValidUserContext() {
@@ -466,5 +469,43 @@ public class ParticipantServiceImplTest {
         Mockito.verify(participantDao, Mockito.never()).save(Mockito.any());
         Mockito.verify(meetingRepository, Mockito.never()).save(Mockito.any());
         Mockito.verify(auditService, Mockito.never()).auditParticipant(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    public void testCreateParticipantsCitizenNameIsEncrypted() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Jens Hansen", null, ParticipantRole.GUEST)
+        );
+        setupValidUserContext(true);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(cprHasher.hash("0101011234")).thenReturn("hashed-cpr");
+        Mockito.when(nameEncryptor.encrypt("Jens Hansen")).thenReturn("encrypted-name");
+        Mockito.when(nameEncryptor.decrypt("encrypted-name")).thenReturn("Jens Hansen");
+        Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "encrypted-name".equals(p.name())));
+        assertEquals("Jens Hansen", result.getFirst().name());
+    }
+
+    @Test
+    public void testCreateParticipantsNonCitizenNameIsNotEncrypted() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Jens Hansen", null, ParticipantRole.GUEST)
+        );
+        setupValidUserContext(false);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "Jens Hansen".equals(p.name())));
+        assertEquals("Jens Hansen", result.getFirst().name());
+        Mockito.verifyNoInteractions(nameEncryptor);
     }
 }

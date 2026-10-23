@@ -8,11 +8,13 @@ import dk.medcom.video.api.dao.MeetingRepository;
 import dk.medcom.video.api.dao.ParticipantDao;
 import dk.medcom.video.api.dao.SchedulingInfoRepository;
 import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.exception.NotAcceptableExceptionV2;
 import dk.medcom.video.api.service.exception.NotValidDataExceptionV2;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.encryption.NameEncryptor;
 import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +39,7 @@ public class MeetingServiceV2ImplTest {
     private ParticipantDao participantDao;
     private final String shortLinkBaseUrl = "base.url";
     private CprHasher cprHasher;
+    private NameEncryptor nameEncryptor;
     private UserContextService userContextService;
     private AuditService auditService;
 
@@ -47,13 +50,16 @@ public class MeetingServiceV2ImplTest {
         meetingRepository = Mockito.mock(MeetingRepository.class);
         schedulingInfoRepository = Mockito.mock(SchedulingInfoRepository.class);
         cprHasher = Mockito.mock(CprHasher.class);
+        nameEncryptor = Mockito.mock(NameEncryptor.class);
+        Mockito.when(cprHasher.hash(Mockito.anyString())).thenAnswer(i -> "hashed-" + i.getArgument(0));
+        Mockito.when(nameEncryptor.encrypt(Mockito.anyString())).thenAnswer(i -> "encrypted-" + i.getArgument(0));
         userContextService = Mockito.mock(UserContextService.class);
         auditService = Mockito.mock(AuditService.class);
         var userContext = Mockito.mock(UserContext.class);
         Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(true);
         Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
         Mockito.when(participantDao.findByMeeting(Mockito.any())).thenReturn(List.of());
-        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher);
+        meetingServiceV2 = new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher, nameEncryptor);
     }
 
     private void verifyNoMoreInteractions() {
@@ -482,13 +488,51 @@ public class MeetingServiceV2ImplTest {
                         actual.meetingId().equals(meeting.getId())
                                 && actual.meetingUuid().equals(UUID.fromString(meeting.getUuid()))
                                 && actual.type() == expectedParticipant.type()
-                                && actual.participantId().equals(expectedParticipant.participantId())
+                                && actual.participantId().equals(expectedParticipant.type() == ParticipantType.CITIZEN ? "hashed-" + expectedParticipant.participantId() : expectedParticipant.participantId())
+                                && actual.name().equals(expectedParticipant.type() == ParticipantType.CITIZEN ? "encrypted-" + expectedParticipant.name() : expectedParticipant.name())
                                 && java.util.Objects.equals(actual.organisationId(), expectedParticipant.organisation())
                                 && actual.role() == expectedParticipant.role()));
             }
         }
 
         verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void testCreateMeetingV2CitizenParticipantIsHashedAndEncrypted() throws NotValidDataException, NotAcceptableException, PermissionDeniedException {
+        var input = createMeetingModelWithParticipants(List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Jens Hansen", null, ParticipantRole.GUEST),
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "Hans Jensen", null, ParticipantRole.HOST)));
+
+        var meeting = randomMeeting();
+        Mockito.when(meetingService.createMeeting(Mockito.any())).thenReturn(meeting);
+
+        meetingServiceV2.createMeetingV2(input);
+
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> p.type() == ParticipantType.CITIZEN
+                && "hashed-0101011234".equals(p.participantId())
+                && "encrypted-Jens Hansen".equals(p.name())));
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> p.type() == ParticipantType.USER
+                && "ext-id".equals(p.participantId())
+                && "Hans Jensen".equals(p.name())));
+    }
+
+    @Test
+    public void testCreateMeetingV2CitizenParticipantRejectedWithoutRole() {
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        var input = createMeetingModelWithParticipants(List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", "Jens Hansen", null, ParticipantRole.GUEST)));
+
+        assertThrows(PermissionDeniedExceptionV2.class, () -> meetingServiceV2.createMeetingV2(input));
+
+        verifyNoMoreInteractions();
+    }
+
+    private CreateMeetingModel createMeetingModelWithParticipants(List<CreateParticipantModel> participants) {
+        var m = randomCreateMeetingModel();
+        return new CreateMeetingModel(m.subject(), m.startTime(), m.endTime(), m.description(), m.projectCode(), m.schedulingInfoReservationId(), m.organizedByEmail(), m.maxParticipants(), m.endMeetingOnEndTime(), m.schedulingTemplateId(), m.meetingType(), m.uuid(), m.labels(), m.externalId(), m.guestMicrophone(), m.guestPinRequired(), m.vmrType(), m.hostView(), m.guestView(), m.vmrQuality(), m.enableOverlayText(), m.guestsCanPresent(), m.forcePresenterIntoMain(), m.forceEncryption(), m.muteAllGuests(), m.uriWithoutDomain(), m.hostPin(), m.guestPin(), m.callType(), m.additionalInformation(), participants);
     }
 
     @Test
