@@ -10,6 +10,7 @@ import dk.medcom.video.api.dao.entity.MeetingUser;
 import dk.medcom.video.api.dao.entity.Participant;
 import dk.medcom.video.api.dao.entity.ParticipantType;
 import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
+import dk.medcom.video.api.service.encryption.NameEncryptor;
 import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
 import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
@@ -34,8 +35,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final UserContextService userContextService;
     private final AuditService auditService;
     private final CprHasher cprHasher;
+    private final NameEncryptor nameEncryptor;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, UserContextService userContextService, AuditService auditService, CprHasher cprHasher) {
+    public ParticipantServiceImpl(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, UserContextService userContextService, AuditService auditService, CprHasher cprHasher, NameEncryptor nameEncryptor) {
         this.participantDao = participantDao;
         this.meetingRepository = meetingRepository;
         this.meetingUserService = meetingUserService;
@@ -44,6 +46,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         this.userContextService = userContextService;
         this.auditService = auditService;
         this.cprHasher = cprHasher;
+        this.nameEncryptor = nameEncryptor;
     }
 
     @Override
@@ -86,9 +89,11 @@ public class ParticipantServiceImpl implements ParticipantService {
         var participants = createParticipantModel.stream().map(p -> {
             String organisation = p.organisation();
             var participantId = p.participantId();
+            var name = p.name();
 
             if (p.type() == ParticipantType.CITIZEN) {
                 participantId = cprHasher.hash(p.participantId());
+                name = nameEncryptor.encrypt(p.name());
             }
 
             if (p.type() == ParticipantType.ORGANISATION) {
@@ -107,6 +112,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                     UUID.fromString(meeting.getUuid()),
                     p.type(),
                     participantId,
+                    name,
                     organisation,
                     p.role(),
                     null,
@@ -153,6 +159,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 participant.meetingUuid(),
                 participant.type(),
                 participant.participantId(),
+                participant.name(),
                 participant.organisationId(),
                 updateParticipant.role(),
                 participant.createdAt(),
@@ -174,7 +181,22 @@ public class ParticipantServiceImpl implements ParticipantService {
         MeetingUser updatedByUser = participant.updatedBy() != null
                 ? meetingUserRepository.findById(participant.updatedBy()).orElse(null)
                 : null;
-        return ParticipantModel.from(participant, createdByUser, updatedByUser);
+        var model = ParticipantModel.from(participant, createdByUser, updatedByUser);
+        if (participant.type() != ParticipantType.CITIZEN) {
+            return model;
+        }
+        return new ParticipantModel(
+                model.id(),
+                model.uuid(),
+                model.type(),
+                model.externalId(),
+                nameEncryptor.decrypt(model.name()),
+                model.organisation(),
+                model.role(),
+                model.createdTime(),
+                model.createdBy(),
+                model.updatedTime(),
+                model.updatedBy());
     }
 
     private void validateUser(Meeting meeting) {
@@ -218,6 +240,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 null,
                 null,
                 participant.type(),
+                null,
                 null,
                 null,
                 participant.role(),

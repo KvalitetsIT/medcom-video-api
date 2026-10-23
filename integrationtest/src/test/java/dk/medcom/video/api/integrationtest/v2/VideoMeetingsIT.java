@@ -1532,7 +1532,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeeting();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
         var participants = List.of(
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
+                new CreateParticipant().name(randomString()).role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
         );
         var expectedException = assertThrows(ApiException.class, () ->
                 videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), participants));
@@ -1571,7 +1571,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
@@ -1596,7 +1596,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
         var meeting = randomCreateMeeting();
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
         videoMeetingsV2Api.v2MeetingsUuidParticipantsParticipantUuidDelete(createdMeeting.getUuid(), createdParticipants.getFirst().getUuid());
@@ -1656,7 +1656,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant()
+        var participant = new CreateParticipant().name(randomString())
                 .role(ParticipantRole.HOST)
                 .type(ParticipantType.USER)
                 .participantId(participantId);
@@ -1683,7 +1683,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.USER).participantId(participantId);
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.HOST).type(ParticipantType.USER).participantId(participantId);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
@@ -1702,7 +1702,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         createMeeting.setGuestPin(1234);
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
         var schedulingInfo = videoSchedulingInformationV2Api.v2SchedulingInfoUuidGet(createdMeeting.getUuid());
@@ -1720,7 +1720,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(participantId);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
         var result = videoMeetingsV2Api.getMeetingParticipations(participantId,
@@ -1814,9 +1814,9 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     private static List<CreateParticipant> createParticipants() {
         return List.of(
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisationId(randomString()).participantId(randomString()),
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("test-org").organisationId(randomString()),
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.USER).organisationId(randomString()).participantId(randomString())
+                new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).organisationId(randomString()).participantId(randomString()),
+                new CreateParticipant().name(randomString()).role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("test-org").organisationId(randomString()),
+                new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).organisationId(randomString()).participantId(randomString())
         );
     }
 
@@ -1999,7 +1999,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant()
+        var participant = new CreateParticipant().name(randomString())
                 .role(ParticipantRole.HOST)
                 .type(ParticipantType.CITIZEN)
                 .participantId(cpr);
@@ -2026,7 +2026,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         var createMeeting = randomCreateMeetingForParticipations();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
 
-        var participant = new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).participantId(cpr);
+        var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).participantId(cpr);
         videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
 
         var search = citizenParticipationSearch(cpr)
@@ -2076,8 +2076,8 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     private static List<CreateParticipant> createCitizenParticipants() {
         return List.of(
-                new CreateParticipant().role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).participantId(randomString()),
-                new CreateParticipant().role(ParticipantRole.HOST).type(ParticipantType.CITIZEN).participantId(randomString())
+                new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.CITIZEN).participantId(randomString()),
+                new CreateParticipant().name(randomString()).role(ParticipantRole.HOST).type(ParticipantType.CITIZEN).participantId(randomString())
         );
     }
 }

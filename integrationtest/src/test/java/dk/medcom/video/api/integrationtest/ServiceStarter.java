@@ -109,6 +109,7 @@ public class ServiceStarter {
 
         System.setProperty("short.link.base.url", "https://video.link/");
         System.setProperty("cpr.hash.secret-key", "dGVzdC1zZWNyZXQta2V5LWZvci1obWFjLXNoYTI1Ni10ZXN0aW5n");
+        System.setProperty("citizen.name.encryption-key", "dGVzdC1rZXktZm9yLWNpdGl6ZW4tbmFtZS1hZXMyNTY=");
         System.setProperty("overflow.pool.organisation.id", "overflow");
 
         System.setProperty("ALLOWED_ORIGINS", "http://allowed:4100,http://allowed:4200");
@@ -191,6 +192,7 @@ public class ServiceStarter {
                 .withEnv("organisationtree.service.endpoint", "http://organisation:1080")
                 .withEnv("short.link.base.url", "https://video.link/")
                 .withEnv("cpr.hash.secret-key", "dGVzdC1zZWNyZXQta2V5LWZvci1obWFjLXNoYTI1Ni10ZXN0aW5n")
+                .withEnv("citizen.name.encryption-key", "dGVzdC1rZXktZm9yLWNpdGl6ZW4tbmFtZS1hZXMyNTY=")
                 .withEnv("overflow.pool.organisation.id", "overflow")
 
                 .withEnv("keycloak.service.endpoint", "http://keycloak-mock:1080/realms/broker")

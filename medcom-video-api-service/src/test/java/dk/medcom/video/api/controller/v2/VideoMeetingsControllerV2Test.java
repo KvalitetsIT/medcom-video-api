@@ -870,7 +870,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostWithVariousParticipantCounts(int count) {
         var input = randomCreateMeetingInput();
         var participants = Collections.nCopies(count,
-                new CreateParticipant(ParticipantType.USER, "", ParticipantRole.GUEST));
+                new CreateParticipant(ParticipantType.USER, "", "Name", ParticipantRole.GUEST));
         input.setParticipants(participants);
         var meeting = randomMeetingWithXParticipants(count);
         Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
@@ -883,7 +883,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var participantUuid = UUID.randomUUID();
         var participants = List.of(new ParticipantModel(1L, participantUuid, dk.medcom.video.api.dao.entity.ParticipantType.USER,
-                "Test User", "test@example.com", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
+                "Test User", "Test Name", "test@example.com", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
                 null, null, null, null));
 
         Mockito.when(participantService.getParticipants(uuid)).thenReturn(participants);
@@ -896,6 +896,7 @@ public class VideoMeetingsControllerV2Test {
         var participant = result.getBody().getFirst();
         assertSame(ParticipantRole.GUEST, participant.getRole());
         assertEquals("Test User", participant.getParticipantId());
+        assertEquals("Test Name", participant.getName());
 
         Mockito.verify(participantService).getParticipants(uuid);
     }
@@ -927,7 +928,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var participantUuid = UUID.randomUUID();
         var input = List.of(randomCreateParticipantInput(), randomCreateParticipantInput(), randomCreateParticipantInput());
-        var participants = List.of(new ParticipantModel(1l, participantUuid, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
+        var participants = List.of(new ParticipantModel(1l, participantUuid, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "Name", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
                 null, null, null, null));
 
         Mockito.when(participantService.createParticipants(Mockito.eq(uuid), Mockito.any())).thenReturn(participants);
@@ -963,7 +964,7 @@ public class VideoMeetingsControllerV2Test {
         var uuid = UUID.randomUUID();
         var participantUuid = UUID.randomUUID();
         var updateParticipant = randomUpdateParticipant();
-        var participantModel = new ParticipantModel(1l, participantUuid, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
+        var participantModel = new ParticipantModel(1l, participantUuid, dk.medcom.video.api.dao.entity.ParticipantType.USER, "", "Name", "", dk.medcom.video.api.dao.entity.ParticipantRole.GUEST,
                 null, null, null, null);
 
         Mockito.when(participantService.updateParticipant(Mockito.eq(uuid), Mockito.eq(participantUuid), Mockito.any())).thenReturn(participantModel);
