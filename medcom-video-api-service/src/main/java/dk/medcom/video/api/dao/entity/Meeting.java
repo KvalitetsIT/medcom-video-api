@@ -1,6 +1,8 @@
 package dk.medcom.video.api.dao.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Formula;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,6 +46,9 @@ public class Meeting {
 	private String shortId;
 
 	private String externalId;
+
+	@Formula("(select count(*) from participant p where p.meeting_id = id)")
+	private int participantCount;
 
 	@OneToMany(mappedBy = "meeting")
 	private Set<MeetingLabel> meetingLabels = new HashSet<>();
@@ -167,6 +172,10 @@ public class Meeting {
 
 	public String getShortId() {
 		return shortId;
+	}
+
+	public int getParticipantCount() {
+		return participantCount;
 	}
 
 	public void setShortId(String shortId) {

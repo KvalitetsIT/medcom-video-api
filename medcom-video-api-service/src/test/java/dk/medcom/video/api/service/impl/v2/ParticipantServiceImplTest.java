@@ -1,0 +1,470 @@
+package dk.medcom.video.api.service.impl.v2;
+
+import dk.medcom.video.api.context.UserContext;
+import dk.medcom.video.api.context.UserContextService;
+import dk.medcom.video.api.context.UserRole;
+import dk.medcom.video.api.dao.MeetingRepository;
+import dk.medcom.video.api.dao.MeetingUserRepository;
+import dk.medcom.video.api.dao.ParticipantDao;
+import dk.medcom.video.api.dao.entity.MeetingUser;
+import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.dao.entity.Participant;
+import dk.medcom.video.api.dao.entity.ParticipantRole;
+import dk.medcom.video.api.dao.entity.ParticipantType;
+import dk.medcom.video.api.service.*;
+import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
+import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
+import dk.medcom.video.api.service.exception.ResourceNotFoundExceptionV2;
+import dk.medcom.video.api.service.hashing.CprHasher;
+import dk.medcom.video.api.service.model.CreateParticipantModel;
+import dk.medcom.video.api.service.model.UpdateParticipantModel;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public class ParticipantServiceImplTest {
+    private ParticipantDao participantDao;
+    private MeetingUserService meetingUserService;
+    private MeetingRepository meetingRepository;
+    private UserContextService userContextService;
+    private OrganisationService organisationService;
+    private ParticipantService participantService;
+    private CprHasher cprHasher;
+    private AuditService auditService;
+
+
+    @BeforeEach
+    public void setup() {
+        participantDao = Mockito.mock(ParticipantDao.class);
+        meetingUserService = Mockito.mock(MeetingUserService.class);
+        MeetingUserRepository meetingUserRepository = Mockito.mock(MeetingUserRepository.class);
+        meetingRepository = Mockito.mock(MeetingRepository.class);
+        userContextService = Mockito.mock(UserContextService.class);
+        organisationService = Mockito.mock(OrganisationService.class);
+        cprHasher = Mockito.mock(CprHasher.class);
+        auditService = Mockito.mock(AuditService.class);
+        participantService = new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher);
+    }
+
+    private void setupValidUserContext() {
+        setupValidUserContext(false);
+    }
+
+    private void setupValidUserContext(boolean citizenLookup) {
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(citizenLookup);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.userIsPermittedForOrganisation(Mockito.any())).thenReturn(true);
+
+        var currentUser = Mockito.mock(MeetingUser.class);
+        Mockito.when(currentUser.getId()).thenReturn(1L);
+        Mockito.when(meetingUserService.getOrCreateCurrentMeetingUser()).thenReturn(currentUser);
+    }
+
+    private dk.medcom.video.api.dao.entity.Meeting createMeeting(UUID uuid, Organisation organisation) {
+        var meeting = new dk.medcom.video.api.dao.entity.Meeting();
+        meeting.setUuid(uuid.toString());
+        meeting.setOrganisation(organisation);
+        return meeting;
+    }
+
+    @Test
+    public void testGetParticipants() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        setupValidUserContext();
+        var participants = List.of(
+                new Participant(null, null, null, null, null, null, null, null, null, null, null, null),
+                new Participant(null, null, null, null, null, null, null, null, null, null, null, null));
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
+
+        var result = participantService.getParticipants(uuid);
+
+        assertEquals(participants.size(), result.size());
+    }
+
+    @Test
+    public void testGetParticipantsAuditsSearch() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasRole(UserRole.CITIZEN_LOOKUP)).thenReturn(true);
+        Mockito.when(userContext.getUserEmail()).thenReturn("user@example.com");
+        Mockito.when(userContext.getUserOrganisation()).thenReturn("org-id");
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.userIsPermittedForOrganisation(Mockito.any())).thenReturn(true);
+        var participantUuid = UUID.randomUUID();
+        var participants = List.of(
+                new Participant(1L, participantUuid, null, null, ParticipantType.USER, "ext-id", "org", ParticipantRole.GUEST, null, null, null, null));
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
+
+        participantService.getParticipants(uuid);
+
+        var captor = ArgumentCaptor.forClass(ParticipantSearch.class);
+        Mockito.verify(auditService).auditParticipantSearch(captor.capture(), Mockito.eq("list"));
+        var audited = captor.getValue();
+        assertEquals(uuid.toString(), audited.getMeetingUuid());
+        assertEquals("user@example.com", audited.getPerformedBy());
+        assertEquals("org-id", audited.getOrganisation());
+        assertEquals(1, audited.getResultCount());
+        assertEquals(List.of(participantUuid.toString()), audited.getResultIdentifiers());
+    }
+
+    @Test
+    public void testGetParticipantsRedactsCitizenParticipants() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        setupValidUserContext();
+        var participants = List.of(
+                new Participant(1L, UUID.randomUUID(), null, null, ParticipantType.CITIZEN, "hashed-cpr", "org", ParticipantRole.GUEST, LocalDateTime.now(), 10L, LocalDateTime.now(), 10L),
+                new Participant(2L, UUID.randomUUID(), null, null, ParticipantType.USER, "ext-id", "org", ParticipantRole.HOST, null, null, null, null));
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.findByMeeting(meeting)).thenReturn(participants);
+
+        var result = participantService.getParticipants(uuid);
+
+        assertEquals(2, result.size());
+
+        var citizenResult = result.stream().filter(p -> p.type() == ParticipantType.CITIZEN).findFirst().orElseThrow();
+        assertEquals(ParticipantRole.GUEST, citizenResult.role());
+        assertNull(citizenResult.id());
+        assertNull(citizenResult.uuid());
+        assertNull(citizenResult.externalId());
+        assertNull(citizenResult.organisation());
+        assertNull(citizenResult.createdTime());
+        assertNull(citizenResult.createdBy());
+        assertNull(citizenResult.updatedTime());
+        assertNull(citizenResult.updatedBy());
+
+        var userResult = result.stream().filter(p -> p.type() == ParticipantType.USER).findFirst().orElseThrow();
+        assertEquals("ext-id", userResult.externalId());
+        assertEquals("org", userResult.organisation());
+    }
+
+    @Test
+    public void testGetParticipantsMeetingNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
+
+        assertThrows(ResourceNotFoundExceptionV2.class, () ->
+                participantService.getParticipants(uuid));
+    }
+
+    @Test
+    public void testGetParticipantsUserIsProvisioner() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(true);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.getParticipants(uuid));
+    }
+
+    @Test
+    public void testGetParticipantsOrganisationMismatch() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.getUserOrganisation()).thenReturn(new Organisation());
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.getParticipants(uuid));
+    }
+
+    @Test
+    public void testCreateParticipants() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        var meeting = createMeeting(uuid, organisation);
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", "org", ParticipantRole.GUEST)
+        );
+        var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
+        setupValidUserContext();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+        assertEquals(1, result.size());
+        Mockito.verify(meetingRepository).save(meeting);
+    }
+
+    @Test
+    public void testCreateParticipantsMeetingNotFound() {
+        var uuid = UUID.randomUUID();
+
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
+        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.createParticipants(uuid, List.of()));
+    }
+
+    @Test
+    public void testCreateParticipantsUserIsProvisioner() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(true);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.createParticipants(uuid, List.of()));
+    }
+
+    @Test
+    public void testCreateParticipantsOrganisationMismatch() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.getUserOrganisation()).thenReturn(new Organisation());
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.createParticipants(uuid, List.of()));
+    }
+
+    @Test
+    void testUpdateParticipant() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var participantUuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        var meeting = createMeeting(uuid, organisation);
+        setupValidUserContext();
+        var updateParticipant = new UpdateParticipantModel(ParticipantRole.GUEST);
+        var savedParticipant = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), ParticipantType.USER, "ext-id", null, null, null, null, null, null);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(savedParticipant));
+        Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+        var result = participantService.updateParticipant(uuid, participantUuid, updateParticipant);
+        assertEquals(updateParticipant.role(), result.role());
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("update"));
+        assertEquals(participantUuid.toString(), captor.getValue().getUuid());
+        assertEquals("ext-id", captor.getValue().getParticipantId());
+        assertEquals("GUEST", captor.getValue().getRole());
+    }
+
+    @Test
+    void testUpdateParticipantMeetingNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
+
+        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
+    }
+
+    @Test
+    void testUpdateParticipantUserIsProvisioner() {
+
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(true);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
+    }
+
+    @Test
+    void testUpdateParticipantOrganisationMisMatch() throws PermissionDeniedExceptionV2 {
+
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.getUserOrganisation()).thenReturn(new Organisation());
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.updateParticipant(uuid, UUID.randomUUID(), Mockito.any()));
+    }
+
+    @Test
+    void testDeleteParticipant() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var participantUuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        var meeting = createMeeting(uuid, organisation);
+        setupValidUserContext();
+        var participantToDelete = new Participant(null, participantUuid, meeting.getId(), UUID.fromString(meeting.getUuid()), null, null, null, null, null, null, null, null);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(participantDao.findByUuId(Mockito.any())).thenReturn(Optional.of(participantToDelete));
+        Mockito.when(participantDao.save(Mockito.any())).thenReturn(participantToDelete);
+        participantService.deleteParticipant(uuid, participantUuid);
+
+        Mockito.verify(participantDao).delete(participantToDelete);
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("delete"));
+        assertEquals(participantUuid.toString(), captor.getValue().getUuid());
+        assertEquals(uuid.toString(), captor.getValue().getMeetingUuid());
+    }
+
+    @Test
+    void testDeleteParticipantMeetingNotFound() {
+        var uuid = UUID.randomUUID();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(null);
+        assertThrows(ResourceNotFoundExceptionV2.class, () -> participantService.deleteParticipant(uuid, UUID.randomUUID()));
+    }
+
+    @Test
+    void testDeleteParticipantUserIsProvisioner() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(true);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.deleteParticipant(uuid, UUID.randomUUID()));
+    }
+
+    @Test
+    void testDeleteParticipantOrganisationMismatch() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+
+        var userContext = Mockito.mock(UserContext.class);
+        Mockito.when(userContext.hasOnlyRole(UserRole.PROVISIONER)).thenReturn(false);
+        Mockito.when(userContextService.getUserContext()).thenReturn(userContext);
+        Mockito.when(organisationService.getUserOrganisation()).thenReturn(new Organisation());
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.deleteParticipant(uuid, UUID.randomUUID()));
+    }
+
+    @Test
+    public void testCreateParticipantsOrganisationTypeParticipant() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var participantOrganisation = new Organisation();
+        participantOrganisation.setOrganisationId("resolved-org-id");
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "test-org", "ignored-input-org", ParticipantRole.HOST)
+        );
+        var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
+        setupValidUserContext();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(organisationService.getParticipantOrganisation("test-org")).thenReturn(participantOrganisation);
+        Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        assertEquals(1, result.size());
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "resolved-org-id".equals(p.organisationId())));
+    }
+
+    @Test
+    public void testCreateParticipantsOrganisationTypeParticipantNotFound() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.ORGANISATION, "unknown-org", "ignored-input-org", ParticipantRole.HOST)
+        );
+        setupValidUserContext();
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(organisationService.getParticipantOrganisation("unknown-org"))
+                .thenThrow(new ResourceNotFoundExceptionV2("organisation", "participantId"));
+
+        assertThrows(ResourceNotFoundExceptionV2.class, () ->
+                participantService.createParticipants(uuid, createParticipants));
+    }
+
+    @Test
+    public void testCreateParticipantsCitizenIsHashed() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        var meeting = createMeeting(uuid, organisation);
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", null, ParticipantRole.GUEST)
+        );
+        var savedParticipant = new Participant(null, null, null, null, null, null, null, null, null, null, null, null);
+        setupValidUserContext(true);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(cprHasher.hash("0101011234")).thenReturn("hashed-cpr");
+        Mockito.when(participantDao.save(Mockito.any())).thenReturn(savedParticipant);
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        assertEquals(1, result.size());
+        Mockito.verify(participantDao).save(Mockito.argThat(p -> "hashed-cpr".equals(p.participantId())));
+        Mockito.verify(meetingRepository).save(meeting);
+    }
+
+    @Test
+    public void testCreateParticipantsAudited() throws PermissionDeniedExceptionV2 {
+        var uuid = UUID.randomUUID();
+        var organisation = new Organisation();
+        organisation.setOrganisationId("meeting-org");
+        var meeting = createMeeting(uuid, organisation);
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", null, ParticipantRole.GUEST)
+        );
+        setupValidUserContext(true);
+        Mockito.when(userContextService.getUserContext().getUserEmail()).thenReturn("user@example.com");
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+        Mockito.when(cprHasher.hash("0101011234")).thenReturn("hashed-cpr");
+        Mockito.when(participantDao.save(Mockito.any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var result = participantService.createParticipants(uuid, createParticipants);
+
+        var captor = ArgumentCaptor.forClass(dk.medcom.video.api.service.domain.audit.Participant.class);
+        Mockito.verify(auditService).auditParticipant(captor.capture(), Mockito.eq("create"));
+        var audited = captor.getValue();
+        assertEquals(result.getFirst().uuid().toString(), audited.getUuid());
+        assertEquals(uuid.toString(), audited.getMeetingUuid());
+        assertEquals("CITIZEN", audited.getType());
+        assertNull(audited.getParticipantId());
+        assertEquals("GUEST", audited.getRole());
+        assertEquals("meeting-org", audited.getOrganisation());
+        assertEquals("user@example.com", audited.getPerformedBy());
+    }
+
+    @Test
+    public void testCreateParticipantsCitizenRejectedWithoutRole() {
+        var uuid = UUID.randomUUID();
+        var meeting = createMeeting(uuid, new Organisation());
+        var createParticipants = List.of(
+                new CreateParticipantModel(ParticipantType.USER, "ext-id", null, ParticipantRole.GUEST),
+                new CreateParticipantModel(ParticipantType.CITIZEN, "0101011234", null, ParticipantRole.GUEST)
+        );
+        setupValidUserContext(false);
+        Mockito.when(meetingRepository.findOneByUuid(uuid.toString())).thenReturn(meeting);
+
+        assertThrows(PermissionDeniedExceptionV2.class, () ->
+                participantService.createParticipants(uuid, createParticipants));
+
+        Mockito.verify(participantDao, Mockito.never()).save(Mockito.any());
+        Mockito.verify(meetingRepository, Mockito.never()).save(Mockito.any());
+        Mockito.verify(auditService, Mockito.never()).auditParticipant(Mockito.any(), Mockito.any());
+    }
+}

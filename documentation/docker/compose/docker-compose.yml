@@ -101,6 +101,8 @@ services:
 
       - short.link.base.url=""
 
+      - cpr.hash.secret-key=pSd1CT+dcWoBj1iYCPOFCFD7YJ9uGybwBbAA0DNBmXc=
+
       - overflow.pool.organisation.id=0
 
       - ALLOWED_ORIGINS=http://localhost
