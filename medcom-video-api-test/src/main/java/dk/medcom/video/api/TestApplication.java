@@ -62,6 +62,8 @@ public class TestApplication extends SpringBootServletInitializer {
         System.setProperty("jdbc.url", jdbcUrl + "?useSSL=false");
         System.setProperty("organisation.service.endpoint", String.format("http://localhost:%s/services/", testOrganisationFrontend.getMappedPort(1080)));
         System.setProperty("short.link.base.url", "http://shortlink");
+        System.setProperty("cpr.hash.secret-key", "dGVzdC1zZWNyZXQta2V5LWZvci1obWFjLXNoYTI1Ni10ZXN0aW5n");
+        System.setProperty("citizen.name.encryption-key", "dGVzdC1rZXktZm9yLWNpdGl6ZW4tbmFtZS1hZXMyNTY=");
         System.setProperty("overflow.pool.organisation.id", "overflow");
         System.setProperty("organisationtree.service.endpoint", "http://localhost:" + testOrganisationFrontend.getMappedPort(1080));
 

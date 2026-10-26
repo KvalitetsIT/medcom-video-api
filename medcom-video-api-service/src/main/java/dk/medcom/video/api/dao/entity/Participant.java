@@ -10,6 +10,7 @@ public record Participant(
         UUID meetingUuid,
         ParticipantType type,
         String participantId,
+        String name,
         String organisationId,
         ParticipantRole role,
         LocalDateTime createdAt,

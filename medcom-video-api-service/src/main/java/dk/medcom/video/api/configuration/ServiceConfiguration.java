@@ -13,6 +13,7 @@ import dk.medcom.video.api.keycloak.KeycloakHttpClientServiceImpl;
 import dk.medcom.video.api.organisation.*;
 import dk.medcom.video.api.service.*;
 import dk.medcom.video.api.service.PortalLinkBuilder;
+import dk.medcom.video.api.service.encryption.NameEncryptor;
 import dk.medcom.video.api.service.hashing.CprHasher;
 import dk.medcom.video.api.service.model.PortalLinkModel;
 import org.openapitools.model.ViewType;
@@ -185,8 +186,8 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao, MeetingRepository meetingRepository, SchedulingInfoRepository schedulingInfoRepository, UserContextService userContextService, AuditService auditService, CprHasher cprHasher) {
-        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher);
+    public MeetingServiceV2 meetingServiceV2(MeetingService meetingService, ParticipantDao participantDao, MeetingRepository meetingRepository, SchedulingInfoRepository schedulingInfoRepository, UserContextService userContextService, AuditService auditService, CprHasher cprHasher, NameEncryptor nameEncryptor) {
+        return new MeetingServiceV2Impl(meetingService, shortLinkBaseUrl, participantDao, meetingRepository, schedulingInfoRepository, userContextService, auditService, cprHasher, nameEncryptor);
     }
 
     @Bean
@@ -373,8 +374,13 @@ public class ServiceConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, CprHasher cprHasher, UserContextService userContextService, AuditService auditService) {
-        return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher);
+    public NameEncryptor nameEncryptor(@Value("${citizen.name.encryption-key}") String citizenNameEncryptionKey) {
+        return new NameEncryptor(citizenNameEncryptionKey);
+    }
+
+    @Bean
+    public ParticipantService participantService(ParticipantDao participantDao, MeetingRepository meetingRepository, MeetingUserService meetingUserService, MeetingUserRepository meetingUserRepository, OrganisationService organisationService, CprHasher cprHasher, NameEncryptor nameEncryptor, UserContextService userContextService, AuditService auditService) {
+        return new ParticipantServiceImpl(participantDao, meetingRepository, meetingUserService, meetingUserRepository, organisationService, userContextService, auditService, cprHasher, nameEncryptor);
     }
 
     @Bean
