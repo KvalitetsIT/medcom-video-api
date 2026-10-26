@@ -870,7 +870,7 @@ public class VideoMeetingsControllerV2Test {
     public void testV2MeetingsPostWithVariousParticipantCounts(int count) {
         var input = randomCreateMeetingInput();
         var participants = Collections.nCopies(count,
-                new CreateParticipant(ParticipantType.USER, "", "Name", ParticipantRole.GUEST));
+                new CreateParticipant(ParticipantType.USER, "", ParticipantRole.GUEST));
         input.setParticipants(participants);
         var meeting = randomMeetingWithXParticipants(count);
         Mockito.when(meetingService.createMeetingV2(any())).thenReturn(meeting);
