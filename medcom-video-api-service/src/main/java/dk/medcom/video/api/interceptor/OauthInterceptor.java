@@ -42,6 +42,7 @@ public class OauthInterceptor implements HandlerInterceptor {
         roleAttToUserRole.put("ROLE_ATT_meeting-planner", UserRole.MEETING_PLANNER);
         roleAttToUserRole.put("ROLE_ATT_meeting-provisioner", UserRole.PROVISIONER);
         roleAttToUserRole.put("ROLE_ATT_meeting-provisioner-user", UserRole.PROVISIONER_USER);
+        roleAttToUserRole.put("ROLE_ATT_meeting-citizen-lookup", UserRole.CITIZEN_LOOKUP);
     }
 
 

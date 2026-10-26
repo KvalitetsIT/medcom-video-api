@@ -1,10 +1,12 @@
 package dk.medcom.video.api.service;
 
-import dk.medcom.video.api.controller.exceptions.PermissionDeniedException;
 import dk.medcom.video.api.dao.entity.Organisation;
+import dk.medcom.video.api.service.exception.PermissionDeniedExceptionV2;
 
 public interface OrganisationService {
-    Organisation getUserOrganisation() throws PermissionDeniedException;
+    Organisation getUserOrganisation() throws PermissionDeniedExceptionV2;
+
+    Organisation getParticipantOrganisation(String participantId);
 
     Integer getPoolSizeForOrganisation(String organisationId);
 
@@ -13,4 +15,6 @@ public interface OrganisationService {
     boolean isPolicyServerEnabledForOrganisation(String organisationId);
 
     boolean isPolicyServerEnabledForUserOrganisation();
+
+     boolean userIsPermittedForOrganisation(String organisationId);
 }
