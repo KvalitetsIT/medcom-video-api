@@ -241,7 +241,7 @@ public class ParticipantServiceImpl implements ParticipantService {
                 null,
                 participant.type(),
                 null,
-                null,
+                participant.name(),
                 null,
                 participant.role(),
                 null,

@@ -566,7 +566,7 @@ paths:
         * meeting-planner <br>
         * meeting-provisioner-user <br> <br>
         Participants of type CITIZEN are returned only with
-        type and role. All other fields (uuid, participantId, name, organisationId, createdTime,
+        name, type and role. All other fields (uuid, participantId, organisationId, createdTime,
         createdBy, updatedTime and updatedBy) are returned as null.
       parameters:
         - $ref: '#/components/parameters/uuid'
@@ -2577,7 +2577,6 @@ components:
       required:
         - type
         - participantId
-        - name
         - role
       properties:
         type:
