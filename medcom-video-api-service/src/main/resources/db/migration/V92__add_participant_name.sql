@@ -1,5 +1,2 @@
 ALTER TABLE participant
-    ADD COLUMN name VARCHAR(2048) NOT NULL DEFAULT '' AFTER participant_id;
-
-ALTER TABLE participant
-    ALTER COLUMN name DROP DEFAULT;
+    ADD COLUMN name VARCHAR(2048) AFTER participant_id;
