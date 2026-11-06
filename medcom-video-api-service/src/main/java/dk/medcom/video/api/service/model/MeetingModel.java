@@ -27,8 +27,11 @@ public record MeetingModel(String subject,
                            GuestMicrophoneModel guestMicrophone,
                            boolean guestPinRequired,
                            List<String> labels,
-                           List<AdditionalInformationModel> additionalInformation) {
-    public static MeetingModel from(Meeting meeting, String shortLinkBaseUrl) {
+                           List<AdditionalInformationModel> additionalInformation,
+                           int knownParticipants) {
+
+
+    public static MeetingModel from(Meeting meeting, String shortLinkBaseUrl, int knownParticipants) {
         if (meeting == null) {
             return null;
         }
@@ -52,7 +55,8 @@ public record MeetingModel(String subject,
                 GuestMicrophoneModel.from(meeting.getGuestMicrophone()),
                 meeting.getGuestPinRequired(),
                 meeting.getMeetingLabels().stream().map(MeetingLabel::getLabel).toList(),
-                meeting.getMeetingAdditionalInfo().stream().map(AdditionalInformationModel::from).toList());
+                meeting.getMeetingAdditionalInfo().stream().map(AdditionalInformationModel::from).toList(),
+                knownParticipants);
     }
 
     private static OffsetDateTime mapDate(Date input) {

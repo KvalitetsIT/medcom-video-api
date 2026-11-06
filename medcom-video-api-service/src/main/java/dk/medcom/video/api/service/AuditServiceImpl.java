@@ -6,6 +6,7 @@ import dk.medcom.video.api.dao.entity.Meeting;
 import dk.medcom.video.api.dao.entity.MeetingLabel;
 import dk.medcom.video.api.dao.entity.SchedulingInfo;
 import dk.medcom.video.api.dao.entity.SchedulingTemplate;
+import dk.medcom.video.api.service.domain.audit.ParticipantSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,54 @@ public class AuditServiceImpl implements AuditService {
 
         var auditSchedulingInfo = mapSchedulingInfo(input);
         auditClient.addAuditEntry(createSchedulingInfoAuditEvent(auditSchedulingInfo, action));
+    }
+
+    @Override
+    public void auditParticipantSearch(ParticipantSearch search, String action) {
+        if(search == null) {
+            logger.warn("Unable to create audit entry as input is null.");
+            return;
+        }
+
+        auditClient.addAuditEntry(createParticipantSearchAuditEvent(search, action));
+    }
+
+    @Override
+    public void auditParticipant(dk.medcom.video.api.service.domain.audit.Participant participant, String action) {
+        if(participant == null) {
+            logger.warn("Unable to create audit entry as input is null.");
+            return;
+        }
+
+        auditClient.addAuditEntry(createParticipantAuditEvent(participant, action));
+    }
+
+    private AuditEvent<dk.medcom.video.api.service.domain.audit.Participant> createParticipantAuditEvent(dk.medcom.video.api.service.domain.audit.Participant participant, String action) {
+        var auditEvent = new AuditEvent<dk.medcom.video.api.service.domain.audit.Participant>();
+        auditEvent.setAuditData(participant);
+        auditEvent.setAuditEventDateTime(OffsetDateTime.now());
+        auditEvent.setOrganisationCode(participant.getOrganisation());
+        auditEvent.setUser(participant.getPerformedBy());
+        auditEvent.setSource("video-api");
+        auditEvent.setIdentifier(participant.getUuid());
+        auditEvent.setOperation(action);
+        auditEvent.setResource("participant");
+
+        return auditEvent;
+    }
+
+    private AuditEvent<ParticipantSearch> createParticipantSearchAuditEvent(ParticipantSearch search, String action) {
+        var auditEvent = new AuditEvent<ParticipantSearch>();
+        auditEvent.setAuditData(search);
+        auditEvent.setAuditEventDateTime(OffsetDateTime.now());
+        auditEvent.setOrganisationCode(search.getOrganisation());
+        auditEvent.setUser(search.getPerformedBy());
+        auditEvent.setSource("video-api");
+        auditEvent.setIdentifier(search.getMeetingUuid() != null ? search.getMeetingUuid() : search.getSearchParticipantId());
+        auditEvent.setOperation(action);
+        auditEvent.setResource("participant");
+
+        return auditEvent;
     }
 
     private AuditEvent<dk.medcom.video.api.service.domain.audit.SchedulingInfo> createSchedulingInfoAuditEvent(dk.medcom.video.api.service.domain.audit.SchedulingInfo schedulingInfo, String action) {

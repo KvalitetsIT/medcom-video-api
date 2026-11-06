@@ -55,4 +55,20 @@ public class EnumMapper {
     public static MeetingTypeModel externalToInternal(MeetingType input) {
         return MeetingTypeModel.valueOf(input.toString());
     }
+
+    public static dk.medcom.video.api.dao.entity.ParticipantType externalToInternal(ParticipantType type) {
+        return dk.medcom.video.api.dao.entity.ParticipantType.valueOf(type.toString());
+    }
+
+    public static ParticipantType internalToExternal(dk.medcom.video.api.dao.entity.ParticipantType type) {
+        return ParticipantType.valueOf(type.toString());
+    }
+
+    public static dk.medcom.video.api.dao.entity.ParticipantRole externalToInternal(ParticipantRole role) {
+        return dk.medcom.video.api.dao.entity.ParticipantRole.valueOf(role.toString());
+    }
+
+    public static ParticipantRole internalToExternal(dk.medcom.video.api.dao.entity.ParticipantRole role){
+        return ParticipantRole.valueOf(role.toString());
+    }
 }

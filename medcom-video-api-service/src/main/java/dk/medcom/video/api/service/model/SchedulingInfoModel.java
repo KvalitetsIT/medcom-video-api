@@ -45,6 +45,8 @@ public record SchedulingInfoModel(UUID uuid,
                                   String shortlink,
                                   String callType) {
     public static SchedulingInfoModel from(SchedulingInfo schedulingInfo, String shortLinkBaseUrl) {
+        var meeting = schedulingInfo.getMeeting();
+
         return new SchedulingInfoModel(UUID.fromString(schedulingInfo.getUuid()),
                 schedulingInfo.getHostPin(),
                 schedulingInfo.getGuestPin(),
@@ -76,11 +78,11 @@ public record SchedulingInfoModel(UUID uuid,
                 schedulingInfo.getCustomPortalGuest(),
                 schedulingInfo.getCustomPortalHost(),
                 schedulingInfo.getReturnUrl(),
-                MeetingModel.from(schedulingInfo.getMeeting(), shortLinkBaseUrl),
+                meeting != null ? MeetingModel.from(meeting, shortLinkBaseUrl, meeting.getParticipantCount()) : null,
                 DirectMediaModel.from(schedulingInfo.getDirectMedia()),
                 schedulingInfo.getBreakoutRooms(),
-                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
-                schedulingInfo.getMeeting() != null ? shortLinkBaseUrl + schedulingInfo.getMeeting().getShortId() : null,
+                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
+                meeting != null ? shortLinkBaseUrl + meeting.getShortId() : null,
                 schedulingInfo.getCallType());
     }
 
