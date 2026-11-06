@@ -1503,7 +1503,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     @Test
     void testV2MeetingsPostThenV2MeetingsUuidParticipantsPost() throws ApiException {
 
-        var createMeeting = randomCreateMeeting();
+        var createMeeting = randomFutureCreateMeeting();
         var participants = createParticipants();
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
@@ -1529,7 +1529,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testV2MeetingsUuidParticipantsPostUnknownOrganisationParticipant() throws ApiException {
-        var createMeeting = randomCreateMeeting();
+        var createMeeting = randomFutureCreateMeeting();
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
         var participants = List.of(
                 new CreateParticipant().name(randomString()).role(ParticipantRole.HOST).type(ParticipantType.ORGANISATION).participantId("unknown-" + randomString())
@@ -1543,7 +1543,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testV2MeetingsUuidParticipantsGet() throws ApiException {
-        var createMeeting = randomCreateMeeting();
+        var createMeeting = randomFutureCreateMeeting();
         var participantsModel = createParticipants();
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
@@ -1570,7 +1570,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testV2MeetingsUuidParticipantsIdPut() throws ApiException {
-        var meeting = randomCreateMeeting();
+        var meeting = randomFutureCreateMeeting();
         var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
@@ -1595,7 +1595,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
 
     @Test
     void testV2MeetingsUuiParticipantsIdDelete() throws ApiException {
-        var meeting = randomCreateMeeting();
+        var meeting = randomFutureCreateMeeting();
         var participant = new CreateParticipant().name(randomString()).role(ParticipantRole.GUEST).type(ParticipantType.USER).participantId(randomString());
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(meeting);
         var createdParticipants = videoMeetingsV2Api.v2MeetingsUuidParticipantsPost(createdMeeting.getUuid(), List.of(participant));
@@ -1761,12 +1761,15 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
      * kræver en startTime i FREMTIDEN (participations filtreres bl.a. på
      * startTime-interval omkring "nu"), mens randomCreateMeeting() bevidst
      * bruger tider i fortiden til resten af klassens tests.
+     * NB: plusDays(1) fordi count starter på 10000 sekunder - plusHours(1) ville give en
+     * startTime i fortiden, hvorved mødet bruger en af de få ledige pool scheduling infos
+     * og VideoSchedulingInformationIT reserve-testene fejler.
      */
     private static CreateMeeting randomCreateMeetingForParticipations() {
         return new CreateMeeting()
                 .subject(randomString())
-                .startTime(OffsetDateTime.now().plusHours(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
-                .endTime(OffsetDateTime.now().plusHours(2).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .startTime(OffsetDateTime.now().plusDays(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().plusDays(1).plusHours(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
                 .description(randomString())
                 .organizedByEmail(randomString());
     }
@@ -1820,6 +1823,11 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
         );
     }
 
+    private static CreateMeeting randomFutureCreateMeeting() {
+        return randomCreateMeeting()
+                .startTime(OffsetDateTime.now().plusDays(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS))
+                .endTime(OffsetDateTime.now().plusDays(1).plusHours(1).minusSeconds(count++).truncatedTo(ChronoUnit.MILLIS));
+    }
 
     private static CreateMeeting randomCreateMeeting() {
         return new CreateMeeting()
@@ -1976,7 +1984,7 @@ class VideoMeetingsIT extends AbstractIntegrationTest {
     // ---------- No JWT errors - citizen participants/participations ----------
     @Test
     void testV2MeetingsPostThenV2MeetingsUuidParticipantsPostCitizen() throws ApiException {
-        var createMeeting = randomCreateMeeting();
+        var createMeeting = randomFutureCreateMeeting();
         var participants = createCitizenParticipants();
 
         var createdMeeting = videoMeetingsV2Api.v2MeetingsPost(createMeeting);
