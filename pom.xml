@@ -19,7 +19,7 @@
 		<spring-request-id-logger-version>3.0.0</spring-request-id-logger-version>
 		<jacoco-version>0.8.15</jacoco-version>
 		<shed-lock-version>7.9.0</shed-lock-version>
-		<okhttp-version>5.5.0</okhttp-version>
+		<okhttp-version>5.5.1</okhttp-version>
 	</properties>
 
 	<dependencyManagement>
